@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --time=##HOURS##:0:00
+#SBATCH --tasks=##CORESTOT##
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=##MEMORY##
+#SBATCH --account=rrg-patey-ad
+#SBATCH --job-name=##JOBNAME##
+#SBATCH --error=##JOBNAME##.stde
+#SBATCH --export=ALL
+
+# Check on some basics:
+cd ##CDIR##
+echo "Running on host: " `hostname`
+echo "Current working directory is now: " `pwd`
+
+# Load modules
+module --force purge
+module load StdEnv/2020  intel/2020.1.217  openmpi/4.0.3
+module load cp2k/7.1
+module load matlab/2021a.1
+
+# Run job
+matlab -r '##JOBNAME##' > ##JOBNAME##.optlog
+
+echo "Job completed at `date`"
+exit 0

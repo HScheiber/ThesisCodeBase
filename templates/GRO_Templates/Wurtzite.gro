@@ -1,0 +1,7 @@
+##MET####HAL## Wurtzite Unit Cell
+    4
+    0        ##MET##    1   ##MX1##   ##MY1##   ##MZ1##
+    0        ##MET##    2   ##MX2##   ##MY2##   ##MZ2##
+    0        ##HAL##    3   ##HX1##   ##HY1##   ##HZ1##
+    0        ##HAL##    4   ##HX2##   ##HY2##   ##HZ2##
+  ##V1X##  ##V2Y##  ##V3Z##  ##V1Y##  ##V1Z##  ##V2X##  ##V2Z##  ##V3X##  ##V3Y##

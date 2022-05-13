@@ -1,0 +1,30 @@
+; ##MET####HAL## mdp file
+coulombtype              = ##COULOMB##; Define how the coulombic interaction is calculated
+vdwtype                  = ##VDWTYPE##; Define the type of van der waals potential used
+vdw-modifier             = ##VDWMOD##; Define the behaviour of the vdw potential at the cutoff
+nsteps                   = ##NSTEPS##; How many minimization steps are performed
+integrator               = ##INTEGR##; What type of calculation is run
+dt                       = ##TIMEST##; Time step (ps)
+ewald-rtol-lj            = ##LJTOL##; Used to control the relative strength of the dispersion potential at rvdw
+lj-pme-comb-rule         = ##LJCOMB##; Combination rule for the lennard jones PME
+nstcalcenergy            = 0                 ; Number of steps that elapse between calculating the energies, 0 is never
+nstenergy                = 0                 ; Number of steps that elapse between writing energies to energy file, the last energies are always written, should be a multiple of nstcalcenergy.
+nstxout                  = 0
+nstvout                  = 0
+nstlog                   = 0
+nstxout-compressed       = 0
+energygrps               = ##MET## ##HAL##
+energygrp-table          = ##MET## ##MET## ##HAL## ##HAL##
+cutoff-scheme            = ##CUTOFF##; One of Group or Verlet
+verlet-buffer-tolerance  = ##VerletBT##; Sets the maximum allowed error for pair interactions per particle caused by the Verlet buffer
+ns-type                  = grid              ; Method to determine neighbor list (simple, grid)
+rlist                    = ##RLIST##; Sets the search radius for neighbour list generation
+rcoulomb                 = ##RCOULOMB##; Real space coulomb cutoff radius
+rvdw                     = ##RVDW##; Van der Waals cutoff radius
+pbc                      = xyz               ; Periodic Boundary Conditions (yes/no)
+constraints              = none              ; Bonding constraints
+nstlist                  = 1                 ; Frequency to update the neighbor list and long range forces
+fourierspacing           = ##FOURIER##; Grid dimensions in PME are controlled with fourierspacing
+pme-order                = ##PMEORDER##; Interpolation order for PME. 4 equals cubic interpolation.
+ewald-rtol               = ##EWALDTOL##; The relative strength of the Ewald-shifted direct potential at rcoulomb.
+continuation             = yes               ; Yes = do not apply constraints to the start configuration and do not reset shells, useful for exact coninuation and reruns

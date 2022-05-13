@@ -1,0 +1,83 @@
+\providecommand{\latin}[1]{#1}
+\makeatletter
+\providecommand{\doi}
+  {\begingroup\let\do\@makeother\dospecials
+  \catcode`\{=1 \catcode`\}=2 \doi@aux}
+\providecommand{\doi@aux}[1]{\endgroup\texttt{#1}}
+\makeatother
+\providecommand*\mcitethebibliography{\thebibliography}
+\csname @ifundefined\endcsname{endmcitethebibliography}
+  {\let\endmcitethebibliography\endthebibliography}{}
+\begin{mcitethebibliography}{6}
+\providecommand*\natexlab[1]{#1}
+\providecommand*\mciteSetBstSublistMode[1]{}
+\providecommand*\mciteSetBstMaxWidthForm[2]{}
+\providecommand*\mciteBstWouldAddEndPuncttrue
+  {\def\EndOfBibitem{\unskip.}}
+\providecommand*\mciteBstWouldAddEndPunctfalse
+  {\let\EndOfBibitem\relax}
+\providecommand*\mciteSetBstMidEndSepPunct[3]{}
+\providecommand*\mciteSetBstSublistLabelBeginEnd[3]{}
+\providecommand*\EndOfBibitem{}
+\mciteSetBstSublistMode{f}
+\mciteSetBstMaxWidthForm{subitem}{(\alph{mcitesubitemcount})}
+\mciteSetBstSublistLabelBeginEnd
+  {\mcitemaxwidthsubitemform\space}
+  {\relax}
+  {\relax}
+
+\bibitem[Scheiber and Patey(2021)Scheiber, and Patey]{scheiber2021analysis}
+Scheiber,~H.; Patey,~G. Analysis of the relative stability of lithium halide
+  crystal structures: Density functional theory and classical models. \emph{The
+  Journal of Chemical Physics} \textbf{2021}, \emph{154}, 184507\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[{\v{C}}an{\v{c}}arevi{\'{c}}
+  \latin{et~al.}(2005){\v{C}}an{\v{c}}arevi{\'{c}}, Sch{\"{o}}n, Fischer, and
+  Jansen]{vcanvcarevic2005theoretical}
+{\v{C}}an{\v{c}}arevi{\'{c}},~{\v{Z}}.; Sch{\"{o}}n,~J.; Fischer,~D.;
+  Jansen,~M. Theoretical and Experimental Exploration of the Energy Landscape
+  of LiI. Current Research in Advanced Materials and Processes. 2005; pp
+  61--66\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Tao and Mo(2016)Tao, and Mo]{tao2016accurate}
+Tao,~J.; Mo,~Y. Accurate semilocal density functional for condensed-matter
+  physics and quantum chemistry. \emph{Phys. Rev. Lett.} \textbf{2016},
+  \emph{117}, 073001\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Patra \latin{et~al.}(2019)Patra, Jana, and
+  Samal]{patra2019performance}
+Patra,~A.; Jana,~S.; Samal,~P. Performance of Tao--Mo Semilocal Functional with
+  rVV10 Dispersion-Correction: Influence of Different Correlation. \emph{J.
+  Phys. Chem. A} \textbf{2019}, \emph{123}, 10582--10593\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Steinhardt \latin{et~al.}(1983)Steinhardt, Nelson, and
+  Ronchetti]{steinhardt1983bond}
+Steinhardt,~P.~J.; Nelson,~D.~R.; Ronchetti,~M. Bond-orientational order in
+  liquids and glasses. \emph{Physical Review B} \textbf{1983}, \emph{28},
+  784\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Liebold-Ribeiro \latin{et~al.}(2008)Liebold-Ribeiro, Fischer, and
+  Jansen]{liebold2008experimental}
+Liebold-Ribeiro,~Y.; Fischer,~D.; Jansen,~M. Experimental substantiation of the
+  “energy landscape concept” for solids: synthesis of a new modification of
+  LiBr. \emph{Angew. Chem. Int.} \textbf{2008}, \emph{47}, 4428--4431\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\end{mcitethebibliography}

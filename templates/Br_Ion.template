@@ -1,0 +1,13 @@
+%mem=##MEMORY##
+%NProcShared=##CORES##
+
+#p ##THER##/##BASS## SP SCF=(NoVarAcc,tight,NoIncFock,Conver=##CONV##)
+int(grid=ultrafine) ##DISP####IOPS####GUESS##
+
+Single Br(-1) ion ##THERT## Energy with ##BASST## basis ##DISPT##
+
+ -1   1
+ Br
+ 
+##GENBAS##
+##GENECP##

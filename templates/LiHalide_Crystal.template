@@ -1,0 +1,14 @@
+%mem=##MEMORY##
+%NProcShared=##CORES##
+##LINDA##
+
+#p ##THER##/##BASS## SP SCF=(NoVarAcc,tight,NoIncFock,Conver=##CONV##)
+int(grid=ultrafine) PBC=(##KPOINT##,##CELLR##) pop=Regular ##DISP####IOPS##
+
+##CTYPE## ##CRYS## Crystal ##THERT## Energy (a = ##APART## Angstroms) with ##BASST## basis ##DISPT##
+
+ 0   1
+##APAR##
+
+##GENBAS##
+##GENECP##

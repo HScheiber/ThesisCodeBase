@@ -1,0 +1,32 @@
+#!/bin/bash
+#SBATCH --time=##HOURS##:0:00
+#SBATCH --nodes=##NODES##
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=##CPUS##
+#SBATCH --mem-per-cpu=##MEMORY##
+#SBATCH --account=##ACCOUNT##
+#SBATCH --job-name=##MODEL_NAME##
+#SBATCH --error=##MODEL_NAME##.stde
+#SBATCH --output=##MODEL_NAME##.stdo
+#SBATCH --export=ALL
+
+# Check on some basics:
+echo "Running on host: " `hostname`
+cd $SLURM_SUBMIT_DIR
+echo "Current working directory is now: " `pwd`
+
+# Load modules
+module load nixpkgs/16.09  gcc/7.3.0  openmpi/3.1.4
+module load matlab/2020a
+module load gromacs/2019.6
+
+mkdir $SLURM_TMPDIR/.matlab
+export MATLAB_PREFDIR=$SLURM_TMPDIR/.matlab
+
+# Run Job
+matlab -nodisplay -r "Bayesian_Optimize_LiX_Parameters('##MODEL_NAME##.inp')" >> ##MODEL_NAME##.log
+
+echo "Job completed at `date`"
+matlab -r "cleanup_BO_log('##MODEL_NAME##.log')"
+
+exit 0

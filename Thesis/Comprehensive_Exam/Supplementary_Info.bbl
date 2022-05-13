@@ -1,0 +1,318 @@
+\providecommand{\latin}[1]{#1}
+\makeatletter
+\providecommand{\doi}
+  {\begingroup\let\do\@makeother\dospecials
+  \catcode`\{=1 \catcode`\}=2 \doi@aux}
+\providecommand{\doi@aux}[1]{\endgroup\texttt{#1}}
+\makeatother
+\providecommand*\mcitethebibliography{\thebibliography}
+\csname @ifundefined\endcsname{endmcitethebibliography}
+  {\let\endmcitethebibliography\endthebibliography}{}
+\begin{mcitethebibliography}{34}
+\providecommand*\natexlab[1]{#1}
+\providecommand*\mciteSetBstSublistMode[1]{}
+\providecommand*\mciteSetBstMaxWidthForm[2]{}
+\providecommand*\mciteBstWouldAddEndPuncttrue
+  {\def\EndOfBibitem{\unskip.}}
+\providecommand*\mciteBstWouldAddEndPunctfalse
+  {\let\EndOfBibitem\relax}
+\providecommand*\mciteSetBstMidEndSepPunct[3]{}
+\providecommand*\mciteSetBstSublistLabelBeginEnd[3]{}
+\providecommand*\EndOfBibitem{}
+\mciteSetBstSublistMode{f}
+\mciteSetBstMaxWidthForm{subitem}{(\alph{mcitesubitemcount})}
+\mciteSetBstSublistLabelBeginEnd
+  {\mcitemaxwidthsubitemform\space}
+  {\relax}
+  {\relax}
+
+\bibitem[Born and Land{\'e}(1918)Born, and Land{\'e}]{born1918absolute}
+Born,~M.; Land{\'e},~A. The absolute calculation of crystal properties with the
+  aid of the Bohr atomic model. \emph{Sitzb. kg. preuss. Akad} \textbf{1918},
+  \emph{45}, 1048\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Born and Mayer(1932)Born, and Mayer]{Born1932}
+Born,~M.; Mayer,~J.~E. Zur Gittertheorie der Ionenkristalle. \emph{Zeitschrift
+  f{\"u}r Physik} \textbf{1932}, \emph{75}, 1--18\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Huggins(1937)]{Huggins1937}
+Huggins,~M.~L. {Lattice Energies, Equilibrium Distances, Compressibilities and
+  Characteristic Frequencies of Alkali Halide Crystals}. \emph{The Journal of
+  Chemical Physics} \textbf{1937}, \emph{5}, 143--148\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Huggins(1947)]{Huggins1947}
+Huggins,~M.~L. {Errata: Lattice Energies, Equilibrium Distances,
+  Compressibilities, and Characteristic Frequencies of Alkali Halide Crystals}.
+  \emph{Interatomic Distances in Crystals of the Alkali Halides The Journal of
+  Chemical Physics} \textbf{1947}, \emph{15}, 643\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Slater(1928)]{Slater1928}
+Slater,~J.~C. {The Normal State of Helium}. \emph{Physical Review}
+  \textbf{1928}, \emph{32}, 349--360\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Buckingham and Lennard-Jones(1938)Buckingham, and
+  Lennard-Jones]{Buckingham1938}
+Buckingham,~R.~A.; Lennard-Jones,~J.~E. The classical equation of state of
+  gaseous helium, neon and argon. \emph{Proceedings of the Royal Society of
+  London. Series A. Mathematical and Physical Sciences} \textbf{1938},
+  \emph{168}, 264--283\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Rumble(2019)]{book:CRC}
+Rumble,~J. \emph{CRC handbook of chemistry and physics, 99th Edition}; CRC
+  press, 2019\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Ladd and Lee(1959)Ladd, and Lee]{Ladd1959}
+Ladd,~M.; Lee,~W. {The calculation of lattice energies}. \emph{Journal of
+  Inorganic and Nuclear Chemistry} \textbf{1959}, \emph{11}, 264--271\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Jenkins(2005)]{Jenkins2005}
+Jenkins,~H. D.~B. Thermodynamics of the Relationship between Lattice Energy and
+  Lattice Enthalpy. \emph{Journal of Chemical Education} \textbf{2005},
+  \emph{82}, 950\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Froyen and Cohen(1984)Froyen, and Cohen]{froyen1984}
+Froyen,~S.; Cohen,~M.~L. Structural properties of NaCl. \emph{Physical Review
+  B} \textbf{1984}, \emph{29}, 3770\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Chase~Jr(1998)]{chase1998nist}
+Chase~Jr,~M. NIST-JANAF thermochemical tables fourth edition. \emph{J. Phys.
+  Chem. Ref. Data, Monograph} \textbf{1998}, \emph{9}\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Cox \latin{et~al.}(1984)Cox, Wagman, and Medvedev]{cox1984codata}
+Cox,~J.; Wagman,~D.; Medvedev,~V. CODATA Key Values for Thermodynamics, 1 New
+  York. 1984\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Peintinger \latin{et~al.}(2013)Peintinger, Oliveira, and
+  Bredow]{Peintinger2013}
+Peintinger,~M.~F.; Oliveira,~D.~V.; Bredow,~T. {Consistent Gaussian basis sets
+  of triple-zeta valence with polarization quality for solid-state
+  calculations}. \emph{Journal of Computational Chemistry} \textbf{2013},
+  \emph{34}, 451--459\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Laun \latin{et~al.}(2018)Laun, {Vilela Oliveira}, and
+  Bredow]{Laun2018}
+Laun,~J.; {Vilela Oliveira},~D.; Bredow,~T. {Consistent gaussian basis sets of
+  double- and triple-zeta valence with polarization quality of the fifth period
+  for solid-state calculations}. \emph{Journal of Computational Chemistry}
+  \textbf{2018}, \emph{39}, 1285--1290\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Bredow and Gerson(2000)Bredow, and Gerson]{PW1PW}
+Bredow,~T.; Gerson,~A.~R. {Effect of exchange and correlation on bulk
+  properties of MgO, NiO, and CoO}. \emph{Phys. Rev. B} \textbf{2000},
+  \emph{61}, 5194--5201\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Rappoport and Furche(2010)Rappoport, and Furche]{Rappoport2010}
+Rappoport,~D.; Furche,~F. Property-optimized Gaussian basis sets for molecular
+  response calculations. \emph{The Journal of Chemical Physics} \textbf{2010},
+  \emph{133}, 134105\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Ojam{\"a}e \latin{et~al.}(1994)Ojam{\"a}e, Hermansson, Pisani,
+  Caus{\`a}, and Roetti]{ojamae1994structural}
+Ojam{\"a}e,~L.; Hermansson,~K.; Pisani,~C.; Caus{\`a},~M.; Roetti,~C.
+  Structural, vibrational and electronic properties of a crystalline hydrate
+  from ab initio periodic Hartree--Fock calculations. \emph{Acta
+  Crystallographica Section B: Structural Science} \textbf{1994}, \emph{50},
+  268--279\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Nada \latin{et~al.}(1993)Nada, Catlow, Pisani, and
+  Orlando]{nada1993ab}
+Nada,~R.; Catlow,~C.; Pisani,~C.; Orlando,~R. An ab-initio Hartree-Fock
+  perturbed-cluster study of neutral defects in LiF. \emph{Modelling and
+  Simulation in Materials Science and Engineering} \textbf{1993}, \emph{1},
+  165\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Apra \latin{et~al.}(1993)Apra, Causa, Prencipe, Dovesi, and
+  Saunders]{apra1993structural}
+Apra,~E.; Causa,~M.; Prencipe,~M.; Dovesi,~R.; Saunders,~V. On the structural
+  properties of NaCl: an ab initio study of the B1-B2 phase transition.
+  \emph{Journal of Physics: Condensed Matter} \textbf{1993}, \emph{5},
+  2969\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Doll and Stoll(1998)Doll, and Stoll]{doll1998ground}
+Doll,~K.; Stoll,~H. Ground-state properties of heavy alkali halides.
+  \emph{Physical Review B} \textbf{1998}, \emph{57}, 4327\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Hehre \latin{et~al.}(1969)Hehre, Lathan, Ditchfield, and
+  Newton]{hehre1969program}
+Hehre,~W.; Lathan,~W.; Ditchfield,~R.; Newton,~M. Program No. 236, Quantum
+  Chemistry Program Exchange, Indiana University, Bloomington, Indiana;(b) WJ
+  Hehre, RF Stewart, and JA Pople. \emph{J. Chem. Phys} \textbf{1969},
+  \emph{2}, 2657\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Hehre(1970)]{hehre1970r}
+Hehre,~W. R. Ditchfield, RF Stewart, and JA Pople. \emph{J. Chem. Phys}
+  \textbf{1970}, \emph{52}, 2769\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Pietro \latin{et~al.}(1980)Pietro, Levi, Hehre, and
+  Stewart]{pietro1980molecular}
+Pietro,~W.~J.; Levi,~B.~A.; Hehre,~W.~J.; Stewart,~R.~F. Molecular orbital
+  theory of the properties of inorganic and organometallic compounds. 1. STO-NG
+  basis sets for third-row main-group elements. \emph{Inorganic Chemistry}
+  \textbf{1980}, \emph{19}, 2225--2229\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Pietro \latin{et~al.}(1981)Pietro, Blurock, Hout~Jr, Hehre, DeFrees,
+  and Stewart]{pietro1981molecular}
+Pietro,~W.~J.; Blurock,~E.~S.; Hout~Jr,~R.~F.; Hehre,~W.~J.; DeFrees,~D.~J.;
+  Stewart,~R.~F. Molecular orbital theory of the properties of inorganic and
+  organometallic compounds. 2. STO-NG basis sets for fourth-row main-group
+  elements. \emph{Inorganic Chemistry} \textbf{1981}, \emph{20},
+  3650--3654\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Perdew \latin{et~al.}(1996)Perdew, Burke, and Ernzerhof]{Perdew1996}
+Perdew,~J.~P.; Burke,~K.; Ernzerhof,~M. {Generalized Gradient Approximation
+  Made Simple}. \emph{Phys. Rev. Lett.} \textbf{1996}, \emph{77},
+  3865--3868\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Dovesi \latin{et~al.}(2017)Dovesi, Saunders, Roetti, Orlando,
+  Zicovich-Wilson, Pascale, Civalleri, Doll, Harrison, Bush, D'Arco, Llunell,
+  Caus\`{a}, No\:{e}l, Maschio, Erba, Rerat, and Casassa]{Crystal17Manual}
+Dovesi,~R. \latin{et~al.}  CRYSTAL17 User's Manual. \emph{University of Torino}
+  \textbf{2017}, \relax
+\mciteBstWouldAddEndPunctfalse
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Pulay(1980)]{pulay1980convergence}
+Pulay,~P. Convergence acceleration of iterative sequences. The case of SCF
+  iteration. \emph{Chemical Physics Letters} \textbf{1980}, \emph{73},
+  393--398\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Pulay(1982)]{pulay1982improved}
+Pulay,~P. Improved SCF convergence acceleration. \emph{Journal of Computational
+  Chemistry} \textbf{1982}, \emph{3}, 556--560\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Szabo and Ostlund(2012)Szabo, and Ostlund]{szabo2012modern}
+Szabo,~A.; Ostlund,~N.~S. \emph{Modern quantum chemistry: introduction to
+  advanced electronic structure theory}; Courier Corporation, 2012\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Grimme \latin{et~al.}(2016)Grimme, Hansen, Brandenburg, and
+  Bannwarth]{grimme2016dispersion}
+Grimme,~S.; Hansen,~A.; Brandenburg,~J.~G.; Bannwarth,~C. Dispersion-corrected
+  mean-field electronic structure methods. \emph{Chemical reviews}
+  \textbf{2016}, \emph{116}, 5105--5154\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Grimme \latin{et~al.}(2010)Grimme, Antony, Ehrlich, and
+  Krieg]{Grimme2010}
+Grimme,~S.; Antony,~J.; Ehrlich,~S.; Krieg,~H. {A consistent and accurate ab
+  initio parametrization of density functional dispersion correction (DFT-D)
+  for the 94 elements H-Pu}. \emph{The Journal of Chemical Physics}
+  \textbf{2010}, \emph{132}, 154104\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Becke and Johnson(2007)Becke, and Johnson]{Becke2007}
+Becke,~A.~D.; Johnson,~E.~R. A unified density-functional treatment of
+  dynamical, nondynamical, and dispersion correlations. \emph{The Journal of
+  Chemical Physics} \textbf{2007}, \emph{127}, 124108\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Grimme \latin{et~al.}(2011)Grimme, Ehrlich, and Goerigk]{Grimme2011}
+Grimme,~S.; Ehrlich,~S.; Goerigk,~L. Effect of the damping function in
+  dispersion corrected density functional theory. \emph{Journal of
+  Computational Chemistry} \textbf{2011}, \emph{32}, 1456--1465\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Dovesi \latin{et~al.}(2018)Dovesi, Erba, Orlando, Zicovich-Wilson,
+  Civalleri, Maschio, Rérat, Casassa, Baima, Salustro, and Kirtman]{Crystal17}
+Dovesi,~R.; Erba,~A.; Orlando,~R.; Zicovich-Wilson,~C.~M.; Civalleri,~B.;
+  Maschio,~L.; Rérat,~M.; Casassa,~S.; Baima,~J.; Salustro,~S.; Kirtman,~B.
+  Quantum-mechanical condensed matter simulations with CRYSTAL. \emph{Wiley
+  Interdisciplinary Reviews: Computational Molecular Science} \textbf{2018},
+  \emph{8}, e1360\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\end{mcitethebibliography}

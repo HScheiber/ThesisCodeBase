@@ -1,0 +1,29 @@
+%Chk=##JOBNAME##.chk
+%mem=##MEMORY##
+%NProcShared=##CPUS##
+#N PBEPBE/##BASIS_ROUTE_ROUGH##/##AUXBASIS## OPT=(Loose) SCRF=(PCM,Solvent=Water) EmpiricalDispersion=GD3BJ SCF=XQC
+
+##JOBNAME##
+
+##CHARGE## ##MULTIPLICITY##
+##GEOMETRY##
+
+##BASIS_SET_ROUGH##
+
+--Link1--
+%Chk=##JOBNAME##.chk
+%RWF=##JOBNAME##.rwf
+%mem=##MEMORY##
+%NProcShared=##CPUS##
+#N PBE1PBE/##BASIS_ROUTE_TIGHT## geom=AllCheckpoint Guess=Read OPT FREQ SCRF=(PCM,Solvent=Water) EmpiricalDispersion=GD3BJ SCF=XQC
+
+##BASIS_SET_TIGHT##
+
+--Link1--
+%Chk=##JOBNAME##.chk
+%mem=##MEMORY##
+%NProcShared=##CPUS##
+#N PBE1PBE/##BASIS_ROUTE_TD## TD=(##FULL##NStates=##STATES##) Geom=AllCheckpoint Guess=Read SCRF=(PCM,Solvent=Water) SCF=XQC
+
+##BASIS_SET_TD##
+

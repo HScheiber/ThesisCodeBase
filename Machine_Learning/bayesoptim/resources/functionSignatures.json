@@ -1,0 +1,124 @@
+{
+"bayesopt":
+{
+	"inputs":
+	[
+		{"name":"fun", "kind":"required", "type":"function_handle"},
+		{"name":"vars", "kind":"required", "type":"optimizableVariable"},
+        
+        {"name":"AcquisitionFunctionName", "kind":"namevalue", "type":[["choices={'expected-improvement', 'expected-improvement-plus', 'expected-improvement-per-second', 'expected-improvement-per-second-plus', 'lower-confidence-bound', 'probability-of-improvement'}"], ["char"]]},
+        {"name":"IsObjectiveDeterministic", "kind":"namevalue", "type":["logical", "scalar"]},
+        {"name":"ExplorationRatio", "kind":"namevalue", "type":["numeric", ">0"]},
+        {"name":"GPActiveSetSize", "kind":"namevalue", "type":["numeric", "integer", ">0"]},
+        {"name":"UseParallel", "kind":"namevalue", "type":["logical", "scalar"]},
+        {"name":"ParallelMethod", "kind":"namevalue", "type":[["choices={'clipped-model-prediction', 'model-prediction', 'max-observed', 'min-observed'}"], ["char"]]},
+        {"name":"MinWorkerUtilization", "kind":"namevalue", "type":["numeric", "integer", ">0"]},
+        {"name":"MaxObjectiveEvaluations", "kind":"namevalue", "type":["numeric", "integer", ">0"]},
+        {"name":"MaxTime", "kind":"namevalue", "type":["numeric", ">0"]},
+        {"name":"NumSeedPoints", "kind":"namevalue", "type":["numeric", "integer", ">0"]},
+        {"name":"XConstraintFcn", "kind":"namevalue", "type":"function_handle"},
+        {"name":"ConditionalVariableFcn", "kind":"namevalue", "type":"function_handle"},
+        {"name":"NumCoupledConstraints", "kind":"namevalue", "type":["numeric", "integer", ">0"]},
+        {"name":"AreCoupledConstraintsDeterministic", "kind":"namevalue", "type":"logical"},
+        {"name":"Verbose", "kind":"namevalue", "type":"choices={0, 1, 2}"},
+        {"name":"OutputFcn", "kind":"namevalue", "type":[["function_handle"], ["cell"]]},
+        {"name":"SaveFileName", "kind":"namevalue", "type":[["choices={'BayesoptResults.mat'}"], ["char"]]},
+        {"name":"SaveVariableName", "kind":"namevalue", "type":[["choices={'BayesoptResults'}"], ["char"]]},
+        {"name":"PlotFcn", "kind":"namevalue", "type":[["choices={'all'}"], ["function_handle"], ["cell"]]},
+        {"name":"InitialX", "kind":"namevalue", "type":"table"},
+        {"name":"InitialObjective", "kind":"namevalue", "type":["numeric", "vector"]},
+        {"name":"InitialConstraintViolations", "kind":"namevalue", "type":"numeric"},
+        {"name":"InitialErrorValues", "kind":"namevalue", "type":["numeric", "vector"]},
+        {"name":"InitialUserData", "kind":"namevalue", "type":[["numeric"], ["cell"]]},
+        {"name":"InitialObjectiveEvaluationTimes", "kind":"namevalue", "type":["numeric", "vector"]},
+        {"name":"InitialIterationTimes", "kind":"namevalue", "type":["numeric", "vector"]}
+	]
+},
+
+"optimizableVariable":
+{
+	"inputs":
+	[
+		{"name":"Name", "kind":"required", "type":"char"},
+		{"name":"Range", "kind":"required", "type":[["numeric", "vector"], ["cell"], ["cellstr"]]},
+
+        {"name":"Type", "kind":"namevalue", "type":"choices={'real', 'integer', 'categorical'}"},
+        {"name":"Transform", "kind":"namevalue", "type":"choices={'none', 'log'}"}, 
+        {"name":"Optimize", "kind":"namevalue", "type":["logical", "scalar"]}
+	]
+},
+
+"fitcauto":
+{
+    "inputs":
+    [
+        {
+            "mutuallyExclusiveGroup":
+            [
+                [
+                    {"name":"Tbl", "kind":"required", "type":"table"},
+                    {"name":"ResponseVarName", "kind":"required", "type":[["choices=Tbl.Properties.VariableNames"], ["char"]]}
+                ],
+                [
+                    {"name":"Tbl", "kind":"required", "type":"table"},
+                    {"name":"formula", "kind":"required", "type":["char", "vector"]}
+                ],
+                [
+                    {"name":"Tbl", "kind":"required", "type":"table"},
+                    {"name":"Y", "kind":"required", "type":[["single", "vector"], ["double", "vector"], ["logical", "vector"], ["char"], ["cellstr"], ["categorical"]]}
+                ],
+                [
+                   {"name":"X", "kind":"required", "type":[["double"], ["single"]]},
+                   {"name":"Y", "kind":"required", "type":[["single", "vector"], ["double", "vector"], ["logical", "vector"], ["char"], ["cellstr"], ["categorical"]]}
+                ]
+            ]
+        },
+        {"name":"CategoricalPredictors", "kind":"namevalue", "type":[["choices=Tbl.Properties.VariableNames"], ["choices={'all'}"], ["logical", "vector"], ["single", "vector"], ["double", "vector"], ["cellstr"]]},
+        {"name":"ClassNames", "kind":"namevalue", "type":[["categorical"], ["char"], ["cellstr"], ["logical", "vector"], ["double", "vector"], ["single", "vector"]]},
+        {"name":"Cost", "kind":"namevalue", "type":[["double"], ["single"], ["struct"]]},
+        {"name":"PredictorNames", "kind":"namevalue", "type":[["choices=Tbl.Properties.VariableNames"],["cellstr"]]},
+        {"name":"Prior", "kind":"namevalue", "type":[["choices={'empirical', 'uniform'}"], ["single", "vector"], ["double", "vector"], ["struct"]]},
+        {"name":"ScoreTransform", "kind":"namevalue", "type":[["choices={'none', 'uniform', 'doublelogit', 'invlogit', 'ismax', 'logit', 'identity', 'sign', 'symmetric', 'symmetriclogit', 'symmetricismax' }"], ["function_handle"], ["char"]]},
+        {"name":"ResponseName", "kind":"namevalue", "type":[["choices=Tbl.Properties.VariableNames"], ["choices={'Y'}"], ["char"]]},
+        {"name":"Weights", "kind":"namevalue", "type":[["double", "vector"], ["single", "vector"], ["char"]]},
+        {"name":"OptimizeHyperparameters", "kind":"namevalue", "type":[["cellstr"], ["choices={'auto', 'all'}"], ["optimizableVariable", "vector"]]}, 
+        {"name":"HyperparameterOptimizationOptions", "kind":"namevalue", "type":"struct"},
+        {"name":"Learners", "kind":"namevalue", "type":[["cellstr"], ["choices={'auto', 'all','all-linear','all-nonlinear','svm','knn','nb','tree','discr','linear','ensemble','kernel'}"]]}
+    ]
+},
+
+"fitrauto":
+{
+    "inputs":
+    [
+        {
+            "mutuallyExclusiveGroup":
+            [
+                [
+                    {"name":"Tbl", "kind":"required", "type":"table"},
+                    {"name":"ResponseVarName", "kind":"required", "type":[["choices=Tbl.Properties.VariableNames"], ["char"]]}
+                ],
+                [
+                    {"name":"Tbl", "kind":"required", "type":"table"},
+                    {"name":"formula", "kind":"required", "type":["char", "vector"]}
+                ],
+                [
+                    {"name":"Tbl", "kind":"required", "type":"table"},
+                    {"name":"Y", "kind":"required", "type":[["single", "vector"], ["double", "vector"]]}
+                ],
+                [
+                   {"name":"X", "kind":"required", "type":[["double"], ["single"]]},
+                   {"name":"Y", "kind":"required", "type":[["single", "vector"], ["double", "vector"]]}
+                ]
+            ]
+        },
+        {"name":"CategoricalPredictors", "kind":"namevalue", "type":[["choices=Tbl.Properties.VariableNames"], ["choices={'all'}"], ["logical", "vector"], ["single", "vector"], ["double", "vector"], ["cellstr"]]},
+        {"name":"PredictorNames", "kind":"namevalue", "type":[["choices=Tbl.Properties.VariableNames"],["cellstr"]]},
+        {"name":"ResponseName", "kind":"namevalue", "type":[["choices=Tbl.Properties.VariableNames"], ["choices={'Y'}"], ["char"]]},
+        {"name":"Weights", "kind":"namevalue", "type":[["double", "vector"], ["single", "vector"], ["char"]]},
+        {"name":"OptimizeHyperparameters", "kind":"namevalue", "type":[["cellstr"], ["choices={'auto', 'all'}"], ["optimizableVariable", "vector"]]}, 
+        {"name":"HyperparameterOptimizationOptions", "kind":"namevalue", "type":"struct"},
+        {"name":"Learners", "kind":"namevalue", "type":[["cellstr"], ["choices={'auto', 'all','all-linear','all-nonlinear','svm','tree','linear','ensemble','kernel','gp'}"]]}
+    ]
+}
+}

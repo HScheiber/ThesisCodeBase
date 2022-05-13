@@ -1,0 +1,175 @@
+Need gfortran version 8.2.1 or newer:
+sudo apt-get install -y gfortran-8
+
+Make sure you have python 3.5 or later. If not, install it.
+python3 --version
+
+Need pip3 to install meson:
+sudo apt-get install python3-pip
+
+Install meson:
+sudo -H pip3 install meson
+
+Ensure that meson is version 0.49.0 or later:
+meson --version
+
+Install Ninja:
+sudo apt install ninja-build
+
+Ensure Ninja is 1.8.2 or later:
+ninja --version
+
+Installed ase (not sure if needed)
+pip3 install --upgrade --user ase
+
+install ifort with MKL backend
+https://software.intel.com/en-us/parallel-studio-xe/choose-download/student-linux-fortran
+download custom installer
+cp /mnt/c/Users/Hayden/Downloads/parallel_studio_xe_2020_cluster_edition_online.tgz ~
+cd ~
+tar xfz parallel_studio_xe_2020_cluster_edition_online.tgz
+rm parallel_studio_xe_2020_cluster_edition_online.tgz
+cd parallel_studio_xe_2020_cluster_edition_online/
+sudo ./install.sh       Only add required parts
+cd .. (after fully installed)
+rm -rf parallel_studio_xe_2020_cluster_edition_online/
+nano .bashrc #add the following
+source /opt/intel/bin/compilervars.sh intel64
+source /opt/intel/mkl/bin/mklvars.sh intel64
+
+Optional: Install asciidoc
+sudo apt-get install -y asciidoc
+
+Finally... Download dftd4
+Download https://github.com/dftd4/dftd4 as zip
+cp /mnt/c/Users/Hayden/Downloads/dftd4-master.zip ~ 
+unzip dftd4-master.zip 
+cd ~/dftd4-master
+FC=gfortran meson setup build
+ninja -C build
+
+Make link to dftd4 in /usr/local/DFTD4 for ease of use:
+mkdir /usr/local/DFTD4/
+sudo ln -s ~/dftd4-master/build/dftd4 /usr/local/DFTD4/dftd4
+add to .bashrc:
+export PATH=/usr/local/DFTD4:$PATH
+
+
+
+
+
+
+ON CEDAR:
+
+download dftd4-master from https://github.com/dftd4/dftd4 and unzip into ~/dftd4-master
+
+Load required modules:
+	module load nixpkgs/16.09  intel/2019.3
+	module load openblas/0.3.6
+	module load python/3.8.0
+	module load ninja
+	ninja --version
+	1.9.0
+	gfortran --version
+	GNU Fortran (20190410 gcc-8-branch revision 270244) 8.3.0
+	Copyright (C) 2018 Free Software Foundation, Inc.
+	This is free software; see the source for copying conditions.  There is NO
+	warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+	
+Download meson from source and unzip into home
+	git clone https://github.com/mesonbuild/meson/releases/download/0.53.1/meson-0.53.1.tar.gz
+Make local meson link:
+	ln -s ~/meson-0.53.1/meson.py ~/.local/meson
+
+Modify meson options file for MKL:
+	cd ~/dftd4-master
+	meson_options.txt
+	option('la_backend', type: 'combo', value: 'mkl',
+		   choices: ['mkl', 'openblas', 'netlib', 'custom'],
+		   description : 'linear algebra backend')
+
+
+Get rid of the path to asciidoc unless it is version 8.6.10 or greater. Add ~/.local to path
+	asciidoc --version
+	asciidoc 8.6.9
+	asciiloc=$(which asciidoc | sed -e 's/\/asciidoc//')
+	OLDPATH=$PATH
+	export PATH=$(echo "$PATH" | sed "s/${asciiloc//\//\\/}//g"):$HOME/.local
+	
+asciidoc was in the same path as ninja for me, had to add symbolic link
+	NINPATH=`which ninja`
+	ln -s $NINPATH ~/.local/ninja
+
+Start build with meson
+	FC=gfortran meson setup build
+
+Restore path
+	export PATH=$OLDPATH
+
+Finish Build with ninja
+	ninja -C build
+
+Create link for dftd4 in ~/.local/
+	ln -s ~/dftd4-master/build/dftd4 ~/.local/dftd4
+	
+Added to .bash_profile:
+	module load netlib-lapack/3.8.0 # required for DFTD4
+	PATH=${PATH}:$HOME/.local
+	export PATH
+
+
+
+
+ON SOCKEYE:
+
+Load python module:
+	module load python/3.6.8
+	
+For Linear Algebra backend used:
+	module load netlib-lapack/3.8.0
+
+download meson from source and unzip into home
+	git clone https://github.com/mesonbuild/meson/releases/download/0.53.1/meson-0.53.1.tar.gz
+
+make link
+	ln -s ~/meson-0.53.1/meson.py meson
+
+download ninja-master from source and unzip into home, link
+	cd ninja-master
+	python3 ./configure.py --bootstrap
+	ln -s ~/ninja-master/ninja ninja
+
+ls -s /home/scheiber/gcc-8.3.0/bin/gcc gcc
+ls -s /home/scheiber/gcc-8.3.0/bin/g++ g++
+ls -s /home/scheiber/gcc-8.3.0/bin/cpp cpp
+ls -s /home/scheiber/gcc-8.3.0/bin/c++ c++
+ls -s /home/scheiber/gcc-8.3.0/bin/gfortran gfortran
+
+check ninja version
+	ninja --version
+	1.10.0.git
+
+Add home to path
+	PATH={$PATH}:~
+
+Download dftd4-master from https://github.com/dftd4/dftd4
+	git clone https://github.com/dftd4/dftd4.git ~/dftd4-master
+
+
+Modify meson options file:
+cd ~/dftd4-master
+meson_options.txt
+option('la_backend', type: 'combo', value: 'netlib',
+       choices: ['mkl', 'openblas', 'netlib', 'custom'],
+       description : 'linear algebra backend')
+
+FC=gfortran meson setup build
+ninja -C build
+
+Create link for dftd4 in ~/.local/
+	ln -s ~/dftd4-master/build/dftd4 ~/.local/dftd4
+	
+Added to .bash_profile:
+	module load netlib-lapack/3.8.0 # required for DFTD4
+	PATH=${PATH}:$HOME/.local
+	export PATH

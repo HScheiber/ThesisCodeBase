@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -l walltime=##HOURS##:0:00,select=1:ncpus=##CORESTOT##:mpiprocs=1:ompthreads=1:mem=186gb
+#PBS -A st-gpatey-1
+#PBS -N ##JOBNAME##
+#PBS -e ##JOBNAME##.stde
+#PBS -o ##JOBNAME##.stdo
+
+################################################################################
+cd ##CDIR##
+echo "Running on host: " `hostname`
+echo "Current working directory is: " `pwd`
+
+# Load modules
+module load gcc/5.4.0
+module load openmpi/3.1.4
+
+# Environment variables
+export OMP_NUM_THREADS=##OMPTHREADS##
+
+# Run Job
+cp2k.popt ##JOBNAME##.inp > ##JOBNAME##.out
+
+echo "Job completed at `date`"
+exit 0

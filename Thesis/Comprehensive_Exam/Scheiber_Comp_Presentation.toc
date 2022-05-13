@@ -1,0 +1,14 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\beamer@sectionintoc {1}{Introduction}{1}{0}{1}
+\beamer@subsectionintoc {1}{1}{Overview}{2}{0}{1}
+\beamer@subsectionintoc {1}{2}{What is Molecular Dynamics?}{3}{0}{1}
+\beamer@subsectionintoc {1}{3}{Classical Nucleation Theory}{8}{0}{1}
+\beamer@subsectionintoc {1}{4}{Our Goal and Questions}{10}{0}{1}
+\beamer@sectionintoc {2}{My Research}{18}{0}{2}
+\beamer@subsectionintoc {2}{1}{Solution: Improve the models!}{18}{0}{2}
+\beamer@subsectionintoc {2}{2}{Ab Initio Calculation Details}{21}{0}{2}
+\beamer@subsectionintoc {2}{3}{Comparison of Potentials}{27}{0}{2}
+\beamer@subsectionintoc {2}{4}{Importance of Dispersion}{28}{0}{2}
+\beamer@sectionintoc {3}{Future Work}{32}{0}{3}
+\beamer@subsectionintoc {3}{1}{Nucleation Mechanism of LiX Salts}{32}{0}{3}
+\beamer@subsectionintoc {3}{2}{Acknowledgments}{33}{0}{3}

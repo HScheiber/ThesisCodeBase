@@ -1,0 +1,28 @@
+#!/bin/bash
+#SBATCH --time=##HOURS##:0:00
+#SBATCH --tasks=##CORESTOT##
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=##MEMORY##
+#SBATCH --account=rrg-patey-ad
+#SBATCH --job-name=##JOBNAME##
+#SBATCH --error=##JOBNAME##.stde
+#SBATCH --export=ALL
+
+# Check on some basics:
+echo "Running on host: " `hostname`
+echo "Current working directory is now: " `pwd`
+
+# Load modules
+module --force purge
+module load StdEnv/2020  intel/2020.1.217  openmpi/4.0.3
+module load cp2k/7.1
+
+
+# Environment variables
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+# Run Job
+mpiexec -np ##CORES## cp2k.popt ##JOBNAME##.inp > ##JOBNAME##.out
+
+echo "Job completed at `date`"
+exit 0

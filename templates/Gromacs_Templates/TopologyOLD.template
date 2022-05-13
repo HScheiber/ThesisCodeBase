@@ -1,0 +1,37 @@
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+  ##NBFUNC##             ##COMBR##               ##GENPAIRS##              ##FUDGELJ##     ##FUDGEQQ##
+
+[ atomtypes ]
+; name  bond_type  atomic_nb  mass     charge  ptype  C          A
+  ##MET##    ##MET##         ##METZ##        ##METMASS##   1      A      ##METMETC## ##METMETA##
+  ##HAL##    ##HAL##         ##HALZ##        ##HALMASS##  -1      A      ##HALHALC## ##HALHALA##
+
+[ nonbond_params ]
+; i   j    func  C          A
+  ##MET##  ##MET##   1     ##METMETC## ##METMETA##
+  ##HAL##  ##HAL##   1     ##HALHALC## ##HALHALA##
+  ##MET##  ##HAL##   1     ##METHALC## ##METHALA##
+
+[ moleculetype ]
+;name       nbexcl (exclude non-bonded interactions between atoms that are no further than nbexcl bonds away)
+##MET##          1         
+
+[ atoms ] 
+;nr         type       resnr      residue    atom       cgnr       charge     mass      
+1           ##MET##         1          ##MET##         ##MET##         1          1         
+
+[ moleculetype ]
+;name       nbexcl (exclude non-bonded interactions between atoms that are no further than nbexcl bonds away)
+##HAL##          1         
+
+[ atoms ] 
+;nr         type       resnr      residue    atom       cgnr       charge     mass      
+1           ##HAL##         1          ##HAL##         ##HAL##         1          -1        
+
+[ system ]
+##MET####HAL## ##N##x##N## crystal
+
+[ molecules ]
+##LATOMS##
+

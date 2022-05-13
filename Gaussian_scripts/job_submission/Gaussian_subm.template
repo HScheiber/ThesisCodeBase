@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --time=##TIME##:0:00
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=1
+#SBATCH --cpus-per-task=##CPUS##
+#SBATCH --mem-per-cpu=0
+#SBATCH --account=##ACCOUNT##
+#SBATCH --job-name=##JOBNAME##
+#SBATCH --error=##JOBNAME##.stde
+#SBATCH --output=##JOBNAME##.stdo
+#SBATCH --export=ALL
+
+# Check on some basics:
+echo "Running on host: " `hostname`
+echo "Current working directory is now: " `pwd`
+
+# Load modules
+module load gaussian/g16.c01
+
+# Run Job
+G16 ##JOBNAME##.com            # G16 command
+
+echo "Job completed at `date`"
+exit 0

@@ -1,0 +1,10 @@
+COMPND    BetaBeO Unit Cell
+HETATM    1 ##MET1##                   ##MX1##   ##MY1##   ##MZ1##  1.00  1.00          ##MET2##
+HETATM    2 ##MET1##                   ##MX2##   ##MY2##   ##MZ2##  1.00  1.00          ##MET2##
+HETATM    3 ##MET1##                   ##MX3##   ##MY3##   ##MZ3##  1.00  1.00          ##MET2##
+HETATM    4 ##MET1##                   ##MX4##   ##MY4##   ##MZ4##  1.00  1.00          ##MET2##
+HETATM    5 ##HAL1##                   ##HX1##   ##HY1##   ##HZ1##  1.00  1.00          ##HAL2##
+HETATM    6 ##HAL1##                   ##HX2##   ##HY2##   ##HZ2##  1.00  1.00          ##HAL2##
+HETATM    7 ##HAL1##                   ##HX3##   ##HY3##   ##HZ3##  1.00  1.00          ##HAL2##
+HETATM    8 ##HAL1##                   ##HX4##   ##HY4##   ##HZ4##  1.00  1.00          ##HAL2##
+END

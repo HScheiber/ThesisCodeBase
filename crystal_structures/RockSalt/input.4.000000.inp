@@ -1,0 +1,42 @@
+ &CONTROL
+                       title = 'LiF RockSalt' ,
+                 calculation = 'scf' ,
+                restart_mode = 'from_scratch' ,
+                  wf_collect = .true. ,
+                  pseudo_dir = '/home/scheiber/project/pseudopotentials/' ,
+                      prefix = 'LiFiRock' ,
+                 lkpoint_dir = .true. ,
+                     disk_io = 'default' ,
+                   verbosity = 'default' ,
+               etot_conv_thr = 1.0D-9 ,
+ /
+ &SYSTEM
+                       ibrav = 2,
+                           A = 4.000000 ,
+                         nat = 8,
+                        ntyp = 2,
+                     ecutwfc = 100 ,
+                    lspinorb = .true. ,
+                    noncolin = .true. ,
+ /
+ &ELECTRONS
+           scf_must_converge = .true. ,
+                    conv_thr = 1D-7 ,
+                 startingwfc = 'atomic+random' ,
+ /
+ 
+ATOMIC_SPECIES
+ Li  3 Li.rel-pbe-s-kjpaw_psl.0.2.1.UPF
+ F   9 F.rel-pbe-n-kjpaw_psl.0.1.UPF
+
+ATOMIC_POSITIONS crystal
+F            0.000000   0.000000   0.000000
+F            0.000000   0.500000   0.500000
+F            0.500000   0.000000   0.500000
+F            0.500000   0.500000   0.000000
+Li           0.500000   0.000000   0.000000
+Li           0.000000   0.500000   0.000000
+Li           0.000000   0.000000   0.500000
+Li           0.500000   0.500000   0.500000
+K_POINTS automatic 
+  1 1 1   1 1 1 

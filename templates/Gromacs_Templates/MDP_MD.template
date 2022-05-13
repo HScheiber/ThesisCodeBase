@@ -1,0 +1,57 @@
+; ##TITLE##
+
+; Output control
+nstxout                  = ##POSOUT##; Number of steps that elapse between writing coordinates to output trajectory file, the last coordinates are always written
+nstvout                  = ##VELOUT##; Number of steps that elapse between writing velocities to output trajectory, the last velocities are always written
+nstfout                  = ##FORCEOUT##; Number of steps that elapse between writing forces to output trajectory.
+nstenergy                = ##ENOUT##; Number of steps that elapse between writing energies to output trajectory.
+nstcalcenergy            = ##CALCE##; Number of steps that elapse between calculating the energies, 0 is never
+nstxout-compressed       = ##POSOUTCOMP##; Number of steps that elapse between writing position coordinates using lossy compression
+
+; Parameters for run
+coulombtype              = ##COULOMB##; Define how the coulombic interaction is calculated
+vdwtype                  = ##VDWTYPE##; Define the type of van der waals potential used
+vdw-modifier             = ##VDWMOD##; Define the behaviour of the vdw potential at the cutoff
+nsteps                   = ##NSTEPS##; How many MD steps are performed (10 ns)
+integrator               = ##INTEGR##; What type of calculation is run
+dt                       = ##TIMEST##; Time step (ps)
+energygrps               = ##MET## ##HAL##           ; Input all groups here
+energygrp-table          = ##MET## ##MET## ##HAL## ##HAL##   ; Names for input tables (used for some forcefields)
+cutoff-scheme            = ##CUTOFF##; One of Group or Verlet
+verlet-buffer-tolerance  = ##VerletBT##; Sets the maximum allowed error for pair interactions per particle caused by the Verlet buffer
+ns-type                  = grid              ; Method to determine neighbor list (simple, grid)
+rlist                    = ##RLIST##; Sets the search radius for neighbour list generation
+rcoulomb                 = ##RCOULOMB##; Real space coulomb cutoff radius
+rvdw                     = ##RVDW##; Van der Waals cutoff radius
+pbc                      = xyz               ; Periodic Boundary Conditions (yes/no)
+constraints              = none              ; Bonding constraints
+nstlist                  = ##LISTUPDATE##; Frequency to update the neighbor list and long range forces
+fourierspacing           = ##FOURIER##; Grid dimensions in PME are controlled with fourierspacing
+pme-order                = ##PMEORDER##; Interpolation order for PME. 4 equals cubic interpolation.
+ewald-rtol               = ##EWALDTOL##; The relative strength of the Ewald-shifted direct potential at rcoulomb.
+continuation             = ##CONTINUE##; Yes = do not apply constraints to the start configuration and do not reset shells, useful for exact continuation and reruns
+
+; Temperature Coupling
+tcoupl                   = ##THERMOSTAT##; The type of thermostat
+tc-grps                  = System           ; Groups to couple seperately to temperature bath
+tau-t                    = ##TTIMECONST##; [ps] time constant for coupling. Need one for each energy group.
+nsttcouple               = ##NSTTCOUPLE##; The frequency for coupling the temperature.
+ref-t                    = ##REFT##; [K] Reference temperature for coupling. Need one for each group.
+
+; Simulated annealing
+annealing                = ##ANNEALING##; Type of annealing for each temperature group. Set to 'no' to disable
+annealing-npoints        = ##ANNEALPNTS##; Number of annealing points set for each group.
+annealing-time           = ##ANNEALTIMES##; [ps] For each group, set the time at which to being thermostating each temperature. One set for each group.
+annealing-temp           = ##ANNEALTEMPS##; [K] List of temperatures at the annealing reference/control points for each group.
+
+; Pressure Coupling
+pcoupl                   = ##BAROSTAT##; Type of barostat used. Set to 'no' for fixed volume.
+pcoupltype               = ##ISOTROPY##; Pressure coupling isotropy
+tau-p                    = ##PTIMECONST##; [ps] Time constant for barostat coupling
+nstpcouple               = ##NSTPCOUPLE##; The frequency for coupling the Pressure.
+compressibility          = ##COMPRESS##; [bar^-1] Compressibility of box.
+ref-p                    = ##REFP##; [bar] Reference pressure for coupling
+
+; Initial Velocity Generation
+gen-vel                  = yes               ; Velocity generation switch
+gen-temp                 = ##REFTINIT##; Initial temperatre for velocity generation

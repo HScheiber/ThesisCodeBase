@@ -1,0 +1,4 @@
+COMPND    Ion Pair
+HETATM    1 ##MET1##                   0.000   0.000   0.000  1.00  1.00          ##MET2##
+HETATM    2 ##HAL1##                   ##BND##   0.000   0.000  1.00  1.00          ##HAL2##
+END

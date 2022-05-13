@@ -1,0 +1,4985 @@
+%% Model 1: LiI BF2 (targeting DFT/0.44 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BF2';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.RLE = 10000;
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+Models(idx).Fix_Charge = true;
+
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.2900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [0 5.0000e-11];
+
+%% Model 2: LiI BF3 (targeting 1 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BF3';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+% Loss function
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -1;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.2900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-12 6e-11];
+
+%% Model 3: LiI BF4 (targeting 2 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BF4';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+% Loss function
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -2;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.2900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-12 6e-11];
+
+%% Model 4: LiI BF5 (targeting 3 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BF5';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+% Loss function
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -3;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.2900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-12 6e-11];
+
+%% Model 5: LiI BF6 (targeting 4 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BF6';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+% Loss function
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -4;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.2900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-12 6e-11];
+
+%% Model 6: LiI BF7 (targeting 5 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BF7';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+% Loss function
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -5;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.2900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-12 6e-11];
+
+%% Model 7: LiI BF8 (targeting 10 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BF8';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+% Loss function
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -10;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.2900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-12 6e-11];
+
+%% Model 8: LiI BG1
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BG1';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.RLE = 10000;
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+Models(idx).Fix_Charge = true;
+
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-21 3e-20];
+
+%% Model 9: LiI BG2
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BG2';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.RLE = 10000;
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+Models(idx).Fix_Charge = true;
+
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 10: LiI BG3: (targetting 1 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BG3';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -1;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 11: LiI BG4: (targetting 2 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BG4';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -2;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 12: LiI BG5: (targetting 3 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BG5';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -3;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 13: LiI BG6: (targetting 4 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BG6';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -4;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 14: LiI BG7: (targetting 5 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BG7';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -5;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 15: LiI BG8: (targetting 10 kJ/mol gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BG8';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 1;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -10;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Wurtzite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Rocksalt.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 4e-42];
+
+%% Model 9: LiI BH1
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BH1';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.RLE = 10000;
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-21 3e-20];
+
+%% Model 10: LiI BH2
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BH2';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.RLE = 10000;
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 11: LiI BH3: (targetting 1 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BH3';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -1;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 12: LiI BH4: (targetting 2 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BH4';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -2;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 13: LiI BH5: (targetting 3 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BH5';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -3;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 14: LiI BH6: (targetting 4 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BH6';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -4;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 15: LiI BH7: (targetting 5 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BH7';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -5;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 16: LiI BH8: (targetting 10 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BH8';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -10;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 45: LiI BI1
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BI1';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.LE = 10;
+Models(idx).Loss_Options.NiAs.RLE = 10000;
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1900; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 50;
+Models(idx).Additional_Function.MM.Range = [1e-21 3e-20];
+
+%% Model 46: LiI BI2
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BI2';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.LE = 10;
+Models(idx).Loss_Options.NiAs.RLE = 10000;
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 47: LiI BI3: (targetting 1 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BI3';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -1;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Rocksalt.Gap.Type = @eq;
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 48: LiI BI4: (targetting 2 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BI4';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -2;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Rocksalt.Gap.Type = @eq;
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 49: LiI BI5: (targetting 3 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BI5';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -3;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Rocksalt.Gap.Type = @eq;
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 50: LiI BI6: (targetting 4 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BI6';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -4;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Rocksalt.Gap.Type = @eq;
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 51: LiI BI7: (targetting 5 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BI7';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -5;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Rocksalt.Gap.Type = @eq;
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% Model 52: LiI BI8: (targetting 10 kJ/mol RS/NiAs gap)
+idx = idx+1;
+Models(idx) = Initialize_LiX_BO_Settings;
+Models(idx).Salt = 'LiI';
+Models(idx).Theory = 'JC';
+Models(idx).Trial_ID = 'BI8';
+
+% Initial optimization
+Models(idx).initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Models(idx).Max_Bayesian_Iterations = 1000;
+Models(idx).Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
+Models(idx).KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
+% 'ardexponential', 'ardsquaredexponential', 
+% 'ardmatern32', 'ardmatern52', 'ardrationalquadratic'
+
+% Secondary optimization
+Models(idx).second_opt_type = 'none';
+Models(idx).final_opt_type = 'fminsearchbnd';
+
+Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Experimental_LP = false; % Targets experimental rocksalt lattice energy rather than DFT
+Models(idx).Loss_Options.Rocksalt.LE = 10;
+Models(idx).Loss_Options.Rocksalt.a = 1/10;
+
+Models(idx).Loss_Options.NiAs.a = 1/20;
+Models(idx).Loss_Options.NiAs.c = 1/20;
+
+% Targetting gaps
+Models(idx).Loss_Options.Rocksalt.Gap.Value = -10;
+Models(idx).Loss_Options.Rocksalt.Gap.Weight = 10000;
+Models(idx).Loss_Options.Rocksalt.Gap.Ref = 'NiAs';
+Models(idx).Loss_Options.Rocksalt.Gap.Type = @eq;
+
+Models(idx).Loss_Options.Wurtzite.Gap.Value = 0;
+Models(idx).Loss_Options.Wurtzite.Gap.Weight = 10000;
+Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+Models(idx).Loss_Options.Sphalerite.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+Models(idx).Loss_Options.FiveFive.Gap = Models(idx).Loss_Options.Wurtzite.Gap;
+
+Models(idx).Fix_Charge = true;
+Models(idx).Additivity = true;
+Models(idx).SDMM_Range = [0 20];
+
+Models(idx).C6Damp.input_rvdw = true;
+Models(idx).C6Damp.rvdw.Li = 0.1850; % nm
+Models(idx).C6Damp.N.MM = 1;
+Models(idx).C6Damp.MM = 1;
+
+Models(idx).Additional_Function.MM.N = 100;
+Models(idx).Additional_Function.MM.Range = [5e-44 3e-42];
+
+%% LiBr JC Models C3a - C3e
+Salts = {'LiBr'};
+Replicates = {'a' 'b' 'c' 'd' 'e'};
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model 1
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['C3' Rep];
+        Models(idx).second_opt_type = 'none';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+        Models(idx).Loss_Options.Rocksalt.a = 1/10;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 100];
+    end
+end
+
+%% LiBr JC Models C5 testing Acquisition Functions
+%'expected-improvement'
+%'expected-improvement-plus' with ExplorationRatio 0.5, 1, 2
+%'lower-confidence-bound' with ExplorationRatio (kappa) 1, 2, 3
+%'probability-of-improvement'
+
+Salts = {'LiBr'};
+Replicates = {'a' 'b' 'c'};
+for ridx = 1:length(Replicates)
+    Rep = Replicates{ridx};
+
+    %% Model 1
+    idx = idx+1;
+    Models(idx) = Initialize_LiX_BO_Settings;
+    Models(idx).Salt = 'LiBr';
+    Models(idx).Theory = 'JC';
+    Models(idx).Trial_ID = ['C5_EI' Rep];
+    Models(idx).Acquisition_Function = 'expected-improvement';
+    Models(idx).final_opt_type = 'fminsearchbnd';
+
+    Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Rocksalt.LE = 1;
+    Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+    Models(idx).Loss_Options.Rocksalt.a = 1/10;
+    Models(idx).Loss_Options.Wurtzite.a = 1/20;
+    Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+    Models(idx).Fix_Charge = false;
+    Models(idx).Additivity = true;
+    Models(idx).SDMM_Range = [0 100];
+    
+    %% Model 2
+    idx = idx+1;
+    Models(idx) = Initialize_LiX_BO_Settings;
+    Models(idx).Salt = 'LiBr';
+    Models(idx).Theory = 'JC';
+    Models(idx).Trial_ID = ['C5_EIP0.5' Rep];
+    Models(idx).Acquisition_Function = 'expected-improvement-plus';
+    Models(idx).ExplorationRatio = 0.5;
+    Models(idx).final_opt_type = 'fminsearchbnd';
+
+    Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Rocksalt.LE = 1;
+    Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+    Models(idx).Loss_Options.Rocksalt.a = 1/10;
+    Models(idx).Loss_Options.Wurtzite.a = 1/20;
+    Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+    Models(idx).Fix_Charge = false;
+    Models(idx).Additivity = true;
+    Models(idx).SDMM_Range = [0 100];
+    
+    %% Model 3
+    idx = idx+1;
+    Models(idx) = Initialize_LiX_BO_Settings;
+    Models(idx).Salt = 'LiBr';
+    Models(idx).Theory = 'JC';
+    Models(idx).Trial_ID = ['C5_EIP1' Rep];
+    Models(idx).Acquisition_Function = 'expected-improvement-plus';
+    Models(idx).ExplorationRatio = 1;
+    Models(idx).final_opt_type = 'fminsearchbnd';
+
+    Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Rocksalt.LE = 1;
+    Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+    Models(idx).Loss_Options.Rocksalt.a = 1/10;
+    Models(idx).Loss_Options.Wurtzite.a = 1/20;
+    Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+    Models(idx).Fix_Charge = false;
+    Models(idx).Additivity = true;
+    Models(idx).SDMM_Range = [0 100];
+    
+    %% Model 4
+    idx = idx+1;
+    Models(idx) = Initialize_LiX_BO_Settings;
+    Models(idx).Salt = 'LiBr';
+    Models(idx).Theory = 'JC';
+    Models(idx).Trial_ID = ['C5_EIP2' Rep];
+    Models(idx).Acquisition_Function = 'expected-improvement-plus';
+    Models(idx).ExplorationRatio = 2;
+    Models(idx).final_opt_type = 'fminsearchbnd';
+
+    Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Rocksalt.LE = 1;
+    Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+    Models(idx).Loss_Options.Rocksalt.a = 1/10;
+    Models(idx).Loss_Options.Wurtzite.a = 1/20;
+    Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+    Models(idx).Fix_Charge = false;
+    Models(idx).Additivity = true;
+    Models(idx).SDMM_Range = [0 100];
+    
+    %% Model 5
+    idx = idx+1;
+    Models(idx) = Initialize_LiX_BO_Settings;
+    Models(idx).Salt = 'LiBr';
+    Models(idx).Theory = 'JC';
+    Models(idx).Trial_ID = ['C5_LCB1' Rep];
+    Models(idx).Acquisition_Function = 'lower-confidence-bound';
+    Models(idx).ExplorationRatio = 1;
+    Models(idx).final_opt_type = 'fminsearchbnd';
+
+    Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Rocksalt.LE = 1;
+    Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+    Models(idx).Loss_Options.Rocksalt.a = 1/10;
+    Models(idx).Loss_Options.Wurtzite.a = 1/20;
+    Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+    Models(idx).Fix_Charge = false;
+    Models(idx).Additivity = true;
+    Models(idx).SDMM_Range = [0 100];
+    
+    %% Model 6
+    idx = idx+1;
+    Models(idx) = Initialize_LiX_BO_Settings;
+    Models(idx).Salt = 'LiBr';
+    Models(idx).Theory = 'JC';
+    Models(idx).Trial_ID = ['C5_LCB2' Rep];
+    Models(idx).Acquisition_Function = 'lower-confidence-bound';
+    Models(idx).ExplorationRatio = 2;
+    Models(idx).final_opt_type = 'fminsearchbnd';
+
+    Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Rocksalt.LE = 1;
+    Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+    Models(idx).Loss_Options.Rocksalt.a = 1/10;
+    Models(idx).Loss_Options.Wurtzite.a = 1/20;
+    Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+    Models(idx).Fix_Charge = false;
+    Models(idx).Additivity = true;
+    Models(idx).SDMM_Range = [0 100];
+    
+    %% Model 7
+    idx = idx+1;
+    Models(idx) = Initialize_LiX_BO_Settings;
+    Models(idx).Salt = 'LiBr';
+    Models(idx).Theory = 'JC';
+    Models(idx).Trial_ID = ['C5_LCB3' Rep];
+    Models(idx).Acquisition_Function = 'lower-confidence-bound';
+    Models(idx).ExplorationRatio = 3;
+    Models(idx).final_opt_type = 'fminsearchbnd';
+
+    Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Rocksalt.LE = 1;
+    Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+    Models(idx).Loss_Options.Rocksalt.a = 1/10;
+    Models(idx).Loss_Options.Wurtzite.a = 1/20;
+    Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+    Models(idx).Fix_Charge = false;
+    Models(idx).Additivity = true;
+    Models(idx).SDMM_Range = [0 100];
+    
+    %% Model 8
+    idx = idx+1;
+    Models(idx) = Initialize_LiX_BO_Settings;
+    Models(idx).Salt = 'LiBr';
+    Models(idx).Theory = 'JC';
+    Models(idx).Trial_ID = ['C5_POI' Rep];
+    Models(idx).Acquisition_Function = 'probability-of-improvement';
+    Models(idx).final_opt_type = 'fminsearchbnd';
+
+    Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+    Models(idx).Loss_Options.Rocksalt.LE = 1;
+    Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+    Models(idx).Loss_Options.Rocksalt.a = 1/10;
+    Models(idx).Loss_Options.Wurtzite.a = 1/20;
+    Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+    Models(idx).Fix_Charge = false;
+    Models(idx).Additivity = true;
+    Models(idx).SDMM_Range = [0 100];
+    
+end
+
+
+%% JC Models CA, CB, CC
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = {'a' 'b' 'c' 'd' 'e'};
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model 1
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CA' Rep];
+        Models(idx).second_opt_type = 'none';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+        
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+        Models(idx).Loss_Options.Wurtzite.RLE_freedom = 2; % kJ/mol
+        Models(idx).Loss_Options.Rocksalt.a = 1/10;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model 2
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CB' Rep];
+        Models(idx).second_opt_type = 'none';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 10000;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1/10;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model 3
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CC' Rep];
+        Models(idx).second_opt_type = 'none';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 10000/10;
+        Models(idx).Loss_Options.Wurtzite.a = 10000/20;
+        Models(idx).Loss_Options.Wurtzite.c = 10000/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+    end
+end
+
+%% JC Models CD, CE
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = {'a' 'b' 'c' 'd' 'e'};
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model 1
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CD' Rep];
+        Models(idx).second_opt_type = 'none';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 10000;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model 2
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CE' Rep];
+        Models(idx).second_opt_type = 'none';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 10000;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 10000;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+    end
+end
+
+%% JC Models CF
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = {'a' 'b' 'c' 'd' 'e'};
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model 1
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CF' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+        Models(idx).Loss_Options.Rocksalt.a = 1/10;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+    end
+end
+
+%% JC Models CG, CH, CI
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CG
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CG' Rep];
+        Models(idx).second_opt_type = 'bayesopt';
+        Models(idx).final_opt_type = 'fmincon';
+        Models(idx).Structures = {'Rocksalt'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+        
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 100;
+        Models(idx).Loss_Options.Rocksalt.a = 100;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model CH
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CH' Rep];
+        Models(idx).second_opt_type = 'bayesopt';
+        Models(idx).final_opt_type = 'fmincon';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+        
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model CI
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CI' Rep];
+        Models(idx).second_opt_type = 'bayesopt';
+        Models(idx).final_opt_type = 'fmincon';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+    end
+end
+
+%% JC Models CJ, CK, CL
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CG
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CJ' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 1;
+        Models(idx).Loss_Options.NiAs.c = 1;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 1;
+        Models(idx).Loss_Options.AntiNiAs.c = 1;
+        
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model CH
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CK' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 1;
+        Models(idx).Loss_Options.NiAs.c = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 1;
+        Models(idx).Loss_Options.AntiNiAs.c = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model CI
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CL' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;        
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+    end
+end
+
+%% JC Models CM, CN, CO
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CM
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CM' Rep];
+        Models(idx).final_opt_type = 'patternsearch';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model CN
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CN' Rep];
+        Models(idx).final_opt_type = 'patternsearch';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 20;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.RLE = 20;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 20;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 20;
+        Models(idx).Loss_Options.NiAs.a = 1;
+        Models(idx).Loss_Options.NiAs.c = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 20;
+        Models(idx).Loss_Options.AntiNiAs.a = 1;
+        Models(idx).Loss_Options.AntiNiAs.c = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model CO
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CO' Rep];
+        Models(idx).final_opt_type = 'patternsearch';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'FiveFive'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 20;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.RLE = 20;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 20;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;        
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+    end
+end
+
+%% JC Models CP, CQ, CR
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CP
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CP' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1/5;
+        Models(idx).Loss_Options.Wurtzite.c = 1/5;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model CQ
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CQ' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1/5;
+        Models(idx).Loss_Options.Wurtzite.c = 1/5;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 100];
+        
+        %% Model CR
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CR' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1/5;
+        Models(idx).Loss_Options.Wurtzite.c = 1/5;   
+
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+    end
+end
+
+%% JC Models CS, CT
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CS
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CS' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 100];
+        
+        %% Model CT
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CT' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+    end
+end
+
+%% JC Models DA, DB, DC, DD
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model DA
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DA' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model DB
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DB' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model DC
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DC' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+        %% Model DD
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DD' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 1000];
+    end
+end
+
+%% JC Models DE, DF, DG, DH
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model DE
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DE' Rep];
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model DF
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DF' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+        %% Model DG
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DG' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.V = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.V = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.V = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.V = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.V = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.V = 1;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.V = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model DH
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DH' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+    end
+end
+
+%% JC Models CT
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CT
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['CT' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+    end
+end
+
+%% JC Models DA, DB, DC, DD
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model DA
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DA' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DB
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DB' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DC
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DC' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DD
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DD' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 1000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+    end
+end
+
+%% JC Models DE, DF, DG, DH
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model DE
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DE' Rep];
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DF
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DF' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DG
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DG' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.V = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.V = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.V = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.V = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.V = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.V = 1;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.V = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DH
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['DH' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+    end
+end
+
+%% JC Models EA, EB, EC, ED, EE
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:10;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+        
+        %% Model JC: EA
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EA' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EB
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EB' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EC
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EC' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: ED
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ED' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+        %% Model JC: EE
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EE' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+    end
+end
+
+%% JC Models EF, EG, EH, EI, EJ, EK, EL, EM
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+        
+        %% Model JC: EF
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EF' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EG
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EG' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+        %% Model JC: EH
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EH' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EI
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EI' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EJ
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EJ' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+        %% Model JC: EK
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EK' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EL
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EL' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EM
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EM' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+    end
+end
+
+%% JC Models EN, EO, EP
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:10;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+        
+        %% Model JC: EN
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EN' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EO
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EO' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EP
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EP' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+        
+    end
+end
+
+%% JC Models EQ, ER, ES, ET, EU
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+        
+        %% Model JC: EQ
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EQ' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: ER
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ER' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: ES
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ES' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 300];
+        
+        
+        %% Model JC: ET
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ET' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: EU
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EU' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        
+    end
+end
+
+%% JC Models EQ, ER, ES, ET, EU
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+        
+        %% Model JC: ET
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ET' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: EU
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EU' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        
+    end
+end
+
+
+
+%% TF Models CA, CB, CC, CD
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = {'a' 'b' 'c' 'd' 'e'};
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CA
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CA' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10000;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CB
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CB' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 10000;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1/10;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CC
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CC' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 10000;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CD
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CD' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 10000;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 10000;
+        Models(idx).Loss_Options.Wurtzite.a = 1/20;
+        Models(idx).Loss_Options.Wurtzite.c = 1/20;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+    end
+end
+
+%% TF Models CG, CH, CI
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CG
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CG' Rep];
+        Models(idx).second_opt_type = 'bayesopt';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 100;
+        Models(idx).Loss_Options.Rocksalt.a = 100;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CH
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CH' Rep];
+        Models(idx).second_opt_type = 'bayesopt';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CI
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CI' Rep];
+        Models(idx).second_opt_type = 'bayesopt';
+        Models(idx).final_opt_type = 'fminsearchbnd';
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+    end
+end
+
+%% TF Models CJ, CK, CL
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CG
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CJ' Rep];
+        Models(idx).final_opt_type = 'patternsearch'; % fminsearchbnd
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 1;
+        Models(idx).Loss_Options.NiAs.c = 1;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 1;
+        Models(idx).Loss_Options.AntiNiAs.c = 1;
+        
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CH
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CK' Rep];
+        Models(idx).final_opt_type = 'patternsearch'; % fminsearchbnd
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 1;
+        Models(idx).Loss_Options.NiAs.c = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 1;
+        Models(idx).Loss_Options.AntiNiAs.c = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CI
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CL' Rep];
+        Models(idx).final_opt_type = 'patternsearch'; % fminsearchbnd
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;        
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+    end
+end
+
+%% TF Models CM, CN, CO
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model CM
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CM' Rep];
+        Models(idx).final_opt_type = 'patternsearch';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CN
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CN' Rep];
+        Models(idx).final_opt_type = 'patternsearch';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 20;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.RLE = 20;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 20;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 20;
+        Models(idx).Loss_Options.NiAs.a = 1;
+        Models(idx).Loss_Options.NiAs.c = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 20;
+        Models(idx).Loss_Options.AntiNiAs.a = 1;
+        Models(idx).Loss_Options.AntiNiAs.c = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        %% Model CO
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['CO' Rep];
+        Models(idx).final_opt_type = 'patternsearch';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'FiveFive'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 20;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        
+        Models(idx).Loss_Options.Wurtzite.RLE = 20;
+        Models(idx).Loss_Options.Wurtzite.a = 1;
+        Models(idx).Loss_Options.Wurtzite.c = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 20;
+        Models(idx).Loss_Options.FiveFive.a = 1;
+        Models(idx).Loss_Options.FiveFive.c = 1;        
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+    end
+end
+
+%% TF Models DA, DB, DC, DD
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model DA
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['DA' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DB
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['DB' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+
+        Models(idx).Fix_Charge = false;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DC
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['DC' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = false;
+        Models(idx).SD6MM_Range = [0 2000];
+        Models(idx).SD8MM_Range = [0 2000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DD
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['DD' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        Models(idx).Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        Models(idx).SD8MM_Range = [0 2000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+    end
+end
+
+%% TF Models DE, DF, DG, DH
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = arrayfun(@num2str,1:5,'UniformOutput',false);
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = Replicates{ridx};
+        
+        %% Model DE
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['DE' Rep];
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        Models(idx).final_opt_type = 'patternsearch';
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DF
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['DF' Rep];
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = false;
+        Models(idx).SD6MM_Range = [0 2000];
+        Models(idx).SD8MM_Range = [0 2000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DG
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['DG' Rep];
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.V = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 10;
+        Models(idx).Loss_Options.Wurtzite.V = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.V = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 10;
+        Models(idx).Loss_Options.Sphalerite.V = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 10;
+        Models(idx).Loss_Options.FiveFive.V = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 10;
+        Models(idx).Loss_Options.AntiNiAs.V = 1;
+        Models(idx).Loss_Options.BetaBeO.RLE = 10;
+        Models(idx).Loss_Options.BetaBeO.V = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+        
+        %% Model DH
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['DH' Rep];
+
+        Models(idx).Loss_Options.Experimental_LE = true; % Targets experimental rocksalt lattice energy rather than DFT
+        Models(idx).Loss_Options.Experimental_LP = true; % Targets experimental rocksalt lattice param rather than DFT
+        
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 10;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 10;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 10;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 10;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 10;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 10;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 2000];
+        
+        % Used in older models
+        Models(idx).CRDamp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
+        Models(idx).CRDamp.MX.b = 100; % sigmoid "steepness" for damping
+        Models(idx).CRDamp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
+        Models(idx).CRDamp.MM.b  = 75; % 75
+        Models(idx).CRDamp.XX.r_d = 0.20; 
+        Models(idx).CRDamp.XX.b  = 100;
+    end
+end
+
+%% TF Models EA, EB, EC, ED, EE, EF
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:10;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+        
+        %% Model TF: EA
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['EA' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        Models(idx).Loss_Options.BetaBeO.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 3000];
+        
+        %% Model TF: EB
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['EB' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.Sphalerite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        Models(idx).Loss_Options.BetaBeO.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 3000];
+        
+        %% Model TF: EC
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['EC' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 3000];
+        
+        %% Model TF: ED
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['ED' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 3000];
+        
+        %% Model TF: EE
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['EE' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 3000];
+        
+        %% Model TF: EF
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'TF';
+        Models(idx).Trial_ID = ['EF' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Max_Bayesian_Iterations = 1000;
+            Models(idx).Max_Secondary_Iterations = 1000;
+        else
+            Models(idx).Max_Bayesian_Iterations = 800;
+            Models(idx).Max_Secondary_Iterations = 200;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.RLE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.RLE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.RLE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Fix_Alpha = true;
+        Models(idx).Fix_C8 = true;
+        Models(idx).SD6MM_Range = [0 3000];
+    end
+end
+
+%% TF & BH Models FA, FB, FC, FD
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'BH' 'TF'};
+Replicates = 1:10;
+
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model TF & BH: FA
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FA' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: FB
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FB' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: FC
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FC' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = false;
+            
+            %% Model TF & BH: FD
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FD' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+            
+        end
+    end
+end
+
+%% TF & BH Models FE, FF, FG, FH, FI
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'BH' 'TF'};
+Replicates = 1:10;
+
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model TF & BH: FE
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FE' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.FiveFive.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: FF
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FF' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Wurtzite.a = 2/3;
+            Models(idx).Loss_Options.Wurtzite.c = 1/3;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: FG
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FG' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.FiveFive.RLE = 1;
+            Models(idx).Loss_Options.Sphalerite.RLE = 1;
+            Models(idx).Loss_Options.BetaBeO.RLE = 1;
+            Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+            Models(idx).Loss_Options.NiAs.RLE = 1;
+            Models(idx).Loss_Options.CsCl.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: FH
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FH' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.FiveFive.RLE = 1;
+            Models(idx).Loss_Options.Sphalerite.RLE = 1;
+            Models(idx).Loss_Options.BetaBeO.RLE = 1;
+            Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+            Models(idx).Loss_Options.NiAs.RLE = 1;
+            Models(idx).Loss_Options.CsCl.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = false;
+            
+            %% Model TF & BH: FI
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['FI' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.FiveFive.RLE = 1;
+            Models(idx).Loss_Options.Sphalerite.RLE = 1;
+            Models(idx).Loss_Options.BetaBeO.RLE = 1;
+            Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+            Models(idx).Loss_Options.NiAs.RLE = 1;
+            Models(idx).Loss_Options.CsCl.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+            
+        end
+    end
+end

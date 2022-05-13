@@ -1,0 +1,12 @@
+TITLE
+##MET####HAL## NiAs Unit Cell
+END
+POSITION
+    1 ##MET##    ##MET##         1    ##MX1##    ##MY1##    ##MZ1##
+    1 ##MET##    ##MET##         2    ##MX2##    ##MY2##    ##MZ2##
+    2 ##HAL##    ##HAL##         3    ##HX1##    ##HY1##    ##HZ1##
+    2 ##HAL##    ##HAL##         4    ##HX2##    ##HY2##    ##HZ2##
+END
+BOX
+   ##V1X##   ##V2Y##   ##V3Z##   ##V1Y##   ##V1Z##   ##V2X##   ##V2Z##   ##V3X##   ##V3Y##
+END

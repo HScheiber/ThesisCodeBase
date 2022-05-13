@@ -1,0 +1,16 @@
+%mem=##MEMORY##
+%NProcShared=##CORES##
+
+#p ##THER##/##BASS## scan SCF=(NoVarAcc,tight,NoIncFock,Conver=##CONV##)
+int(grid=ultrafine) ##DISP####IOPS##
+
+LiLi ion pair ##THERT## PES with ##BASST## basis ##DISPT##
+
+ 2   1
+ Li 
+ Li 1 R1
+
+R1 1.0 90 0.1
+ 
+##GENBAS##
+##GENECP##

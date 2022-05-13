@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (MiKTeX 2.9.7380 64-bit)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Scheiber_Thesis_Outline_Short.aux
+The style file: achemso.bst
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Database file #1: references.bib
+achemso 2021-01-20 v3.13c
+You've used 6 entries,
+            2538 wiz_defined-function locations,
+            797 strings with 7802 characters,
+and the built_in function-call counts, 2174 in all, are:
+= -- 186
+> -- 103
+< -- 3
++ -- 40
+- -- 34
+* -- 229
+:= -- 289
+add.period$ -- 13
+call.type$ -- 6
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 6
+duplicate$ -- 115
+empty$ -- 151
+format.name$ -- 44
+if$ -- 425
+int.to.chr$ -- 0
+int.to.str$ -- 1
+missing$ -- 0
+newline$ -- 64
+num.names$ -- 18
+pop$ -- 10
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 6
+stack$ -- 0
+substring$ -- 134
+swap$ -- 113
+text.length$ -- 13
+text.prefix$ -- 0
+top$ -- 1
+type$ -- 42
+warning$ -- 0
+while$ -- 22
+width$ -- 0
+write$ -- 105

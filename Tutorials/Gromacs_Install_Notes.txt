@@ -1,0 +1,53 @@
+Downloading GROMACS from http://manual.gromacs.org/documentation/
+
+For GPU acceleration:
+1. visit https://developer.nvidia.com/cuda-toolkit to download the CUDA toolkit for NVIDIA. Follow the instructions to install
+
+2. Add these flags to cmake command -DGMX_GPU=ON -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda
+
+3. Cannot use -DGMX_DOUBLE=on for GPU acceleration (use mixed precision)
+
+4. sudo cmake .. -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs2019.5 -DGMX_GPU=ON -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda
+
+Extra stuff:
+1. Visit this page to use the latest version of gcc and g++:
+https://linuxize.com/post/how-to-install-gcc-compiler-on-ubuntu-18-04/
+NOTE: for gromacs 2019.5, only gcc/g++ up to version 8 is supported
+
+
+Installing GROMACS:
+1. Download source code and move to home directory: cp /mnt/c/Users/Hayden/Downloads/gromacs-<version>.tar.gz ~/
+2. Unzip source code: tar xfz gromacs-<version>.tar.gz
+3. from unzip folder, cd gromacs-<version here>
+4. within this folder, mkdir build && cd build
+5. sudo cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DGMX_DOUBLE=on -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs ;(default is /usr/local/gromacs, so do e.g. /usr/local/gromacs-<version>)
+6. sudo make
+7. sudo make check
+8. sudo make install
+9a. From here... if you have two versions you will want the code below to your ~/.bashrc file.
+
+
+# If running interactive shell
+if [[ $- == *i* ]]
+then
+	echo "Which Version of Gromacs Should I Load?"
+	select ans in "5.1.4" "2019.3"; do
+	case $ans in
+		5.1.4 ) source /usr/local/gromacs/bin/GMXRC; echo "Loaded GROMACS/5.1.4"
+		2019.3 ) source /path/to/installation/directory/bin/GMXRC; echo "Loaded GROMACS/2019.3"
+		esac
+	done
+fi	
+
+
+
+
+9b. If you have one version just add the following to ~/.bashrc
+
+source /path/to/installation/directory/bin/GMXRC to ~/.bashrc file.
+
+NOTE: Replace /path/to/installation/directory with your own thing!
+
+
+For installing fftw3:
+./configure CFLAGS="-fPIC" --enable-shared --enable-sse2 --enable-avx --enable-avx2

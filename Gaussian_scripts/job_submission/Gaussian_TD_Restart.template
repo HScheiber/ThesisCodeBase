@@ -1,0 +1,7 @@
+%Chk=##JOBNAME##.chk
+%mem=##MEMORY##
+%NProcShared=##CPUS##
+#N ##THEORY##/##BASIS_ROUTE_TD## TD=(##FULL##NStates=##STATES##) Geom=AllCheckpoint Guess=Read SCRF=(PCM,Solvent=Water) SCF=XQC
+
+##BASIS_SET_TD##
+

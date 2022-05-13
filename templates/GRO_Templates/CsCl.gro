@@ -1,0 +1,5 @@
+##MET####HAL## CsCl Unit Cell
+    2
+    0        ##MET##    1   ##MX1##   ##MY1##   ##MZ1##
+    0        ##HAL##    2   ##HX1##   ##HY1##   ##HZ1##
+  ##V1X##  ##V2Y##  ##V3Z##  ##V1Y##  ##V1Z##  ##V2X##  ##V2Z##  ##V3X##  ##V3Y##

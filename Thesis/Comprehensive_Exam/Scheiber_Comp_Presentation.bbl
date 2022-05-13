@@ -1,0 +1,491 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nyt/global//global/global}
+    \entry{Booth1950}{article}{}
+      \name{author}{2}{}{%
+        {{uniquename=0,uniquepart=base,hash=088b0956a083124764c3ddbec1497e50}{%
+           family={Booth},
+           familyi={B\bibinitperiod},
+           given={H.\bibnamedelimi S.},
+           giveni={H\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=fe94cbbaa08ba192b870d84ab3f28983}{%
+           family={Bidwell},
+           familyi={B\bibinitperiod},
+           given={R.\bibnamedelimi M.},
+           giveni={R\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {ACS Publications}%
+      }
+      \strng{namehash}{05ca6c225cd312389beaec13770bf96a}
+      \strng{fullhash}{05ca6c225cd312389beaec13770bf96a}
+      \strng{bibnamehash}{05ca6c225cd312389beaec13770bf96a}
+      \strng{authorbibnamehash}{05ca6c225cd312389beaec13770bf96a}
+      \strng{authornamehash}{05ca6c225cd312389beaec13770bf96a}
+      \strng{authorfullhash}{05ca6c225cd312389beaec13770bf96a}
+      \field{sortinit}{B}
+      \field{sortinithash}{276475738cc058478c1677046f857703}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{J. Am. Chem. Soc.}
+      \field{title}{Solubilities of Salts in Water at High Temperatures}
+      \field{volume}{72}
+      \field{year}{1950}
+      \field{pages}{2567}
+      \range{pages}{1}
+    \endentry
+    \entry{born1918absolute}{article}{}
+      \name{author}{2}{}{%
+        {{uniquename=0,uniquepart=base,hash=bad172b2c82dbccc8e126f5da73356ce}{%
+           family={Born},
+           familyi={B\bibinitperiod},
+           given={M},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=a16e1aae8312017ec19398471131be57}{%
+           family={Land{é}},
+           familyi={L\bibinitperiod},
+           given={A},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{1a6b7343479d559ab814b14cae7788a9}
+      \strng{fullhash}{1a6b7343479d559ab814b14cae7788a9}
+      \strng{bibnamehash}{1a6b7343479d559ab814b14cae7788a9}
+      \strng{authorbibnamehash}{1a6b7343479d559ab814b14cae7788a9}
+      \strng{authornamehash}{1a6b7343479d559ab814b14cae7788a9}
+      \strng{authorfullhash}{1a6b7343479d559ab814b14cae7788a9}
+      \field{sortinit}{B}
+      \field{sortinithash}{276475738cc058478c1677046f857703}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Sitzb. kg. preuss. Akad}
+      \field{title}{The absolute calculation of crystal properties with the aid of the Bohr atomic model}
+      \field{volume}{45}
+      \field{year}{1918}
+      \field{pages}{1048}
+      \range{pages}{1}
+    \endentry
+    \entry{Huggins1937}{article}{}
+      \name{author}{1}{}{%
+        {{uniquename=0,uniquepart=base,hash=3e0527906a300546ead853f541212bb8}{%
+           family={Huggins},
+           familyi={H\bibinitperiod},
+           given={Maurice\bibnamedelima L.},
+           giveni={M\bibinitperiod\bibinitdelim L\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {American Institute of Physics}%
+      }
+      \strng{namehash}{3e0527906a300546ead853f541212bb8}
+      \strng{fullhash}{3e0527906a300546ead853f541212bb8}
+      \strng{bibnamehash}{3e0527906a300546ead853f541212bb8}
+      \strng{authorbibnamehash}{3e0527906a300546ead853f541212bb8}
+      \strng{authornamehash}{3e0527906a300546ead853f541212bb8}
+      \strng{authorfullhash}{3e0527906a300546ead853f541212bb8}
+      \field{sortinit}{H}
+      \field{sortinithash}{5f15a7bc777ad49ff15aa4d2831b1681}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Constants in the Born and Mayer exponential expression for the repulsion between two ions have been recalculated. Using these, the lattice energies and equilibrium distances between ions have been recomputed, for alkali halide crystals. Expressions have been derived and tested for the calculation of the compressibility and the characteristic maximum infrared frequency. The relation between these two quantities is shown to be approximated by an empirical equation proposed by Madelung.}
+      \field{issn}{0021-9606}
+      \field{journaltitle}{The Journal of Chemical Physics}
+      \field{month}{2}
+      \field{number}{2}
+      \field{title}{{Lattice Energies, Equilibrium Distances, Compressibilities and Characteristic Frequencies of Alkali Halide Crystals}}
+      \field{volume}{5}
+      \field{year}{1937}
+      \field{pages}{143\bibrangedash 148}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1063/1.1749993
+      \endverb
+      \verb{file}
+      \verb :C$\backslash$:/Users/Hayden/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Huggins - 1937 - Lattice Energies, Equilibrium Distances, Compressibilities and Characteristic Frequencies of Alkali Halide Crystals.pdf:pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://aip.scitation.org/doi/10.1063/1.1749993
+      \endverb
+      \verb{url}
+      \verb http://aip.scitation.org/doi/10.1063/1.1749993
+      \endverb
+    \endentry
+    \entry{Jenkins2005}{article}{}
+      \name{author}{1}{}{%
+        {{uniquename=0,uniquepart=base,hash=7a229ac90699c55ce73eee2f6fac0047}{%
+           family={Jenkins},
+           familyi={J\bibinitperiod},
+           given={H.\bibnamedelimi Donald\bibnamedelima B.},
+           giveni={H\bibinitperiod\bibinitdelim D\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{7a229ac90699c55ce73eee2f6fac0047}
+      \strng{fullhash}{7a229ac90699c55ce73eee2f6fac0047}
+      \strng{bibnamehash}{7a229ac90699c55ce73eee2f6fac0047}
+      \strng{authorbibnamehash}{7a229ac90699c55ce73eee2f6fac0047}
+      \strng{authornamehash}{7a229ac90699c55ce73eee2f6fac0047}
+      \strng{authorfullhash}{7a229ac90699c55ce73eee2f6fac0047}
+      \field{sortinit}{J}
+      \field{sortinithash}{fce5f8d0bd05e8d93f3dbe21c78897ca}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Chemical Education}
+      \field{number}{6}
+      \field{title}{Thermodynamics of the Relationship between Lattice Energy and Lattice Enthalpy}
+      \field{volume}{82}
+      \field{year}{2005}
+      \field{pages}{950}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1021/ed082p950
+      \endverb
+      \verb{eprint}
+      \verb https://doi.org/10.1021/ed082p950
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1021/ed082p950
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1021/ed082p950
+      \endverb
+    \endentry
+    \entry{Karthika2016}{article}{}
+      \name{author}{3}{}{%
+        {{uniquename=0,uniquepart=base,hash=2af23e6b03afbd0703522129214c3a78}{%
+           family={Karthika},
+           familyi={K\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=ea5b948ac5dfe93ae4b983c5b0646361}{%
+           family={Radhakrishnan},
+           familyi={R\bibinitperiod},
+           given={T.\bibnamedelimi K.},
+           giveni={T\bibinitperiod\bibinitdelim K\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=9d81ac269efd881544cfb94c468af86a}{%
+           family={Kalaichelvi},
+           familyi={K\bibinitperiod},
+           given={P.},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {American Chemical Society}%
+      }
+      \strng{namehash}{bec93e3d217d8d8ef362a1f8d493b59d}
+      \strng{fullhash}{be187c0f13226cf887a0775688ca9de9}
+      \strng{bibnamehash}{be187c0f13226cf887a0775688ca9de9}
+      \strng{authorbibnamehash}{be187c0f13226cf887a0775688ca9de9}
+      \strng{authornamehash}{bec93e3d217d8d8ef362a1f8d493b59d}
+      \strng{authorfullhash}{be187c0f13226cf887a0775688ca9de9}
+      \field{sortinit}{K}
+      \field{sortinithash}{9fd838a31ba64d981e8f44562bd33f89}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Nucleation, the initial process in vapor condensation, crystal nucleation, melting, and boiling, is the localized emergence of a distinct thermodynamic phase at the nanoscale that macroscopically grows in size with the attachment of growth units. These phase changes are the result of atomistic events driven by thermal fluctuations. The occurrence of atomistic level events with the length scales on the order of 10–10 m and time scales of 10–13 S equivalent to the vibrational frequency of atoms makes the nucleation a very complicated phenomenon to study. Even though abundant literature is available about fundamental aspects of nucleation, the knowledge on these phenomena is far from complete. The classical pathway to nucleation which was once considered to have general applicability to all nucleating systems is gradually giving way to a nonclassical pathway which is now considered as a dominating mechanism in solution crystallization and other systems. In this review, an attempt is made to compare underlyin...}
+      \field{issn}{1528-7483}
+      \field{journaltitle}{Crystal Growth {\&} Design}
+      \field{month}{11}
+      \field{number}{11}
+      \field{title}{{A Review of Classical and Nonclassical Nucleation Theories}}
+      \field{volume}{16}
+      \field{year}{2016}
+      \field{pages}{6663\bibrangedash 6681}
+      \range{pages}{19}
+      \verb{doi}
+      \verb 10.1021/acs.cgd.6b00794
+      \endverb
+      \verb{urlraw}
+      \verb http://pubs.acs.org/doi/10.1021/acs.cgd.6b00794
+      \endverb
+      \verb{url}
+      \verb http://pubs.acs.org/doi/10.1021/acs.cgd.6b00794
+      \endverb
+    \endentry
+    \entry{Lanaro2016}{article}{}
+      \name{author}{2}{}{%
+        {{uniquename=0,uniquepart=base,hash=5ad0946b760090c1f77a323c169ee566}{%
+           family={Lanaro},
+           familyi={L\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=f4d94ed997bfb694003cae40bfcdfb3c}{%
+           family={Patey},
+           familyi={P\bibinitperiod},
+           given={G.\bibnamedelimi N.},
+           giveni={G\bibinitperiod\bibinitdelim N\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {American Chemical Society}%
+      }
+      \strng{namehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{fullhash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{bibnamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authorbibnamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authornamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authorfullhash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \field{sortinit}{L}
+      \field{sortinithash}{2c7981aaabc885868aba60f0c09ee20f}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Molecular dynamics simulations are used to investigate the factors that influence the nucleation of NaCl crystals in a supersaturated aqueous solution. We describe a methodology for detecting solidlike NaCl clusters (potential nuclei) and following their evolution in time until they achieve nucleation (which is very rare) or dissolve back into solution. Through an analysis of cluster lifetimes and multiple nucleation events, we demonstrate that cluster size is not the only property that influences cluster stability and the probability of achieving nucleation. We introduce a parameter called cluster crystallinity, which is a measure of the solidlike order in a particular cluster. We show that cluster order (as measured by this parameter) has a strong influence on the lifetime and nucleation probability of clusters of equal sizes, with the lifetime and probability of nucleation increasing with increasing crystallinity. These observations remain true for clusters as small as six ions, showing that the struct...}
+      \field{issn}{1520-6106}
+      \field{journaltitle}{The Journal of Physical Chemistry B}
+      \field{month}{9}
+      \field{number}{34}
+      \field{title}{{Birth of NaCl Crystals: Insights from Molecular Simulations}}
+      \field{volume}{120}
+      \field{year}{2016}
+      \field{pages}{9076\bibrangedash 9087}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1021/acs.jpcb.6b05291
+      \endverb
+      \verb{urlraw}
+      \verb http://pubs.acs.org/doi/10.1021/acs.jpcb.6b05291
+      \endverb
+      \verb{url}
+      \verb http://pubs.acs.org/doi/10.1021/acs.jpcb.6b05291
+      \endverb
+    \endentry
+    \entry{Lanaro2017}{article}{}
+      \name{author}{2}{}{%
+        {{uniquename=0,uniquepart=base,hash=5ad0946b760090c1f77a323c169ee566}{%
+           family={Lanaro},
+           familyi={L\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=f4d94ed997bfb694003cae40bfcdfb3c}{%
+           family={Patey},
+           familyi={P\bibinitperiod},
+           given={G.\bibnamedelimi N.},
+           giveni={G\bibinitperiod\bibinitdelim N\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{fullhash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{bibnamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authorbibnamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authornamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authorfullhash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \field{sortinit}{L}
+      \field{sortinithash}{2c7981aaabc885868aba60f0c09ee20f}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{00219606}
+      \field{journaltitle}{Journal of Chemical Physics}
+      \field{number}{15}
+      \field{title}{{Crystal structures of model lithium halides in bulk phase and in clusters}}
+      \field{volume}{146}
+      \field{year}{2017}
+      \verb{doi}
+      \verb 10.1063/1.4979926
+      \endverb
+    \endentry
+    \entry{Lanaro2018}{article}{}
+      \name{author}{2}{}{%
+        {{uniquename=0,uniquepart=base,hash=5ad0946b760090c1f77a323c169ee566}{%
+           family={Lanaro},
+           familyi={L\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=f4d94ed997bfb694003cae40bfcdfb3c}{%
+           family={Patey},
+           familyi={P\bibinitperiod},
+           given={G.\bibnamedelimi N.},
+           giveni={G\bibinitperiod\bibinitdelim N\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {AIP Publishing LLC}%
+      }
+      \strng{namehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{fullhash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{bibnamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authorbibnamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authornamehash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \strng{authorfullhash}{bbee0a0c954c1a6e7433a60e0844beac}
+      \field{sortinit}{L}
+      \field{sortinithash}{2c7981aaabc885868aba60f0c09ee20f}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Molecular dynamics (MD) simulations are employed to investigate crystal nucleation and growth in oversaturated aqueous LiF solutions. Results obtained for a range of temperatures provide evidence that the rate of crystal growth is determined by a substantial energy barrier (∼49 kJ mol−1) related to the loss of water from the ion hydration shells. Employing direct MD simulations, we do not observe spontaneous nucleation of LiF crystals at 300 K, but nucleation is easily observable in NVT simulations at 500 K. This contrasts with the NaCl case, where crystal nucleation is directly observed in similar simulations at 300 K. Based on these observations, together with a detailed analysis of ion clustering in metastable LiF solutions, we argue that the ion dehydration barrier also plays a key role in crystal nucleation. The hydration of the relatively small Li+ and F− ions strongly influences the probability of forming large, crystal-like ion clusters, which are a necessary precursor to nucleation. This importan...}
+      \field{issn}{0021-9606}
+      \field{journaltitle}{The Journal of Chemical Physics}
+      \field{month}{1}
+      \field{number}{2}
+      \field{title}{{The influence of ion hydration on nucleation and growth of LiF crystals in aqueous solution}}
+      \field{volume}{148}
+      \field{year}{2018}
+      \field{pages}{024507}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1063/1.5001521
+      \endverb
+      \verb{urlraw}
+      \verb http://aip.scitation.org/doi/10.1063/1.5001521
+      \endverb
+      \verb{url}
+      \verb http://aip.scitation.org/doi/10.1063/1.5001521
+      \endverb
+      \keyw{crystal growth from solution,lithium compounds,molecular dynamics method,nucleation,solvation}
+    \endentry
+    \entry{Peintinger2013}{article}{}
+      \name{author}{3}{}{%
+        {{uniquename=0,uniquepart=base,hash=5d45aaf0f129d77dd73c009673d1f731}{%
+           family={Peintinger},
+           familyi={P\bibinitperiod},
+           given={Michael\bibnamedelima F.},
+           giveni={M\bibinitperiod\bibinitdelim F\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=386b9b556adeda0e7a48e5e265662397}{%
+           family={Oliveira},
+           familyi={O\bibinitperiod},
+           given={Daniel\bibnamedelima Vilela},
+           giveni={D\bibinitperiod\bibinitdelim V\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=af90494e7590949356f68dfb5b026942}{%
+           family={Bredow},
+           familyi={B\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Wiley-Blackwell}%
+      }
+      \strng{namehash}{09b9ae51dd09007071507d144634cd2d}
+      \strng{fullhash}{67daa4eae5a4f6fe9afd2ac2e7c24987}
+      \strng{bibnamehash}{67daa4eae5a4f6fe9afd2ac2e7c24987}
+      \strng{authorbibnamehash}{67daa4eae5a4f6fe9afd2ac2e7c24987}
+      \strng{authornamehash}{09b9ae51dd09007071507d144634cd2d}
+      \strng{authorfullhash}{67daa4eae5a4f6fe9afd2ac2e7c24987}
+      \field{sortinit}{P}
+      \field{sortinithash}{8d51b3d5b78d75b54308d706b9bbe285}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{01928651}
+      \field{journaltitle}{Journal of Computational Chemistry}
+      \field{month}{3}
+      \field{number}{6}
+      \field{title}{{Consistent Gaussian basis sets of triple-zeta valence with polarization quality for solid-state calculations}}
+      \field{volume}{34}
+      \field{year}{2013}
+      \field{pages}{451\bibrangedash 459}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1002/jcc.23153
+      \endverb
+      \verb{file}
+      \verb :C$\backslash$:/Users/Hayden/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Peintinger, Oliveira, Bredow - 2013 - Consistent Gaussian basis sets of triple-zeta valence with polarization quality for solid-state ca.pdf:pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://doi.wiley.com/10.1002/jcc.23153
+      \endverb
+      \verb{url}
+      \verb http://doi.wiley.com/10.1002/jcc.23153
+      \endverb
+      \keyw{CRYSTAL,TZVP,basis sets,solid‐state calculations}
+    \endentry
+    \entry{Perdew1996}{article}{}
+      \name{author}{3}{}{%
+        {{uniquename=0,uniquepart=base,hash=b20502c143ecda7aa2ac9969b4834ecf}{%
+           family={Perdew},
+           familyi={P\bibinitperiod},
+           given={John\bibnamedelima P},
+           giveni={J\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=33a535778ce96cdd2d59799deeea173d}{%
+           family={Burke},
+           familyi={B\bibinitperiod},
+           given={Kieron},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=ccb694b80578a814211265eb307fdcde}{%
+           family={Ernzerhof},
+           familyi={E\bibinitperiod},
+           given={Matthias},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {American Physical Society}%
+      }
+      \strng{namehash}{a6b4a6d7d2cbcb31ab2561f22bbe2d87}
+      \strng{fullhash}{abea4610c58f739c582a833750abe5e3}
+      \strng{bibnamehash}{abea4610c58f739c582a833750abe5e3}
+      \strng{authorbibnamehash}{abea4610c58f739c582a833750abe5e3}
+      \strng{authornamehash}{a6b4a6d7d2cbcb31ab2561f22bbe2d87}
+      \strng{authorfullhash}{abea4610c58f739c582a833750abe5e3}
+      \field{sortinit}{P}
+      \field{sortinithash}{8d51b3d5b78d75b54308d706b9bbe285}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Phys. Rev. Lett.}
+      \field{month}{10}
+      \field{number}{18}
+      \field{title}{{Generalized Gradient Approximation Made Simple}}
+      \field{volume}{77}
+      \field{year}{1996}
+      \field{pages}{3865\bibrangedash 3868}
+      \range{pages}{4}
+      \verb{doi}
+      \verb 10.1103/PhysRevLett.77.3865
+      \endverb
+      \verb{urlraw}
+      \verb https://link.aps.org/doi/10.1103/PhysRevLett.77.3865
+      \endverb
+      \verb{url}
+      \verb https://link.aps.org/doi/10.1103/PhysRevLett.77.3865
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

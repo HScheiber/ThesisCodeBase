@@ -1,0 +1,60 @@
+export MPI_PATH='/cvmfs/soft.computecanada.ca/easybuild/software/2020/avx2/MPI/intel2020/openmpi4'
+export INTEL_PATH='/cvmfs/soft.computecanada.ca/easybuild/software/2020/avx2/Compiler/intel2020'
+export MKLROOT='/cvmfs/soft.computecanada.ca/easybuild/software/2020/Core/imkl/2020.1.217/mkl'
+export GCC_LIBRARY_DIR='/cvmfs/soft.computecanada.ca/easybuild/software/2020/Core/gcccore/9.3.0/lib64'
+
+./install_cp2k_toolchain.sh -j 48 --with-libxsmm=system --with-openblas=system --with-fftw=system --with-reflapack=no  --with-openmpi=system --mpi-mode=openmpi --math-mode=openblas --with-cmake=system --with-libint=/cvmfs/soft.computecanada.ca/easybuild/software/2020/avx2/Compiler/gcc9/libint/2.6.0 --with-libxc=system  --with-libxsmm=/cvmfs/soft.computecanada.ca/easybuild/software/2020/avx2/Compiler/gcc9/libxsmm/1.16.1 --with-scalapack=system --with-elpa=install --with-spglib=system --with-hdf5=system --with-gsl=system --with-libvori=no --with-cosma=no --with-spfft=no --with-sirius=no
+
+module --force purge
+module load StdEnv/2020 gcc/9.3.0 openmpi/4.0.3
+module del ipykernel/2020a scipy-stack/2020a
+module load libxsmm/1.16.1
+module load cmake/3.18.4
+module load fftw-mpi/3.3.8
+module load libint/2.6.0
+module load libxc/4.3.4 
+module load spglib/1.16.0
+module load hdf5/1.10.6
+module load gsl/2.6
+module load scalapack/2.1.0
+module load openblas/0.3.9
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export F77=gfortran
+
+
+
+cp /home/scheiber/cp2k-8.1/tools/toolchain/install/arch/* ~/cp2k-8.1/arch/
+source /home/scheiber/cp2k-8.1/tools/toolchain/install/setup
+source /home/scheiber/cp2k/tools/toolchain/install/setup
+cd ~/cp2k-8.1/
+
+
+make -j 48 ARCH=Linux-x86-64-gfortran VERSION=psmp test clean
+make -j 48 ARCH=Linux-x86-64-intel VERSION=psmp test clean
+make -j 48 ARCH=local VERSION=psmp test clean
+
+
+
+1. TO RUN CP2K VERSION 8.1, LOAD THE FOLLOWING:
+
+module --force purge
+module load StdEnv/2020 gcc/9.3.0 openmpi/4.0.3
+module del ipykernel/2020a scipy-stack/2020a
+module load libxsmm/1.16.1
+module load cmake/3.18.4
+module load fftw-mpi/3.3.8
+module load libint/2.6.0
+module load libxc/4.3.4 
+module load spglib/1.16.0
+module load hdf5/1.10.6
+module load gsl/2.6
+module load scalapack/2.1.0
+module load openblas/0.3.9
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export F77=gfortran
+source /home/scheiber/cp2k-8.1/tools/toolchain/install/setup
+
+
+2. THEN RUN:
+
+mpiexec -np 36 cp2k-8.1.popt test_gga_WZ.inp

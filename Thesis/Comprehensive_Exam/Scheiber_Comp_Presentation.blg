@@ -1,0 +1,22 @@
+[0] Config.pm:302> INFO - This is Biber 2.11
+[0] Config.pm:305> INFO - Logfile is 'Scheiber_Comp_Presentation.blg'
+[38] biber-MSWIN64:313> INFO - === 
+[110] Biber.pm:371> INFO - Reading 'Scheiber_Comp_Presentation.bcf'
+[206] Biber.pm:857> INFO - Found 10 citekeys in bib section 0
+[220] Biber.pm:3976> INFO - Processing section 0
+[246] Biber.pm:4136> INFO - Looking for bibtex format file 'references.bib' for section 0
+[263] bibtex.pm:1500> INFO - LaTeX decoding ...
+[419] bibtex.pm:1316> INFO - Found BibTeX data source 'references.bib'
+[425] Utils.pm:193> WARN - Duplicate entry key: 'szabo2012modern' in file 'references.bib', skipping ...
+[438] Utils.pm:193> WARN - month field 'Jan' in entry 'Lanaro2018' is not an integer - this will probably not sort properly.
+[447] Utils.pm:193> WARN - month field 'Mar' in entry 'Peintinger2013' is not an integer - this will probably not sort properly.
+[465] Utils.pm:193> WARN - month field 'Feb' in entry 'Huggins1937' is not an integer - this will probably not sort properly.
+[473] Utils.pm:193> WARN - month field 'oct' in entry 'Perdew1996' is not an integer - this will probably not sort properly.
+[481] Utils.pm:193> WARN - month field 'sep' in entry 'Lanaro2016' is not an integer - this will probably not sort properly.
+[509] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[509] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[509] Biber.pm:3804> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[510] Biber.pm:3810> INFO - No sort tailoring available for locale 'en-US'
+[572] bbl.pm:617> INFO - Writing 'Scheiber_Comp_Presentation.bbl' with encoding 'UTF-8'
+[582] bbl.pm:720> INFO - Output to Scheiber_Comp_Presentation.bbl
+[586] Biber.pm:110> INFO - WARNINGS: 6

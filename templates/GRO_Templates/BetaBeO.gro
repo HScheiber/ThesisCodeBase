@@ -1,0 +1,11 @@
+##MET####HAL## BetaBeO Unit Cell
+    8
+    0        ##MET##    1   ##MX1##   ##MY1##   ##MZ1##
+    0        ##MET##    2   ##MX2##   ##MY2##   ##MZ2##
+    0        ##MET##    3   ##MX3##   ##MY3##   ##MZ3##
+    0        ##MET##    4   ##MX4##   ##MY4##   ##MZ4##
+    0        ##HAL##    5   ##HX1##   ##HY1##   ##HZ1##
+    0        ##HAL##    6   ##HX2##   ##HY2##   ##HZ2##
+    0        ##HAL##    7   ##HX3##   ##HY3##   ##HZ3##
+    0        ##HAL##    8   ##HX4##   ##HY4##   ##HZ4##
+  ##V1X##  ##V2Y##  ##V3Z##  ##V1Y##  ##V1Z##  ##V2X##  ##V2Z##  ##V3X##  ##V3Y##
