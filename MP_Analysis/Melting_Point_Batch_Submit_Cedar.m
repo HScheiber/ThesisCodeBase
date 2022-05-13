@@ -51,7 +51,7 @@ Set = 63;
 Salt = 'NaCl';
 Theory = 'JC';
 T0 = 1290;
-Reps = 1:25;
+Reps = 1:50;
 for kdx = 1:length(Reps)
     Rep = num2str(Reps(kdx));
     
