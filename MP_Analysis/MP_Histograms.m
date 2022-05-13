@@ -10,9 +10,9 @@ Custom_Legend = true;
 % 'MeltFreezeThreshold' 'XYZ' 'XY' 'Z' 'N' 'Ewald' 'Fourier_Spacing'
 % 'Ewald_rtol' 'ScaleCompressibility' 'PreEquilibrate'
 
-Sets = {'Set60' 'Set61'};
+Sets = {'Set60' 'Set61' 'Set62'};
 Legend_Params = {'N' 'MaxTime' 'MeltFreezeThreshold'};
-
+Show_Fit_dist = false;
 % Sets = {'Set27' 'Set28' 'Set29' 'Set30' 'Set31'};
 % Legend_Params = {'N' 'R_C' 'Thermostat' 'Tau_T' 'Barostat' 'Tau_P'};
 
@@ -20,15 +20,21 @@ Legend_Params = {'N' 'MaxTime' 'MeltFreezeThreshold'};
 N_Sets = length(Sets);
 Colours = cbrewer('qual','Set2',max(N_Sets,3));
 ColoursDark = cbrewer('qual','Dark2',max(N_Sets,3));
-Legend_txt = cell(1,2*N_Sets);
-p = gobjects(1,2*N_Sets);
-w = 0.75;
+if Show_Fit_dist
+    Legend_txt = cell(1,2*N_Sets);
+    p = gobjects(1,2*N_Sets);
+else
+    Legend_txt = cell(1,N_Sets);
+    p = gobjects(1,N_Sets);
+end
+w = 0.5;
 dist_start = 1280;
 dist_end = 1300;
 bin_edges = dist_start:w:dist_end; %205:w:226;
 bin_centers = bin_edges(1:end-1)+w/2;
 xlimits = [bin_edges(1) bin_edges(end)];
 YDat = zeros(N_Sets,length(bin_edges)-1);
+
 
 figh = figure('WindowState','maximized','NumberTitle','off',...
     'Name','','Visible','On');
@@ -48,11 +54,21 @@ for sidx = 1:N_Sets
     col = Colours(sidx,:);
     colDark = ColoursDark(sidx,:);
     
-    [~,Dependent_var,Legend_txt{2*sidx-1},~,~,~,Parameters] =  MP_Set_Info(Set);
-    if Custom_Legend
-        Legend_txt{2*sidx-1} = Parameters.(Legend_Params{1});
-        for lidx = 2:length(Legend_Params)
-            Legend_txt{2*sidx-1} = [Legend_txt{2*sidx-1} ', ' Parameters.(Legend_Params{lidx})];
+    if Show_Fit_dist
+        [~,Dependent_var,Legend_txt{2*sidx-1},~,~,~,Parameters] =  MP_Set_Info(Set);
+        if Custom_Legend
+            Legend_txt{2*sidx-1} = Parameters.(Legend_Params{1});
+            for lidx = 2:length(Legend_Params)
+                Legend_txt{2*sidx-1} = [Legend_txt{2*sidx-1} ', ' Parameters.(Legend_Params{lidx})];
+            end
+        end
+    else
+        [~,Dependent_var,Legend_txt{sidx},~,~,~,Parameters] =  MP_Set_Info(Set);
+        if Custom_Legend
+            Legend_txt{sidx} = Parameters.(Legend_Params{1});
+            for lidx = 2:length(Legend_Params)
+                Legend_txt{sidx} = [Legend_txt{sidx} ', ' Parameters.(Legend_Params{lidx})];
+            end
         end
     end
     
@@ -118,6 +134,10 @@ for sidx = 1:N_Sets
     end
     %YDat(sidx,:) = histcounts(Y,bin_edges);
     YDat = histcounts(Y,bin_edges);
+    
+    
+    if Show_Fit_dist
+    
 %     p(2*sidx-1) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
 %         'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
     p(2*sidx-1) = bar(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
@@ -145,6 +165,15 @@ for sidx = 1:N_Sets
     SEM = std(Y)/sqrt(length(Y));               % Standard Error
     ts = tinv([0.025  0.975],length(Y)-1);      % T-Score
     CI = mean(Y) + ts*SEM;                      % Confidence Intervals
+    
+    else
+        
+    %     p(sidx) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
+    %         'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
+        p(sidx) = bar(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
+            'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
+        
+    end
     
     
 
