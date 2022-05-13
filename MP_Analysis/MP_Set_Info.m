@@ -1407,11 +1407,11 @@ switch Set
         
         Models = {'JC'};
         Dependent_var = 'Rep';
-        Legend_txt = 'N = 11664, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
+        Legend_txt = 'N = 2000, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
         x_label = 'Trial Number';
         xlimits = [0 11];
         x_ticks = 1:10; 
-	case 'Set61' % Set60: Testing Pre-Equilibration + Initial equilibration with my "default" parameters + Rc = 1.4 + dispersion correction ON
+	case 'Set61' % Set61: Testing Pre-Equilibration + Initial equilibration with my "default" parameters + Rc = 1.4 + dispersion correction ON
         Parameters.Thermostat = 'V-Rescale Thermostat';
         Parameters.Tau_T = '$\tau_T = 0.2$ ps';
         Parameters.Barostat = 'Parrinello-Rahman Barostat';
@@ -1420,10 +1420,34 @@ switch Set
         Parameters.DispCorr = 'Disp. Corr. ON';
         Parameters.MaxTime = '$t_{max} = 5$ ns';
         Parameters.MeltFreezeThreshold = '$\Delta x_{\mathrm{liquid}}$ = 25 \%';
-        Parameters.XYZ = '(x,y,z) = (3.0,3.0,6.0) nm';
-        Parameters.XY = '(x,y) = (3.0,3.0) nm';
-        Parameters.Z = 'z = 6.0 nm';
-        Parameters.N = 'N = 11000';
+        Parameters.XYZ = '(x,y,z) = (6.0,6.0,12.0) nm';
+        Parameters.XY = '(x,y) = (6.0,6.0) nm';
+        Parameters.Z = 'z = 12.0 nm';
+        Parameters.N = 'N = 11664';
+        Parameters.Ewald = 'PME Summation';
+        Parameters.Fourier_Spacing = 'Fourier Spacing = 0.12 nm';
+        Parameters.Ewald_rtol = 'Ewald Rel. Tol. = $10^{-5}$';
+        Parameters.PreEquilibrate = 'Pre-Equilibration ON';
+        
+        Models = {'JC'};
+        Dependent_var = 'Rep';
+        Legend_txt = 'N = 11664, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
+        x_label = 'Trial Number';
+        xlimits = [0 11];
+        x_ticks = 1:10;
+	case 'Set62'
+        Parameters.Thermostat = 'V-Rescale Thermostat';
+        Parameters.Tau_T = '$\tau_T = 0.2$ ps';
+        Parameters.Barostat = 'Parrinello-Rahman Barostat';
+        Parameters.Tau_P = '$\tau_P = 1$ ps';
+        Parameters.R_C = '$r_{c} = 1.40$ nm';
+        Parameters.DispCorr = 'Disp. Corr. ON';
+        Parameters.MaxTime = '$t_{max} = 1$ ns';
+        Parameters.MeltFreezeThreshold = '$\Delta x_{\mathrm{liquid}}$ = 25 \%';
+        Parameters.XYZ = '(x,y,z) = (6.0,6.0,12.0) nm';
+        Parameters.XY = '(x,y) = (6.0,6.0) nm';
+        Parameters.Z = 'z = 12.0 nm';
+        Parameters.N = 'N = 11664';
         Parameters.Ewald = 'PME Summation';
         Parameters.Fourier_Spacing = 'Fourier Spacing = 0.12 nm';
         Parameters.Ewald_rtol = 'Ewald Rel. Tol. = $10^{-5}$';
@@ -1435,5 +1459,29 @@ switch Set
         x_label = 'Trial Number';
         xlimits = [0 11];
         x_ticks = 1:10; 
+	case 'Set63' % Set63: Testing Pre-Equilibration + Initial equilibration with my "default" parameters + Rc = 1.4 + dispersion correction ON
+        Parameters.Thermostat = 'V-Rescale Thermostat';
+        Parameters.Tau_T = '$\tau_T = 0.2$ ps';
+        Parameters.Barostat = 'Parrinello-Rahman Barostat';
+        Parameters.Tau_P = '$\tau_P = 1$ ps';
+        Parameters.R_C = '$r_{c} = 1.40$ nm';
+        Parameters.DispCorr = 'Disp. Corr. ON';
+        Parameters.MaxTime = '$t_{max} = 5$ ns';
+        Parameters.MeltFreezeThreshold = '$\Delta x_{\mathrm{liquid}}$ = 15 \%';
+        Parameters.XYZ = '(x,y,z) = (6.0,6.0,12.0) nm';
+        Parameters.XY = '(x,y) = (6.0,6.0) nm';
+        Parameters.Z = 'z = 12.0 nm';
+        Parameters.N = 'N = 11664';
+        Parameters.Ewald = 'PME Summation';
+        Parameters.Fourier_Spacing = 'Fourier Spacing = 0.12 nm';
+        Parameters.Ewald_rtol = 'Ewald Rel. Tol. = $10^{-5}$';
+        Parameters.PreEquilibrate = 'Pre-Equilibration ON';
+        
+        Models = {'JC'};
+        Dependent_var = 'Rep';
+        Legend_txt = 'N = 11664, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
+        x_label = 'Trial Number';
+        xlimits = [0 11];
+        x_ticks = 1:10;
 
 end
