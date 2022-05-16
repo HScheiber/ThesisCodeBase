@@ -3,13 +3,15 @@ Data = load(fullfile(Settings.home,'data','MX_JCTF_Min_Data.mat'),'Data').Data;
 
 fs = 24;
 
-Theory = 'JC';
+Theory = 'JC4P';
+%Salts = {'NaCl'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...
          'KF' 'KCl' 'KBr' 'KI' ...
          'RbF' 'RbCl' 'RbBr' 'RbI' ...
          'CsF' 'CsCl' 'CsBr' 'CsI'};
 Structures = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+Structures_legend = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' '$\beta$-BeO' 'CsCl'};
 Prop_of_intr = 'E';
 
 X = 1:length(Salts);
@@ -57,13 +59,22 @@ switch Theory
         Thertxt = Theory;
 end
 
-title(['Comparison of Alkali Halide Crystal Energies: ' Thertxt ' Model.'],...
-    'Interpreter','latex','FontSize',fs)
+%title(['Comparison of Alkali Halide Crystal Energies: ' Thertxt ' Model.'],...
+%    'Interpreter','latex','FontSize',fs)
 xlim(axh,[0.5 length(X)+0.5])
 ylim(axh,'padded')
 xticks(axh,X);
 xticklabels(axh,Salts);
 set(axh,'FontSize',fs,'Box','On','TickLabelInterpreter','latex')
+axh.XAxis.TickLength = [0 0];
+axh.YGrid = 'on';
+axh.YMinorGrid = 'On';
 ylabel(axh,'$E_{\textrm{RS}} - E_{\textrm{Struc}}$ [kJ mol$^{-1}$]','Interpreter','latex');
-legend(p,Structures,'FontSize',fs,'Box','On','Interpreter','latex',...
+legend(p,Structures_legend,'FontSize',fs,'Box','On','Interpreter','latex',...
     'NumColumns',4)
+% ylim(axh,[-60 10])
+% xticks(axh,[]);
+% xticklabels(axh,[]);
+
+exportgraphics(axh ,['C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\SI_Figures\Min_Structures_' Theory '.eps'],...
+    'ContentType','vector','BackgroundColor','none')

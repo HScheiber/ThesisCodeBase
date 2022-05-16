@@ -3,16 +3,16 @@ DataDir = fullfile(home,'data','Melting_Point_Data.mat');
 Salt = 'NaCl';
 SolStructure = 'Rocksalt';
 Model = 'JC';
-fs = 24;
+fs = 32;
 Custom_Legend = true;
 % Custom legend parameters:
 % 'Thermostat' 'Tau_T' 'Barostat' 'Tau_P' 'R_C' 'DispCorr' 'MaxTime'
 % 'MeltFreezeThreshold' 'XYZ' 'XY' 'Z' 'N' 'Ewald' 'Fourier_Spacing'
 % 'Ewald_rtol' 'ScaleCompressibility' 'PreEquilibrate'
 
-Sets = {'Set60' 'Set61' 'Set62'};
-Legend_Params = {'N' 'MaxTime' 'MeltFreezeThreshold'};
-Show_Fit_dist = false;
+Sets = {'Set60' 'Set61'}; % 'Set62' 'Set63'
+Legend_Params = {'N'};
+Show_Fit_dist = true;
 % Sets = {'Set27' 'Set28' 'Set29' 'Set30' 'Set31'};
 % Legend_Params = {'N' 'R_C' 'Thermostat' 'Tau_T' 'Barostat' 'Tau_P'};
 
@@ -34,13 +34,14 @@ bin_edges = dist_start:w:dist_end; %205:w:226;
 bin_centers = bin_edges(1:end-1)+w/2;
 xlimits = [bin_edges(1) bin_edges(end)];
 YDat = zeros(N_Sets,length(bin_edges)-1);
+b = [1289.7 1.4; 1289.9 0.45];
 
 
 figh = figure('WindowState','maximized','NumberTitle','off',...
     'Name','','Visible','On');
 axh = axes(figh,'FontSize',24,'TickLabelInterpreter','latex',...
-    'XMinorGrid','on','YLimitMethod','padded',...
-    'YMinorGrid','on');
+    'XMinorGrid','off','YLimitMethod','padded',...
+    'YMinorGrid','off','Position',[0.07 0.13 0.9 0.84]);
 hold(axh,'on')
 
 Exp = Load_Experimental_Data;
@@ -138,41 +139,45 @@ for sidx = 1:N_Sets
     
     if Show_Fit_dist
     
-%     p(2*sidx-1) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
-%         'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
-    p(2*sidx-1) = bar(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
-        'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
-    
-    
-	% Generate a Gaussian Fit model
-    X_known = bin_centers;
-    Y_known = YDat./sum(YDat);
-    modelfun = @(b,x)normpdf(x,b(1),b(2));
-    beta0 = [1290 2];
-    opts = statset('Display','iter','TolFun',1e-20,'TolX',1e-20,'maxiter',1000);
-    model = fitnlm(X_known',Y_known',modelfun,beta0,'Options',opts);
-    
-    x = (dist_start:0.1:dist_end)';
-    y = model.predict(x);
-    hold on
-    p(2*sidx) = plot(x,y,'Linewidth',2,'Color',Colours(sidx,:));
-    Legend_txt{2*sidx} = ['Fitted Gaussian: $\mu = ' num2str(model.Coefficients.Estimate(1),'%.1f') '$ K, $\sigma = ' num2str(model.Coefficients.Estimate(2),'%.2f') '$ K'];
+    %     p(2*sidx-1) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
+    %         'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
+        p(2*sidx-1) = bar(axh,bin_centers,YDat./sum(YDat.*w),'FaceColor',Colours(sidx,:),...
+            'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
 
-    % Statistics
-    varc = var(Y);
-    meanc = mean(Y);
-    
-    SEM = std(Y)/sqrt(length(Y));               % Standard Error
-    ts = tinv([0.025  0.975],length(Y)-1);      % T-Score
-    CI = mean(Y) + ts*SEM;                      % Confidence Intervals
-    
+
+        % Generate a Gaussian Fit model
+        X_known = bin_centers;
+        Y_known = YDat./sum(YDat.*w);
+        modelfun = @(b,x)normpdf(x,b(1),b(2));
+        beta0 = [1289.9 1];
+        opts = statset('Display','iter','TolFun',1e-20,'TolX',1e-20,'maxiter',1000);
+        model = fitnlm(X_known',Y_known',modelfun,beta0,'Options',opts);
+
+        x = (dist_start:0.001:dist_end)';
+        y = model.predict(x);
+        %y = normpdf(x,b(sidx,1),b(sidx,2));
+        hold on
+        p(2*sidx) = plot(x,y,'Linewidth',3,'Color',Colours(sidx,:));
+        Legend_txt{2*sidx} = ['PDF: $\mu = ' num2str(model.Coefficients.Estimate(1),'%.1f') '$ K, $\sigma = ' num2str(model.Coefficients.Estimate(2),'%.2f') '$ K'];
+
+        %Legend_txt{2*sidx} = ['PDF: $\mu = ' num2str(b(sidx,1),'%.1f') '$ K, $\sigma = ' num2str(b(sidx,2),'%.2f') '$ K'];
+
+        
+        % Statistics
+        varc = var(Y);
+        meanc = mean(Y);
+
+        SEM = std(Y)/sqrt(length(Y));               % Standard Error
+        ts = tinv([0.025  0.975],length(Y)-1);      % T-Score
+        CI = mean(Y) + ts*SEM;                      % Confidence Intervals
+
     else
         
-    %     p(sidx) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
-    %         'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
-        p(sidx) = bar(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
+        p(sidx) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
             'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
-        
+%         p(sidx) = bar(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
+%             'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
+%         
     end
     
     
@@ -187,21 +192,21 @@ end
 %     p(i).CData = Colours(i,:);
 %     p(i).LineWidth = 2;
 % end
+legend(axh,p,Legend_txt,'location','Northwest','Interpreter','latex');
 
 set(axh,'FontSize',fs,'Box','On','TickLabelInterpreter','latex')
-xlim(axh,'padded')
+xlim(axh,'tight')
 ylim(axh,'padded')
 xlabel(axh,'$T_{m}$ [K]','Interpreter','latex');
 
     
 ylabel(axh,'$\rho(T_{m})$','Interpreter','latex')
 %yticks(axh,0:0.1:1)
-grid(axh,'minor')
 
 
-%% Fit normal distribution to results
-legend(axh,p,Legend_txt,'location','Northwest','Interpreter','latex');
+grid(axh,'on')
+drawnow
 
-
-
+exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Sys_Size_Comp.pdf',...
+    'ContentType','vector','BackgroundColor','none')
 

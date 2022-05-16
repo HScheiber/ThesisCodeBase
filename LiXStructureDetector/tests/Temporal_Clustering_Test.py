@@ -19,9 +19,6 @@
 # InMemory = False
 
 
-
-
-
 ## CsCl Example
 # WorkDir = r'D:\Example_Nucleations\CsCl\ExampleNuc_L_TF_NPT'
 # Salt = 'CsCl'
@@ -43,25 +40,25 @@
 # InMemory = False
 
 
-# # LiBr Example
-# WorkDir = r'D:\Example_Nucleations\LiBr\ExampleNuc_L_TF_NPT'
-# Salt = 'LiBr'
-# SystemName = 'ExampleNuc_L_TF_NPT'
-# SaveTrajectory=True
-# SaveFeatures=True
-# SavePredictions=True 
-# SavePredictionsImage=True
-# ML_TimeLength=0
-# ML_TimeStep=1
-# TimePerFrame=1
-# FileType='gro'
-# Verbose=True
-# Temporal_Cutoff = 7 #
-# StartPoint = 17400-Temporal_Cutoff
-# EndPoint = 17800+Temporal_Cutoff
-# Version = 2
-# SaveDir = None
-# InMemory = False
+# LiBr Example
+WorkDir = r'D:\Example_Nucleations\LiBr\ExampleNuc_L_TF_NPT'
+Salt = 'LiBr'
+SystemName = 'ExampleNuc_L_TF_NPT'
+SaveTrajectory=True
+SaveFeatures=True
+SavePredictions=True 
+SavePredictionsImage=True
+ML_TimeLength=0
+ML_TimeStep=1
+TimePerFrame=1
+FileType='gro'
+Verbose=True
+Temporal_Cutoff = 7 #
+StartPoint = 17400-Temporal_Cutoff
+EndPoint = 17800+Temporal_Cutoff
+Version = 2
+SaveDir = None
+InMemory = False
 
 
 # ## LiI Example
@@ -85,24 +82,24 @@
 # InMemory = False
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing'
-Salt = 'LiBr'
-SystemName = 'Prod2_W_TF_NPT'
-SaveTrajectory=True
-SaveFeatures=True
-SavePredictions=True 
-SavePredictionsImage=True
-ML_TimeLength=21
-ML_TimeStep=5
-TimePerFrame=5
-FileType='gro'
-Verbose=True
-Temporal_Cutoff = 0 #
-StartPoint = Temporal_Cutoff
-EndPoint = 1250-Temporal_Cutoff
-Version = 2
-SaveDir = None
-InMemory = False
+# WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing'
+# Salt = 'LiBr'
+# SystemName = 'Prod2_W_TF_NPT'
+# SaveTrajectory=True
+# SaveFeatures=True
+# SavePredictions=True 
+# SavePredictionsImage=True
+# ML_TimeLength=21
+# ML_TimeStep=5
+# TimePerFrame=5
+# FileType='gro'
+# Verbose=True
+# Temporal_Cutoff = 0 #
+# StartPoint = Temporal_Cutoff
+# EndPoint = 1250-Temporal_Cutoff
+# Version = 2
+# SaveDir = None
+# InMemory = False
 
 
 
@@ -459,8 +456,8 @@ if SaveFeatures:
         pickle.dump([Ql_result_all], f)
         
         
-# with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'rb') as f:
-#     [Ql_result_all] = pickle.load(f)
+with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'rb') as f:
+    [Ql_result_all] = pickle.load(f)
 
 # Calculate the prediction for each atom at each time step
 logging.info('\nInferring Predictions...')
@@ -567,11 +564,11 @@ if SavePredictionsImage:
     d_halide = hist_laxis(predicted_classes_grouped[init:finit,Halide_Ind], n_classes, [0,n_classes])
     d_halide_norm = d_halide/sum(Halide_Ind)
     
-    #d = hist_laxis(predicted_classes_grouped, n_classes, [0,n_classes])
-    #d_norm = d/np.shape(predicted_classes_grouped)[1]
+    d = hist_laxis(predicted_classes_grouped, n_classes, [0,n_classes])
+    d_norm = d/np.shape(predicted_classes_grouped)[1]
     
     x = np.array([i * traj_timestep + min_traj_time for i in Traj_starts[init:finit]])
-    #x = x - x[0]
+    x = x - x[0]
     
     # colors
     cols = sns.color_palette("muted",n_classes)
@@ -590,15 +587,16 @@ if SavePredictionsImage:
     
     matplotlib.rc('font', **font)
     
-    fig, ax = plt.subplots()
+    fig = plt.figure(figsize=(8, 4))
     for idx,y_dat_metal in enumerate(d_metal_norm.T):
         #yhat = uniform_filter1d(y_dat,size=int(np.ceil(len(y_dat)/30)))
         #plt.plot(x,yhat*100, label=labels[idx], color=cols[idx], linewidth=2, linestyle='dashed')
         y_dat_halide = d_halide_norm.T[idx,:]
+        # plt.plot(x-min(x),y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
+        # plt.plot(x-min(x),y_dat_halide*100, label=None, color=cols[idx], alpha=0.8, linewidth=3, linestyle='dashed')
+        y_dat = d_norm[idx,:]
+        # plt.plot(x-min(x),y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
         plt.plot(x,y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
-        plt.plot(x,y_dat_halide*100, label=None, color=cols[idx], alpha=0.8, linewidth=3, linestyle='dashed')
-        #y_dat = d_norm[idx,:]
-        #plt.plot(x,y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
     
     
     #plt.title('[' + ML_Name + ']: ' + Salt + ' ' + SystemName)
@@ -607,20 +605,26 @@ if SavePredictionsImage:
              alpha=0.25)
     plt.xlabel(r'Trajectory Time [ps]')
     plt.ylabel(r'Mole Fraction [%]')
+    ax = plt.gca()
     ax.set_yticks(np.arange(0, 110, step=10))
-    plt.legend(ncol=3,
-               framealpha=1,
-               borderpad=0.4,
-               labelspacing=0.25,
-               columnspacing=0.5,
-               borderaxespad=0.25,
-               handletextpad=0.5,
-               loc='upper center')
+    # ax.xaxis.set_ticklabels([])
+    # ax.yaxis.set_ticklabels([])
+    plt.legend(ncol=2,
+                framealpha=1,
+                borderpad=0.4,
+                labelspacing=0.25,
+                columnspacing=0.5,
+                borderaxespad=0.25,
+                handletextpad=0.5,
+                loc='center right')
     if y_max < 100:
         plt.ylim([0,y_max])
         
+    # plt.ylim([0,2])
+    # plt.xlim([0,max(x)])
+        
     if SaveDir == None:
-        fig.savefig(ML_Name + '_' + Salt + '_' + SystemName + '.pdf', dpi=1200, format='pdf',bbox_inches="tight")
+        fig.savefig(ML_Name + '_' + Salt + '_' + SystemName + '.svg', format='svg',bbox_inches="tight",transparent=True)
     else:
         fig.savefig(os.path.join(SaveDir,ML_Name + '_' + Salt + '_' + SystemName + '.pdf'), dpi=1200, format='pdf',bbox_inches="tight")
     

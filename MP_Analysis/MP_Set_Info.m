@@ -1399,7 +1399,7 @@ switch Set
         Parameters.XYZ = '(x,y,z) = (3.0,3.0,6.0) nm';
         Parameters.XY = '(x,y) = (3.0,3.0) nm';
         Parameters.Z = 'z = 6.0 nm';
-        Parameters.N = 'N = 2000';
+        Parameters.N = '$N = 2000$';
         Parameters.Ewald = 'PME Summation';
         Parameters.Fourier_Spacing = 'Fourier Spacing = 0.12 nm';
         Parameters.Ewald_rtol = 'Ewald Rel. Tol. = $10^{-5}$';
@@ -1407,7 +1407,7 @@ switch Set
         
         Models = {'JC'};
         Dependent_var = 'Rep';
-        Legend_txt = 'N = 2000, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
+        Legend_txt = '$N = 2000$, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
         x_label = 'Trial Number';
         xlimits = [0 11];
         x_ticks = 1:10; 
@@ -1423,7 +1423,7 @@ switch Set
         Parameters.XYZ = '(x,y,z) = (6.0,6.0,12.0) nm';
         Parameters.XY = '(x,y) = (6.0,6.0) nm';
         Parameters.Z = 'z = 12.0 nm';
-        Parameters.N = 'N = 11664';
+        Parameters.N = '$N = 11664$';
         Parameters.Ewald = 'PME Summation';
         Parameters.Fourier_Spacing = 'Fourier Spacing = 0.12 nm';
         Parameters.Ewald_rtol = 'Ewald Rel. Tol. = $10^{-5}$';
@@ -1431,7 +1431,7 @@ switch Set
         
         Models = {'JC'};
         Dependent_var = 'Rep';
-        Legend_txt = 'N = 11664, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
+        Legend_txt = '$N = 11664$, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
         x_label = 'Trial Number';
         xlimits = [0 11];
         x_ticks = 1:10;
@@ -1447,7 +1447,7 @@ switch Set
         Parameters.XYZ = '(x,y,z) = (6.0,6.0,12.0) nm';
         Parameters.XY = '(x,y) = (6.0,6.0) nm';
         Parameters.Z = 'z = 12.0 nm';
-        Parameters.N = 'N = 11664';
+        Parameters.N = '$N = 11664$';
         Parameters.Ewald = 'PME Summation';
         Parameters.Fourier_Spacing = 'Fourier Spacing = 0.12 nm';
         Parameters.Ewald_rtol = 'Ewald Rel. Tol. = $10^{-5}$';
@@ -1455,7 +1455,7 @@ switch Set
         
         Models = {'JC'};
         Dependent_var = 'Rep';
-        Legend_txt = 'N = 11664, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
+        Legend_txt = '$N = 11664$, VR Thermo, $\tau_T = 0.2 ps$, PR Baro, $\tau_P = 1 ps$';
         x_label = 'Trial Number';
         xlimits = [0 11];
         x_ticks = 1:10; 
@@ -1471,7 +1471,7 @@ switch Set
         Parameters.XYZ = '(x,y,z) = (6.0,6.0,12.0) nm';
         Parameters.XY = '(x,y) = (6.0,6.0) nm';
         Parameters.Z = 'z = 12.0 nm';
-        Parameters.N = 'N = 11664';
+        Parameters.N = '$N = 11664$';
         Parameters.Ewald = 'PME Summation';
         Parameters.Fourier_Spacing = 'Fourier Spacing = 0.12 nm';
         Parameters.Ewald_rtol = 'Ewald Rel. Tol. = $10^{-5}$';

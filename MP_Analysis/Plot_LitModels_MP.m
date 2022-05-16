@@ -168,3 +168,8 @@ xticklabels(axh,Salts);
 set(axh,'FontSize',fs,'Box','On','TickLabelInterpreter','latex')
 ylabel(axh,'T [K]','Interpreter','latex');
 legend(p,Legend_Labels,'FontSize',fs,'Box','On','Interpreter','latex','NumColumns',2)
+grid(axh,'on')
+
+
+exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
+    'ContentType','vector','BackgroundColor','none')
