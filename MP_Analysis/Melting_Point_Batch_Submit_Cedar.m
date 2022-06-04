@@ -58,7 +58,7 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).N_Calc = 1;
+    Settings_array(idx).JobSettings.N_Calc = 1;
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
