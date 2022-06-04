@@ -863,6 +863,15 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         system_froze = system_freezing
         system_melted = system_melting
     
+    # If both freezing and melting is detected, check which occurs later
+    if system_froze and system_melted:
+        if max(x[is_frozen]) > max(x[is_melted]):
+            system_froze = True
+            system_melted = False
+        else:
+            system_froze = False
+            system_melted = True
+    
     # If liquid has neither fully melted nor fully frozen, report back
     if not system_froze and not system_melted:
         time_to_phase_change = np.nan

@@ -136,31 +136,31 @@ import LiXStructureDetector
 # Spatial_Interfacial = None
 
 
-## LiI Example
-WorkDir = r'D:\Example_Nucleations\LiI\ExampleNuc_L_TF_NPT'
-Salt = 'LiI'
-SystemName = 'ExampleNuc_L_TF_NPT'
-SaveTrajectory=True
-SaveFeatures=True
-SavePredictions=False 
-SavePredictionsImage=True
-ML_TimeLength=10
-ML_TimeStep=1
-TimePerFrame=1
-FileType='gro'
-Verbose=True
-Temporal_Cutoff = 0
-StartPoint = 19400
-EndPoint = 20400
-Version = 2
-SaveDir = None
-InMemory = False
-Temporal_Cutoff = 0
-Voronoi = False
-Qlm_Average = True
-Prob_Interfacial = None
-Spatial_Reassignment = False
-Spatial_Interfacial = None
+# ## LiI Example
+# WorkDir = r'D:\Example_Nucleations\LiI\ExampleNuc_L_TF_NPT'
+# Salt = 'LiI'
+# SystemName = 'ExampleNuc_L_TF_NPT'
+# SaveTrajectory=True
+# SaveFeatures=True
+# SavePredictions=False 
+# SavePredictionsImage=True
+# ML_TimeLength=10
+# ML_TimeStep=1
+# TimePerFrame=1
+# FileType='gro'
+# Verbose=True
+# Temporal_Cutoff = 0
+# StartPoint = 19400
+# EndPoint = 20400
+# Version = 2
+# SaveDir = None
+# InMemory = False
+# Temporal_Cutoff = 0
+# Voronoi = False
+# Qlm_Average = True
+# Prob_Interfacial = None
+# Spatial_Reassignment = False
+# Spatial_Interfacial = None
 
 
 # WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing'
@@ -187,20 +187,48 @@ Spatial_Interfacial = None
 
 
 
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\T_1291.7288'
+Salt = 'NaCl'
+SystemName = 'Set60_Rep_1_R_JC_NPT'
+SaveTrajectory=False
+SaveFeatures=False
+SavePredictions=False 
+SavePredictionsImage=True
+ML_TimeLength=20
+ML_TimeStep=5
+TimePerFrame=5
+FileType='gro'
+Verbose=True
+Temporal_Cutoff = 0
+StartPoint = None
+EndPoint = None
+Version = 2
+SaveDir = None
+InMemory = False
+Temporal_Cutoff = 0
+Voronoi = False
+Qlm_Average = True
+Prob_Interfacial = None
+Spatial_Reassignment = False
+Spatial_Interfacial = None
+T = 1291.7288
+T_Ref = 1291.7288
 RefChangeThreshold = 0.25
+CheckFullTrajectory = True
 
 
-[system_froze,system_melted,time_to_phase_change] = LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=SystemName, T=None,
-                              T_Ref=None, RefStructure='Liquid', CheckFullTrajectory=False, 
-                              SaveTrajectory=False, SaveFeatures=False, 
-                              SavePredictions=False, SavePredictionsImage=False,
+
+[system_froze,system_melted,time_to_phase_change,final_ref_frac] = LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=SystemName, T=T,
+                              T_Ref=T_Ref, RefStructure='Liquid', CheckFullTrajectory=CheckFullTrajectory, 
+                              SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
+                              SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage,
                               InitialRefFrac=None, RefChangeThreshold=RefChangeThreshold, 
                               SlopeThreshold=1e10, SlopeCheckBegin=0.1,
-                              ML_TimeLength=20, ML_TimeStep=5, TimePerFrame=1000, 
-                              FileType='gro', Verbose=True, Version=2,
-                              Temporal_Cutoff=0, Voronoi = False, Qlm_Average=True,
-                              Prob_Interfacial=None, Spatial_Reassignment=False,
-                              Spatial_Interfacial=None)
+                              ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
+                              FileType=FileType, Verbose=Verbose, Version=Version,
+                              Temporal_Cutoff=Temporal_Cutoff, Voronoi=Voronoi, Qlm_Average=Qlm_Average,
+                              Prob_Interfacial=Prob_Interfacial, Spatial_Reassignment=Spatial_Reassignment,
+                              Spatial_Interfacial=Spatial_Interfacial)
 
 # LiXStructureDetector.Check_Structures(WorkDir, Salt, SystemName=SystemName,
 #                         SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 

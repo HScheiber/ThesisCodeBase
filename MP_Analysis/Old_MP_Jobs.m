@@ -3635,6 +3635,72 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MDP.Fourier_Spacing = 0.12;
 end
 
+%% Set63: 11000 atoms default settings (full debugged 2022-04-29) - reproduciblility test with MeltFreezeThreshold = 15%
+% Dispersion correction added
+% Cutoff 1.4 nm
+% Adding new Pre-equilibration strategy
+% Compressibility in all dimensions is now fixed at the solid experimental isothermal compressibility
+Set = 63;
+Salt = 'NaCl';
+Theory = 'JC';
+T0 = 1290;
+Reps = 1:50;
+for kdx = 1:length(Reps)
+    Rep = num2str(Reps(kdx));
+    
+    rng(Set + Reps(kdx))
+    T0_i = T0 + (rand-1/2)*2*20; % add a random number between -20 and +20 to the initial temperature
+    
+    idx = idx+1;
+    Settings_array(idx) = Shared_Settings;
+    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+    Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+    Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+    Settings_array(idx).Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
+    Settings_array(idx).JobID = ['Set' num2str(Set) '_Rep_' Rep]; % An ID that is tacked onto the folder name of all current jobs
+    Settings_array(idx).Manual_Box = false; % When set to true, rather than setting the number of atoms in a box, user sets the a, b, and c dimensions of the box
+    Settings_array(idx).MDP.RVDW_Cutoff = 1.4; % nm
+    Settings_array(idx).MDP.RCoulomb_Cutoff = 1.4; % nm
+    Settings_array(idx).MDP.RList_Cutoff = 1.4; % nm
+    Settings_array(idx).Cutoff_Buffer = 1.05;
+    Settings_array(idx).MDP.Disp_Correction = true; % Adds in long-range dispersion correction
+    Settings_array(idx).c_over_a = 2;
+    Settings_array(idx).N_atoms = 11000;
+    Settings_array(idx).BracketThreshold = 1; % K
+    Settings_array(idx).MinStepSize = 0.25;
+    Settings_array(idx).MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
+    Settings_array(idx).MeltFreezeThreshold = 0.15;
+    
+    Settings_array(idx).MaxWarn = 2;
+    Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
+    Settings_array(idx).InitialMeshSize = 10;
+    Settings_array(idx).MeshSizeMultiplier = 1;
+    
+    % Barostat Options
+    Settings_array(idx).Isotropy = 'semiisotropic';
+    Settings_array(idx).Target_P = [1 1]; % Bar
+    Settings_array(idx).Barostat = 'Parrinello-Rahman'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
+    Settings_array(idx).Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
+    Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
+    Settings_array(idx).ScaleCompressibility = 1;
+    
+    % Thermostat Options
+    Settings_array(idx).Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'nose-hoover' (set NO for NVE)
+    Settings_array(idx).Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
+    Settings_array(idx).Nsttcouple = Get_nstcouple(Settings_array(idx).Time_Constant_T,Settings_array(idx).MDP.dt); %[ps] The frequency for coupling the temperature. 
+    Settings_array(idx).Target_T = T0_i; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+    Settings_array(idx).MDP.Initial_T = T0_i; % Initial termpature at which to generate velocities
+    Settings_array(idx).T0 = T0_i; % K, Initial temperature
+    
+    Settings_array(idx).MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
+    Settings_array(idx).MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of the Ewald-shifted direct potential at rcoulomb. Decreasing this will give a more accurate direct sum, but then you need more wave vectors for the reciprocal sum.
+    Settings_array(idx).MDP.Fourier_Spacing = 0.12;
+end
+
+
 %% Prod1: Melting points of all alkali halides with "default" parameters + Rc = 1.4 + dispersion correction ON
 % Structure: rocksalt
 % N = 20000 atoms
