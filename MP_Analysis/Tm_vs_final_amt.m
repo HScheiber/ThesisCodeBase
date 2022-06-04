@@ -1,3 +1,4 @@
+% Tm_vs_final_amt
 Settings = Initialize_MD_Settings;
 Settings.Project_Directory_Name = 'Melting_Point_Studies';
 DataSetName = 'Set61_TvsXliq.mat';
