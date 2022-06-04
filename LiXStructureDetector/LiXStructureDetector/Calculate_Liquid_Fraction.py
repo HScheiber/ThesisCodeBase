@@ -764,6 +764,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     # Generate the histogram along one dimension: combined metal/halide
     d = hist_laxis(predicted_classes, n_classes, [0,n_classes])
     d_norm = d/t.atoms.n_atoms
+    final_ref_frac = d_norm[-1,ref_idx]
     x = np.array([i * traj_timestep + min_traj_time for i in Traj_starts])
     
     if CheckFullTrajectory and SavePredictionsImage:
@@ -881,4 +882,4 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     if not CheckFullTrajectory:
         time_to_phase_change = np.nan
     
-    return [system_froze,system_melted,time_to_phase_change]
+    return [system_froze,system_melted,time_to_phase_change,final_ref_frac]
