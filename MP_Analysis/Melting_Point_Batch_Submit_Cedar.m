@@ -25,8 +25,6 @@ Shared_Settings.JobSettings.dd = [1 2 2]; % Domain decomposition
 
 
 % Shared calculation parameters
-Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
-Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Shared_Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
 Shared_Settings.MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number of atoms (1,inf) of liquid/solid required to establish a phase change
 Shared_Settings.Optimizer = 'MPSearcher';
