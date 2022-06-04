@@ -12,12 +12,12 @@ setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
 
 Settings.Skip_Minimization = false;
 Settings.Theory = 'JC'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-Settings.Salt = 'CsCl'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-Settings.Structure = 'CsCl'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'
-Settings.RefStructure = 'CsCl'; % Reference structure used for determination of melting or freezing
+Settings.Salt = 'NaCl'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
+Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'
+Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing (usually liquid)
 Settings.Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
-Settings.JobID = 'Prod2'; % An ID that is tacked onto the folder name of all current jobs
-Settings.N_atoms = 11000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
+Settings.JobID = 'Test'; % An ID that is tacked onto the folder name of all current jobs
+Settings.N_atoms = 1000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
 Settings.Thermal_Solid = false;
 Settings.MDP.Disp_Correction = true;
 Settings.MinMDP.Disp_Correction = true;
@@ -32,7 +32,7 @@ Settings.Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be
 Settings.Nstpcouple = Get_nstcouple(Settings.Time_Constant_P,Settings.MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
 
 % Thermostat Options
-T0 = 93.75; %BestKnownMP(Settings);
+T0 = 1285; %BestKnownMP(Settings);
 Settings.Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'v-rescale' (set NO for NVE)
 Settings.Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
 Settings.Nsttcouple = Get_nstcouple(Settings.Time_Constant_T,Settings.MDP.dt); %[ps] The frequency for coupling the temperature. 
@@ -49,7 +49,7 @@ Settings.T0 = T0; % K, Initial temperature
 Settings.MeltFreezeThreshold = 0.25; % Required CHANGE in fraction or number of atoms either frozen or melted to flag the end of the simulation
 Settings.SaveTrajectory = true; % Save processed xyz trajectory file for each temperature check when true
 Settings.SavePredictionsImage = true; % Save structure fraction vs time image when true for each temperature check
-Settings.c_over_a = 2;
+Settings.c_over_a = 1;
 Settings.MaxTDiff = 0.01; % Max change in temperature before generating new initial conditions
 
 % Debugging
@@ -84,7 +84,7 @@ Settings.TimePerFrame = 10; % ps
 Settings.MDP.RVDW_Cutoff = 1.40; % nm
 Settings.MDP.RCoulomb_Cutoff = 1.40; % nm
 Settings.MDP.RList_Cutoff = 1.40; % nm
-Settings.Cutoff_Buffer = 1.2;
+Settings.Cutoff_Buffer = 1.01;
 
 
 Settings.MinMDP.RVDW_Cutoff = 1.90; % nm

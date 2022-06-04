@@ -4,7 +4,11 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
                         ML_TimeLength=5, ML_TimeStep=1, TimePerFrame=1, 
                         FileType='gro', Verbose=False, StartPoint = None,
                         EndPoint = None, Version = 2, SaveDir = None,
-                        InMemory = False, Temporal_Cutoff = 0):
+                        InMemory = False, Temporal_Cutoff = 0,
+                        Voronoi = False, Qlm_Average = False,
+                        Prob_Interfacial = None,
+                        Spatial_Reassignment = False,
+                        Spatial_Interfacial = None):
     
     """
     Created on Fri Nov 20 18:54:17 2020
@@ -50,6 +54,17 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         Temporal_Cutoff         [Frames] Eliminates short-term fluctuations of solids 
                                 in the liquid phase whose timescale is shorter 
                                 than this value.
+        Voronoi                 Use NN classification models based on Neighbourhoods 
+                                determined by Voronoi tesselation
+        Qlm_Average             Use NN classification models based on averaged Qlm 
+                                parameters
+        Prob_Interfacial        Use the probability of structure to classify interfacial 
+                                atoms
+        Spatial_Reassignment    Re-assign atom classes based on the class of the surrounding
+                                neighbourhood
+        Spatial_Interfacial     Re-assign atoms to interfacial if Spatial_Interfacial 
+                                fraction of surrounding atoms are not all at least one class
+                                
     @author: Hayden
     """
     
@@ -66,6 +81,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     import re
     import warnings
     import logging
+    import collections
     
     if SavePredictionsImage:
         #from scipy.ndimage.filters import uniform_filter1d
@@ -169,6 +185,12 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         L_list = [[2,4,6,8]] # List of lists: for each neighbour number, a list of l values for the order parameters
         timeless = False
     
+    if Voronoi:
+        Trial_ID = Trial_ID + 'v'
+    
+    if Qlm_Average:
+        Trial_ID = Trial_ID + 'a'
+    
     if Version == 1:
         ML_Name = 'V1NN-' + Trial_ID
     elif Version == 2:
@@ -181,9 +203,9 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     MLModelDir = os.path.join(pwd, "ML_Models/")
     
     if Version == 1:
-        model_loc = os.path.join(MLModelDir,'LiX_Sturcture_Selector_CNN_Model_' + Trial_ID + '.tf')
+        model_loc = os.path.join(MLModelDir,'LiX_Structure_Selector_CNN_Model_' + Trial_ID + '.tf')
     elif Version == 2:
-        model_loc = os.path.join(MLModelDir,'MX_Sturcture_Classifier_Model_' + Trial_ID + '.tf')
+        model_loc = os.path.join(MLModelDir,'MX_Structure_Classifier_Model_' + Trial_ID + '.tf')
     
     if not os.path.isdir(model_loc):
         raise FileNotFoundError('Unable to load Structure Selector model from: ' + model_loc + ' (model not found).')
@@ -234,9 +256,15 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
                     6: "B",
                     7: "A",
                     8: "C"}
-    
-    n_classes = len(map_dict)
-    
+        
+        n_classes = len(map_dict)
+        
+    if Spatial_Interfacial is not None or Prob_Interfacial is not None:
+        labels.append("Interfacial")
+        map_dict[n_classes] = "Interfacial"
+        map_label[n_classes] = "I"
+        
+        n_classes += 1
     
     trajfile = os.path.join(WorkDir, SystemName + "." + 'trr')
     grofile = os.path.join(WorkDir, SystemName + "." + FileType)
@@ -300,9 +328,8 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     # List of index points to examine
     steps_per_init_frame = int(TimePerFrame/traj_timestep)
     Traj_starts = list(range(min_step, max_step+1, steps_per_init_frame)) # Steps
-    ML_TimeLength_in_steps = int(np.ceil(ML_TimeLength/traj_timestep)) # number of trajectory steps required to traverse the CNN time slice
+    ML_TimeLength_in_steps = int(np.ceil((ML_TimeLength+ML_TimeStep)/traj_timestep)) # number of trajectory steps required to traverse the CNN time slice
     Half_ML_TimeLength_in_steps = int(np.floor(ML_TimeLength_in_steps/2))
-    
     
     # What is the number of features used in this model (useful for preallocation)
     n_features = 0
@@ -321,10 +348,23 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     Ql_result_traj = np.empty([t_slice_len,t.atoms.n_atoms,n_features])
     Ql_result_all = np.empty([num_traj_starts,t_slice_len,t.atoms.n_atoms,n_features])
     
+    if Spatial_Reassignment or Spatial_Interfacial is not None:
+        Save_Neighbour = True
+        Neighbourlist_list = []
+        Neighbourlist_slice = [None] * t_slice_len
+        Neighbourlist_slice_prev = [None] * t_slice_len
+    else:
+        Save_Neighbour = False
+    
     logging.info('Generating features...')
+    prev_traj_slice = np.array([])
+    central_idx = int((t_slice_len - 1)/2)
     if Include_ID:
         namelist = t.atoms.names
         Metal_Index = np.array([x not in Metal for x in namelist]).astype(int) # 0 = metal, 1 = halide
+        
+    if Voronoi:
+        voro = freud.locality.Voronoi()
     
     for traj_start_idx, Init_step in enumerate(Traj_starts):
         t_cur = time.time()
@@ -341,16 +381,16 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
             traj_slice = traj_slice + ds
         
         # Calculate Ql values at each time point in the time slice
-        prev_time = np.nan;
         for t_idx, ts in enumerate(t.trajectory[traj_slice]):
             
-            # Check if previous time slice is the same
-            if ts.time == prev_time:
-                Ql_result_traj[t_idx] = np.column_stack(Ql_result)
+            if traj_slice[t_idx] in prev_traj_slice:
+                pridx = list(prev_traj_slice).index(traj_slice[t_idx])
+                Ql_result_traj[t_idx] = Ql_result_all[traj_start_idx-1,pridx,:,:]
+                if Save_Neighbour:
+                    Neighbourlist_slice[t_idx] = Neighbourlist_slice_prev[pridx]
+                    if t_idx == central_idx:
+                        Neighbourlist_list.append(Neighbourlist_slice[t_idx])
                 continue
-            
-            # update previous time
-            prev_time = ts.time
             
             if pbc_on:
                 box_data = to_freud_box(ts.dimensions)
@@ -367,16 +407,28 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
             if Include_ID:
                 Ql_result[fidx] = Metal_Index # Append the atom idenities: metal vs non-metal
                 fidx += 1
-            for Neighbour_idx, N_neighbour  in enumerate(N_neighbour_list):
+            for Neighbour_idx, N_neighbour in enumerate(N_neighbour_list):
                 
-                # Construct the neighbour filter
-                query_args = dict(mode='nearest', num_neighbors=N_neighbour, exclude_ii=True)
+                if Voronoi:
+                    nlist = voro.compute((box_data, point_data)).nlist
+                else:
+                    # Construct the neighbour filter
+                    query_args = dict(mode='nearest', num_neighbors=N_neighbour, exclude_ii=True)
+                    
+                    # Build the neighbour list
+                    nlist = freud.locality.AABBQuery(box_data, point_data).query(point_data, query_args).toNeighborList()
                 
-                # Build the neighbour list
-                nlist = freud.locality.AABBQuery(box_data, point_data).query(point_data, query_args).toNeighborList()
+                if Save_Neighbour and (Neighbour_idx+1 == len(N_neighbour_list)):
+                    Neighbourlist_slice[t_idx] = nlist
+                    if t_idx == central_idx:
+                        Neighbourlist_list.append(nlist)
                 
                 for L in L_list[Neighbour_idx]:
-                    ql = freud.order.Steinhardt(L,wl=Include_Wl,wl_normalize=True)
+                    ql = freud.order.Steinhardt(L,wl=Include_Wl,
+                                                wl_normalize=True,
+                                                average=Qlm_Average,
+                                                weighted=Voronoi)
+                    
                     ql_calc = ql.compute(system, neighbors=nlist)
                     
                     # Append order parameters to output
@@ -389,6 +441,9 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
             Ql_result_traj[t_idx] = np.column_stack(Ql_result)
             
         Ql_result_all[traj_start_idx] = Ql_result_traj
+        prev_traj_slice = traj_slice
+        if Save_Neighbour:
+            Neighbourlist_slice_prev = Neighbourlist_slice.copy()
         logging.info("\rTime Point: {:.2f} ps. Time Elapsed: {:.1f} s. ({:.2f}%, {:.2f} time points/s)".format(
             Init_step*traj_timestep,
             time.time() - t_tot,
@@ -397,7 +452,6 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     
     if np.shape(Ql_result_all)[1] == 1:
         Ql_result_all = np.squeeze(Ql_result_all,axis=1)
-    
     
     # Optional: Save the calculated features
     if SaveFeatures:
@@ -413,37 +467,74 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     else:
         Ql_result_all_t = Ql_result_all.transpose(0, 2, 1, 3)
     
+    if Save_Neighbour:
+        del(Neighbourlist_slice_prev,Neighbourlist_slice)
+    
     # Concatenate all time slices into one
     Ql_result_all_cat = np.concatenate(Ql_result_all_t,axis=0)
     
     # Prediction probability
-    predicted_prob = model.predict(Ql_result_all_cat, verbose=int(Verbose), batch_size = 10000)
+    with tf.device('/cpu:0'):
+        predicted_prob = model.predict(Ql_result_all_cat, verbose=int(Verbose), batch_size = 10000)
     
     # Convert to predictions and convert back to time slices
-    predicted_classes = np.array(np.split(np.argmax(predicted_prob, axis=1), num_traj_starts, axis=0))
-    
+    pred_class = np.array(np.split(np.argmax(predicted_prob, axis=1), num_traj_starts, axis=0))
     logging.info('\nFinished Inferring Predictions.')
+    
+    # Applying various post-processing elements
+    predicted_classes = pred_class.copy()
+    if Prob_Interfacial is not None:
+        max_prob = np.amax(predicted_prob, axis=1)
+        max_prob_below_cutoff = np.array(np.split((max_prob <= Prob_Interfacial), num_traj_starts, axis=0))
+        predicted_classes[max_prob_below_cutoff] = 9
     
     # Filter out transient predictions
     if Temporal_Cutoff > 0:
         t_tot = time.time()
         logging.info('\nRemoving short-timescale liquid fluctuations...')
-        predicted_classes_grouped = predicted_classes.copy()
-        for atm in range(0,np.shape(predicted_classes)[1]):
-            c_atom_trj = (predicted_classes[:,atm].copy() == 0)
+        for atm in range(0,np.shape(pred_class)[1]):
+            c_atom_trj = (pred_class[:,atm].copy() == 0)
             
             i = 0
             for k, g in groupby(c_atom_trj):
                 grp = len(list(g))
                 if grp < Temporal_Cutoff:
-                    predicted_classes_grouped[range(i, i+grp),atm] = 0
+                    predicted_classes[range(i, i+grp),atm] = 0
                 i += grp
-        
-        predicted_classes = predicted_classes_grouped
         logging.info('\nFinished removing liquid fluctuations. Time elapsed: {:.1f} s'.format(time.time() - t_tot))
-    
+        
+    if Spatial_Reassignment or Spatial_Interfacial is not None:
+        logging.info('\nReclassifying Atoms...')
+        t_tot = time.time()
+        for t_idx, traj_start in enumerate(Traj_starts):
+            t_cur = time.time()
+            
+            nlist = Neighbourlist_list[t_idx]
+            cut_idx = np.array([nlist.find_first_index(x) for x in range(1,t.atoms.n_atoms)])
+            
+            nlist_grps_id = np.split(nlist[:,1],cut_idx)
+            nlist_grps = [pred_class[t_idx,x] for x in nlist_grps_id]
+            
+            mcl = np.array([collections.Counter(x).most_common(1)[0] for x in nlist_grps])
+            unmatched_mcl = pred_class[t_idx] != mcl[:,0]
+            if Spatial_Reassignment:
+                predicted_classes[t_idx,unmatched_mcl] =  mcl[unmatched_mcl,0]
+            
+            if Spatial_Interfacial is not None:
+                predicted_classes[t_idx,mcl[:,1] <= nlist.neighbor_counts*Spatial_Interfacial] = 9
+            
+            logging.info("\rTime Point: {:.2f} ps. Time Elapsed: {:.1f} s. ({:.2f}%, {:.2f} time points/s)".format(
+            Traj_starts[t_idx]*traj_timestep,
+            time.time() - t_tot,
+            (t_idx+1)*100/num_traj_starts,
+            (1)/(time.time() - t_cur)))
+        logging.info('\nFinished Reclassifying Atoms. Time elapsed: {:.1f} s'.format(time.time() - t_tot))
     
     if SaveTrajectory:
+        Certainty_ts = np.split(np.amax(predicted_prob, axis=1,keepdims=True), num_traj_starts, axis=0)
+        Probs_ts = np.split(predicted_prob, num_traj_starts, axis=0)
+        aux_dat = np.concatenate((Certainty_ts,Probs_ts), axis=2)
+        
         t_tot = time.time()
         # Check if processed outfle already exists and delete
         if os.path.isfile(outfile):
@@ -471,6 +562,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
                     + ' ' + str(dims[7]) + ' ' + str(dims[8]) + '"'\
                     + ' Properties=species:S:1:pos:R:3 Time=' + str(ts.time)
             W.remark = comment_txt
+            W.aux_data = aux_dat[idx]
             W.write(t.atoms)
         W.close()
     
@@ -489,10 +581,10 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         
         if Temporal_Cutoff > 0:
             init = Temporal_Cutoff-1
-            finit = np.shape(predicted_classes_grouped)[0]-(Temporal_Cutoff-1)
+            finit = np.shape(predicted_classes)[0]-(Temporal_Cutoff-1)
         else:
             init = 0
-            finit = np.shape(predicted_classes_grouped)[0]
+            finit = np.shape(predicted_classes)[0]
         
         # Separate into metal and halide
         Metal_Ind = (Metal_Index == 0) # 0 = metal, 1 = halide
@@ -507,7 +599,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         #d = hist_laxis(predicted_classes, n_classes, [0,n_classes])
         #d_norm = d/np.shape(predicted_classes)[1]
         
-        x = np.array([i * traj_timestep + min_traj_time for i in Traj_starts[init:finit,Halide_Ind]])
+        x = np.array([i * traj_timestep + min_traj_time for i in Traj_starts[init:finit]])
         #x = x - x[0]
         
         # colors

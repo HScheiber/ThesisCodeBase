@@ -14,7 +14,7 @@ labels = ["Liquid","Rocksalt","Wurtzite","5-5","NiAs","Sphalerite","$\\beta$-BeO
 n_classes = len(labels)
 # Generate the histogram along one dimension
 
-y = np.zeros(9)
+y = np.zeros(n_classes)
 
 # colors
 cols = sns.color_palette("muted",n_classes)
@@ -29,18 +29,22 @@ plt.rcParams['text.latex.preamble'] = [
 ]
 
 font = {'family' : 'sans-serif',
-        'size'   : 21}
+        'size'   : 18}
 
 matplotlib.rc('font', **font)
 
 # Set up the matplotlib figure
 for idx,y_dat in enumerate(y[:]):
     if idx > -1:
-        fig = plt.scatter(0.5, 0.5, s=30, c=cols[idx], label=labels[idx])
+        fig = plt.scatter(0, 0, s=30, c=cols[idx], label=labels[idx])
+        #plt.plot(0.5, 0.5, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
+        
 plt.axis('off')
-plt.legend(loc=10,bbox_to_anchor=(0.,0.,1.,1.),ncol=2,markerscale=2,fancybox=False,
-           shadow=False,framealpha=1,edgecolor='0.',mode="expand",
-           columnspacing=1.0,handletextpad=0.2)
+plt.legend(loc=10,bbox_to_anchor=(0.,0.,0.5,1.),ncol=1,markerscale=2,fancybox=False,
+            shadow=False,framealpha=1,edgecolor='0.75',mode="expand",
+            columnspacing=1.0,handletextpad=0)
+# plt.legend(ncol=5,markerscale=1,fancybox=True,
+#            shadow=False,framealpha=1,edgecolor='0.75',mode="expand")
 plt.margins(x=0)
 
 plt.savefig('Legend.svg', format='svg',bbox_inches='tight')

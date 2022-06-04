@@ -11,7 +11,7 @@ Custom_Legend = true;
 % 'Ewald_rtol' 'ScaleCompressibility' 'PreEquilibrate'
 
 Sets = {'Set60' 'Set61'}; % 'Set62' 'Set63'
-Legend_Params = {'N'};
+Legend_Params = {'N' 'MaxTime' 'MeltFreezeThreshold'};
 Show_Fit_dist = true;
 % Sets = {'Set27' 'Set28' 'Set29' 'Set30' 'Set31'};
 % Legend_Params = {'N' 'R_C' 'Thermostat' 'Tau_T' 'Barostat' 'Tau_P'};
@@ -41,7 +41,7 @@ figh = figure('WindowState','maximized','NumberTitle','off',...
     'Name','','Visible','On');
 axh = axes(figh,'FontSize',24,'TickLabelInterpreter','latex',...
     'XMinorGrid','off','YLimitMethod','padded',...
-    'YMinorGrid','off','Position',[0.07 0.13 0.9 0.84]);
+    'YMinorGrid','off','Position',[0.08 0.13 0.9 0.84]);
 hold(axh,'on')
 
 Exp = Load_Experimental_Data;
@@ -82,7 +82,7 @@ for sidx = 1:N_Sets
     Xscatter = [];
     Yscatter = [];
 
-    for jdx = 1:length(JobsOfInterest)
+    for jdx = 1:max(length(JobsOfInterest),50)
 
          if Data.(JobsOfInterest{jdx}).MP_confirmed
             MPs_idx = ~Data.(JobsOfInterest{jdx}).Freeze_Trace & ~Data.(JobsOfInterest{jdx}).Melt_Trace;
@@ -173,11 +173,11 @@ for sidx = 1:N_Sets
 
     else
         
-        p(sidx) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
-            'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
-%         p(sidx) = bar(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
+%         p(sidx) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
 %             'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
-%         
+        p(sidx) = bar(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...
+            'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
+        
     end
     
     
@@ -207,6 +207,6 @@ ylabel(axh,'$\rho(T_{m})$','Interpreter','latex')
 grid(axh,'on')
 drawnow
 
-exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Sys_Size_Comp.pdf',...
+exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Sys_Multi_Comp.pdf',...
     'ContentType','vector','BackgroundColor','none')
 

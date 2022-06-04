@@ -4,34 +4,212 @@ sys.path.append(r"C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiXStructur
 import LiXStructureDetector
 
 
+# WorkDir = r'D:\Example_Nucleations\NaCl\Interface_at_MP'
+# Salt='NaCl'
+# SystemName = 'Interface_at_MP'
+# RefChangeThreshold = 0.25
 
-#WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\figures\Project_4-5\NaCl_TF_Example'
-#Salt='NaCl'
-#SystemName= r'ExpRef_L_TF_NPT'
+# # NaCl Example
+# WorkDir = r'D:\Example_Nucleations\NaCl\ExampleNuc_L_JC_NPT'
+# Salt = 'NaCl'
+# SystemName = 'ExampleNuc_L_JC_NPT'
+# SaveTrajectory=True
+# SaveFeatures=True
+# SavePredictions=True 
+# SavePredictionsImage=True, 
+# ML_TimeLength=0
+# ML_TimeStep=1
+# TimePerFrame=1
+# FileType='gro'
+# Verbose=True
+# Temporal_Cutoff = 7
+# StartPoint = 6200-Temporal_Cutoff
+# EndPoint = 6400+Temporal_Cutoff
+# Version = 2
+# SaveDir = None
+# InMemory = False
+# Temporal_Cutoff = 0
+# Voronoi = False
+# Qlm_Average = True
+# Prob_Interfacial = None
+# Spatial_Reassignment = False
+# Spatial_Interfacial = None
+
+
+# # NaCl interface Example
+# WorkDir = r'D:\Example_Nucleations\NaCl\Interface_at_MP'
+# Salt = 'NaCl'
+# SystemName = 'Interface_at_MP'
+# SaveTrajectory=True
+# SaveFeatures=True
+# SavePredictions=True 
+# SavePredictionsImage=True, 
+# ML_TimeLength=21
+# ML_TimeStep=5
+# TimePerFrame=5
+# FileType='gro'
+# Verbose=True
+# Temporal_Cutoff = 0
+# StartPoint = 0-Temporal_Cutoff
+# EndPoint = 2000+Temporal_Cutoff
+# Version = 2
+# SaveDir = None
+# InMemory = False
+
+
+# # CsCl Example
+# WorkDir = r'D:\Example_Nucleations\CsCl\ExampleNuc_L_TF_NPT'
+# Salt = 'CsCl'
+# SystemName = 'ExampleNuc_L_TF_NPT'
+# SaveTrajectory=True
+# SaveFeatures=True
+# SavePredictions=False 
+# SavePredictionsImage=True
+# ML_TimeLength=10
+# ML_TimeStep=1
+# TimePerFrame=1
+# FileType='gro'
+# Verbose=True
+# Temporal_Cutoff = 0
+# StartPoint = 12200
+# EndPoint = 12600
+# Version = 2
+# SaveDir = None
+# InMemory = False
+# Temporal_Cutoff = 0
+# Voronoi = False
+# Qlm_Average = True
+# Prob_Interfacial = None
+# Spatial_Reassignment = False
+# Spatial_Interfacial = None
+
+
+# # LiBr Example
+# WorkDir = r'D:\Example_Nucleations\LiBr\ExampleNuc_L_TF_NPT'
+# Salt = 'LiBr'
+# SystemName = 'ExampleNuc_L_TF_NPT'
+# SaveTrajectory=True
+# SaveFeatures=False
+# SavePredictions=True 
+# SavePredictionsImage=True
+# ML_TimeLength=0
+# ML_TimeStep=0
+# TimePerFrame=50
+# FileType='gro'
+# Verbose=True
+# Temporal_Cutoff = 0 #
+# StartPoint = 17400-Temporal_Cutoff
+# EndPoint = 17800+Temporal_Cutoff
+# Version = 2
+# SaveDir = None
+# InMemory = False
+# Voronoi = False
+# Qlm_Average = True
+# Probability_Interfacial = None
+# Spatial_Reassignment = True
+# Spatial_Interfacial = 0.5
+
+# # LiBr Interface Example
+# WorkDir = r'D:\Example_Nucleations\LiBr\Interface_at_MP'
+# Salt = 'LiBr'
+# SystemName = 'Interface_at_MP'
+# SaveTrajectory=True
+# SaveFeatures=True
+# SavePredictions=False 
+# SavePredictionsImage=True
+# ML_TimeLength=20
+# ML_TimeStep=5
+# TimePerFrame=5
+# FileType='gro'
+# Verbose=True
+# Temporal_Cutoff = 0
+# StartPoint = 0
+# EndPoint = None
+# Version = 2
+# SaveDir = None
+# InMemory = False
+# Temporal_Cutoff = 0
+# Voronoi = False
+# Qlm_Average = True
+# Prob_Interfacial = None
+# Spatial_Reassignment = False
+# Spatial_Interfacial = None
+
+
+## LiI Example
+WorkDir = r'D:\Example_Nucleations\LiI\ExampleNuc_L_TF_NPT'
+Salt = 'LiI'
+SystemName = 'ExampleNuc_L_TF_NPT'
+SaveTrajectory=True
+SaveFeatures=True
+SavePredictions=False 
+SavePredictionsImage=True
+ML_TimeLength=10
+ML_TimeStep=1
+TimePerFrame=1
+FileType='gro'
+Verbose=True
+Temporal_Cutoff = 0
+StartPoint = 19400
+EndPoint = 20400
+Version = 2
+SaveDir = None
+InMemory = False
+Temporal_Cutoff = 0
+Voronoi = False
+Qlm_Average = True
+Prob_Interfacial = None
+Spatial_Reassignment = False
+Spatial_Interfacial = None
+
+
+# WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing'
+# Salt = 'LiBr'
+# SystemName = 'Prod2_W_TF_NPT'
+# SaveTrajectory=True
+# SaveFeatures=True
+# SavePredictions=True 
+# SavePredictionsImage=True
+# ML_TimeLength=21
+# ML_TimeStep=5
+# TimePerFrame=5
+# FileType='gro'
+# Verbose=True
+# Temporal_Cutoff = 0 #
+# StartPoint = Temporal_Cutoff
+# EndPoint = 1250-Temporal_Cutoff
+# Version = 2
+# SaveDir = None
+# InMemory = False
 
 
 
 
-# LiXStructureDetector.Check_Structures(WorkDir, Salt, SystemName=SystemName,
-#                         SaveTrajectory=True, SaveFeatures=False, 
-#                         SavePredictions=False, SavePredictionsImage=True, 
-#                         ML_TimeLength=51, ML_TimeStep=5, TimePerFrame=1, 
-#                         FileType='gro', Verbose=True, StartPoint = 15300,
-#                         EndPoint = 15380, Version = 2, SaveDir = None,
-#                         InMemory = False)
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing'
-Salt='NaCl'
-SystemName = 'Prod2_R_JC_NPT'
-RefChangeThreshold = 0.25
 
-[system_froze,system_melted,time_to_phase_change] = LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=SystemName, T=None,
-                              T_Ref=None, RefStructure='Rocksalt', CheckFullTrajectory=False, 
-                              SaveTrajectory=False, SaveFeatures=False, 
-                              SavePredictions=False, SavePredictionsImage=True,
-                              InitialRefFrac=None, RefChangeThreshold=RefChangeThreshold, 
-                              SlopeThreshold=1e10, SlopeCheckBegin=0.1,
-                              ML_TimeLength=21, ML_TimeStep=5, TimePerFrame=10, 
-                              FileType='gro', Verbose=True, Version = 2)
 
+
+# [system_froze,system_melted,time_to_phase_change] = LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=SystemName, T=None,
+#                               T_Ref=None, RefStructure='Rocksalt', CheckFullTrajectory=True, 
+#                               SaveTrajectory=True, SaveFeatures=False, 
+#                               SavePredictions=False, SavePredictionsImage=True,
+#                               InitialRefFrac=None, RefChangeThreshold=RefChangeThreshold, 
+#                               SlopeThreshold=1e10, SlopeCheckBegin=0.1,
+#                               ML_TimeLength=20, ML_TimeStep=5, TimePerFrame=100, 
+#                               FileType='gro', Verbose=True, Version=2,
+#                               Temporal_Cutoff=0, Voronoi = False, Qlm_Average=True,
+#                               Prob_Interfacial=0.99, Spatial_Reassignment=True,
+#                               Spatial_Interfacial=None)
+
+LiXStructureDetector.Check_Structures(WorkDir, Salt, SystemName=SystemName,
+                        SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
+                        SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage, 
+                        ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
+                        FileType=FileType, Verbose=Verbose, StartPoint = StartPoint,
+                        EndPoint=EndPoint, Version=Version, SaveDir=SaveDir,
+                        InMemory=InMemory, Temporal_Cutoff=Temporal_Cutoff,
+                        Voronoi=Voronoi, Qlm_Average=Qlm_Average,
+                        Prob_Interfacial=Prob_Interfacial,
+                        Spatial_Reassignment=Spatial_Reassignment,
+                        Spatial_Interfacial=Spatial_Interfacial)
