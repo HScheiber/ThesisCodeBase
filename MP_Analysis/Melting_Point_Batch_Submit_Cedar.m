@@ -67,9 +67,9 @@ for kdx = 1:length(Reps)
     Settings_array(idx).Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
     Settings_array(idx).JobID = ['Set' num2str(Set) '_Rep_' Rep]; % An ID that is tacked onto the folder name of all current jobs
     Settings_array(idx).Manual_Box = false; % When set to true, rather than setting the number of atoms in a box, user sets the a, b, and c dimensions of the box
-    Settings_array(idx).MDP.RVDW_Cutoff = 1.4; % nm
-    Settings_array(idx).MDP.RCoulomb_Cutoff = 1.4; % nm
-    Settings_array(idx).MDP.RList_Cutoff = 1.4; % nm
+    Settings_array(idx).MDP.RVDW_Cutoff = 1.40; % nm
+    Settings_array(idx).MDP.RCoulomb_Cutoff = 1.44; % nm
+    Settings_array(idx).MDP.RList_Cutoff = 1.44; % nm
     Settings_array(idx).Cutoff_Buffer = 1.00;
     Settings_array(idx).MDP.Disp_Correction = true; % Adds in long-range dispersion correction
     Settings_array(idx).c_over_a = 2;
@@ -105,6 +105,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
     Settings_array(idx).MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of the Ewald-shifted direct potential at rcoulomb. Decreasing this will give a more accurate direct sum, but then you need more wave vectors for the reciprocal sum.
     Settings_array(idx).MDP.Fourier_Spacing = 0.12;
+    Settings_array(idx).MDP.VerletBT = -1;
+    
 end
 
 %% Set61: 11000 atoms default settings (full debugged 2022-04-29) - reproduciblility test x 100
