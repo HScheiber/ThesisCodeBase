@@ -1,7 +1,7 @@
 % Script to plot all melting points: experiment vs models
 
 % Settings
-fs = 28;
+fs = 32;
 linestyles = {'-',':','-.','--'};
 mkrshapes = {'s' 'd' '^' 'o'};
 DataSetName = 'Melting_Point_Data.mat';
@@ -171,5 +171,5 @@ legend(p,Legend_Labels,'FontSize',fs,'Box','On','Interpreter','latex','NumColumn
 grid(axh,'on')
 
 
-exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
+exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_HalidesBigText.pdf',...
     'ContentType','vector','BackgroundColor','none')

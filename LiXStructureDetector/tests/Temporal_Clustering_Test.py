@@ -1,18 +1,44 @@
-# NaCl Example
-WorkDir = r'D:\Example_Nucleations\NaCl\ExampleNuc_L_JC_NPT'
+# # NaCl Example
+# WorkDir = r'D:\Example_Nucleations\NaCl\ExampleNuc_L_JC_NPT'
+# Salt = 'NaCl'
+# SystemName = 'ExampleNuc_L_JC_NPT'
+# SaveTrajectory=True
+# SaveFeatures=True
+# SavePredictions=False 
+# SavePredictionsImage=True
+# ML_TimeLength=0
+# ML_TimeStep=0
+# TimePerFrame=1
+# FileType='gro'
+# Verbose=True
+# StartPoint = 6100
+# EndPoint = 6400
+# Version = 2
+# SaveDir = None
+# InMemory = False
+# Temporal_Cutoff = 0
+# Voronoi = False
+# Qlm_Average = True
+# Prob_Interfacial = None
+# Spatial_Reassignment = False
+# Spatial_Interfacial = None
+
+
+# NaCl interface Example
+WorkDir = r'D:\Example_Nucleations\NaCl\Interface_at_MP'
 Salt = 'NaCl'
-SystemName = 'ExampleNuc_L_JC_NPT'
+SystemName = 'Interface_at_MP'
 SaveTrajectory=True
-SaveFeatures=True
+SaveFeatures=False
 SavePredictions=False 
-SavePredictionsImage=True
-ML_TimeLength=0
-ML_TimeStep=0
-TimePerFrame=1
+SavePredictionsImage=True, 
+ML_TimeLength=50
+ML_TimeStep=5
+TimePerFrame=5
 FileType='gro'
 Verbose=True
-StartPoint = 6100
-EndPoint = 6400
+StartPoint = 0
+EndPoint = None
 Version = 2
 SaveDir = None
 InMemory = False
@@ -22,27 +48,6 @@ Qlm_Average = True
 Prob_Interfacial = None
 Spatial_Reassignment = False
 Spatial_Interfacial = None
-
-
-# # NaCl interface Example
-# WorkDir = r'D:\Example_Nucleations\NaCl\Interface_at_MP'
-# Salt = 'NaCl'
-# SystemName = 'Interface_at_MP'
-# SaveTrajectory=True
-# SaveFeatures=True
-# SavePredictions=True 
-# SavePredictionsImage=True, 
-# ML_TimeLength=21
-# ML_TimeStep=5
-# TimePerFrame=5
-# FileType='gro'
-# Verbose=True
-# Temporal_Cutoff = 0
-# StartPoint = 0-Temporal_Cutoff
-# EndPoint = 2000+Temporal_Cutoff
-# Version = 2
-# SaveDir = None
-# InMemory = False
 
 
 ## CsCl Example
