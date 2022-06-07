@@ -43,16 +43,17 @@ idx=0;
 % CsCl TF Rocksalt: Tm = 1179.9
 
 Experiment = Load_Experimental_Data;
-JobStuff = {{'LiF' 'JC' 'FiveFive' 1336.8} ...
-            {'LiBr' 'TF' 'Rocksalt' 802.9} ...
-            {'NaCl' 'TF' 'Rocksalt' 1081.4} ...
-            {'CsCl' 'TF' 'Rocksalt' 1179.9}};
+JobStuff = {{'LiF' 'JC' 'FiveFive' 1336.8 'FiveFive'} ...
+            {'LiBr' 'TF' 'Rocksalt' 802.9 'Liquid'} ...
+            {'NaCl' 'TF' 'Rocksalt' 1081.4 'Liquid'} ...
+            {'CsCl' 'TF' 'Rocksalt' 1179.9 'CsCl'}};
         
 for jdx = 1:length(JobStuff)
     Salt = JobStuff{jdx}{1};
     Theory = JobStuff{jdx}{2};
     Structure = JobStuff{jdx}{3};
     T0 = JobStuff{jdx}{4};
+    RefStructure = JobStuff{jdx}{5};
     
     Theory_Settings = Shared_Settings;
     switch Theory
@@ -76,15 +77,13 @@ for jdx = 1:length(JobStuff)
 
     idx = idx+1;
     Settings_array(idx) = Theory_Settings;
+    Settings_array(idx).RefStructure = RefStructure;
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).InitialMeshSize = 5; % K
     Settings_array(idx).Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
     Settings_array(idx).JobID = 'Prod2'; % An ID that is tacked onto the folder name of all current jobs
-    Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-    Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
-    Settings_array(idx).T0 = T0; % K, Initial temperature
     if contained_in_cell(Structure,{'Rocksalt' 'Sphalerite' 'CsCl'})
         Settings_array(idx).Isotropy = 'semiisotropic';
         Settings_array(idx).Target_P = [1 1]; % Bar
@@ -115,9 +114,9 @@ for jdx = 1:length(JobStuff)
     Settings_array(idx).Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'nose-hoover' (set NO for NVE)
     Settings_array(idx).Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
     Settings_array(idx).Nsttcouple = Get_nstcouple(Settings_array(idx).Time_Constant_T,Settings_array(idx).MDP.dt); %[ps] The frequency for coupling the temperature. 
-    Settings_array(idx).Target_T = T0_i; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-    Settings_array(idx).MDP.Initial_T = T0_i; % Initial termpature at which to generate velocities
-    Settings_array(idx).T0 = T0_i; % K, Initial temperature
+    Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+    Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
+    Settings_array(idx).T0 = T0; % K, Initial temperature
 end
 
 
@@ -127,5 +126,6 @@ for idx = 1:length(Settings_array)
         continue
     end
     Settings = Settings_array(idx);
+    setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
     Find_Melting_Point(Settings);
 end
