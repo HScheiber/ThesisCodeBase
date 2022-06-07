@@ -87,9 +87,11 @@ for jdx = 1:length(JobStuff)
     if contained_in_cell(Structure,{'Rocksalt' 'Sphalerite' 'CsCl'})
         Settings_array(idx).Isotropy = 'semiisotropic';
         Settings_array(idx).Target_P = [1 1]; % Bar
+        Settings_array(idx).Use_Conv_cell = true;
     else
         Settings_array(idx).Isotropy = 'anisotropic';
         Settings_array(idx).Target_P = [1 1 1 1 1 1]; % Bar
+        Settings_array(idx).Use_Conv_cell = false;
     end
     Settings_array(idx).c_over_a = 2;
     Settings_array(idx).N_atoms = 11000;
