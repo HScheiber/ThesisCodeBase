@@ -86,7 +86,7 @@ if strcmpi(Settings.RefStructure,'Liquid')
         % Info
         disp(['Checked temperatures that melted: ' num2str(sort(T_dat.T_Melt_Trace),'%.4f K    ')])
         disp(['Checked temperatures that froze:  ' num2str(sort(T_dat.T_Freeze_Trace,'descend'),'%.4f K    ')])
-        disp(['Checked possible MPs:             ' num2str(sort(T_dat.T_Trace(MP_check)),'%.4f K    ')])
+        disp(['Checked indeterminate points:             ' num2str(sort(T_dat.T_Trace(MP_check)),'%.4f K    ')])
 
         if any(MP_check)
 
