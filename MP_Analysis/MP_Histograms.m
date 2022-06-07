@@ -3,7 +3,7 @@ DataDir = fullfile(home,'data','Melting_Point_Data.mat');
 Salt = 'NaCl';
 SolStructure = 'Rocksalt';
 Model = 'JC';
-fs = 32;
+fs = 34;
 Custom_Legend = true;
 % Custom legend parameters:
 % 'Thermostat' 'Tau_T' 'Barostat' 'Tau_P' 'R_C' 'DispCorr' 'MaxTime'
@@ -11,7 +11,7 @@ Custom_Legend = true;
 % 'Ewald_rtol' 'ScaleCompressibility' 'PreEquilibrate'
 
 Sets = {'Set60' 'Set61'}; % 'Set62' 'Set63'
-Legend_Params = {'N' 'MaxTime' 'MeltFreezeThreshold'};
+Legend_Params = {'N'};
 Show_Fit_dist = true;
 % Sets = {'Set27' 'Set28' 'Set29' 'Set30' 'Set31'};
 % Legend_Params = {'N' 'R_C' 'Thermostat' 'Tau_T' 'Barostat' 'Tau_P'};
