@@ -8,7 +8,8 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                               FileType='gro', Verbose=False, Version = 2,
                               Temporal_Cutoff = 0,Voronoi = False, Qlm_Average = True,
                               Prob_Interfacial = None,Spatial_Reassignment = False,
-                              Spatial_Interfacial = None):
+                              Spatial_Interfacial = None,
+                              SaveTrajectoryAux = 0):
     
     """
     Created on Fri Nov 20 18:54:17 2020
@@ -101,6 +102,10 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                                 neighbourhood
         Spatial_Interfacial     Re-assign atoms to interfacial if Spatial_Interfacial 
                                 fraction of surrounding atoms are not all at least one class
+        SaveTrajectoryAux       Only applicable when SaveTrajectory is enabled. 
+                                Tells the program how much auxiliary data to export.
+                                0 = No auxiliary data, 1 = max probability of any one class,
+                                2 = also include liquid probability, ... Up to 10.
     
     @author: Hayden
     """
@@ -200,6 +205,28 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         
         return [Metal,Halide]
     
+    def GetRefStructure(RefStructure):
+        rfs = RefStructure.lower()
+        if rfs in set(['liquid','liq','l']):
+            return 'Liquid'
+        elif rfs in set(['rocksalt','rs','r']):
+            return 'Rocksalt'
+        elif rfs in set(['wurtzite','wz','w']):
+            return 'Wurtzite'
+        elif rfs in set(['fivefive','5-5','f']):
+            return '5-5'
+        elif rfs in set(['nias','ns','n']):
+            return 'NiAs'
+        elif rfs in set(['sphalerite','sphal','s']):
+            return 'Sphalerite'
+        elif rfs in set(['betabeo','bbeo','b-beo','beta-beo','b']):
+            return 'b-BeO'
+        elif rfs in set(['antinias','anias','a']):
+            return 'AntiNiAs'
+        elif rfs in set(['cscl','cc','c']):
+            return 'CsCl'
+        else:
+            return None
     
     # Calculation setup and loading the ML model
     
@@ -207,6 +234,8 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     if not os.path.isdir(WorkDir):
         raise NotADirectoryError(WorkDir + ' is not a valid directory.')
     os.chdir(WorkDir)
+    
+    RefStructure = GetRefStructure(RefStructure)
     
     # Load some model parameters
     Trial_ID = str(int(ML_TimeLength)) + '-' + str(int(ML_TimeStep))
@@ -360,7 +389,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     # List of index points to examine
     steps_per_init_frame = int(TimePerFrame/traj_timestep)
     Traj_starts = list(range(min_step, max_step+1, steps_per_init_frame)) # Steps
-    ML_TimeLength_in_steps = int(np.ceil((ML_TimeLength+ML_TimeStep)/traj_timestep)) # number of trajectory steps required to traverse the CNN time slice
+    ML_TimeLength_in_steps = int(np.ceil((ML_TimeLength)/traj_timestep)) # number of trajectory steps required to traverse the CNN time slice
     Half_ML_TimeLength_in_steps = int(np.floor(ML_TimeLength_in_steps/2))
     
     # Ensure the last time step is checked when CheckFullTrajectory is active
@@ -374,7 +403,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     if Include_ID:
         n_features = n_features + 1
     
-    t_slice_len = int(np.ceil(max(ML_TimeLength_in_steps,1)/steps_per_frame))
+    t_slice_len = int(np.ceil((ML_TimeLength_in_steps+1)/steps_per_frame))
     num_traj_starts = len(Traj_starts)
     
     #% Calculate features
@@ -393,7 +422,6 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         Save_Neighbour = False
     
     logging.info('Generating features...')
-    prev_traj_slice = np.array([])
     central_idx = int((t_slice_len - 1)/2)
     if Include_ID:
         namelist = t.atoms.names
@@ -415,13 +443,27 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         elif any(traj_slice > max_traj_step):
             ds = max_traj_step - np.max(traj_slice)
             traj_slice = traj_slice + ds
+            
+        prev_idx = int(traj_start_idx - np.ceil(steps_per_frame/steps_per_init_frame))
+        if prev_idx < 0 or timeless:
+            prev_traj_slice = np.array([])
+        else:
+            prev_init_step = Traj_starts[prev_idx]
+            prev_traj_slice = np.array(range(prev_init_step-Half_ML_TimeLength_in_steps, prev_init_step+Half_ML_TimeLength_in_steps+1, steps_per_frame))
+            
+            if any(prev_traj_slice < min_traj_step):
+                ds = min_traj_step - np.min(prev_traj_slice)
+                prev_traj_slice = prev_traj_slice + ds
+            elif any(prev_traj_slice > max_traj_step):
+                ds = max_traj_step - np.max(prev_traj_slice)
+                prev_traj_slice = prev_traj_slice + ds
         
         # Calculate Ql values at each time point in the time slice
         for t_idx, ts in enumerate(t.trajectory[traj_slice]):
             
             if traj_slice[t_idx] in prev_traj_slice:
                 pridx = list(prev_traj_slice).index(traj_slice[t_idx])
-                Ql_result_traj[t_idx] = Ql_result_all[traj_start_idx-1,pridx,:,:]
+                Ql_result_traj[t_idx] = Ql_result_all[prev_idx,pridx,:,:]
                 if Save_Neighbour:
                     Neighbourlist_slice[t_idx] = Neighbourlist_slice_prev[pridx]
                     if t_idx == central_idx:
@@ -563,6 +605,13 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         logging.info('\nFinished Reclassifying Atoms. Time elapsed: {:.1f} s'.format(time.time() - t_tot))
     
     if SaveTrajectory:
+        if SaveTrajectoryAux > 0:
+            Certainty_ts = np.split(np.amax(predicted_prob, axis=1,keepdims=True), num_traj_starts, axis=0)
+            Probs_ts = np.split(predicted_prob, num_traj_starts, axis=0)
+            aux_dat = np.concatenate((Certainty_ts,Probs_ts), axis=2)[:,:,0:SaveTrajectoryAux]
+        else:
+            aux_dat = [None] * num_traj_starts
+        
         # Check if processed outfle already exists and delete
         if os.path.isfile(outfile):
             os.remove(outfile)
@@ -589,6 +638,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                     + ' ' + str(dims[7]) + ' ' + str(dims[8]) + '"'\
                     + ' Properties=species:S:1:pos:R:3 Time=' + str(ts.time)
             W.remark = comment_txt
+            W.aux_data = aux_dat[idx]
             W.write(t.atoms)
         W.close()
         

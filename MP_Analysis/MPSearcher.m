@@ -106,7 +106,7 @@ if strcmpi(Settings.RefStructure,'Liquid')
                 error('It should not be possible to reach this!')
             end
 
-        % If there are no known possible MPs, attempt to narrow the bracket
+        % If there are no known indeterminate points, attempt to narrow the bracket
         else
             [T_Freeze_Max,TFMidx] = max(T_dat.T_Trace(logical(T_dat.Freeze_Trace)));
             [T_Melt_Min,TMMidx] = min(T_dat.T_Trace(logical(T_dat.Melt_Trace)));
@@ -409,7 +409,7 @@ for idx = 1:length(T_dat.T_Trace)
     elseif T_dat.df_Trace(idx) > 0
         cls = 'melting';
     else
-        cls = 'a possible MP';
+        cls = 'indeterminate';
     end
 
     if T_dat.Freeze_Trace(idx)
@@ -417,7 +417,7 @@ for idx = 1:length(T_dat.T_Trace)
     elseif T_dat.Melt_Trace(idx)
         cls2 = 'melting';
     else
-        cls2 = 'a possible MP';
+        cls2 = 'indeterminate';
     end
 
     disp(['At T = ' num2str(T_dat.T_Trace(idx),'%.4f') ' K, detected as ' cls ' and classified as ' cls2 '.'])

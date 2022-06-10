@@ -8,7 +8,9 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
                         Voronoi = False, Qlm_Average = False,
                         Prob_Interfacial = None,
                         Spatial_Reassignment = False,
-                        Spatial_Interfacial = None):
+                        Spatial_Interfacial = None,
+                        SaveTrajectoryAux = 2,
+                        LoadFeatures = False):
     
     """
     Created on Fri Nov 20 18:54:17 2020
@@ -64,6 +66,11 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
                                 neighbourhood
         Spatial_Interfacial     Re-assign atoms to interfacial if Spatial_Interfacial 
                                 fraction of surrounding atoms are not all at least one class
+        SaveTrajectoryAux       Only applicable when SaveTrajectory is enabled. 
+                                Tells the program how much auxiliary data to export.
+                                0 = No auxiliary data, 1 = max probability of any one class,
+                                2 = also include liquid probability, ... Up to 10.
+        LoadFeatures            Switch to load features if present
                                 
     @author: Hayden
     """
@@ -161,7 +168,6 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
                 return [Metal,Halide]
         
         return [Metal,Halide]
-    
     
     # Calculation setup and loading the ML model
     
@@ -328,7 +334,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     # List of index points to examine
     steps_per_init_frame = int(TimePerFrame/traj_timestep)
     Traj_starts = list(range(min_step, max_step+1, steps_per_init_frame)) # Steps
-    ML_TimeLength_in_steps = int(np.ceil((ML_TimeLength+ML_TimeStep)/traj_timestep)) # number of trajectory steps required to traverse the CNN time slice
+    ML_TimeLength_in_steps = int(np.ceil((ML_TimeLength)/traj_timestep)) # number of trajectory steps required to traverse the CNN time slice
     Half_ML_TimeLength_in_steps = int(np.floor(ML_TimeLength_in_steps/2))
     
     # What is the number of features used in this model (useful for preallocation)
@@ -338,7 +344,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     if Include_ID:
         n_features = n_features + 1
     
-    t_slice_len = int(np.ceil(max(ML_TimeLength_in_steps,1)/steps_per_frame))
+    t_slice_len = int(np.ceil((ML_TimeLength_in_steps+1)/steps_per_frame))
     num_traj_starts = len(Traj_starts)
     
     #% Calculate features
@@ -357,7 +363,6 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         Save_Neighbour = False
     
     logging.info('Generating features...')
-    prev_traj_slice = np.array([])
     central_idx = int((t_slice_len - 1)/2)
     if Include_ID:
         namelist = t.atoms.names
@@ -366,97 +371,115 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     if Voronoi:
         voro = freud.locality.Voronoi()
     
-    for traj_start_idx, Init_step in enumerate(Traj_starts):
-        t_cur = time.time()
-        
-        # Select out a slice of the trajectory of the correct ML_TimeLength [steps]
-        traj_slice = np.array(range(Init_step-Half_ML_TimeLength_in_steps, Init_step+Half_ML_TimeLength_in_steps+1, steps_per_frame))
-        
-        # Make sure there are not step indeces outside of the trajectory range by shifting back extremes
-        if any(traj_slice < min_traj_step):
-            ds = min_traj_step - np.min(traj_slice)
-            traj_slice = traj_slice + ds
-        elif any(traj_slice > max_traj_step):
-            ds = max_traj_step - np.max(traj_slice)
-            traj_slice = traj_slice + ds
-        
-        # Calculate Ql values at each time point in the time slice
-        for t_idx, ts in enumerate(t.trajectory[traj_slice]):
+    if LoadFeatures and os.path.exists(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl'):
+        with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'rb') as f:
+            [Ql_result_all] = pickle.load(f)
+    
+    else:
+        for traj_start_idx, Init_step in enumerate(Traj_starts):
+            t_cur = time.time()
             
-            if traj_slice[t_idx] in prev_traj_slice:
-                pridx = list(prev_traj_slice).index(traj_slice[t_idx])
-                Ql_result_traj[t_idx] = Ql_result_all[traj_start_idx-1,pridx,:,:]
-                if Save_Neighbour:
-                    Neighbourlist_slice[t_idx] = Neighbourlist_slice_prev[pridx]
-                    if t_idx == central_idx:
-                        Neighbourlist_list.append(Neighbourlist_slice[t_idx])
-                continue
+            # Select out a slice of the trajectory of the correct ML_TimeLength [steps]
+            traj_slice = np.array(range(Init_step-Half_ML_TimeLength_in_steps, Init_step+Half_ML_TimeLength_in_steps+1, steps_per_frame))
             
-            if pbc_on:
-                box_data = to_freud_box(ts.dimensions)
+            # Make sure there are not step indeces outside of the trajectory range by shifting back extremes
+            if any(traj_slice < min_traj_step):
+                ds = min_traj_step - np.min(traj_slice)
+                traj_slice = traj_slice + ds
+            elif any(traj_slice > max_traj_step):
+                ds = max_traj_step - np.max(traj_slice)
+                traj_slice = traj_slice + ds
+                
+            prev_idx = int(traj_start_idx - np.ceil(steps_per_frame/steps_per_init_frame))
+            if prev_idx < 0 or timeless:
+                prev_traj_slice = np.array([])
             else:
-                # If pbc is off, place particles in ~infinite box
-                box_data = freud.box.Box(1e5,1e5,1e5,0,0,0)
-            
-            # Select out the atoms
-            point_data = ts.positions/10 # in nm
-            system = [box_data,ts.positions/10]
-            
-            # Loop through the N_neighbour_list to built up a set of features
-            fidx = 0
-            if Include_ID:
-                Ql_result[fidx] = Metal_Index # Append the atom idenities: metal vs non-metal
-                fidx += 1
-            for Neighbour_idx, N_neighbour in enumerate(N_neighbour_list):
+                prev_init_step = Traj_starts[prev_idx]
+                prev_traj_slice = np.array(range(prev_init_step-Half_ML_TimeLength_in_steps, prev_init_step+Half_ML_TimeLength_in_steps+1, steps_per_frame))
                 
-                if Voronoi:
-                    nlist = voro.compute((box_data, point_data)).nlist
+                if any(prev_traj_slice < min_traj_step):
+                    ds = min_traj_step - np.min(prev_traj_slice)
+                    prev_traj_slice = prev_traj_slice + ds
+                elif any(prev_traj_slice > max_traj_step):
+                    ds = max_traj_step - np.max(prev_traj_slice)
+                    prev_traj_slice = prev_traj_slice + ds
+            
+            # Calculate Ql values at each time point in the time slice
+            for t_idx, ts in enumerate(t.trajectory[traj_slice]):
+                
+                if traj_slice[t_idx] in prev_traj_slice:
+                    pridx = list(prev_traj_slice).index(traj_slice[t_idx])
+                    Ql_result_traj[t_idx] = Ql_result_all[prev_idx,pridx,:,:]
+                    if Save_Neighbour:
+                        Neighbourlist_slice[t_idx] = Neighbourlist_slice_prev[pridx]
+                        if t_idx == central_idx:
+                            Neighbourlist_list.append(Neighbourlist_slice[t_idx])
+                    continue
+                
+                if pbc_on:
+                    box_data = to_freud_box(ts.dimensions)
                 else:
-                    # Construct the neighbour filter
-                    query_args = dict(mode='nearest', num_neighbors=N_neighbour, exclude_ii=True)
-                    
-                    # Build the neighbour list
-                    nlist = freud.locality.AABBQuery(box_data, point_data).query(point_data, query_args).toNeighborList()
+                    # If pbc is off, place particles in ~infinite box
+                    box_data = freud.box.Box(1e5,1e5,1e5,0,0,0)
                 
-                if Save_Neighbour and (Neighbour_idx+1 == len(N_neighbour_list)):
-                    Neighbourlist_slice[t_idx] = nlist
-                    if t_idx == central_idx:
-                        Neighbourlist_list.append(nlist)
+                # Select out the atoms
+                point_data = ts.positions/10 # in nm
+                system = [box_data,ts.positions/10]
                 
-                for L in L_list[Neighbour_idx]:
-                    ql = freud.order.Steinhardt(L,wl=Include_Wl,
-                                                wl_normalize=True,
-                                                average=Qlm_Average,
-                                                weighted=Voronoi)
+                # Loop through the N_neighbour_list to built up a set of features
+                fidx = 0
+                if Include_ID:
+                    Ql_result[fidx] = Metal_Index # Append the atom idenities: metal vs non-metal
+                    fidx += 1
+                for Neighbour_idx, N_neighbour in enumerate(N_neighbour_list):
                     
-                    ql_calc = ql.compute(system, neighbors=nlist)
-                    
-                    # Append order parameters to output
-                    Ql_result[fidx] = ql_calc.ql
-                    if Include_Wl:
-                        Ql_result[fidx+1] = ql_calc.particle_order
-                        fidx += 2
+                    if Voronoi:
+                        nlist = voro.compute((box_data, point_data)).nlist
                     else:
-                        fidx += 1
-            Ql_result_traj[t_idx] = np.column_stack(Ql_result)
-            
-        Ql_result_all[traj_start_idx] = Ql_result_traj
-        prev_traj_slice = traj_slice
-        if Save_Neighbour:
-            Neighbourlist_slice_prev = Neighbourlist_slice.copy()
-        logging.info("\rTime Point: {:.2f} ps. Time Elapsed: {:.1f} s. ({:.2f}%, {:.2f} time points/s)".format(
-            Init_step*traj_timestep,
-            time.time() - t_tot,
-            (traj_start_idx+1)*100/num_traj_starts,
-            (1)/(time.time() - t_cur)))
-    
-    if np.shape(Ql_result_all)[1] == 1:
-        Ql_result_all = np.squeeze(Ql_result_all,axis=1)
-    
-    # Optional: Save the calculated features
-    if SaveFeatures:
-        with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'wb') as f:
-            pickle.dump([Ql_result_all], f)
+                        # Construct the neighbour filter
+                        query_args = dict(mode='nearest', num_neighbors=N_neighbour, exclude_ii=True)
+                        
+                        # Build the neighbour list
+                        nlist = freud.locality.AABBQuery(box_data, point_data).query(point_data, query_args).toNeighborList()
+                    
+                    if Save_Neighbour and (Neighbour_idx+1 == len(N_neighbour_list)):
+                        Neighbourlist_slice[t_idx] = nlist
+                        if t_idx == central_idx:
+                            Neighbourlist_list.append(nlist)
+                    
+                    for L in L_list[Neighbour_idx]:
+                        ql = freud.order.Steinhardt(L,wl=Include_Wl,
+                                                    wl_normalize=True,
+                                                    average=Qlm_Average,
+                                                    weighted=Voronoi)
+                        
+                        ql_calc = ql.compute(system, neighbors=nlist)
+                        
+                        # Append order parameters to output
+                        Ql_result[fidx] = ql_calc.ql
+                        if Include_Wl:
+                            Ql_result[fidx+1] = ql_calc.particle_order
+                            fidx += 2
+                        else:
+                            fidx += 1
+                Ql_result_traj[t_idx] = np.column_stack(Ql_result)
+                
+            Ql_result_all[traj_start_idx] = Ql_result_traj
+            if Save_Neighbour:
+                Neighbourlist_slice_prev = Neighbourlist_slice.copy()
+            logging.info("\rTime Point: {:.2f} ps. Time Elapsed: {:.1f} s. ({:.2f}%, {:.2f} time points/s)".format(
+                Init_step*traj_timestep,
+                time.time() - t_tot,
+                (traj_start_idx+1)*100/num_traj_starts,
+                (1)/(time.time() - t_cur)))
+        
+        if np.shape(Ql_result_all)[1] == 1:
+            Ql_result_all = np.squeeze(Ql_result_all,axis=1)
+        
+        # Optional: Save the calculated features
+        if SaveFeatures:
+            with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'wb') as f:
+                pickle.dump([Ql_result_all], f)
     
     # Calculate the prediction for each atom at each time step
     logging.info('\nInferring Predictions...')
@@ -531,9 +554,12 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         logging.info('\nFinished Reclassifying Atoms. Time elapsed: {:.1f} s'.format(time.time() - t_tot))
     
     if SaveTrajectory:
-        Certainty_ts = np.split(np.amax(predicted_prob, axis=1,keepdims=True), num_traj_starts, axis=0)
-        Probs_ts = np.split(predicted_prob, num_traj_starts, axis=0)
-        aux_dat = np.concatenate((Certainty_ts,Probs_ts), axis=2)
+        if SaveTrajectoryAux > 0:
+            Certainty_ts = np.split(np.amax(predicted_prob, axis=1,keepdims=True), num_traj_starts, axis=0)
+            Probs_ts = np.split(predicted_prob, num_traj_starts, axis=0)
+            aux_dat = np.concatenate((Certainty_ts,Probs_ts), axis=2)[:,:,0:SaveTrajectoryAux]
+        else:
+            aux_dat = [None] * num_traj_starts
         
         t_tot = time.time()
         # Check if processed outfle already exists and delete
