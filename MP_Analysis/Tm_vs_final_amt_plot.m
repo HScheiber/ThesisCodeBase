@@ -31,7 +31,7 @@ p(3) = scatter(Data.T_LBs,100*Data.Y_LBs,sz,'MarkerEdgeColor','k',...
               'LineWidth',1);
 legtxt = {'$T^{x}$' '$T_{UB}$' '$T_{LB}$'};
 
-legend(p,legtxt,'interpreter','latex','location','Southeast')
+legend(p,legtxt,'interpreter','latex','location','Southeast','FontSize',fs)
 
 set(axh,'FontSize',fs,'Box','On','TickLabelInterpreter','latex')
 xlim(axh,'padded')
