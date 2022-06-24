@@ -1,8 +1,8 @@
 % Tm_vs_final_amt
 Settings = Initialize_MD_Settings;
 Settings.Project_Directory_Name = 'Melting_Point_Studies';
-DataSetName = 'Set61_TvsXliq.mat';
-DataKeyword = 'Set61';
+DataSetName = 'Set60_TvsXliq.mat';
+DataKeyword = 'Set60';
 ProjectDir = fullfile(Settings.project,Settings.Project_Directory_Name);
 SaveDataDir = fullfile(Settings.home,'data',DataSetName);
 Salt = 'NaCl';
