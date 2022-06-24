@@ -46,8 +46,8 @@ Experiment = Load_Experimental_Data;
 % JobStuff = {{'LiF' 'JC' 'FiveFive' 1336.8 '5-5'} ...
 %             {'LiBr' 'TF' 'Rocksalt' 802.9 'Liquid'} ...
 %             {'NaCl' 'TF' 'Rocksalt' 1081.4 'Liquid'} ...
-%             {'CsCl' 'TF' 'Rocksalt' 1179.9 'CsCl'}};
-JobStuff = {{'CsCl' 'TF' 'Rocksalt' 1179.9 'CsCl'}};
+%             {'CsCl' 'TF' 'Rocksalt' 1179.9 'Rocksalt'}};
+JobStuff = {{'CsCl' 'TF' 'Rocksalt' 1179.9 'Rocksalt'}};
 for jdx = 1:length(JobStuff)
     Salt = JobStuff{jdx}{1};
     Theory = JobStuff{jdx}{2};
