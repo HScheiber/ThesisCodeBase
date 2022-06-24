@@ -1,4 +1,4 @@
-%%%%% Melting_Point_Batch_Submit_Cedar %%%%%%
+%%%%% Melting_Point_Batch_Submit_Local %%%%%%
 
 %% Global Calculation settings
 clear;
@@ -43,11 +43,11 @@ idx=0;
 % CsCl TF Rocksalt: Tm = 1179.9
 
 Experiment = Load_Experimental_Data;
-JobStuff = {{'LiF' 'JC' 'FiveFive' 1336.8 '5-5'} ...
-            {'LiBr' 'TF' 'Rocksalt' 802.9 'Liquid'} ...
-            {'NaCl' 'TF' 'Rocksalt' 1081.4 'Liquid'} ...
-            {'CsCl' 'TF' 'Rocksalt' 1179.9 'CsCl'}};
-        
+% JobStuff = {{'LiF' 'JC' 'FiveFive' 1336.8 '5-5'} ...
+%             {'LiBr' 'TF' 'Rocksalt' 802.9 'Liquid'} ...
+%             {'NaCl' 'TF' 'Rocksalt' 1081.4 'Liquid'} ...
+%             {'CsCl' 'TF' 'Rocksalt' 1179.9 'CsCl'}};
+JobStuff = {{'CsCl' 'TF' 'Rocksalt' 1179.9 'CsCl'}};
 for jdx = 1:length(JobStuff)
     Salt = JobStuff{jdx}{1};
     Theory = JobStuff{jdx}{2};
