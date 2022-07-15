@@ -2,12 +2,12 @@
 # WorkDir = r'D:\Example_Nucleations\NaCl\ExampleNuc_L_JC_NPT'
 # Salt = 'NaCl'
 # SystemName = 'ExampleNuc_L_JC_NPT'
-# SaveTrajectory=True
-# SaveFeatures=True
-# SavePredictions=False 
+# SaveTrajectory=False
+# SaveFeatures=False
+# SavePredictions=False
 # SavePredictionsImage=True
-# ML_TimeLength=0
-# ML_TimeStep=0
+# ML_TimeLength=10
+# ML_TimeStep=1
 # TimePerFrame=1
 # FileType='gro'
 # Verbose=True
@@ -22,7 +22,7 @@
 # Prob_Interfacial = None
 # Spatial_Reassignment = False
 # Spatial_Interfacial = None
-
+# LoadFeatures = True
 
 # NaCl interface Example
 WorkDir = r'D:\Example_Nucleations\NaCl\Interface_at_MP'
@@ -32,9 +32,9 @@ SaveTrajectory=True
 SaveFeatures=False
 SavePredictions=False 
 SavePredictionsImage=True, 
-ML_TimeLength=50
-ML_TimeStep=5
-TimePerFrame=5
+ML_TimeLength=0
+ML_TimeStep=0
+TimePerFrame=100
 FileType='gro'
 Verbose=True
 StartPoint = 0
@@ -48,7 +48,7 @@ Qlm_Average = True
 Prob_Interfacial = None
 Spatial_Reassignment = False
 Spatial_Interfacial = None
-
+LoadFeatures = False
 
 ## CsCl Example
 # WorkDir = r'D:\Example_Nucleations\CsCl\ExampleNuc_L_TF_NPT'
@@ -71,12 +71,12 @@ Spatial_Interfacial = None
 # InMemory = False
 
 
-# LiBr Example
+# # LiBr Example
 # WorkDir = r'D:\Example_Nucleations\LiBr\ExampleNuc_L_TF_NPT'
 # Salt = 'LiBr'
 # SystemName = 'ExampleNuc_L_TF_NPT'
-# SaveTrajectory=True
-# SaveFeatures=True
+# SaveTrajectory=False
+# SaveFeatures=False
 # SavePredictions=False 
 # SavePredictionsImage=True
 # ML_TimeLength=10
@@ -92,9 +92,10 @@ Spatial_Interfacial = None
 # InMemory = False
 # Voronoi = False
 # Qlm_Average = True
-# Prob_Interfacial = 0.75
+# Prob_Interfacial = None
 # Spatial_Reassignment = False
 # Spatial_Interfacial = None
+# LoadFeatures = True
 
 # # LiBr Interface Example
 # WorkDir = r'D:\Example_Nucleations\LiBr\Interface_at_MP'
@@ -179,6 +180,7 @@ import time
 import re
 import warnings
 import logging
+import pickle
 from itertools import groupby
 
 if SavePredictionsImage:
@@ -186,9 +188,6 @@ if SavePredictionsImage:
     import seaborn as sns
     import matplotlib
     import matplotlib.pyplot as plt
-
-if SaveFeatures or SavePredictions:
-    import pickle
 
 physical_devices = tf.config.list_physical_devices('GPU')
 if len(physical_devices) > 0:
@@ -459,106 +458,107 @@ if Voronoi:
     voro = freud.locality.Voronoi()
 
 #%% Calculate features
-logging.info('Generating features...')
-prev_traj_slice = np.array([])
-central_idx = int((t_slice_len - 1)/2)
-for traj_start_idx, Init_step in enumerate(Traj_starts):
-    t_cur = time.time()
-    
-    # Select out a slice of the trajectory of the correct ML_TimeLength [steps]
-    traj_slice = np.array(range(Init_step-Half_ML_TimeLength_in_steps, Init_step+Half_ML_TimeLength_in_steps+1, steps_per_frame))
-    
-    # Make sure there are not step indeces outside of the trajectory range by shifting back extremes
-    if any(traj_slice < min_traj_step):
-        ds = min_traj_step - np.min(traj_slice)
-        traj_slice = traj_slice + ds
-    elif any(traj_slice > max_traj_step):
-        ds = max_traj_step - np.max(traj_slice)
-        traj_slice = traj_slice + ds
-    
-    # Calculate Ql values at each time point in the time slice
-    for t_idx, ts in enumerate(t.trajectory[traj_slice]):
+if LoadFeatures and os.path.exists(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl'):
+    with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'rb') as f:
+        [Ql_result_all] = pickle.load(f)
+
+else:
+    logging.info('Generating features...')
+    prev_traj_slice = np.array([])
+    central_idx = int((t_slice_len - 1)/2)
+    for traj_start_idx, Init_step in enumerate(Traj_starts):
+        t_cur = time.time()
         
-        if traj_slice[t_idx] in prev_traj_slice:
-            pridx = list(prev_traj_slice).index(traj_slice[t_idx])
-            Ql_result_traj[t_idx] = Ql_result_all[traj_start_idx-1,pridx,:,:]
-            if Save_Neighbour:
-                Neighbourlist_slice[t_idx] = Neighbourlist_slice_prev[pridx]
-                if t_idx == central_idx:
-                    Neighbourlist_list.append(Neighbourlist_slice[t_idx])
-            continue
+        # Select out a slice of the trajectory of the correct ML_TimeLength [steps]
+        traj_slice = np.array(range(Init_step-Half_ML_TimeLength_in_steps, Init_step+Half_ML_TimeLength_in_steps+1, steps_per_frame))
         
-        if pbc_on:
-            box_data = to_freud_box(ts.dimensions)
-        else:
-            # If pbc is off, place particles in ~infinite box
-            box_data = freud.box.Box(1e5,1e5,1e5,0,0,0)
+        # Make sure there are not step indeces outside of the trajectory range by shifting back extremes
+        if any(traj_slice < min_traj_step):
+            ds = min_traj_step - np.min(traj_slice)
+            traj_slice = traj_slice + ds
+        elif any(traj_slice > max_traj_step):
+            ds = max_traj_step - np.max(traj_slice)
+            traj_slice = traj_slice + ds
         
-        # Select out the atoms
-        point_data = ts.positions/10 # in nm
-        system = [box_data,ts.positions/10]
-        
-        # Loop through the N_neighbour_list to built up a set of features
-        fidx = 0
-        if Include_ID:
-            Ql_result[fidx] = Metal_Index # Append the atom idenities: metal vs non-metal
-            fidx += 1
-        for Neighbour_idx, N_neighbour  in enumerate(N_neighbour_list):
+        # Calculate Ql values at each time point in the time slice
+        for t_idx, ts in enumerate(t.trajectory[traj_slice]):
             
-            if Voronoi:
-                nlist = voro.compute((box_data, point_data)).nlist
+            if traj_slice[t_idx] in prev_traj_slice:
+                pridx = list(prev_traj_slice).index(traj_slice[t_idx])
+                Ql_result_traj[t_idx] = Ql_result_all[traj_start_idx-1,pridx,:,:]
+                if Save_Neighbour:
+                    Neighbourlist_slice[t_idx] = Neighbourlist_slice_prev[pridx]
+                    if t_idx == central_idx:
+                        Neighbourlist_list.append(Neighbourlist_slice[t_idx])
+                continue
+            
+            if pbc_on:
+                box_data = to_freud_box(ts.dimensions)
             else:
-                # Construct the neighbour filter
-                query_args = dict(mode='nearest', num_neighbors=N_neighbour, exclude_ii=True)
-                
-                # Build the neighbour list
-                nlist = freud.locality.AABBQuery(box_data, point_data).query(point_data, query_args).toNeighborList()
+                # If pbc is off, place particles in ~infinite box
+                box_data = freud.box.Box(1e5,1e5,1e5,0,0,0)
             
-            if Save_Neighbour and (Neighbour_idx+1 == len(N_neighbour_list)):
-                Neighbourlist_slice[t_idx] = nlist
-                if t_idx == central_idx:
-                    Neighbourlist_list.append(nlist)
+            # Select out the atoms
+            point_data = ts.positions/10 # in nm
+            system = [box_data,ts.positions/10]
             
-            for L in L_list[Neighbour_idx]:
-                ql = freud.order.Steinhardt(L,wl=Include_Wl,
-                                            wl_normalize=True,
-                                            average=Qlm_Average,
-                                            weighted=Voronoi)
-                ql_calc = ql.compute(system, neighbors=nlist)
+            # Loop through the N_neighbour_list to built up a set of features
+            fidx = 0
+            if Include_ID:
+                Ql_result[fidx] = Metal_Index # Append the atom idenities: metal vs non-metal
+                fidx += 1
+            for Neighbour_idx, N_neighbour  in enumerate(N_neighbour_list):
                 
-                # Append order parameters to output
-                Ql_result[fidx] = ql_calc.ql
-                if Include_Wl:
-                    Ql_result[fidx+1] = ql_calc.particle_order
-                    fidx += 2
+                if Voronoi:
+                    nlist = voro.compute((box_data, point_data)).nlist
                 else:
-                    fidx += 1
-        Ql_result_traj[t_idx] = np.column_stack(Ql_result)
-        
-    Ql_result_all[traj_start_idx] = Ql_result_traj
-    prev_traj_slice = traj_slice
+                    # Construct the neighbour filter
+                    query_args = dict(mode='nearest', num_neighbors=N_neighbour, exclude_ii=True)
+                    
+                    # Build the neighbour list
+                    nlist = freud.locality.AABBQuery(box_data, point_data).query(point_data, query_args).toNeighborList()
+                
+                if Save_Neighbour and (Neighbour_idx+1 == len(N_neighbour_list)):
+                    Neighbourlist_slice[t_idx] = nlist
+                    if t_idx == central_idx:
+                        Neighbourlist_list.append(nlist)
+                
+                for L in L_list[Neighbour_idx]:
+                    ql = freud.order.Steinhardt(L,wl=Include_Wl,
+                                                wl_normalize=True,
+                                                average=Qlm_Average,
+                                                weighted=Voronoi)
+                    ql_calc = ql.compute(system, neighbors=nlist)
+                    
+                    # Append order parameters to output
+                    Ql_result[fidx] = ql_calc.ql
+                    if Include_Wl:
+                        Ql_result[fidx+1] = ql_calc.particle_order
+                        fidx += 2
+                    else:
+                        fidx += 1
+            Ql_result_traj[t_idx] = np.column_stack(Ql_result)
+            
+        Ql_result_all[traj_start_idx] = Ql_result_traj
+        prev_traj_slice = traj_slice
+        if Save_Neighbour:
+            Neighbourlist_slice_prev = Neighbourlist_slice.copy()
+        logging.info("\rTime Point: {:.2f} ps. Time Elapsed: {:.1f} s. ({:.2f}%, {:.2f} time points/s)".format(
+            Init_step*traj_timestep,
+            time.time() - t_tot,
+            (traj_start_idx+1)*100/num_traj_starts,
+            (1)/(time.time() - t_cur)))
+    
+    if np.shape(Ql_result_all)[1] == 1:
+        Ql_result_all = np.squeeze(Ql_result_all,axis=1)
+    
     if Save_Neighbour:
-        Neighbourlist_slice_prev = Neighbourlist_slice.copy()
-    logging.info("\rTime Point: {:.2f} ps. Time Elapsed: {:.1f} s. ({:.2f}%, {:.2f} time points/s)".format(
-        Init_step*traj_timestep,
-        time.time() - t_tot,
-        (traj_start_idx+1)*100/num_traj_starts,
-        (1)/(time.time() - t_cur)))
-
-if np.shape(Ql_result_all)[1] == 1:
-    Ql_result_all = np.squeeze(Ql_result_all,axis=1)
-
-if Save_Neighbour:
-    del(Neighbourlist_slice_prev,Neighbourlist_slice)
-
-# Optional: Save the calculated features
-if SaveFeatures:
-    with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'wb') as f:
-        pickle.dump([Ql_result_all], f)
-#%% Load features        
-with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'rb') as f:
-    [Ql_result_all] = pickle.load(f)
-
+        del(Neighbourlist_slice_prev,Neighbourlist_slice)
+    
+    # Optional: Save the calculated features
+    if SaveFeatures:
+        with open(ML_Name + '_' + Salt + '_' + SystemName + '_Features.pkl', 'wb') as f:
+            pickle.dump([Ql_result_all], f)
 #%%
 
 # Calculate the prediction for each atom at each time step
@@ -693,11 +693,11 @@ if SavePredictionsImage:
         ymax = 12 # percentage
         transp=False
     else:
-        fs = 12
+        fs = 18
         ss = 10
         fne = ''
         ymax = 100
-        transp=True
+        transp=False
     
     if Temporal_Cutoff > 0:
         init = Temporal_Cutoff-1
@@ -741,20 +741,23 @@ if SavePredictionsImage:
     
     matplotlib.rc('font', **font)
     
-    fig = plt.figure(figsize=(8, 4))
+    fig = plt.figure(figsize=(8, 5))
     #fig = plt.figure()
     for idx,y_dat_metal in enumerate(d_metal_norm.T):
         #yhat = uniform_filter1d(y_dat,size=int(np.ceil(len(y_dat)/30)))
         #plt.plot(x,yhat*100, label=labels[idx], color=cols[idx], linewidth=2, linestyle='dashed')
-        y_dat_halide = d_halide_norm.T[idx,:]
+        # y_dat_halide = d_halide_norm.T[idx,:]
         # plt.plot(x-min(x),y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
         # plt.plot(x-min(x),y_dat_halide*100, label=None, color=cols[idx], alpha=0.8, linewidth=3, linestyle='dashed')
-        y_dat = d_norm.T[idx,:]
-        # plt.plot(x-min(x),y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
-        plt.plot(x,y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
+        # y_dat = d_norm.T[idx,:]
+        plt.plot(x-min(x),y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
+        # if idx >= 9:
+        #     plt.plot(x,y_dat_metal*100, label=labels[idx], color='k', linewidth=3, linestyle='dotted')
+        # else:
+        #     plt.plot(x,y_dat_metal*100, label=labels[idx], color=cols[idx], alpha=0.8, linewidth=3, linestyle='solid')
     
     
-    #plt.title('[' + ML_Name + ']: ' + Salt + ' ' + SystemName)
+    plt.title('NN ' + Trial_ID)
     plt.minorticks_on()
     plt.grid(which='major',
              alpha=0.25)
@@ -780,14 +783,14 @@ if SavePredictionsImage:
     if Zoomed:
         plt.ylim([0,ymax])
         plt.xlim([0,max(x)])
-        
+    
+    plt.xlim([0,max(x)])
     if SaveDir == None:
-        figname = os.path.join(WorkDir,ML_Name + '_' + Salt + '_' + SystemName + fne + '.svg')
-        fig.savefig(figname, format='svg',bbox_inches="tight", transparent=transp)
+        figname = os.path.join(WorkDir,ML_Name + '_' + Salt + '_' + SystemName + fne + '.png')
+        fig.savefig(figname, format='png',bbox_inches="tight", transparent=transp)
     else:
         figname = os.path.join(SaveDir,ML_Name + '_' + Salt + '_' + SystemName + '.pdf')
         fig.savefig(figname, format='pdf',bbox_inches="tight")
     
-#%%
-import subprocess
-subprocess.call('"C:\Program Files\Inkscape\bin\inkscape.exe" ' + figname + ' -M ' + figname.replace('.svg','.emf') ,shell=True)
+# import subprocess
+# subprocess.call('"C:\Program Files\Inkscape\bin\inkscape.exe" ' + figname + ' -M ' + figname.replace('.svg','.emf') ,shell=True)

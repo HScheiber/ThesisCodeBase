@@ -43,6 +43,8 @@ axh = axes(figh,'FontSize',24,'TickLabelInterpreter','latex',...
     'XMinorGrid','off','YLimitMethod','padded',...
     'YMinorGrid','off','Position',[0.08 0.13 0.9 0.84]);
 hold(axh,'on')
+idps = [];
+idps_size = [];
 
 Exp = Load_Experimental_Data;
 Tm_Exp = Exp.(Salt).mp;
@@ -84,8 +86,20 @@ for sidx = 1:N_Sets
 
     for jdx = 1:length(JobsOfInterest)
 
-%          if Data.(JobsOfInterest{jdx}).MP_confirmed
-%             MPs_idx = ~Data.(JobsOfInterest{jdx}).Freeze_Trace & ~Data.(JobsOfInterest{jdx}).Melt_Trace;
+
+        MPs_idx = ~Data.(JobsOfInterest{jdx}).Freeze_Trace & ~Data.(JobsOfInterest{jdx}).Melt_Trace;
+        Tms = Data.(JobsOfInterest{jdx}).T_Trace(MPs_idx);
+        disp([JobsOfInterest{jdx} ' has ' num2str(length(Tms)) ' indeterminate points.'])
+        idps(end+1) = length(Tms);
+        if length(Tms) > 1
+            idps_size(end+1) =  max(Tms) - min(Tms);
+            Y(jdx) = nan;
+            continue
+        else
+            idps_size(end+1) = 0;
+
+        end
+        
 %             Tms = Data.(JobsOfInterest{jdx}).T_Trace(MPs_idx);
 % 
 %             mean_Tm = mean([min(Tms) max(Tms)]);
@@ -128,12 +142,12 @@ for sidx = 1:N_Sets
 
         Tm = mean(Data.(JobsOfInterest{jdx}).dT);
         Y(jdx) = Tm; %- Tm_Exp;
-
+        
         Y_pos_err(jdx) = Data.(JobsOfInterest{jdx}).dT(2) - Tm;
         Y_neg_err(jdx) = Tm - Data.(JobsOfInterest{jdx}).dT(1);
-     end
-%     end
+    end
     %YDat(sidx,:) = histcounts(Y,bin_edges);
+    Y(isnan(Y)) = [];
     YDat = histcounts(Y,bin_edges);
     
     
@@ -206,7 +220,4 @@ ylabel(axh,'$\rho(T_{m})$','Interpreter','latex')
 
 grid(axh,'on')
 drawnow
-
-exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Sys_Size_Comp.pdf',...
-    'ContentType','vector','BackgroundColor','none')
 

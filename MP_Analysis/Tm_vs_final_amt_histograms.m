@@ -1,7 +1,7 @@
 Settings = Initialize_MD_Settings;
 Settings.Project_Directory_Name = 'Melting_Point_Studies';
-DataSetName = 'Set60_TvsXliq.mat';
-DataKeyword = 'Set60';
+DataSetName = 'Set61_TvsXliq.mat';
+DataKeyword = 'Set61';
 ProjectDir = fullfile(Settings.project,Settings.Project_Directory_Name);
 SaveDataDir = fullfile(Settings.home,'data',DataSetName);
 Salt = 'NaCl';
@@ -23,8 +23,6 @@ Y_Xs_Dat = histcounts(Data.T_Xs,bin_edges);
 Y_UB_Dat = histcounts(Data.T_UBs,bin_edges);
 Y_LB_Dat = histcounts(Data.T_LBs,bin_edges);
 
-
-
 Colours = cbrewer('qual', 'Set1', 3);
 figh = figure('WindowState','maximized','NumberTitle','off',...
     'Name','','Visible','On');
@@ -44,7 +42,7 @@ p(3) = area(axh,bin_centers,Y_LB_Dat./N_tot,'FaceColor',Colours(3,:),...
 
 legtxt = {'$T^{x}$' '$T_{UB}$' '$T_{LB}$'};
 
-legend(p,legtxt,'interpreter','latex','location','Southeast','FontSize',fs)
+legend(axh,p,legtxt,'interpreter','latex','location','Southeast','FontSize',fs)
 
 set(axh,'FontSize',fs,'Box','On','TickLabelInterpreter','latex')
 xlim(axh,'padded')
@@ -54,9 +52,9 @@ ylabel(axh,'$\rho(T)$','Interpreter','latex')
 grid(axh,'minor')
 
 if strcmp(DataKeyword,'Set61')
-    exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\SI_Figures\TUB_TLB_Hist_N2000.eps',...
+    exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\SI_Figures\TUB_TLB_Hist_N11664.pdf',...
         'ContentType','vector','BackgroundColor','none')
 elseif strcmp(DataKeyword,'Set60')
-    exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\SI_Figures\TUB_TLB_Hist_N11664.eps',...
+    exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\SI_Figures\TUB_TLB_Hist_N2000.pdf',...
         'ContentType','vector','BackgroundColor','none')
 end
