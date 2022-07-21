@@ -19,8 +19,16 @@ function Loss_Options = init_loss_options
     % When true: use experimental lattice parameters for rocksalt and
     % wurtzite (where available)
     % When false: use DFT-calculated lattice parameters
-    Loss_Options.Experimental_LP = true; 
+    Loss_Options.Experimental_LP = true;
     
+    % High temperature experimental properties of the liquid and solid
+    Loss_Options.Fusion_Enthalpy = 0; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+    Loss_Options.MP_Volume_Change = 0; % Fitting the experimental change in volume due to melting at the experimental MP
+    Loss_Options.Liquid_MP_Volume = 0; % Fitting the experimental volume per formula unit at the experimental MP
+    Loss_Options.Solid_MP_Volume  = 0; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+    Loss_Options.MP  = 0; % Fitting the experimental MP, using the experimental structure as the solid
+    
+    % Properties of the solid structures
     for idx = 1:length(Structures)
         Structure = Structures{idx};
         
@@ -32,7 +40,7 @@ function Loss_Options = init_loss_options
         Loss_Options.(Structure).a   = 0;
         Loss_Options.(Structure).b   = 0;
         Loss_Options.(Structure).c   = 0;
-        Loss_Options.(Structure).V   = 0;
+        Loss_Options.(Structure).V   = 0; % Volume at 0 K
         Loss_Options.(Structure).Gap.Value = 0; % Negative value:
         Loss_Options.(Structure).Gap.Weight = 0;
         Loss_Options.(Structure).Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne

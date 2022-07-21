@@ -35,6 +35,8 @@ Y_ff = nan(length(Salts),length(Models));
 Y_Er = 2.*ones(length(Salts),length(Models));
 Y_Exp = nan(length(Salts),1);
 Y_Exp_Er = nan(length(Salts),1);
+Y_indet = nan(length(Salts),length(Models),length(Structures));
+N_indet = nan(length(Salts),length(Models),length(Structures));
 
 % Y_Lit = nan(length(Salts),length(Models),length(Literature_Sets));
 % Y_Lit_Er = nan(length(Salts),length(Models),length(Literature_Sets));
@@ -71,6 +73,14 @@ for idx = X
                                 Y_ff(idx,jdx) = mean(Data.(Salt).(Model).(Structure).(Tag).dT);
                                 disp([Salt ' ' Model ' ' Structure ' : ' num2str(Y_ff(idx,jdx),'%.0f') ])
                         end
+                        
+                        MPs_idx = ~Data.(Salt).(Model).(Structure).(Tag).Freeze_Trace & ...
+                            ~Data.(Salt).(Model).(Structure).(Tag).Melt_Trace;
+                        Tms = Data.(Salt).(Model).(Structure).(Tag).T_Trace(MPs_idx);
+                        Fz = Data.(Salt).(Model).(Structure).(Tag).T_Trace(logical(Data.(Salt).(Model).(Structure).(Tag).Freeze_Trace));
+                        Mt = Data.(Salt).(Model).(Structure).(Tag).T_Trace(logical(Data.(Salt).(Model).(Structure).(Tag).Melt_Trace));
+                        Y_indet(idx,jdx,sdx) = diff([max([Fz 0]) min(Mt)]);
+                        N_indet(idx,jdx,sdx) = length(Tms);
                     end
                 end
             end
@@ -171,5 +181,5 @@ legend(p,Legend_Labels,'FontSize',fs,'Box','On','Interpreter','latex','NumColumn
 grid(axh,'on')
 
 
-exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_HalidesBigText.pdf',...
+exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
     'ContentType','vector','BackgroundColor','none')

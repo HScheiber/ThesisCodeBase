@@ -182,16 +182,29 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoop(Settings
     
     en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
     if Extra_Properties
-        En_set = char(regexp(en_opts,'([0-9]{1,2})  LJ-\(SR\)','tokens','once'));
-        En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Coulomb-\(SR\)','tokens','once'))];
-        En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Coul.-recip.','tokens','once'))];
-        En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Potential','tokens','once'))];
-        En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Metal '-' Metal ],'tokens','once'))];
-        En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  LJ-SR:' Metal '-' Metal ],'tokens','once'))];
-        En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Metal '-' Halide],'tokens','once'))];
-        En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  LJ-SR:' Metal '-' Halide],'tokens','once'))];
-        En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Halide '-' Halide ],'tokens','once'))];
-        En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  LJ-SR:' Halide '-' Halide ],'tokens','once'))];
+        if ~isempty(regexp(en_opts,'Buck.ham','once'))
+            En_set = char(regexp(en_opts,'([0-9]{1,2})  Buck.ham-\(SR\)','tokens','once'));
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Coulomb-\(SR\)','tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Coul.-recip.','tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Potential','tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Metal '-' Metal ],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Buck-SR:' Metal '-' Metal ],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Metal '-' Halide],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Buck-SR:' Metal '-' Halide],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Halide '-' Halide ],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Buck-SR:' Halide '-' Halide ],'tokens','once'))];
+        else
+            En_set = char(regexp(en_opts,'([0-9]{1,2})  LJ-\(SR\)','tokens','once'));
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Coulomb-\(SR\)','tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Coul.-recip.','tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Potential','tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Metal '-' Metal ],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  LJ-SR:' Metal '-' Metal ],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Metal '-' Halide],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  LJ-SR:' Metal '-' Halide],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  Coul-SR:' Halide '-' Halide ],'tokens','once'))];
+            En_set = [En_set ' ' char(regexp(en_opts,['([0-9]{1,2})  LJ-SR:' Halide '-' Halide ],'tokens','once'))];
+        end
     else
         En_set = char(regexp(en_opts,'([0-9]{1,2})  Potential','tokens','once'));
     end

@@ -13,9 +13,9 @@ Custom_Legend = true;
 Sets = {'Set60' 'Set61'}; % 'Set62' 'Set63'
 Legend_Params = {'N'};
 Show_Fit_dist = true;
+Include_Delta_T_prime = false; % When false, exclude any calculation where Delta_T' was used as the stopping condition
 % Sets = {'Set27' 'Set28' 'Set29' 'Set30' 'Set31'};
 % Legend_Params = {'N' 'R_C' 'Thermostat' 'Tau_T' 'Barostat' 'Tau_P'};
-
 
 N_Sets = length(Sets);
 Colours = cbrewer('qual','Set2',max(N_Sets,3));
@@ -28,8 +28,8 @@ else
     p = gobjects(1,N_Sets);
 end
 w = 0.5;
-dist_start = 1280;
-dist_end = 1300;
+dist_start = 1279.75;
+dist_end = 1300.25;
 bin_edges = dist_start:w:dist_end; %205:w:226;
 bin_centers = bin_edges(1:end-1)+w/2;
 xlimits = [bin_edges(1) bin_edges(end)];
@@ -118,6 +118,15 @@ for sidx = 1:N_Sets
 %             Y_neg_err(jdx) = mean_Tm - T_freeze_max;
 % 
 %          else
+        if ~Include_Delta_T_prime
+            MPs_idx = ~Data.(JobsOfInterest{jdx}).Freeze_Trace & ~Data.(JobsOfInterest{jdx}).Melt_Trace;
+            Tms = Data.(JobsOfInterest{jdx}).T_Trace(MPs_idx);
+            if length(Tms) > 1
+                Y(jdx) = nan;
+                continue
+            end
+        end
+        
         switch Dependent_var
             case 'Rep'
                 repno = regexp(JobsOfInterest{jdx},'Rep_([0-9]+)','once','tokens');
@@ -134,6 +143,7 @@ for sidx = 1:N_Sets
      end
 %     end
     %YDat(sidx,:) = histcounts(Y,bin_edges);
+    Y(isnan(Y)) = [];
     YDat = histcounts(Y,bin_edges);
     
     

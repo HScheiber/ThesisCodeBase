@@ -28,7 +28,7 @@ coupledconstraints = []; % No coupled constraints on the system
 % Optional inputs
 p = inputParser;
 p.FunctionName = 'LiX_Minimizer';
-addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
+addOptional(p,'Verbose',true,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Extra_Properties',Settings.Extra_Properties,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 
 parse(p,varargin{:});
@@ -939,7 +939,7 @@ else
     
 end
 
-Minimization_Data = Initialize_Minimization_Data(Settings.Structures,Settings.Salt,Settings.Theory);
+Settings.Minimization_Data = Initialize_Minimization_Data(Settings);
 
 % Calculate loss due to infeasible TF / BH models with no well minima (only works reliably in sigma-epsilon form)
 Loss_add = 0;
@@ -987,11 +987,11 @@ if Settings.CheckBadFcn
 %         plot(dU,Loss_add)
         
     end
-    plot(U_MX.r,U_MX.Total)
-    hold on
-    scatter(U_MX.r(peaks_idx),U_MX.Total(peaks_idx))
-    scatter(U_MX.r(valleys_idx),U_MX.Total(valleys_idx))
-    ylim([-1000 1000])
+%     plot(U_MX.r,U_MX.Total)
+%     hold on
+%     scatter(U_MX.r(peaks_idx),U_MX.Total(peaks_idx))
+%     scatter(U_MX.r(valleys_idx),U_MX.Total(valleys_idx))
+%     ylim([-1000 1000])
     
     %% Grab the peaks and valleys of the MM/XX potentials
     for U = [U_MM,U_XX]
@@ -1001,11 +1001,11 @@ if Settings.CheckBadFcn
         maxima_U = U.Total(peaks_idx);
         minima_U = U.Total(valleys_idx);
 
-        plot(U.r,U.Total)
-        hold on
-        scatter(U.r(peaks_idx),U.Total(peaks_idx))
-        scatter(U.r(valleys_idx),U.Total(valleys_idx))
-        ylim([-1000 1000])
+%         plot(U.r,U.Total)
+%         hold on
+%         scatter(U.r(peaks_idx),U.Total(peaks_idx))
+%         scatter(U.r(valleys_idx),U.Total(valleys_idx))
+%         ylim([-1000 1000])
 
         if isempty(maxima_U) % No peak exists
             % Do nothing, this is normal for JC and sometimes BH/TF
@@ -1086,19 +1086,88 @@ if Settings.Parallel_LiX_Minimizer
 
     % Collect outputs into cell array
     for idx = 1:N
-        Minimization_Data{idx} = f(idx).fetchOutputs;
+        Settings.Minimization_Data{idx} = f(idx).fetchOutputs;
     end
 %% Serial mode    
 else
     for idx = 1:N
         Settings.Structure = Settings.Structures{idx};
         
-        Minimization_Data{idx} = Structure_Minimization(Settings,...
+        Settings.Minimization_Data{idx} = Structure_Minimization(Settings,...
             'Extra_Properties',Extra_Properties);
     end
 end
 
+% Initialize Finite T Data structure and update Settings
+tol = sqrt(eps);
+skip_finite_T = false;
+if any([Settings.Loss_Options.Fusion_Enthalpy ...
+        Settings.Loss_Options.MP_Volume_Change ...
+        Settings.Loss_Options.Liquid_MP_Volume ...
+        Settings.Loss_Options.Solid_MP_Volume ...
+        Settings.Loss_Options.MP] > tol)
+    
+    Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
+    
+    Settings.T0 = Settings.Finite_T_Data.Exp_MP;
+    Settings.Structure = Settings.Finite_T_Data.Structure;
+    
+    % Get an estimate for the density in molecules/nm^3
+    N = length(Settings.Minimization_Data);
+    Structures = cell(1,N);
+    for idx = 1:N
+        Structures{idx} = Settings.Minimization_Data{idx}.Structure;
+    end
+    strmatch = strcmp(Settings.Finite_T_Data.Structure,Structures);
+    if any(strmatch)
+        
+        V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
+        V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
+        V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
+        
+        if V_Model_Mismatch > Settings.MaxVModelMismatch
+            Loss_add = Loss_add + log(1 + V_Model_Mismatch*Settings.BadFcnLossPenalty);
+            skip_finite_T = true;
+        end
+        Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3));
+    else
+        Settings.Ref_Density = 1/(Settings.Finite_T_Data.Exp_Liquid_V_MP*(0.1^3));
+    end
+end
+
+% High T liquid properties
+if any([Settings.Loss_Options.Fusion_Enthalpy ...
+        Settings.Loss_Options.MP_Volume_Change ...
+        Settings.Loss_Options.Liquid_MP_Volume] > tol) ...
+        && ~skip_finite_T
+    Output = Calc_Liquid_Properties_at_MP(Settings);
+    Settings.Finite_T_Data;
+end
+
+% High T solid properties
+if any([Settings.Loss_Options.Fusion_Enthalpy ...
+        Settings.Loss_Options.MP_Volume_Change ...
+        Settings.Loss_Options.Solid_MP_Volume] > tol) ...
+        && ~skip_finite_T
+    Settings.Finite_T_Data;
+end
+
+% Melting point
+if Settings.Loss_Options.MP > tol && ~skip_finite_T
+    Settings.Finite_T_Data;
+end
+
+% If skipping the finite_T data, then loss comes through the Loss_add
+% variable, so we don't need to double count
+if skip_finite_T
+    Settings.Finite_T_Data.Fusion_dH   = Settings.Finite_T_Data.Exp_Fusion_dH;
+    Settings.Finite_T_Data.Fusion_dV   = Settings.Finite_T_Data.Exp_Fusion_dV;
+    Settings.Finite_T_Data.Liquid_V_MP = Settings.Finite_T_Data.Exp_Liquid_V_MP;
+    Settings.Finite_T_Data.Solid_V_MP  = Settings.Finite_T_Data.Exp_Solid_V_MP;
+    Settings.Finite_T_Data.MP          = Settings.Finite_T_Data.Exp_MP;
+end
+
 % Calculate Loss function from data
-Loss = LiX_Loss(Settings.Loss_Options,Minimization_Data,Settings.Salt) + Loss_add;
+Loss = LiX_Loss(Settings) + Loss_add;
 
 end

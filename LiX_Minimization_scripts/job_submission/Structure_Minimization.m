@@ -395,21 +395,14 @@ elseif contains(Settings.Theory,'BH')
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',[num2str(BH_MX.B,'%10.8f') ' ' num2str(BH_MX.alpha,'%10.8f')]);
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##',pad(num2str(BH_MX.C,'%10.8f'),10));
     
-
-    % Modify the MDP file
+    % Modify the MDP file (Buckingham potential requires group cutoff)
     Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWTYPE##',pad(Settings.MinMDP.VDWType,18));
     Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWMOD##',pad(Settings.MinMDP.vdw_modifier,18));
-    Settings.MDP_Template = strrep(Settings.MDP_Template,'##CUTOFF##',pad(Settings.MinMDP.CutOffScheme,18));
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##CUTOFF##',pad('group',18));
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'energygrp-table.+?\n','');
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'ewald-rtol-lj.+?\n','');
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'lj-pme-comb-rule.+?\n','');
-    
-    % Add in Verlet Settings
-    if strcmp(Settings.MinMDP.CutOffScheme,'Verlet')
-        Settings.MDP_Template = strrep(Settings.MDP_Template,'##VerletBT##',pad(num2str(Settings.MinMDP.VerletBT),18));
-    else
-        Settings.MDP_Template = regexprep(Settings.MDP_Template,'verlet-buffer-tolerance.+?\n','');
-    end
+    Settings.MDP_Template = regexprep(Settings.MDP_Template,'verlet-buffer-tolerance.+?\n','');
     
 elseif contains(Settings.Theory,'JC')
     switch Settings.Theory

@@ -12,6 +12,11 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         error('Input model does not exist, or is not a compatible data structure.')
     end
     
+    % Initialize some global settings for later
+    [Model.Metal,Model.Halide] = Separate_Metal_Halide(Model.Salt);
+    Model.Longest_Cutoff = max([Model.MDP.RList_Cutoff Model.MDP.RCoulomb_Cutoff Model.MDP.RVDW_Cutoff]);
+    [~,Model.gmx,Model.gmx_loc,Model.mdrun_opts] = MD_Batch_Template(Model.JobSettings);
+    
     %% Display input summary on first iteration
     if ~isfile('intermediate_bayesian_opt.mat') && ~isfile('intermediate_secondary_opt.mat')
         disp(newline)
@@ -59,34 +64,49 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         else
             disp('Reference Rocksalt/Wurtzite Parameters: DFT')
         end
+        tol = sqrt(eps);
+        if Model.Loss_Options.Fusion_Enthalpy > tol
+            disp(['Enthalpy of Fusion at Experimental MP - Weight: ' num2str(Model.Loss_Options.Fusion_Enthalpy)])
+        end
+        if Model.Loss_Options.MP_Volume_Change > tol
+            disp(['Volume Change of Fusion at Experimental MP - Weight: ' num2str(Model.Loss_Options.MP_Volume_Change)])
+        end
+        if Model.Loss_Options.Liquid_MP_Volume > tol
+            disp(['Liquid Volume at Experimental MP - Weight: ' num2str(Model.Loss_Options.Liquid_MP_Volume)])
+        end
+        if Model.Loss_Options.Solid_MP_Volume > tol
+            disp(['Solid Volume at Experimental MP - Weight: ' num2str(Model.Loss_Options.Solid_MP_Volume)])
+        end
+        if Model.Loss_Options.MP > tol
+            disp(['Melting Point - Weight: ' num2str(Model.Loss_Options.MP)])
+        end
+        
         for idx = 1:length(Model.Structures)
             Structure = Model.Structures{idx};
-
-            tol = sqrt(eps);
             if Model.Loss_Options.(Structure).LE > tol
-                disp([Structure ' Absolute Lattice Energy Weight: ' num2str(Model.Loss_Options.(Structure).LE)])
+                disp([Structure ' Absolute Lattice Energy - Weight: ' num2str(Model.Loss_Options.(Structure).LE)])
             end
             if Model.Loss_Options.(Structure).RLE > tol
-                disp([Structure ' Relative Lattice Energy Weight: ' num2str(Model.Loss_Options.(Structure).RLE)])
+                disp([Structure ' Relative Lattice Energy - Weight: ' num2str(Model.Loss_Options.(Structure).RLE)])
             end
             if Model.Loss_Options.(Structure).a > tol
-                disp([Structure ' Lattice Parameter a Weight: ' num2str(Model.Loss_Options.(Structure).a)])
+                disp([Structure ' Lattice Parameter a - Weight: ' num2str(Model.Loss_Options.(Structure).a)])
             end
             if Model.Loss_Options.(Structure).b > tol
-                disp([Structure ' Lattice Parameter b Weight: ' num2str(Model.Loss_Options.(Structure).b)])
+                disp([Structure ' Lattice Parameter b - Weight: ' num2str(Model.Loss_Options.(Structure).b)])
             end
             if Model.Loss_Options.(Structure).c > tol
-                disp([Structure ' Lattice Parameter c Weight: ' num2str(Model.Loss_Options.(Structure).c)])
+                disp([Structure ' Lattice Parameter c - Weight: ' num2str(Model.Loss_Options.(Structure).c)])
             end
             if Model.Loss_Options.(Structure).V > tol
-                disp([Structure ' Crystal Volume Weight: ' num2str(Model.Loss_Options.(Structure).V)])
+                disp([Structure ' Crystal Volume - Weight: ' num2str(Model.Loss_Options.(Structure).V)])
             end
             if Model.Loss_Options.(Structure).Gap.Weight > 0
                 
                 Ref_Structure = Model.Loss_Options.(Structure).Gap.Ref;
 
-                disp([Ref_Structure ' - ' Structure ' Energy Gap Value: ' num2str(Model.Loss_Options.(Structure).Gap.Value)])
-                disp([Ref_Structure ' - ' Structure ' Energy Gap Weight: ' num2str(Model.Loss_Options.(Structure).Gap.Weight)])
+                disp([Ref_Structure ' - ' Structure ' Energy Gap - Value: ' num2str(Model.Loss_Options.(Structure).Gap.Value)])
+                disp([Ref_Structure ' - ' Structure ' Energy Gap - Weight: ' num2str(Model.Loss_Options.(Structure).Gap.Weight)])
                 
                 compare_fun_info = functions(Model.Loss_Options.(Structure).Gap.Type);
                 

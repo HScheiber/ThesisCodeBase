@@ -73,10 +73,10 @@
 
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 Settings = Initialize_MD_Settings;
-Settings.Salt = 'LiI';
+Settings.Salt = 'LiF';
 Settings.Theory = 'BH';
 Basenum = 'F';
-Midnum = 'A';
+Midnum = 'E';
 
 % Find reps of models
 files = {dir(fullfile(ML_results_dir,['*' Basenum Midnum '*'])).name};
@@ -125,6 +125,7 @@ hold(ax,'On')
 for idx = N_Models:-1:1
     ML_Model_Name = Models{idx};
     if ~isempty(ML_Model_Name)
+        Settings.Model = ML_Model_Name;
         [Settings,ModelFound] = Load_Model_Params(Settings);
         if ~ModelFound
             h_MM(idx) = [];
@@ -132,6 +133,8 @@ for idx = N_Models:-1:1
             h_MX(idx) = [];
             continue
         end
+    else
+        Settings.Model = '';
     end
     
     if strcmp(Settings.Theory,'JC')

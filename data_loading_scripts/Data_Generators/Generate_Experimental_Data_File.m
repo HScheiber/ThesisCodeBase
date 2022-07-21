@@ -223,66 +223,6 @@ for idx = 1:length(Salts)
     end
 end
 
-%% Molten salt densities
-% Data source:
-% (1) Physical Properties Relevant to Energy Storage II - https://nvlpubs.nist.gov/nistpubs/Legacy/NSRDS/nbsnsrds61p2.pdf
-% (2) Thermodynamic and Transport Properties for Molten salts: Correlation Equations ...
-% Used (1) for: LiF, LiCl, LiBr, LiI, NaF, NaCl, KF, KCl
-% Densities using equation: rho = a_rho - b_rho*T
-
-% Parameter a, units g / cm^3
-Experiment.LiF.Liquid.a_rho		= 2.3581;
-Experiment.LiCl.Liquid.a_rho	= 1.8842;
-Experiment.LiBr.Liquid.a_rho	= 3.06546;
-Experiment.LiI.Liquid.a_rho		= 3.79045;
-
-Experiment.NaF.Liquid.a_rho		= 2.7550;
-Experiment.NaCl.Liquid.a_rho	= 2.1393;
-Experiment.NaBr.Liquid.a_rho	= 3.1748;
-Experiment.NaI.Liquid.a_rho		= 3.6274;
-
-Experiment.KF.Liquid.a_rho		= 2.6464;
-Experiment.KCl.Liquid.a_rho		= 2.1359;
-Experiment.KBr.Liquid.a_rho		= 2.9583;
-Experiment.KI.Liquid.a_rho		= 3.3594;
-
-Experiment.RbF.Liquid.a_rho		= 3.9983;
-Experiment.RbCl.Liquid.a_rho	= 3.1210;
-Experiment.RbBr.Liquid.a_rho	= 3.7390;
-Experiment.RbI.Liquid.a_rho		= 3.9499;
-
-Experiment.CsF.Liquid.a_rho		= 4.8985;
-Experiment.CsCl.Liquid.a_rho	= 3.7692;
-Experiment.CsBr.Liquid.a_rho	= 4.2449;
-Experiment.CsI.Liquid.a_rho		= 4.2410;
-
-% Parameter b
-% Units: g / (cm^3 K)
-Experiment.LiF.Liquid.b_rho		= 4.902e-4;
-Experiment.LiCl.Liquid.b_rho	= 4.328e-4;
-Experiment.LiBr.Liquid.b_rho	= 6.5146e-4;
-Experiment.LiI.Liquid.b_rho		= 9.1780e-4;
-
-Experiment.NaF.Liquid.b_rho		= 3.63e-4;
-Experiment.NaCl.Liquid.b_rho	= 5.430e-4;
-Experiment.NaBr.Liquid.b_rho	= 8.169e-4;
-Experiment.NaI.Liquid.b_rho		= 9.491e-4;
-
-Experiment.KF.Liquid.b_rho		= 6.515e-4;
-Experiment.KCl.Liquid.b_rho		= 5.831e-4;
-Experiment.KBr.Liquid.b_rho		= 8.253e-4;
-Experiment.KI.Liquid.b_rho		= 9.557e-4;
-
-Experiment.RbF.Liquid.b_rho		= 1.02e-3;
-Experiment.RbCl.Liquid.b_rho	= 8.832e-4;
-Experiment.RbBr.Liquid.b_rho	= 1.0718e-3;
-Experiment.RbI.Liquid.b_rho		= 1.1435e-3;
-
-Experiment.CsF.Liquid.b_rho		= 1.2806e-3;
-Experiment.CsCl.Liquid.b_rho	= 1.0650e-3;
-Experiment.CsBr.Liquid.b_rho	= 1.2234e-3;
-Experiment.CsI.Liquid.b_rho		= 1.1834e-3;
-
 %% Melting Points of Alkali Halides
 % Data Source: CRC Handbook (2017-2018)
 % Units: K
@@ -319,37 +259,163 @@ end
 Experiment.LiF.dmp = 0.1;
 Experiment.NaCl.dmp = 0.001;
 
+%% Molten salt densities function parameters
+% Data source:
+% Thermodynamic and Transport Properties for Molten salts: Correlation Equations ...
+% Densities using equation: rho = a_rho - b_rho*T
+
+% Parameter a, units g / cm^3
+Experiment.LiF.Liquid.a_rho		= 2.3581;
+Experiment.LiCl.Liquid.a_rho	= 1.8842;
+Experiment.LiBr.Liquid.a_rho	= 3.0658;
+Experiment.LiI.Liquid.a_rho		= 3.7902;
+
+Experiment.NaF.Liquid.a_rho		= 2.7550;
+Experiment.NaCl.Liquid.a_rho	= 2.1389;
+Experiment.NaBr.Liquid.a_rho	= 3.1748;
+Experiment.NaI.Liquid.a_rho		= 3.6274;
+
+Experiment.KF.Liquid.a_rho		= 2.6464;
+Experiment.KCl.Liquid.a_rho		= 2.1359;
+Experiment.KBr.Liquid.a_rho		= 2.9583;
+Experiment.KI.Liquid.a_rho		= 3.3594;
+
+Experiment.RbF.Liquid.a_rho		= 3.9953;
+Experiment.RbCl.Liquid.a_rho	= 3.1210;
+Experiment.RbBr.Liquid.a_rho	= 3.7390;
+Experiment.RbI.Liquid.a_rho		= 3.9499;
+
+Experiment.CsF.Liquid.a_rho		= 4.8985;
+Experiment.CsCl.Liquid.a_rho	= 3.7692;
+Experiment.CsBr.Liquid.a_rho	= 4.2449;
+Experiment.CsI.Liquid.a_rho		= 4.2550;
+
+% Parameter b
+% Units: g / (cm^3 K)
+Experiment.LiF.Liquid.b_rho		= 4.902e-4;
+Experiment.LiCl.Liquid.b_rho	= 4.328e-4;
+Experiment.LiBr.Liquid.b_rho	= 6.52e-4;
+Experiment.LiI.Liquid.b_rho		= 9.176e-4;
+
+Experiment.NaF.Liquid.b_rho		= 6.36e-4;
+Experiment.NaCl.Liquid.b_rho	= 5.426e-4;
+Experiment.NaBr.Liquid.b_rho	= 8.169e-4;
+Experiment.NaI.Liquid.b_rho		= 9.491e-4;
+
+Experiment.KF.Liquid.b_rho		= 6.515e-4;
+Experiment.KCl.Liquid.b_rho		= 5.831e-4;
+Experiment.KBr.Liquid.b_rho		= 8.253e-4;
+Experiment.KI.Liquid.b_rho		= 9.557e-4;
+
+Experiment.RbF.Liquid.b_rho		= 1.0211e-3;
+Experiment.RbCl.Liquid.b_rho	= 8.832e-4;
+Experiment.RbBr.Liquid.b_rho	= 1.0718e-3;
+Experiment.RbI.Liquid.b_rho		= 1.1435e-3;
+
+Experiment.CsF.Liquid.b_rho		= 1.2806e-3;
+Experiment.CsCl.Liquid.b_rho	= 1.0650e-3;
+Experiment.CsBr.Liquid.b_rho	= 1.2234e-3;
+Experiment.CsI.Liquid.b_rho		= 1.1833e-3;
+
+%% Molten salt densities at the melting point
+% Data source:
+% CRC Handbook pp 4-124
+
+% Densities units g / cm^3
+Experiment.LiF.Liquid.rho_mp	= 1.81;
+Experiment.LiCl.Liquid.rho_mp   = 1.502;
+Experiment.LiBr.Liquid.rho_mp   = 2.528;
+Experiment.LiI.Liquid.rho_mp    = 3.109;
+
+Experiment.NaF.Liquid.rho_mp    = 1.948;
+Experiment.NaCl.Liquid.rho_mp	= 1.556;
+Experiment.NaBr.Liquid.rho_mp	= 2.342;
+Experiment.NaI.Liquid.rho_mp	= 2.742;
+
+Experiment.KF.Liquid.rho_mp		= 1.910;
+Experiment.KCl.Liquid.rho_mp	= 1.527;
+Experiment.KBr.Liquid.rho_mp	= 2.127;
+Experiment.KI.Liquid.rho_mp		= 2.448;
+
+Experiment.RbF.Liquid.rho_mp	= 2.87;
+Experiment.RbCl.Liquid.rho_mp	= 2.248;
+Experiment.RbBr.Liquid.rho_mp	= 2.715;
+Experiment.RbI.Liquid.rho_mp	= 2.904;
+
+Experiment.CsF.Liquid.rho_mp	= 3.649;
+Experiment.CsCl.Liquid.rho_mp	= 2.79;
+Experiment.CsBr.Liquid.rho_mp	= 3.133;
+Experiment.CsI.Liquid.rho_mp	= 3.197;
+
+%% Fractional Change in Volume during melting (dV / Vs)
+% Data sources:
+% (1) LiF LiCl LiBr NaF NaCl NaBr KI RbCl RbBr CsCl
+% Source: Alkali Halides: A Handbook of Physical Properties
+
+% (2) LiI NaI KF KCl KBr RbI
+% Source: https://link.springer.com/article/10.1007/BF00503248
+
+% (3) CsBr CsI
+% Source: https://pubs.acs.org/doi/pdf/10.1021/ja01615a015
+
+% unitless
+Experiment.LiF.Liquid.dVVs	  = 0.294;
+Experiment.LiCl.Liquid.dVVs   = 0.262;
+Experiment.LiBr.Liquid.dVVs   = 0.243;
+Experiment.LiI.Liquid.dVVs    = 0.202;
+
+Experiment.NaF.Liquid.dVVs    = 0.274;
+Experiment.NaCl.Liquid.dVVs   = 0.250;
+Experiment.NaBr.Liquid.dVVs	  = 0.224;
+Experiment.NaI.Liquid.dVVs	  = 0.186;
+
+Experiment.KF.Liquid.dVVs     = 0.172;
+Experiment.KCl.Liquid.dVVs	  = 0.173;
+Experiment.KBr.Liquid.dVVs	  = 0.166;
+Experiment.KI.Liquid.dVVs	  = 0.159;
+
+Experiment.RbF.Liquid.dVVs	  = 0.156;
+Experiment.RbCl.Liquid.dVVs	  = 0.143;
+Experiment.RbBr.Liquid.dVVs	  = 0.135;
+Experiment.RbI.Liquid.dVVs	  = 0.123;
+
+Experiment.CsF.Liquid.dVVs	  = nan;
+Experiment.CsCl.Liquid.dVVs	  = 0.105;
+Experiment.CsBr.Liquid.dVVs	  = 0.268;
+Experiment.CsI.Liquid.dVVs	  = 0.285;
+
 %% Heats of fusion
 % Data sources:
-% (1) LiF, LiCl, LiBr, LiI, NaF, NaCl, KF, KCl: Physical Properties Relevant to Energy Storage II - https://nvlpubs.nist.gov/nistpubs/Legacy/NSRDS/nbsnsrds61p2.pdf
-% (2) RbF, CsF: https://pubs.rsc.org/en/content/articlelanding/1973/f1/f19736902026
-% (3) NaBr, NaI, KBr, KI, RbCl, RbBr, RbI, CsCl, CsBr, CsI https://pubs.acs.org/doi/10.1021/j100831a023
+% (1) CRC Handbook for most
+% (2) For LiBr: https://pubs.acs.org/doi/10.1021/j100831a023
+% Other sources: Physical Properties Relevant to Energy Storage II - https://nvlpubs.nist.gov/nistpubs/Legacy/NSRDS/nbsnsrds61p2.pdf
+%                https://pubs.rsc.org/en/content/articlelanding/1973/f1/f19736902026
+%                https://pubs.acs.org/doi/10.1021/j100831a023
 % Units kJ/mol
-kJ_per_kcal = 4.184;
-Experiment.LiF.dH_fus	= 6.43*kJ_per_kcal;
-Experiment.LiCl.dH_fus	= 4.76*kJ_per_kcal;
-Experiment.LiBr.dH_fus	= 4.22*kJ_per_kcal;
-Experiment.LiI.dH_fus	= 3.50*kJ_per_kcal;
+Experiment.LiF.dH_fus	= 27.09;
+Experiment.LiCl.dH_fus	= 19.8;
+Experiment.LiBr.dH_fus	= 17.66;
+Experiment.LiI.dH_fus	= 14.6;
 
-Experiment.NaF.dH_fus	= 8.03*kJ_per_kcal;
-Experiment.NaCl.dH_fus	= 6.73*kJ_per_kcal;
-Experiment.NaBr.dH_fus	= 6.24*kJ_per_kcal;
-Experiment.NaI.dH_fus	= 5.64*kJ_per_kcal;
+Experiment.NaF.dH_fus	= 33.35;
+Experiment.NaCl.dH_fus	= 28.16;
+Experiment.NaBr.dH_fus	= 26.23;
+Experiment.NaI.dH_fus	= 23.7;
 
-Experiment.KF.dH_fus	= 7.05*kJ_per_kcal;
-Experiment.KCl.dH_fus	= 6.34*kJ_per_kcal;
-Experiment.KBr.dH_fus	= 6.10*kJ_per_kcal;
-Experiment.KI.dH_fus	= 5.74*kJ_per_kcal;
+Experiment.KF.dH_fus	= 27.2;
+Experiment.KCl.dH_fus	= 26.28;
+Experiment.KBr.dH_fus	= 25.52;
+Experiment.KI.dH_fus	= 24.0;
 
-Experiment.RbF.dH_fus	= 6.18*kJ_per_kcal;
-Experiment.RbCl.dH_fus	= 5.67*kJ_per_kcal;
-Experiment.RbBr.dH_fus	= 5.57*kJ_per_kcal;
-Experiment.RbI.dH_fus	= 5.27*kJ_per_kcal;
+Experiment.RbF.dH_fus	= 25.8;
+Experiment.RbCl.dH_fus	= 24.4;
+Experiment.RbBr.dH_fus	= 23.3;
+Experiment.RbI.dH_fus	= 22.1;
 
-Experiment.CsF.dH_fus	= 3.35*kJ_per_kcal;
-Experiment.CsCl.dH_fus	= 4.84*kJ_per_kcal;
-Experiment.CsBr.dH_fus	= 5.64*kJ_per_kcal;
-Experiment.CsI.dH_fus	= 5.64*kJ_per_kcal;
+Experiment.CsF.dH_fus	= 21.7;
+Experiment.CsCl.dH_fus	= 20.4;
+Experiment.CsBr.dH_fus	= 23.6;
+Experiment.CsI.dH_fus	= 25.7;
 
 %% Additional data: Molar masses, Entropies of fusion, Redundant Geometric Data
 % Elemental Molar masses
@@ -373,12 +439,24 @@ Salts = fieldnames(Experiment);
 for idx = 1:length(Salts)
     Salt = Salts{idx};
     [Metal,Halide] = Separate_Metal_Halide(Salt);
-    % Molar masses
+    % Molar masses (g/mol)
     Experiment.(Salt).MM = MM.(Metal) + MM.(Halide);
     
     % Entropies of fusion
     % Units: J / mol K
     Experiment.(Salt).dS_fus = Experiment.(Salt).dH_fus*1000/Experiment.(Salt).mp;
+    
+    % Liquid molar volumes at MP in Ang^3 / Forumla unit
+    Experiment.(Salt).Liquid.V_mp = (Experiment.(Salt).MM/Experiment.(Salt).Liquid.rho_mp)*(1/(cm3_per_Ang3*N_A));
+    
+    % Solid molar volumes at MP in Ang^3 / Forumla unit
+    % (Delta V / Vs)
+    switch Salt
+        case {'CsBr' 'CsI'}
+            Experiment.(Salt).CsCl.V_mp = Experiment.(Salt).Liquid.V_mp/(1 + Experiment.(Salt).Liquid.dVVs);
+        otherwise
+            Experiment.(Salt).Rocksalt.V_mp = Experiment.(Salt).Liquid.V_mp/(1 + Experiment.(Salt).Liquid.dVVs);
+    end
     
     % Redundant data
     if isfield(Experiment.(Salt),'Rocksalt')
