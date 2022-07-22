@@ -21,7 +21,7 @@
 % are the same)
 % When Model.Parallel_Struct_Min = true, this uses the parallel version of the subroutine Structure_Minimization (Note: each instance of gromacs is single-core in either mode)
 %% Inputs
-function [Loss,coupledconstraints,Minimization_Data] = LiX_Minimizer(Settings,Param,varargin)
+function [Loss,coupledconstraints,Settings] = LiX_Minimizer(Settings,Param,varargin)
 
 coupledconstraints = []; % No coupled constraints on the system
 
@@ -1130,7 +1130,7 @@ end
 
 % Initialize Finite T Data structure and update Settings
 tol = sqrt(eps);
-skip_finite_T = false;
+Settings.skip_finite_T = false;
 if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume ...
@@ -1141,6 +1141,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
     
     Settings.T0 = Settings.Finite_T_Data.Exp_MP;
     Settings.Structure = Settings.Finite_T_Data.Structure;
+    Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true);
     
     % Get an estimate for the density in molecules/nm^3
     N = length(Settings.Minimization_Data);
@@ -1163,9 +1164,13 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         
         if Model_Mismatch > Settings.MaxModelMismatch
             Loss_add = Loss_add + log(1 + Model_Mismatch);
-            skip_finite_T = true;
+            Settings.skip_finite_T = true;
+        else
+            Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3));
+            Settings.Geometry.a = Settings.Minimization_Data{strmatch}.a;
+            Settings.Geometry.b = Settings.Minimization_Data{strmatch}.b;
+            Settings.Geometry.c = Settings.Minimization_Data{strmatch}.c;
         end
-        Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3));
     else
         Settings.Ref_Density = 1/(Settings.Finite_T_Data.Exp_Liquid_V_MP*(0.1^3));
     end
@@ -1175,7 +1180,7 @@ end
 if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume] > tol) ...
-        && ~skip_finite_T
+        && ~Settings.skip_finite_T
     
     if ~isempty(gcp('nocreate'))
         delete(gcp);
@@ -1196,7 +1201,7 @@ end
 if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Solid_MP_Volume] > tol) ...
-        && ~skip_finite_T
+        && ~Settings.skip_finite_T
     if ~isempty(gcp('nocreate'))
         delete(gcp);
     end
@@ -1214,7 +1219,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 end
 
 % Melting point
-if Settings.Loss_Options.MP > tol && ~skip_finite_T
+if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
     if ~isempty(gcp('nocreate'))
         delete(gcp);
     end
@@ -1222,16 +1227,9 @@ if Settings.Loss_Options.MP > tol && ~skip_finite_T
     Settings.Finite_T_Data.MP = Calc_Model_MP(Settings);
 end
 
-% If skipping the finite_T data, then loss comes through the Loss_add
-% variable, so we don't need to double count
-if skip_finite_T
-    Settings.Finite_T_Data.Fusion_dH   = Settings.Finite_T_Data.Exp_Fusion_dH;
-    Settings.Finite_T_Data.Fusion_dV   = Settings.Finite_T_Data.Exp_Fusion_dV;
-    Settings.Finite_T_Data.Liquid_V_MP = Settings.Finite_T_Data.Exp_Liquid_V_MP;
-    Settings.Finite_T_Data.Solid_V_MP  = Settings.Finite_T_Data.Exp_Solid_V_MP;
-    Settings.Finite_T_Data.MP          = Settings.Finite_T_Data.Exp_MP;
-end
-
+% Remember: If skipping the finite_T data, then loss comes through the Loss_add
+% variable, so we don't need to double count. Use Settings.skip_finite_T as
+% a switch to disable re-calculating loss from finite T data
 % Calculate Loss function from data
 Loss = LiX_Loss(Settings) + Loss_add;
 

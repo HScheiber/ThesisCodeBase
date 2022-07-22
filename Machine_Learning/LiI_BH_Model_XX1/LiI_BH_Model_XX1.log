@@ -17,7 +17,7 @@ Model Input Parameters
                         WaterModel: 'SPC/E'
                              JobID: ''
                            N_atoms: 5000
-                     Cutoff_Buffer: 1.5
+                     Cutoff_Buffer: 1.2
                      Prev_geom_loc: ''
                     Prev_geom_time: []
                     Target_Density: []
@@ -237,138 +237,981 @@ No checkpoint files found. Starting new calculation.
 | Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
 |      | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
 |==================================================================================================================================================|
-|    1 | Best   |      26.358 |      0.1476 |      26.358 |      26.358 |      0.37679 |      0.36745 |       921.38 |       575.36 |       22.246 |
-|    2 | Best   |      11.416 |     0.14242 |      11.416 |      11.416 |      0.28705 |      0.37028 |       538.75 |       215.85 |       29.231 |
-|    3 | Accept |      12.938 |     0.13957 |      11.416 |      11.416 |      0.12182 |        0.317 |       919.53 |        69.17 |       15.157 |
+|    1 | Best   |      13.206 |     0.13877 |      13.206 |      13.206 |      0.26467 |      0.14145 |       805.54 |       210.09 |       20.322 |
 Beginning LiI Rocksalt BH Optimization...
-Starting parallel pool (parpool) using the 'local' profile ...
-Connected to the parallel pool (number of workers: 8).
 
                                 Max     Line search  Directional  First-order 
  Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
-    0      2     -871.662       -2.232                                         
-             :-) GROMACS - gmx mdrun, 2019.5 (double precision) (-:
+    0      2     -822.746       -2.232                                         
+    1      4     -2733.41            0            1         -208     3.69e+03   
+Active inequalities (to within options.ConstraintTolerance = 1e-06):
+  lower      upper     ineqlin   ineqnonlin
+    1                                 
 
-                            GROMACS is written by:
-     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
-    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
- Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
-  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
-  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
-    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
-  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
-    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
-    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
-   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
- Christian Wennberg    Maarten Wolf   
-                           and the project leaders:
-        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+<a href = "matlab: helpview('optim','local_min_poss_with_constr','CSHelpWindow');">Local minimum possible. Constraints satisfied</a>.
 
-Copyright (c) 1991-2000, University of Groningen, The Netherlands.
-Copyright (c) 2001-2018, The GROMACS development team at
-Uppsala University, Stockholm University and
-the Royal Institute of Technology, Sweden.
-check out http://www.gromacs.org for more information.
+fmincon stopped because the <a href = "matlab: helpview('optim','norm_search_direction','CSHelpWindow');">size of the current search direction</a> is less than
+twice the value of the <a href = "matlab: helpview('optim','step_size_tol','CSHelpWindow');">step size tolerance</a> and constraints are 
+satisfied to within the value of the <a href = "matlab: helpview('optim','constraint_tolerance','CSHelpWindow');">constraint tolerance</a>.
 
-GROMACS is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License
-as published by the Free Software Foundation; either version 2.1
-of the License, or (at your option) any later version.
+<<a href = "matlab: createExitMsg({'optimlib:nlconst:Exit4basic','fmincon'},{'optimlib:nlconst:Exit4detailed','0.000000e+00','1.000000e-10','0.000000e+00','1.000000e-06'},true,true);;">stopping criteria details</a>>
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:00:59
+Final Optimized Energy is -2733.4056192026 kJ/mol
+Lattice Parameter a = 2.82842712 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+3.8926E+03
+|    2 | Best   |       3.342 |      59.723 |       3.342 |       3.342 |      0.12184 |      0.10088 |       346.63 |       397.26 |       23.533 |
+|    3 | Accept |      20.606 |     0.15126 |       3.342 |       3.342 |      0.13586 |       0.1427 |       349.94 |       841.01 |       9.5841 |
+|    4 | Accept |      9.4966 |     0.16457 |       3.342 |       3.342 |      0.13767 |      0.29074 |       967.19 |       455.22 |       34.972 |
+|    5 | Accept |      24.401 |     0.16416 |       3.342 |       3.342 |      0.37146 |      0.43559 |       201.64 |       943.38 |        13.07 |
+|    6 | Accept |      26.331 |     0.16391 |       3.342 |       3.342 |      0.38575 |      0.46911 |       920.07 |        719.4 |        44.78 |
+|    7 | Accept |       13.05 |     0.14121 |       3.342 |       3.342 |      0.25423 |      0.45197 |       764.27 |       77.774 |       9.2459 |
+|    8 | Accept |      12.905 |     0.14379 |       3.342 |       3.342 |      0.18001 |      0.44016 |       551.33 |       682.82 |       29.676 |
+|    9 | Accept |      27.742 |     0.14789 |       3.342 |       3.342 |       0.1882 |      0.20564 |       493.76 |        149.3 |       6.2799 |
+|   10 | Accept |      9.9824 |     0.14032 |       3.342 |       3.342 |       0.1623 |      0.31717 |       121.73 |       424.15 |       46.465 |
+|   11 | Accept |      17.547 |     0.15808 |       3.342 |       3.342 |      0.18947 |      0.36983 |       33.581 |       212.05 |       8.1329 |
+|   12 | Accept |      12.006 |     0.14369 |       3.342 |       3.342 |      0.36654 |      0.39631 |        507.3 |       203.45 |       34.142 |
+Beginning LiI Rocksalt BH Optimization...
 
-GROMACS:      gmx mdrun, version 2019.5 (double precision)
-Executable:   /usr/local/gromacs2019_5/bin/gmx_d
-Data prefix:  /usr/local/gromacs2019_5
-Working dir:  /mnt/c/Users/Hayden/Documents/Patey_Lab/ThesisCodeBase/Machine_Learning/LiI_BH_Model_XX1
-Command line:
-  gmx_d mdrun -s /mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.tpr -o /mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.trr -g /mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.log -e /mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.edr -c /mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPTOutConf.g96 -rerun /mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.g96 -pin on -ntmpi 1 -ntomp 1
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -1533.36       -2.232                                         
+    1      6     -2574.91       -1.674         0.25    -1.22e+03     2.03e+03   
+    2     11     -2780.33       -1.464        0.125    -2.43e+03      5.4e+03  Hessian modified twice  
+    3     13     -2780.97        -1.58            1    -2.97e+03     1.74e+03   
+    4     15     -2837.12       -1.537            1    -1.74e+03          798   
+    5     17     -2842.54       -1.501            1         -798          615   
+    6     19     -2846.47       -1.517            1         -615         88.2   
+    7     21     -2846.56       -1.515            1        -88.2          8.3   
+    8     23     -2846.56       -1.515            1         -8.3        0.137   
 
-Reading file /mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.tpr, VERSION 2019.5 (double precision)
-Multiple energy groups is not implemented for GPUs, falling back to the CPU. For better performance, run on the GPU without energy groups and then do gmx mdrun -rerun option on the trajectory with an energy group .tpr file.
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
 
-Using 1 MPI thread
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:37
+Final Optimized Energy is -2846.5646914745 kJ/mol
+Lattice Parameter a = 4.97043000 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+-1.3699E-01
+|   13 | Accept |      3.4482 |      97.734 |       3.342 |       3.342 |      0.20012 |      0.30377 |       234.31 |       156.74 |       43.173 |
+|   14 | Accept |      32.244 |     0.14247 |       3.342 |       3.342 |      0.15046 |      0.31147 |       908.98 |       873.73 |       6.4011 |
+|   15 | Accept |      29.768 |     0.14447 |       3.342 |       3.342 |      0.39981 |      0.27472 |       493.22 |       194.07 |       6.4932 |
+|   16 | Accept |      23.667 |     0.14843 |       3.342 |       3.342 |      0.35362 |      0.22413 |       577.31 |        670.4 |       40.957 |
+|   17 | Accept |       13.26 |     0.14638 |       3.342 |       3.342 |      0.15245 |      0.43028 |       348.44 |       745.72 |       24.516 |
+Beginning LiI Rocksalt BH Optimization...
 
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -1657.88       -2.232                                         
+    1      5     -5146.02       -1.116          0.5    -1.39e+03     4.06e+03   
+    2     11     -5167.72       -1.162       0.0625    -2.67e+03     1.35e+03   
+    3     13      -5180.2       -1.146            1    -1.35e+03          244   
+    4     15     -5180.57       -1.143            1         -244         30.1   
+    5     17     -5180.57       -1.143            1        -30.1        0.605   
+    6     19     -5180.57       -1.143            1       -0.605      0.00189   
 
-NOTE: This file uses the deprecated 'group' cutoff_scheme. This will be
-removed in a future release when 'verlet' supports all interaction forms.
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
 
-starting md rerun 'LiI  4x4x4 Rocksalt', reading coordinates from input trajectory '/mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.g96'
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:26
+Final Optimized Energy is -5180.5737549154 kJ/mol
+Lattice Parameter a = 4.44516494 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+1.8879E-03
+|   18 | Accept |      5.4524 |      86.889 |       3.342 |       3.342 |      0.14195 |      0.30876 |       734.95 |       203.56 |       32.861 |
+Beginning LiI Rocksalt BH Optimization...
 
-Reading frame       0 time    0.000   
--------------------------------------------------------
-Program:     gmx mdrun, version 2019.5
-Source file: src/gromacs/mdlib/ns.cpp (line 471)
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -826.159       -2.232                                         
+    1      4     -2921.73            0            1         -213     2.72e+03   
+Active inequalities (to within options.ConstraintTolerance = 1e-06):
+  lower      upper     ineqlin   ineqnonlin
+    1                                 
 
-Fatal error:
-Failed to allocate memory for 300063712 interactions, which is larger than the
-maximum of 268435455. If your simulation is not using interaction cutoffs, you
-should use them.
+<a href = "matlab: helpview('optim','local_min_poss_with_constr','CSHelpWindow');">Local minimum possible. Constraints satisfied</a>.
 
-For more information and tips for troubleshooting, please check the GROMACS
-website at http://www.gromacs.org/Documentation/Errors
--------------------------------------------------------
+fmincon stopped because the <a href = "matlab: helpview('optim','norm_search_direction','CSHelpWindow');">size of the current search direction</a> is less than
+twice the value of the <a href = "matlab: helpview('optim','step_size_tol','CSHelpWindow');">step size tolerance</a> and constraints are 
+satisfied to within the value of the <a href = "matlab: helpview('optim','constraint_tolerance','CSHelpWindow');">constraint tolerance</a>.
 
-{Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback('OptimizationLoop', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\OptimizationLoop.m', 166)" style="font-weight:bold">OptimizationLoop</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\OptimizationLoop.m',166,0)">line 166</a>)
-Error running mdrun. Problem command:
-wsl source ~/.bashrc; gmx_d mdrun -s
-/mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.tpr -o
-/mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.trr -g
-/mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.log -e
-/mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.edr -c
-/mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPTOutConf.g96
--rerun /mnt/c/Users/Hayden/AppData/Local/Temp/tpfec7119f_b36a_4b36_854f_91ef224d2a96/tp05323338_0a45_45a4_b7af_13b9ead1de0b/LiI_R_BH_CELLOPT.g96
--pin on -ntmpi 1 -ntomp 1
+<<a href = "matlab: createExitMsg({'optimlib:nlconst:Exit4basic','fmincon'},{'optimlib:nlconst:Exit4detailed','0.000000e+00','1.000000e-10','0.000000e+00','1.000000e-06'},true,true);;">stopping criteria details</a>>
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:09
+Final Optimized Energy is -2921.7342759233 kJ/mol
+Lattice Parameter a = 2.82842712 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+2.9272E+03
+|   19 | Accept |       3.564 |      69.761 |       3.342 |       3.342 |      0.16626 |      0.11194 |       67.313 |       296.83 |        31.21 |
+Beginning LiI Rocksalt BH Optimization...
 
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Calculate_Crystal_Energy', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Calculate_Crystal_Energy.m', 39)" style="font-weight:bold">Calculate_Crystal_Energy</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Calculate_Crystal_Energy.m',39,0)">line 39</a>)
-OptimizationLoop(Settings);
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -1111.38       -2.232                                         
+    1      5     -2986.57       -1.116          0.5         -618     3.34e+03   
+    2      8     -5538.27      -0.5579          0.5    -3.96e+03     1.25e+04  Hessian modified twice  
+    3     12     -5613.36      -0.6531         0.25     -8.5e+03     4.13e+03   
+    4     14     -5707.35      -0.6219            1    -4.13e+03     1.71e+03   
+    5     16     -5718.58      -0.5999            1    -1.71e+03          830   
+    6     18     -5721.19      -0.6071            1         -830         90.9   
+    7     20     -5721.22      -0.6064            1        -90.9         4.24   
+    8     22     -5721.22      -0.6063            1        -4.24       0.0257   
 
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Structure_Minimization>@(x)Calculate_Crystal_Energy(x,Settings)', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m', 495)" style="font-weight:bold">Structure_Minimization>@(x)Calculate_Crystal_Energy(x,Settings)</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m',495,0)">line 495</a>)
-fun = @(x)Calculate_Crystal_Energy(x,Settings);
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
 
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('nlconst', 'C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\nlconst.m', 750)" style="font-weight:bold">nlconst</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\nlconst.m',750,0)">line 750</a>)
-                f = feval(funfcn{3},x,varargin{:});
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('fmincon', 'C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\fmincon.m', 811)" style="font-weight:bold">fmincon</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\fmincon.m',811,0)">line 811</a>)
-        nlconst(funfcn,X,l,u,full(A),B,full(Aeq),Beq,confcn,options,defaultopt, ...
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Structure_Minimization', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m', 522)" style="font-weight:bold">Structure_Minimization</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m',522,0)">line 522</a>)
-    [lattice_params,E,~,~,~,Gradient,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('LiX_Minimizer', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m', 1126)" style="font-weight:bold">LiX_Minimizer</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m',1126,0)">line 1126</a>)
-        Settings.Minimization_Data{idx} = Structure_Minimization(Settings,...
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_LiX_Parameters>@(x)LiX_Minimizer(Model,x)', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m', 162)" style="font-weight:bold">Bayesian_Optimize_LiX_Parameters>@(x)LiX_Minimizer(Model,x)</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',162,0)">line 162</a>)
-    fun = @(x)LiX_Minimizer(Model,x);
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/callObjNormally', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2636)" style="font-weight:bold">BayesianOptimization_priv/callObjNormally</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2636,0)">line 2636</a>)
-                        Objective = this.ObjectiveFcn(conditionalizeX(this, X));
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/callObjFcn', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 467)" style="font-weight:bold">BayesianOptimization_priv/callObjFcn</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',467,0)">line 467</a>)
-                    = callObjNormally(this, X);
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/runSerial', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2050)" style="font-weight:bold">BayesianOptimization_priv/runSerial</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2050,0)">line 2050</a>)
-                    ObjectiveFcnObjectiveEvaluationTime, ObjectiveNargout] = callObjFcn(this, this.XNext);
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/run', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 1998)" style="font-weight:bold">BayesianOptimization_priv/run</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',1998,0)">line 1998</a>)
-                this = runSerial(this);
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 457)" style="font-weight:bold">BayesianOptimization_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',457,0)">line 457</a>)
-            this = run(this);
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('bayesopt_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m', 323)" style="font-weight:bold">bayesopt_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m',323,0)">line 323</a>)
-Results = BayesianOptimization_priv(Options);
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_LiX_Parameters', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m', 343)" style="font-weight:bold">Bayesian_Optimize_LiX_Parameters</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',343,0)">line 343</a>)
-                results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',true,...
-
-Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_Local_Submit', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_Local_Submit.m', 127)" style="font-weight:bold">Bayesian_Optimize_Local_Submit</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_Local_Submit.m',127,0)">line 127</a>)
-    Bayesian_Optimize_LiX_Parameters(Model)
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:02:39
+Final Optimized Energy is -5721.2210582668 kJ/mol
+Lattice Parameter a = 3.68589181 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+-2.5747E-02
+<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m',1168,1)">1168 </a>        Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3));
+Settings.Geometry
+{Unrecognized field name "Geometry".
 } 
-open Structure_Minimization.m
-open OptimizationLoop
-clc
-1.25*1.25
+Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true)
+
+Settings = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+                       Submit_Jobs: 1
+                         BatchMode: 1
+                          Continue: 0
+                       JobSettings: [1×1 struct]
+                              Salt: 'LiI'
+                         Structure: 'Rocksalt'
+                     Use_Conv_cell: 1
+                  Liquid_Interface: 0
+                   Liquid_Fraction: 0.5
+                            Theory: 'BH'
+                             Model: ''
+                        WaterModel: 'SPC/E'
+                             JobID: ''
+                           N_atoms: 5000
+                     Cutoff_Buffer: 1.2
+                     Prev_geom_loc: ''
+                    Prev_geom_time: []
+                    Target_Density: []
+                       TF_Paramset: 0
+                        Thermostat: 'v-rescale'
+                          Target_T: 0
+                   Time_Constant_T: 0.2
+                        Nsttcouple: 10
+                               MDP: [1×1 struct]
+                          Barostat: 'Berendsen'
+                          Isotropy: 'isotropic'
+                          Target_P: 1
+                   Time_Constant_P: 1
+                        Nstpcouple: 50
+              ScaleCompressibility: 1
+          UseMoltenCompressibility: 0
+                         Annealing: 'no'
+                   Annealing_Times: []
+                   Annealing_Temps: []
+                      Table_Length: 4.01
+                         CoordType: 'gro'
+                     Output_Coords: 1000
+          Output_Coords_Compressed: 0
+                   Output_Velocity: 0
+                     Output_Forces: 0
+                     Calc_Energies: 100
+                   Output_Energies: 1000
+              Update_NeighbourList: 10
+                 Skip_Minimization: 0
+                   Find_Min_Params: 1
+               Find_Similar_Params: 1
+                        Data_Types: 1
+                            MinMDP: [1×1 struct]
+                  PreEquilibration: 0
+                               pbc: 'on'
+                        GenCluster: 0
+                      Cluster_Frac: 0.5
+                         Expand_LP: 1
+                     Thermal_Solid: 0
+                       Expand_a_SC: 1
+                       Expand_b_SC: 1
+                       Expand_c_SC: 1
+                          Expand_a: 1
+                          Expand_b: 1
+                          Expand_c: 1
+                          c_over_a: 1
+                        Manual_Box: 0
+                      Manual_Box_a: 1
+                      Manual_Box_b: 1
+                      Manual_Box_c: 1
+                     Manual_Radius: 1
+                     Delete_MDPout: 0
+                      Delete_MDlog: 0
+                    Delete_ConfOut: 0
+                        Delete_TPR: 0
+                    Delete_Backups: 1
+                   Delete_Minimize: 0
+                      Delete_Equil: 1
+                    Delete_outputs: 0
+                      Delete_subms: 0
+                        Delete_cpt: 1
+                           MaxWarn: 1
+                     Top_gen_pairs: 'no'
+                       Top_fudgeLJ: 1
+                       Top_fudgeQQ: 1
+                    Table_StepSize: 0.0005
+                              home: 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase'
+                           project: 'C:\Users\Hayden\Documents\Patey_Lab'
+                          computer: 'unbearabull'
+                             slurm: 0
+                         BO_Models: 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models'
+                              qsub: ''
+                           passlog: ' ^&^> '
+                              pipe: '^|'
+                               wsl: 'wsl source ~/.bashrc; '
+                        MLModelDir: 'C:\Users\Hayden\Documents\Patey_Lab\Machine_Learning_Structure_Finder\LiX_Structure_Selector_Optimization'
+            Project_Directory_Name: 'Melting_Point_Studies'
+                         CheckTime: 25
+                      MaxCheckTime: 1000
+                                T0: 742
+                                lb: 500
+                                ub: 2000
+               MeltFreezeThreshold: 0.25
+                    SlopeThreshold: 0.0001
+                   MaxMPIterations: 10
+                     StepTolerance: 0
+                          MaxTDiff: 1
+               FinalDensityProfile: 1
+                  Delete_T_History: 0
+                 Equilibrate_Solid: 0
+                Equilibrate_Liquid: 50
+                 MinInterfaceWidth: 0.075
+                      RefStructure: 'Liquid'
+                         Optimizer: 'MPSearcher'
+                  ExplorationRatio: 2
+              Acquisition_Function: 'expected-improvement-plus'
+                     N_Seed_Points: 2
+                    KernelFunction: 'ardmatern52'
+                   InitialMeshSize: 100
+                MeshSizeMultiplier: 2
+                 FunctionTolerance: 0
+                  BracketThreshold: 5
+                       MinStepSize: 1
+            UseDerivativeWeighting: 0
+                      IgnoreBounds: 0
+                  RunPostProcessor: 1
+                    SaveTrajectory: 1
+              SavePredictionsImage: 1
+                      SaveFeatures: 0
+                   SavePredictions: 0
+                     ML_TimeLength: 21
+                       ML_TimeStep: 5
+                      TimePerFrame: 5
+                                 S: [1×1 struct]
+                           CR_Damp: [1×1 struct]
+                           C6_Damp: [1×1 struct]
+                        GAdjust_MX: [0 0 1]
+                        GAdjust_MM: [0 0 1]
+                        GAdjust_XX: [0 0 1]
+                          Trial_ID: 'XX1'
+                        Structures: {'Rocksalt'}
+               Restart_Calculation: 1
+                        Fix_Charge: 1
+                        Additivity: 1
+                Additional_MM_Disp: 0
+                      SigmaEpsilon: 1
+               Additional_Function: [1×1 struct]
+                         Fix_Alpha: 0
+                            Fix_C8: 0
+                        SDMM_Range: [0 1000]
+                        SDXX_Range: [0 40]
+                        SDMX_Range: [0 40]
+                       SDMM2_Range: [0 1000]
+                       SD6MM_Range: [0 1000]
+                       SD6XX_Range: [0 10]
+                       SD6MX_Range: [0 100]
+                       SD8MM_Range: [0 1000]
+                       SD8XX_Range: [0 20]
+                       SD8MX_Range: [0 200]
+                      SRTFMM_Range: [0.1 500]
+                      SRTFXX_Range: [0.1 20]
+                      SRTFMX_Range: [0.1 20]
+                        SAMM_Range: [0.1 10]
+                        SAXX_Range: [0.1 5]
+                        SAMX_Range: [0.1 5]
+                        SRMM_Range: [0.3 10]
+                        SRXX_Range: [0.3 5]
+                        SRMX_Range: [0.3 5]
+                       Sr0MM_Range: [0.1 0.4]
+                       Sr0XX_Range: [0.1 0.5]
+                       Sr0MX_Range: [0.1 0.5]
+                      SepsMM_Range: [0 1000]
+                      SepsXX_Range: [0 1000]
+                      SepsMX_Range: [0 1000]
+                      SgamMM_Range: [1 6.85714285714286]
+                      SgamXX_Range: [1 6.85714285714286]
+                      SgamMX_Range: [1 6.85714285714286]
+                    SgamMM_RangeBH: [6 50]
+                    SgamXX_RangeBH: [6 50]
+                    SgamMX_RangeBH: [6 50]
+                           Q_Range: [0.95 1.05]
+                           Q_value: 1
+                Additional_GAdjust: {}
+         Additional_GAdjust_Ranges: {}
+                            C6Damp: [1×1 struct]
+                            CRDamp: [1×1 struct]
+                  Extra_Properties: 1
+                      Loss_Options: [1×1 struct]
+                       CheckBadFcn: 1
+                  MinExpWallHeight: 100
+                   MaxRepWellDepth: 0
+                  MaxModelMismatch: 0.75
+                 BadFcnLossPenalty: 1000
+                  initial_opt_type: 'bayesopt'
+           Max_Bayesian_Iterations: 800
+                MinSurrogatePoints: 20
+                 MinSampleDistance: 0.1
+                         ShowPlots: 1
+                   second_opt_type: 'bayesopt'
+          Max_Secondary_Iterations: 200
+    Secondary_Acquisition_Function: 'lower-confidence-bound'
+        ExplorationRatio_Secondary: 1
+           SecondaryKernelFunction: 'ardmatern52'
+              Max_Local_Iterations: 1000
+                       MaxFunEvals: 100
+                  Loss_Convergence: 1e-06
+                 Param_Convergence: 0.001
+                    final_opt_type: 'fminsearchbnd'
+                  switch_final_opt: 1
+            Parallel_LiX_Minimizer: 0
+               Parallel_Struct_Min: 1
+                 Parallel_Bayesopt: 0
+                             Metal: 'Li'
+                            Halide: 'I'
+                    Longest_Cutoff: 1.5
+                               gmx: 'wsl source ~/.bashrc; gmx_d'
+                           gmx_loc: 'wsl source ~/.bashrc; gmx_d'
+                        mdrun_opts: ' -v -ntmpi 8'
+                 Minimization_Data: {[1×1 struct]}
+                     skip_finite_T: 1
+                     Finite_T_Data: [1×1 struct]
+                          Geometry: [1×1 struct]
+
+Settings.Geometry
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+          Conv: 1
+             a: 5.96
+             b: 5.96
+             c: 5.96
+      FC_Metal: [4×3 double]
+     FC_Halide: [4×3 double]
+         alpha: 90
+          beta: 90
+         gamma: 90
+             N: 8
+     Transform: [3×3 double]
+            NF: 4
+          Salt: 'LiI'
+         Label: 'R'
+         Metal: 'Li'
+        Halide: 'I'
+    SkewFactor: 1
+            FC: [8×3 double]
+        Skew_a: 1
+        Skew_b: 1
+        Skew_c: 1
+     AtomNames: {8×1 cell}
+
+Settings.Structure
 
 ans =
 
-                    1.5625
+    'Rocksalt'
 
+    Settings.Structure = Settings.Finite_T_Data.Structure;
+    Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true)
+
+Settings = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+                       Submit_Jobs: 1
+                         BatchMode: 1
+                          Continue: 0
+                       JobSettings: [1×1 struct]
+                              Salt: 'LiI'
+                         Structure: 'Rocksalt'
+                     Use_Conv_cell: 1
+                  Liquid_Interface: 0
+                   Liquid_Fraction: 0.5
+                            Theory: 'BH'
+                             Model: ''
+                        WaterModel: 'SPC/E'
+                             JobID: ''
+                           N_atoms: 5000
+                     Cutoff_Buffer: 1.2
+                     Prev_geom_loc: ''
+                    Prev_geom_time: []
+                    Target_Density: []
+                       TF_Paramset: 0
+                        Thermostat: 'v-rescale'
+                          Target_T: 0
+                   Time_Constant_T: 0.2
+                        Nsttcouple: 10
+                               MDP: [1×1 struct]
+                          Barostat: 'Berendsen'
+                          Isotropy: 'isotropic'
+                          Target_P: 1
+                   Time_Constant_P: 1
+                        Nstpcouple: 50
+              ScaleCompressibility: 1
+          UseMoltenCompressibility: 0
+                         Annealing: 'no'
+                   Annealing_Times: []
+                   Annealing_Temps: []
+                      Table_Length: 4.01
+                         CoordType: 'gro'
+                     Output_Coords: 1000
+          Output_Coords_Compressed: 0
+                   Output_Velocity: 0
+                     Output_Forces: 0
+                     Calc_Energies: 100
+                   Output_Energies: 1000
+              Update_NeighbourList: 10
+                 Skip_Minimization: 0
+                   Find_Min_Params: 1
+               Find_Similar_Params: 1
+                        Data_Types: 1
+                            MinMDP: [1×1 struct]
+                  PreEquilibration: 0
+                               pbc: 'on'
+                        GenCluster: 0
+                      Cluster_Frac: 0.5
+                         Expand_LP: 1
+                     Thermal_Solid: 0
+                       Expand_a_SC: 1
+                       Expand_b_SC: 1
+                       Expand_c_SC: 1
+                          Expand_a: 1
+                          Expand_b: 1
+                          Expand_c: 1
+                          c_over_a: 1
+                        Manual_Box: 0
+                      Manual_Box_a: 1
+                      Manual_Box_b: 1
+                      Manual_Box_c: 1
+                     Manual_Radius: 1
+                     Delete_MDPout: 0
+                      Delete_MDlog: 0
+                    Delete_ConfOut: 0
+                        Delete_TPR: 0
+                    Delete_Backups: 1
+                   Delete_Minimize: 0
+                      Delete_Equil: 1
+                    Delete_outputs: 0
+                      Delete_subms: 0
+                        Delete_cpt: 1
+                           MaxWarn: 1
+                     Top_gen_pairs: 'no'
+                       Top_fudgeLJ: 1
+                       Top_fudgeQQ: 1
+                    Table_StepSize: 0.0005
+                              home: 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase'
+                           project: 'C:\Users\Hayden\Documents\Patey_Lab'
+                          computer: 'unbearabull'
+                             slurm: 0
+                         BO_Models: 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models'
+                              qsub: ''
+                           passlog: ' ^&^> '
+                              pipe: '^|'
+                               wsl: 'wsl source ~/.bashrc; '
+                        MLModelDir: 'C:\Users\Hayden\Documents\Patey_Lab\Machine_Learning_Structure_Finder\LiX_Structure_Selector_Optimization'
+            Project_Directory_Name: 'Melting_Point_Studies'
+                         CheckTime: 25
+                      MaxCheckTime: 1000
+                                T0: 742
+                                lb: 500
+                                ub: 2000
+               MeltFreezeThreshold: 0.25
+                    SlopeThreshold: 0.0001
+                   MaxMPIterations: 10
+                     StepTolerance: 0
+                          MaxTDiff: 1
+               FinalDensityProfile: 1
+                  Delete_T_History: 0
+                 Equilibrate_Solid: 0
+                Equilibrate_Liquid: 50
+                 MinInterfaceWidth: 0.075
+                      RefStructure: 'Liquid'
+                         Optimizer: 'MPSearcher'
+                  ExplorationRatio: 2
+              Acquisition_Function: 'expected-improvement-plus'
+                     N_Seed_Points: 2
+                    KernelFunction: 'ardmatern52'
+                   InitialMeshSize: 100
+                MeshSizeMultiplier: 2
+                 FunctionTolerance: 0
+                  BracketThreshold: 5
+                       MinStepSize: 1
+            UseDerivativeWeighting: 0
+                      IgnoreBounds: 0
+                  RunPostProcessor: 1
+                    SaveTrajectory: 1
+              SavePredictionsImage: 1
+                      SaveFeatures: 0
+                   SavePredictions: 0
+                     ML_TimeLength: 21
+                       ML_TimeStep: 5
+                      TimePerFrame: 5
+                                 S: [1×1 struct]
+                           CR_Damp: [1×1 struct]
+                           C6_Damp: [1×1 struct]
+                        GAdjust_MX: [0 0 1]
+                        GAdjust_MM: [0 0 1]
+                        GAdjust_XX: [0 0 1]
+                          Trial_ID: 'XX1'
+                        Structures: {'Rocksalt'}
+               Restart_Calculation: 1
+                        Fix_Charge: 1
+                        Additivity: 1
+                Additional_MM_Disp: 0
+                      SigmaEpsilon: 1
+               Additional_Function: [1×1 struct]
+                         Fix_Alpha: 0
+                            Fix_C8: 0
+                        SDMM_Range: [0 1000]
+                        SDXX_Range: [0 40]
+                        SDMX_Range: [0 40]
+                       SDMM2_Range: [0 1000]
+                       SD6MM_Range: [0 1000]
+                       SD6XX_Range: [0 10]
+                       SD6MX_Range: [0 100]
+                       SD8MM_Range: [0 1000]
+                       SD8XX_Range: [0 20]
+                       SD8MX_Range: [0 200]
+                      SRTFMM_Range: [0.1 500]
+                      SRTFXX_Range: [0.1 20]
+                      SRTFMX_Range: [0.1 20]
+                        SAMM_Range: [0.1 10]
+                        SAXX_Range: [0.1 5]
+                        SAMX_Range: [0.1 5]
+                        SRMM_Range: [0.3 10]
+                        SRXX_Range: [0.3 5]
+                        SRMX_Range: [0.3 5]
+                       Sr0MM_Range: [0.1 0.4]
+                       Sr0XX_Range: [0.1 0.5]
+                       Sr0MX_Range: [0.1 0.5]
+                      SepsMM_Range: [0 1000]
+                      SepsXX_Range: [0 1000]
+                      SepsMX_Range: [0 1000]
+                      SgamMM_Range: [1 6.85714285714286]
+                      SgamXX_Range: [1 6.85714285714286]
+                      SgamMX_Range: [1 6.85714285714286]
+                    SgamMM_RangeBH: [6 50]
+                    SgamXX_RangeBH: [6 50]
+                    SgamMX_RangeBH: [6 50]
+                           Q_Range: [0.95 1.05]
+                           Q_value: 1
+                Additional_GAdjust: {}
+         Additional_GAdjust_Ranges: {}
+                            C6Damp: [1×1 struct]
+                            CRDamp: [1×1 struct]
+                  Extra_Properties: 1
+                      Loss_Options: [1×1 struct]
+                       CheckBadFcn: 1
+                  MinExpWallHeight: 100
+                   MaxRepWellDepth: 0
+                  MaxModelMismatch: 0.75
+                 BadFcnLossPenalty: 1000
+                  initial_opt_type: 'bayesopt'
+           Max_Bayesian_Iterations: 800
+                MinSurrogatePoints: 20
+                 MinSampleDistance: 0.1
+                         ShowPlots: 1
+                   second_opt_type: 'bayesopt'
+          Max_Secondary_Iterations: 200
+    Secondary_Acquisition_Function: 'lower-confidence-bound'
+        ExplorationRatio_Secondary: 1
+           SecondaryKernelFunction: 'ardmatern52'
+              Max_Local_Iterations: 1000
+                       MaxFunEvals: 100
+                  Loss_Convergence: 1e-06
+                 Param_Convergence: 0.001
+                    final_opt_type: 'fminsearchbnd'
+                  switch_final_opt: 1
+            Parallel_LiX_Minimizer: 0
+               Parallel_Struct_Min: 1
+                 Parallel_Bayesopt: 0
+                             Metal: 'Li'
+                            Halide: 'I'
+                    Longest_Cutoff: 1.5
+                               gmx: 'wsl source ~/.bashrc; gmx_d'
+                           gmx_loc: 'wsl source ~/.bashrc; gmx_d'
+                        mdrun_opts: ' -v -ntmpi 8'
+                 Minimization_Data: {[1×1 struct]}
+                     skip_finite_T: 1
+                     Finite_T_Data: [1×1 struct]
+                          Geometry: [1×1 struct]
+
+Settings.Geometry
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+          Conv: 1
+             a: 5.96
+             b: 5.96
+             c: 5.96
+      FC_Metal: [4×3 double]
+     FC_Halide: [4×3 double]
+         alpha: 90
+          beta: 90
+         gamma: 90
+             N: 8
+     Transform: [3×3 double]
+            NF: 4
+          Salt: 'LiI'
+         Label: 'R'
+         Metal: 'Li'
+        Halide: 'I'
+    SkewFactor: 1
+            FC: [8×3 double]
+        Skew_a: 1
+        Skew_b: 1
+        Skew_c: 1
+     AtomNames: {8×1 cell}
+
+Settings.Minimization_Data{strmatch}
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+         LJSR: -4403.77238203671
+       CoulSR: -1006.66389584883
+       CoulLR: -310.784780381276
+          Pot: -5721.22105826682
+    CoulSR_MM: 3727.18904617039
+      LJSR_MM: -153.180642951733
+    CoulSR_MX: -8461.0419881895
+      LJSR_MX: -2765.63877803779
+    CoulSR_XX: 3727.18904617039
+      LJSR_XX: -1484.95296104719
+      N_atoms: 18522
+            a: 3.68589181226593
+            b: 3.68589181226593
+            c: 3.68589181226593
+     FC_Metal: [4×3 double]
+    FC_Halide: [4×3 double]
+            V: 12.5189458190808
+            E: -5721.22105826682
+         Salt: 'LiI'
+    Structure: 'Rocksalt'
+        Model: 'BH'
+
+Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true)
+
+Settings = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+                       Submit_Jobs: 1
+                         BatchMode: 1
+                          Continue: 0
+                       JobSettings: [1×1 struct]
+                              Salt: 'LiI'
+                         Structure: 'Rocksalt'
+                     Use_Conv_cell: 1
+                  Liquid_Interface: 0
+                   Liquid_Fraction: 0.5
+                            Theory: 'BH'
+                             Model: ''
+                        WaterModel: 'SPC/E'
+                             JobID: ''
+                           N_atoms: 5000
+                     Cutoff_Buffer: 1.2
+                     Prev_geom_loc: ''
+                    Prev_geom_time: []
+                    Target_Density: []
+                       TF_Paramset: 0
+                        Thermostat: 'v-rescale'
+                          Target_T: 0
+                   Time_Constant_T: 0.2
+                        Nsttcouple: 10
+                               MDP: [1×1 struct]
+                          Barostat: 'Berendsen'
+                          Isotropy: 'isotropic'
+                          Target_P: 1
+                   Time_Constant_P: 1
+                        Nstpcouple: 50
+              ScaleCompressibility: 1
+          UseMoltenCompressibility: 0
+                         Annealing: 'no'
+                   Annealing_Times: []
+                   Annealing_Temps: []
+                      Table_Length: 4.01
+                         CoordType: 'gro'
+                     Output_Coords: 1000
+          Output_Coords_Compressed: 0
+                   Output_Velocity: 0
+                     Output_Forces: 0
+                     Calc_Energies: 100
+                   Output_Energies: 1000
+              Update_NeighbourList: 10
+                 Skip_Minimization: 0
+                   Find_Min_Params: 1
+               Find_Similar_Params: 1
+                        Data_Types: 1
+                            MinMDP: [1×1 struct]
+                  PreEquilibration: 0
+                               pbc: 'on'
+                        GenCluster: 0
+                      Cluster_Frac: 0.5
+                         Expand_LP: 1
+                     Thermal_Solid: 0
+                       Expand_a_SC: 1
+                       Expand_b_SC: 1
+                       Expand_c_SC: 1
+                          Expand_a: 1
+                          Expand_b: 1
+                          Expand_c: 1
+                          c_over_a: 1
+                        Manual_Box: 0
+                      Manual_Box_a: 1
+                      Manual_Box_b: 1
+                      Manual_Box_c: 1
+                     Manual_Radius: 1
+                     Delete_MDPout: 0
+                      Delete_MDlog: 0
+                    Delete_ConfOut: 0
+                        Delete_TPR: 0
+                    Delete_Backups: 1
+                   Delete_Minimize: 0
+                      Delete_Equil: 1
+                    Delete_outputs: 0
+                      Delete_subms: 0
+                        Delete_cpt: 1
+                           MaxWarn: 1
+                     Top_gen_pairs: 'no'
+                       Top_fudgeLJ: 1
+                       Top_fudgeQQ: 1
+                    Table_StepSize: 0.0005
+                              home: 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase'
+                           project: 'C:\Users\Hayden\Documents\Patey_Lab'
+                          computer: 'unbearabull'
+                             slurm: 0
+                         BO_Models: 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models'
+                              qsub: ''
+                           passlog: ' ^&^> '
+                              pipe: '^|'
+                               wsl: 'wsl source ~/.bashrc; '
+                        MLModelDir: 'C:\Users\Hayden\Documents\Patey_Lab\Machine_Learning_Structure_Finder\LiX_Structure_Selector_Optimization'
+            Project_Directory_Name: 'Melting_Point_Studies'
+                         CheckTime: 25
+                      MaxCheckTime: 1000
+                                T0: 742
+                                lb: 500
+                                ub: 2000
+               MeltFreezeThreshold: 0.25
+                    SlopeThreshold: 0.0001
+                   MaxMPIterations: 10
+                     StepTolerance: 0
+                          MaxTDiff: 1
+               FinalDensityProfile: 1
+                  Delete_T_History: 0
+                 Equilibrate_Solid: 0
+                Equilibrate_Liquid: 50
+                 MinInterfaceWidth: 0.075
+                      RefStructure: 'Liquid'
+                         Optimizer: 'MPSearcher'
+                  ExplorationRatio: 2
+              Acquisition_Function: 'expected-improvement-plus'
+                     N_Seed_Points: 2
+                    KernelFunction: 'ardmatern52'
+                   InitialMeshSize: 100
+                MeshSizeMultiplier: 2
+                 FunctionTolerance: 0
+                  BracketThreshold: 5
+                       MinStepSize: 1
+            UseDerivativeWeighting: 0
+                      IgnoreBounds: 0
+                  RunPostProcessor: 1
+                    SaveTrajectory: 1
+              SavePredictionsImage: 1
+                      SaveFeatures: 0
+                   SavePredictions: 0
+                     ML_TimeLength: 21
+                       ML_TimeStep: 5
+                      TimePerFrame: 5
+                                 S: [1×1 struct]
+                           CR_Damp: [1×1 struct]
+                           C6_Damp: [1×1 struct]
+                        GAdjust_MX: [0 0 1]
+                        GAdjust_MM: [0 0 1]
+                        GAdjust_XX: [0 0 1]
+                          Trial_ID: 'XX1'
+                        Structures: {'Rocksalt'}
+               Restart_Calculation: 1
+                        Fix_Charge: 1
+                        Additivity: 1
+                Additional_MM_Disp: 0
+                      SigmaEpsilon: 1
+               Additional_Function: [1×1 struct]
+                         Fix_Alpha: 0
+                            Fix_C8: 0
+                        SDMM_Range: [0 1000]
+                        SDXX_Range: [0 40]
+                        SDMX_Range: [0 40]
+                       SDMM2_Range: [0 1000]
+                       SD6MM_Range: [0 1000]
+                       SD6XX_Range: [0 10]
+                       SD6MX_Range: [0 100]
+                       SD8MM_Range: [0 1000]
+                       SD8XX_Range: [0 20]
+                       SD8MX_Range: [0 200]
+                      SRTFMM_Range: [0.1 500]
+                      SRTFXX_Range: [0.1 20]
+                      SRTFMX_Range: [0.1 20]
+                        SAMM_Range: [0.1 10]
+                        SAXX_Range: [0.1 5]
+                        SAMX_Range: [0.1 5]
+                        SRMM_Range: [0.3 10]
+                        SRXX_Range: [0.3 5]
+                        SRMX_Range: [0.3 5]
+                       Sr0MM_Range: [0.1 0.4]
+                       Sr0XX_Range: [0.1 0.5]
+                       Sr0MX_Range: [0.1 0.5]
+                      SepsMM_Range: [0 1000]
+                      SepsXX_Range: [0 1000]
+                      SepsMX_Range: [0 1000]
+                      SgamMM_Range: [1 6.85714285714286]
+                      SgamXX_Range: [1 6.85714285714286]
+                      SgamMX_Range: [1 6.85714285714286]
+                    SgamMM_RangeBH: [6 50]
+                    SgamXX_RangeBH: [6 50]
+                    SgamMX_RangeBH: [6 50]
+                           Q_Range: [0.95 1.05]
+                           Q_value: 1
+                Additional_GAdjust: {}
+         Additional_GAdjust_Ranges: {}
+                            C6Damp: [1×1 struct]
+                            CRDamp: [1×1 struct]
+                  Extra_Properties: 1
+                      Loss_Options: [1×1 struct]
+                       CheckBadFcn: 1
+                  MinExpWallHeight: 100
+                   MaxRepWellDepth: 0
+                  MaxModelMismatch: 0.75
+                 BadFcnLossPenalty: 1000
+                  initial_opt_type: 'bayesopt'
+           Max_Bayesian_Iterations: 800
+                MinSurrogatePoints: 20
+                 MinSampleDistance: 0.1
+                         ShowPlots: 1
+                   second_opt_type: 'bayesopt'
+          Max_Secondary_Iterations: 200
+    Secondary_Acquisition_Function: 'lower-confidence-bound'
+        ExplorationRatio_Secondary: 1
+           SecondaryKernelFunction: 'ardmatern52'
+              Max_Local_Iterations: 1000
+                       MaxFunEvals: 100
+                  Loss_Convergence: 1e-06
+                 Param_Convergence: 0.001
+                    final_opt_type: 'fminsearchbnd'
+                  switch_final_opt: 1
+            Parallel_LiX_Minimizer: 0
+               Parallel_Struct_Min: 1
+                 Parallel_Bayesopt: 0
+                             Metal: 'Li'
+                            Halide: 'I'
+                    Longest_Cutoff: 1.5
+                               gmx: 'wsl source ~/.bashrc; gmx_d'
+                           gmx_loc: 'wsl source ~/.bashrc; gmx_d'
+                        mdrun_opts: ' -v -ntmpi 8'
+                 Minimization_Data: {[1×1 struct]}
+                     skip_finite_T: 1
+                     Finite_T_Data: [1×1 struct]
+                          Geometry: [1×1 struct]
+
+Settings.Minimization_Data{strmatch}
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+         LJSR: -4403.77238203671
+       CoulSR: -1006.66389584883
+       CoulLR: -310.784780381276
+          Pot: -5721.22105826682
+    CoulSR_MM: 3727.18904617039
+      LJSR_MM: -153.180642951733
+    CoulSR_MX: -8461.0419881895
+      LJSR_MX: -2765.63877803779
+    CoulSR_XX: 3727.18904617039
+      LJSR_XX: -1484.95296104719
+      N_atoms: 18522
+            a: 3.68589181226593
+            b: 3.68589181226593
+            c: 3.68589181226593
+     FC_Metal: [4×3 double]
+    FC_Halide: [4×3 double]
+            V: 12.5189458190808
+            E: -5721.22105826682
+         Salt: 'LiI'
+    Structure: 'Rocksalt'
+        Model: 'BH'
+
+ Settings.Geometry
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+          Conv: 1
+             a: 5.96
+             b: 5.96
+             c: 5.96
+      FC_Metal: [4×3 double]
+     FC_Halide: [4×3 double]
+         alpha: 90
+          beta: 90
+         gamma: 90
+             N: 8
+     Transform: [3×3 double]
+            NF: 4
+          Salt: 'LiI'
+         Label: 'R'
+         Metal: 'Li'
+        Halide: 'I'
+    SkewFactor: 1
+            FC: [8×3 double]
+        Skew_a: 1
+        Skew_b: 1
+        Skew_c: 1
+     AtomNames: {8×1 cell}
+
+if system_dependent('IsDebugMode')==1, dbquit all; end
+delete all
+[Warning: File 'all' not found.] 
+close all
+Bayesian_Optimize_Local_Submit
+Unable to load intermediate bayesian optimization data.
+Attempting to load backup step.
+Beginning LiI Rocksalt BH Optimization...
