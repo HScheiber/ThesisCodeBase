@@ -1,4 +1,4 @@
-function Tm = Find_Melting_Point(Settings)
+function [Tm_estimate,WorkDir] = Find_Melting_Point(Settings)
 total_timer = tic;
 
 if ~isstruct(Settings)
@@ -24,13 +24,12 @@ end
 if isfile(ResultsFile) && ~Settings.Continue
     try
         T_dat = load(ResultsFile,'T_dat').T_dat;
-        Tm = T_dat.T;
-        
         Max_T_freeze = max(T_dat.T_Freeze_Trace);
         Min_T_Melt = min(T_dat.T_Melt_Trace);
         T_dat.dT = [Max_T_freeze Min_T_Melt];
+        Tm_estimate = mean(T_dat.dT);
         disp(repmat('*',1,40));
-        disp(['Calculation previously completed. Melting Point detected at Tm = ' num2str(T,'%.4f') ' K. Error bounds: Tm = ' ...
+        disp(['Calculation previously completed. Melting Point estimated at Tm = ' num2str(Tm_estimate,'%.4f') ' K. Error bounds: Tm = ' ...
             num2str(Max_T_freeze,'%.4f') ' - ' num2str(Min_T_Melt,'%.4f') ' K.']);
         disp(repmat('*',1,40));
         return
@@ -223,6 +222,8 @@ if Settings.Delete_T_History
     end  
 end
 
+Tm_estimate = mean(T_dat.dT);
+WorkDir = Settings.WorkDir;
 disp(['Calculation complete. Epalsed Time: ' datestr(seconds(toc(total_timer)),'HH:MM:SS')])
 
 end

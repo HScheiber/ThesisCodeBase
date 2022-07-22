@@ -221,10 +221,10 @@ Settings.lb = 500; % K, lower bound on MP search
 Settings.ub = 2000; % K, upper bound on MP search
 Settings.MeltFreezeThreshold = 0.25; % Required CHANGE in the fraction of the box either frozen or melted to flag the end of the simulation
 % The default SlopeThreshold is equivalent to a 10 % change in fraction of liquid over 1000 ps
-Settings.SlopeThreshold = 1e-4; % A second requirement: the change in the fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [Structure Fraction/ps]
+Settings.SlopeThreshold = 1e10; % A second requirement: the change in the fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [Structure Fraction/ps]
 Settings.MaxMPIterations = 100; % Maximum iterations for MP calculations
 Settings.StepTolerance = 0; % K, tolerence for the melting point step size
-Settings.MaxTDiff = 1; % K, maximum change in temperature between points before selecting new initial conditions
+Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
 Settings.FinalDensityProfile = true; % Set to true to run a final density profile along the Z-dimension
 Settings.Delete_T_History = false; % deletes the intermediate temperature check files when true
 Settings.Equilibrate_Solid = 0; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
@@ -243,7 +243,7 @@ Settings.InitialMeshSize = 100; % Applies to patternsearch and MPsearcher
 Settings.MeshSizeMultiplier = 2; % During the first phase of MPsearcher, multiply the stepsize by this value after each attempt
 Settings.FunctionTolerance = 0;
 Settings.BracketThreshold = 5; % [K] Sets the target bracket for the melting point
-Settings.MinStepSize = 1; % [K] Sets the minimum step size between iterations in K
+Settings.MinStepSize = 0.25; % [K] Sets the minimum step size between iterations in K
 Settings.UseDerivativeWeighting = false; % Set true to use derivative-weighted midpoints
 Settings.IgnoreBounds = false; % Ignores recording the MP bounds if set to true. Usually only used on the final iteration.
 

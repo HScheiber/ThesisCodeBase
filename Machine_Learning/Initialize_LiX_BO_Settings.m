@@ -82,8 +82,6 @@ Settings.Additional_GAdjust_Ranges = {};
 % 4 = PAMoC Damping function (fairly weak damping, damps mainly at mid range)
 % 5 = EHFSK Damping function (strong damping)
 % 6 = WY damping function (strongest damping)
-Settings.C6Damp = Init_C6Damping_Object;
-Settings.CRDamp = Init_CRDamping_Object;
 Settings.Extra_Properties = true; % calculate extra properties for the final computation
 
 % Loss options
@@ -134,6 +132,10 @@ Settings.switch_final_opt = true; % When true, switch from 'fminsearchbnd' to 'p
 Settings.Parallel_LiX_Minimizer = false; % Run the parallel version of the LiX_Minimizer subroutine when true
 Settings.Parallel_Struct_Min = false; % Run the parallel version of the LiX_Minimizer subroutine when true (this is generally less efficient)
 Settings.Parallel_Bayesopt = true; % Run the parallel version of Bayesian Optimization when true
+
+% Finite T settings
+Settings.Liquid_Test_Time = 50; % ps
+Settings.Solid_Test_Time = 30; % ps
 
 end
 

@@ -1,5 +1,15 @@
 function [WorkDir,JobName,Full_Model_Name] = GetMDWorkdir(Settings)
 
+% If this is part of a bayesopt calculation, return a temporary folder as
+% the working directory
+if isfield(Settings,'initial_opt_type')
+    WorkDir = tempname;
+    JobName = 'Test_MP';
+    Full_Model_Name = Settings.Model;
+    return
+end
+
+% Otherwise, choose a systematic name
 if isempty(Settings.Model)
     Settings.S = Init_Scaling_Object;
     Settings.CR_Damp = Init_CRDamping_Object;

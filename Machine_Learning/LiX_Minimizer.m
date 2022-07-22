@@ -1139,7 +1139,10 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
     
     Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
     
-    Settings.T0 = Settings.Finite_T_Data.Exp_MP;
+    Settings.T0 = Settings.Finite_T_Data.Exp_MP; % K, Initial temperature
+    Settings.Target_T = Settings.Finite_T_Data.Exp_MP; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+    Settings.MDP.Initial_T = Settings.Finite_T_Data.Exp_MP; % Initial termpature at which to generate velocities
+    
     Settings.Structure = Settings.Finite_T_Data.Structure;
     Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true);
     
@@ -1217,7 +1220,9 @@ if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
         delete(gcp);
     end
     
-    Settings.Finite_T_Data.MP = Calc_Model_MP(Settings);
+    [Tm_estimate,WorkDir] = Find_Melting_Point(Settings);
+    Settings.Finite_T_Data.MP = Tm_estimate;
+    rmdir(WorkDir,'s');
 end
 
 % Remember: If skipping the finite_T data, then loss comes through the Loss_add

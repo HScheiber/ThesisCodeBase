@@ -64,7 +64,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     end
     
     % Set the number of steps
-    MD_nsteps = Settings.Equilibrate_Solid/Settings.MDP.dt;
+    MD_nsteps = Settings.Solid_Test_Time/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt);
     Compressibility = 1e-8;
     tau_p = Settings.MDP.dt; % ps
@@ -362,7 +362,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     end
 
     % Run solid Equilibration
-    disp(['Beginning Solid Equilibration for ' num2str(Settings.Equilibrate_Solid) ' ps...'] )
+    disp(['Beginning Solid Equilibration for ' num2str(Settings.Solid_Test_Time) ' ps...'] )
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
@@ -409,11 +409,11 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     En_set = regexprep(En_set,' +',' ');
     
     % Grab second half of data from results
-    startpoint = Settings.Equilibrate_Solid*0.5; % ps
+    startpoint = Settings.Solid_Test_Time*0.5; % ps
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
     ' energy -f ' windows2unix(Energy_file)...
     ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
-    ' -b ' num2str(startpoint) ' -e ' num2str(Settings.Equilibrate_Solid)];
+    ' -b ' num2str(startpoint) ' -e ' num2str(Settings.Solid_Test_Time)];
     
     [err,~] = system(gmx_command);
     if err ~= 0
