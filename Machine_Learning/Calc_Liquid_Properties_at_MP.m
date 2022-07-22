@@ -18,7 +18,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Grab reference density, cutoff, and corresponding box size
     L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer; % nm, the box dimension
     Volume = L^3; % Volume in nm^3
-    nmol_liquid = round(Volume*Settings.Ref_Density);
+    nmol_liquid = round(Volume*Settings.Ref_Density*0.9);
 
     % Initialize empty cubic box
     Box.a_vec  = [L 0 0];
@@ -49,7 +49,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     mtimer = tic;
     Prep_Liq_Metal_Only = fullfile(Settings.WorkDir,['Prep_Liq_Metal_Only.' Settings.CoordType]);
     cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
-        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(nmol_liquid) ' -try 200 -scale 0.4'];
+        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(nmol_liquid) ' -try 200 -scale 0.1'];
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
@@ -63,7 +63,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
     htimer = tic;
     cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
-        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 200 -scale 0.4'];
+        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 400 -scale 0.1'];
 
     [errcode,output] = system(cmd);
 
@@ -606,46 +606,39 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         'FileType',Settings.CoordType,...
         'ML_TimeLength',10,...
         'ML_TimeStep',1,...
-        'TimePerFrame',Settings.Output_Coords*Settings.MDP.dt));
+        'TimePerFrame',Settings.Output_Coords*Settings.MDP.dt,...
+        'SaveTrajectory',true,...
+        'SavePredictionsImage',true));
+    Liq_Fraction = PyOut{4};
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    if PyOut{4} < 0.9
+        Output.Liquid_V_MP = nan;
+        Output.Solid_H_MP = nan;
+        return
+    end
     
     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq_Energy.xvg');
-
+    
     % Check energy options
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo 0 ' Settings.pipe ' gmx']) ...
         ' energy -f ' windows2unix(Energy_file) ...
         ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
-
+    
     en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
     En_set = '';
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
-    %En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Potential','tokens','once'))];
+    En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Enthalpy','tokens','once'))];
     En_set = [En_set ' 0'];
     En_set = regexprep(En_set,' +',' ');
-
-    % Grab data from results
+    
+    % Grab second half of data from results
     startpoint = Settings.Equilibrate_Liquid*0.5; % ps
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
     ' energy -f ' windows2unix(Energy_file)...
     ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
     ' -b ' num2str(startpoint) ' -e ' num2str(Settings.Equilibrate_Liquid)];
-
+    
     [err,~] = system(gmx_command);
     if err ~= 0
         warndlg('Failed to collect data.')
@@ -655,13 +648,12 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Data = import_xvg(En_xvg_file); % Gather X,Y,Z lengths
     delete(En_xvg_file) % remove temp output file
 
-    Equil_Volume = mean(Data(:,2)); % nm^3
+    Output.Liquid_V_MP = mean(Data(:,2))*(10^3)/nmol_liquid; % A^3 / ion pair
+    Output.Solid_H_MP = mean(Data(:,3))/nmol_liquid; % kJ/mol
 
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)
     % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
     % stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
-
-    Output = nmol_liquid/Equil_Volume;
 
     if Settings.Delete_Equil
         rmdir(Settings.WorkDir,'s')
