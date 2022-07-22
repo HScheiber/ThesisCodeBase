@@ -314,26 +314,25 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##GENPAIRS##',Settings.Top_gen_pairs);
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##FUDGELJ##',num2str(Settings.Top_fudgeLJ));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##FUDGEQQ##',num2str(Settings.Top_fudgeQQ));
-
+    
     % Insert element info into topology template
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##MET##',pad(Settings.Metal,2));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
-
+    
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HAL##',pad(Settings.Halide,2));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
     
     if Table_Req
-
         % Define the function type as 1 (required for custom functions)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','1');
-
+        
         % Define the combination rules (Lorenz-berthelot)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','1');
-
+        
         % Define all the parameters as 1.0 (already included in potentials)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad('1.0',10));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad('1.0',10));
@@ -341,7 +340,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##','1.0');
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##','1.0');
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##','1.0');
-
+        
         % Generate tables of the potential
         if strcmp(Settings.Theory,'TF')
             [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings);
@@ -362,25 +361,25 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         else
             error(['Warning: Unknown theory type: "' Settings.Theory '".'])
         end
-
+        
         TableName = [Settings.JobName '_Table'];
         Settings.TableFile_MX = fullfile(Settings.WorkDir,[TableName '.xvg']);
         Settings.TableFile_MM = fullfile(Settings.WorkDir,[TableName '_' Settings.Metal '_' Settings.Metal '.xvg']);
         Settings.TableFile_XX = fullfile(Settings.WorkDir,[TableName '_' Settings.Halide '_' Settings.Halide '.xvg']);
-
+        
         % Save tables into current directory
         fidMX = fopen(Settings.TableFile_MX,'wt');
         fwrite(fidMX,regexprep(U_MX,'\r',''));
         fclose(fidMX);
-
+        
         fidMM = fopen(Settings.TableFile_MM,'wt');
         fwrite(fidMM,regexprep(U_MM,'\r',''));
         fclose(fidMM);
-
+        
         fidXX = fopen(Settings.TableFile_XX,'wt');
         fwrite(fidXX,regexprep(U_XX,'\r',''));
         fclose(fidXX);
-
+        
         % Modify the MDP file
         MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad('user',18));
         MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad('group',18));
@@ -391,7 +390,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         MDP_Template = strrep(MDP_Template,'##RCOULOMB##',pad(num2str(Settings.MDP.RCoulomb_Cutoff),18));
         MDP_Template = strrep(MDP_Template,'##RVDW##',pad(num2str(Settings.MDP.RVDW_Cutoff),18));
         MDP_Template = strrep(MDP_Template,'##VDWMOD##',pad('none',18));
-
+        
     elseif contains(Settings.Theory,'JC')
         switch Settings.Theory
             case 'JC'
@@ -403,16 +402,16 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             case 'JCSD'
                 Settings.WaterModel = 'SD';
         end
-
+        
         % Definte the function type as 1 (LJ)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','1');
-
+        
         % Define the combination rules (Lorenz-berthelot in sigma-epsilon form)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','2');
-
+        
         % Get JC parameters
         [MX_JC_Param,MM_JC_Param,XX_JC_Param] = JC_Potential_Parameters(Settings);
-
+        
         % Add parameters to topology text
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad(num2str(MM_JC_Param.sigma,'%10.8f'),10));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad(num2str(XX_JC_Param.sigma,'%10.8f'),10));
@@ -420,7 +419,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',num2str(MM_JC_Param.epsilon,'%10.8f'));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(XX_JC_Param.epsilon,'%10.8f'));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(MX_JC_Param.epsilon,'%10.8f'));
-
+        
         % Modify the MDP file
         MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
         MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad(Settings.MDP.CutOffScheme,18));
@@ -439,7 +438,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
         end
     elseif contains(Settings.Theory,'BH')
-
+        
         Settings.TableFile_MX = '';
         
         % Definte the function type as 2 (Buckingham)
@@ -450,7 +449,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         
         % Get BH parameters (cross terms are pre-computed using my combining rules)
         [U_MX,U_MM,U_XX] = BH_Potential_Parameters(Settings);
-
+        
         % Add parameters to topology text
         % For BH potentials, parameter are B*exp(-alpha*r) + C/r^6
         % Parameter order is B alpha C
@@ -461,7 +460,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',pad(num2str(U_XX.C,'%10.8f'),10));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',[num2str(U_MX.B,'%10.8f') ' ' num2str(U_MX.alpha,'%10.8f')]);
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',pad(num2str(U_MX.C,'%10.8f'),10));
-
+        
         % Modify the MDP file
         MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
         MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad('group',18));
@@ -473,7 +472,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         MDP_Template = strrep(MDP_Template,'##RVDW##',pad(num2str(Settings.MDP.RVDW_Cutoff),18));
         MDP_Template = strrep(MDP_Template,'##VDWMOD##',pad(Settings.MDP.vdw_modifier,18));
         MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
-
     else
         error(['Warning: Unknown theory type: "' Settings.Theory '".'])
     end
@@ -596,7 +594,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         disp(mdrun_output);
         error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
     end
-
     
     % Check to ensure system stayed as liquid
     PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...

@@ -2,30 +2,48 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     
     disp('*** Separate Equilibration of Solid Selected ***')
 
-    WorkDir = fullfile(Settings.WorkDir,'Equil_Sol');
-    if ~isfolder(WorkDir)
-        mkdir(WorkDir)
+    Settings.WorkDir = tempname;
+    if ~isfolder(Settings.WorkDir)
+        mkdir(Settings.WorkDir)
     end
     
-    % Generate unit cell
-    
-    % Unit Cell Filename
+    % Generate unit cell: Unit Cell Filename
     Settings.JobName = [Settings.Theory '_TestModel'];
     Settings.UnitCellFile = fullfile(Settings.WorkDir,[Settings.JobName '_UnitCell.' Settings.CoordType]);
+    Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
+        [Settings.Structure '.' Settings.CoordType]);
     
+    % Generate unit cell coord file text
+    Coordinate_Text = fileread(Settings.Coordinate_File);
+
+    % Add Metal and Halide symbols
+    if strcmp(Settings.CoordType,'gro')
+        Met = pad(Settings.Metal,2,'left');
+        Hal = pad(Settings.Halide,2,'left');
+    elseif strcmp(Settings.CoordType,'g96')
+        Met = pad(Settings.Metal,2,'right');
+        Hal = pad(Settings.Halide,2,'right');
+    end
+    Coordinate_Text = strrep(Coordinate_Text,'##MET##',Met);
+    Coordinate_Text = strrep(Coordinate_Text,'##HAL##',Hal);
+    Coordinate_Text = AddCartesianCoord(Coordinate_Text,Settings.Geometry,1,false,Settings.CoordType); %input coordinates
     
-    
+    % Save unit cell .gro file
+    fid = fopen(Settings.UnitCellFile,'wt');
+    fwrite(fid,regexprep(Coordinate_Text,'\r',''));
+    fclose(fid);
+            
     % Generate a box with the structure of interest containing the smallest
     % possible number of atoms for the given cutoff, plus a buffer in case of contraction
-    La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
-    Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_b; % nm, the minimum box dimension
-    Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_c; % nm, the minimum box dimension
+    La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer*1.25/Settings.Geometry.Skew_a; % nm, the minimum box dimension
+    Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer*1.25/Settings.Geometry.Skew_b; % nm, the minimum box dimension
+    Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer*1.25/Settings.Geometry.Skew_c; % nm, the minimum box dimension
     
     Na = ceil(La/(Settings.Geometry.a/10));
     Nb = ceil(Lb/(Settings.Geometry.b/10));
     Nc = ceil(Lc/(Settings.Geometry.c/10));
     
-    SuperCellFile = fullfile(WorkDir,['Equil_Sol.' Settings.CoordType]);
+    SuperCellFile = fullfile(Settings.WorkDir,['Equil_Sol.' Settings.CoordType]);
     Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
          ' -o ' windows2unix(SuperCellFile) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
     [errcode,output] = system(Supercell_command);
@@ -36,7 +54,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     end
     
     % Set the number of steps
-    timesteps = Settings.Equilibrate_Solid/Settings.MDP.dt;
+    MD_nsteps = Settings.Equilibrate_Solid/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt);
     Compressibility = 1e-6;
     tau_p = Settings.MDP.dt; % ps
@@ -59,42 +77,251 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
         Compresstxt = regexprep(num2str([ones(1,3) zeros(1,3)].*Compressibility),' +',' '); % bar^(-1)
     end
     
+    
+    Table_Req = IsGmxTableRequired(Settings);
+    Metal_Info = elements('Sym',Settings.Metal);
+    Halide_Info = elements('Sym',Settings.Halide);
+    
+    % Load new topology and MPD templates
+    Topology_Template_file = fullfile(Settings.home,'templates','Gromacs_Templates',...
+    'Topology.template');
+    MDP_Template = fileread(fullfile(Settings.home,'templates','Gromacs_Templates',...
+    'MDP_MD.template'));
+    
+    % Topology filename and directory for output
+    Settings.Topology_File = fullfile(Settings.WorkDir,[Settings.JobName '.top']);
+    Settings.Topology_Text = fileread(Topology_Template_file);
+    
+    % Add in global parameters to Topology template
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##GENPAIRS##',Settings.Top_gen_pairs);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##FUDGELJ##',num2str(Settings.Top_fudgeLJ));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##FUDGEQQ##',num2str(Settings.Top_fudgeQQ));
+    
+    % Insert element info into topology template
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##MET##',pad(Settings.Metal,2));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+    
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HAL##',pad(Settings.Halide,2));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+    
+    if Table_Req
+        % Define the function type as 1 (required for custom functions)
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','1');
+        
+        % Define the combination rules (Lorenz-berthelot)
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','1');
+        
+        % Define all the parameters as 1.0 (already included in potentials)
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad('1.0',10));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad('1.0',10));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad('1.0',10));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##','1.0');
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##','1.0');
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##','1.0');
+        
+        % Generate tables of the potential
+        if strcmp(Settings.Theory,'TF')
+            [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings);
+        elseif strcmp(Settings.Theory,'BH')
+            [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings);
+        elseif contains(Settings.Theory,'JC')
+            switch Settings.Theory
+                case 'JC'
+                    Settings.WaterModel = 'SPC/E';
+                case 'JC3P'
+                    Settings.WaterModel = 'TIP3P';
+                case 'JC4P'
+                    Settings.WaterModel = 'TIP4PEW';
+                case 'JCSD'
+                    Settings.WaterModel = 'SD';
+            end
+            [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings);
+        else
+            error(['Warning: Unknown theory type: "' Settings.Theory '".'])
+        end
+        
+        TableName = [Settings.JobName '_Table'];
+        Settings.TableFile_MX = fullfile(Settings.WorkDir,[TableName '.xvg']);
+        Settings.TableFile_MM = fullfile(Settings.WorkDir,[TableName '_' Settings.Metal '_' Settings.Metal '.xvg']);
+        Settings.TableFile_XX = fullfile(Settings.WorkDir,[TableName '_' Settings.Halide '_' Settings.Halide '.xvg']);
+        
+        % Save tables into current directory
+        fidMX = fopen(Settings.TableFile_MX,'wt');
+        fwrite(fidMX,regexprep(U_MX,'\r',''));
+        fclose(fidMX);
+        
+        fidMM = fopen(Settings.TableFile_MM,'wt');
+        fwrite(fidMM,regexprep(U_MM,'\r',''));
+        fclose(fidMM);
+        
+        fidXX = fopen(Settings.TableFile_XX,'wt');
+        fwrite(fidXX,regexprep(U_XX,'\r',''));
+        fclose(fidXX);
+        
+        % Modify the MDP file
+        MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad('user',18));
+        MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad('group',18));
+        MDP_Template = regexprep(MDP_Template,'ewald-rtol-lj.+?\n','');
+        MDP_Template = regexprep(MDP_Template,'lj-pme-comb-rule.+?\n','');
+        MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
+        MDP_Template = strrep(MDP_Template,'##RLIST##',pad(num2str(Settings.MDP.RList_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##RCOULOMB##',pad(num2str(Settings.MDP.RCoulomb_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##RVDW##',pad(num2str(Settings.MDP.RVDW_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##VDWMOD##',pad('none',18));
+        
+    elseif contains(Settings.Theory,'JC')
+        switch Settings.Theory
+            case 'JC'
+                Settings.WaterModel = 'SPC/E';
+            case 'JC3P'
+                Settings.WaterModel = 'TIP3P';
+            case 'JC4P'
+                Settings.WaterModel = 'TIP4PEW';
+            case 'JCSD'
+                Settings.WaterModel = 'SD';
+        end
+        
+        % Definte the function type as 1 (LJ)
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','1');
+        
+        % Define the combination rules (Lorenz-berthelot in sigma-epsilon form)
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','2');
+        
+        % Get JC parameters
+        [MX_JC_Param,MM_JC_Param,XX_JC_Param] = JC_Potential_Parameters(Settings);
+        
+        % Add parameters to topology text
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad(num2str(MM_JC_Param.sigma,'%10.8f'),10));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad(num2str(XX_JC_Param.sigma,'%10.8f'),10));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad(num2str(MX_JC_Param.sigma,'%10.8f'),10));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',num2str(MM_JC_Param.epsilon,'%10.8f'));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(XX_JC_Param.epsilon,'%10.8f'));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(MX_JC_Param.epsilon,'%10.8f'));
+        
+        % Modify the MDP file
+        MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
+        MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad(Settings.MDP.CutOffScheme,18));
+        MDP_Template = regexprep(MDP_Template,'energygrp-table.+?\n','');
+        MDP_Template = regexprep(MDP_Template,'ewald-rtol-lj.+?\n','');
+        MDP_Template = regexprep(MDP_Template,'lj-pme-comb-rule.+?\n','');
+        MDP_Template = strrep(MDP_Template,'##RLIST##',pad(num2str(Settings.MDP.RList_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##RCOULOMB##',pad(num2str(Settings.MDP.RCoulomb_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##RVDW##',pad(num2str(Settings.MDP.RVDW_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##VDWMOD##',pad(Settings.MDP.vdw_modifier,18));
+
+        % Add in Verlet Settings
+        if strcmp(Settings.MDP.CutOffScheme,'Verlet')
+            MDP_Template = strrep(MDP_Template,'##VerletBT##',pad(num2str(Settings.MDP.VerletBT),18));
+        else
+            MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
+        end
+    elseif contains(Settings.Theory,'BH')
+        
+        Settings.TableFile_MX = '';
+        
+        % Definte the function type as 2 (Buckingham)
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','2');
+        
+        % Define the combination rule as 1 (Buckingham only has 1 comb rule)
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','1');
+        
+        % Get BH parameters (cross terms are pre-computed using my combining rules)
+        [U_MX,U_MM,U_XX] = BH_Potential_Parameters(Settings);
+        
+        % Add parameters to topology text
+        % For BH potentials, parameter are B*exp(-alpha*r) + C/r^6
+        % Parameter order is B alpha C
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'ptype  C          A','ptype   a              b           c6');
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',[num2str(U_MM.B,'%10.8f') ' ' num2str(U_MM.alpha,'%10.8f')]);
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',pad(num2str(U_MM.C,'%10.8f'),10));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',[num2str(U_XX.B,'%10.8f') ' ' num2str(U_XX.alpha,'%10.8f')]);
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',pad(num2str(U_XX.C,'%10.8f'),10));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',[num2str(U_MX.B,'%10.8f') ' ' num2str(U_MX.alpha,'%10.8f')]);
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',pad(num2str(U_MX.C,'%10.8f'),10));
+        
+        % Modify the MDP file
+        MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
+        MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad('group',18));
+        MDP_Template = regexprep(MDP_Template,'energygrp-table.+?\n','');
+        MDP_Template = regexprep(MDP_Template,'ewald-rtol-lj.+?\n','');
+        MDP_Template = regexprep(MDP_Template,'lj-pme-comb-rule.+?\n','');
+        MDP_Template = strrep(MDP_Template,'##RLIST##',pad(num2str(Settings.MDP.RList_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##RCOULOMB##',pad(num2str(Settings.MDP.RCoulomb_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##RVDW##',pad(num2str(Settings.MDP.RVDW_Cutoff),18));
+        MDP_Template = strrep(MDP_Template,'##VDWMOD##',pad(Settings.MDP.vdw_modifier,18));
+        MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
+    else
+        error(['Warning: Unknown theory type: "' Settings.Theory '".'])
+    end
+    
+    % Add in parameters to MDP template
+    MDP_Template = strrep(MDP_Template,'##NSTEPS##',pad(num2str(MD_nsteps),18));
+    MDP_Template = strrep(MDP_Template,'##INTEGR##',pad(Settings.MDP.integrator,18));
+    MDP_Template = strrep(MDP_Template,'##TIMEST##',pad(num2str(Settings.MDP.dt),18));
+    MDP_Template = strrep(MDP_Template,'##CONTINUE##',pad(Settings.MDP.continuation,18));
+    MDP_Template = strrep(MDP_Template,'##REFTINIT##',pad(num2str(Settings.T0),18));
+    MDP_Template = strrep(MDP_Template,'##COULOMB##',pad(Settings.MDP.CoulombType,18));
+    MDP_Template = strrep(MDP_Template,'##FOURIER##',pad(num2str(Settings.MDP.Fourier_Spacing),18));
+    MDP_Template = strrep(MDP_Template,'##PMEORDER##',pad(num2str(Settings.MDP.PME_Order),18));
+    MDP_Template = strrep(MDP_Template,'##EWALDTOL##',pad(num2str(Settings.MDP.Ewald_rtol),18));
+    MDP_Template = strrep(MDP_Template,'##LISTUPDATE##',pad(num2str(Settings.Update_NeighbourList),18));
+    MDP_Template = strrep(MDP_Template,'##POSOUT##',pad(num2str(Settings.Output_Coords),18));
+    MDP_Template = strrep(MDP_Template,'##POSOUTCOMP##',pad(num2str(Settings.Output_Coords_Compressed),18));
+    MDP_Template = strrep(MDP_Template,'##VELOUT##',pad(num2str(Settings.Output_Velocity),18));
+    MDP_Template = strrep(MDP_Template,'##FORCEOUT##',pad(num2str(Settings.Output_Forces),18));
+    MDP_Template = strrep(MDP_Template,'##ENOUT##',pad(num2str(Settings.Output_Energies),18));
+    MDP_Template = strrep(MDP_Template,'##CALCE##',pad(num2str(Settings.Calc_Energies),18));
+    MDP_Template = strrep(MDP_Template,'##MET##',pad(Settings.Metal,3));
+    MDP_Template = strrep(MDP_Template,'##HAL##',pad(Settings.Halide,3));
+    
     % Ensure fast equilibration with Berendsen barostat + small time constant
-    MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
-    MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$11$3;');
-    MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);','$1100$3;');
-    MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
-    MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);',['$1' isotropy '$3;']);
-    MDP_Template = regexprep(MDP_Template,'(tau-p += *)(.+?)( *);',['$1 ' num2str(tau_p) '$3;']);
-    MDP_Template = regexprep(MDP_Template,'(nstpcouple += *)(.+?)( *);',['$1 ' num2str(nstpcouple) '$3;']);
-    MDP_Template = regexprep(MDP_Template,'(compressibility += *)(.+?)( *);',['$1 ' Compresstxt '$3;']);
-    MDP_Template = regexprep(MDP_Template,'(ref-p += *)(.+?)( *);',['$1 ' ref_p '$3;']);
+    MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
+    MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad('isotropic',18));
+    MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(tau_p),18));
+    MDP_Template = strrep(MDP_Template,'##NSTPCOUPLE##',pad(num2str(nstpcouple),18));
+    MDP_Template = strrep(MDP_Template,'##COMPRESS##',pad(num2str(Compressibility),18));
+    MDP_Template = strrep(MDP_Template,'##REFP##',pad(num2str(Settings.Target_P(1)),18));
     
     % Pair it with velocity rescale thermostat + small time constant
-    MDP_Template = regexprep(MDP_Template,'(tcoupl += *)(.+?)( +);','$1v-rescale$3;');
-    MDP_Template = regexprep(MDP_Template,'(tau-t += *)(.+?)( +);',['$1 ' num2str(tau_t) '$3;']);
-    MDP_Template = regexprep(MDP_Template,'(nsttcouple += *)(.+?)( +);',['$1 ' num2str(nsttcouple) '$3;']);
+    MDP_Template = strrep(MDP_Template,'##THERMOSTAT##',pad('v-rescale',18));
+    MDP_Template = strrep(MDP_Template,'##TTIMECONST##',pad(num2str(tau_t),18));
+    MDP_Template = strrep(MDP_Template,'##NSTTCOUPLE##',pad(num2str(nsttcouple),18));
+    MDP_Template = strrep(MDP_Template,'##REFT##',pad(num2str(Settings.T0),18));
+    
+    % Remove annealing inputs from MDP
+    MDP_Template = strrep(MDP_Template,'##ANNEALING##',pad('no',18));
+    MDP_Template = regexprep(MDP_Template,'annealing-npoints +.+?\n','');
+    MDP_Template = regexprep(MDP_Template,'annealing-time +.+?\n','');
+    MDP_Template = regexprep(MDP_Template,'annealing-temp +.+?\n','');
+    
+    MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' BH_TestModel']);
     
     % Save MDP file
-    MDP_Filename = fullfile(WorkDir,'Equil_Sol.mdp');
+    MDP_Filename = fullfile(Settings.WorkDir,'Equil_Liq.mdp');
     fidMDP = fopen(MDP_Filename,'wt');
     fwrite(fidMDP,regexprep(MDP_Template,'\r',''));
     fclose(fidMDP);
     
-    % Complete a topology file for the liquid box to be minimized
-    Atomlist = copy_atom_order(SuperCellFile);
+    % Finish the topology file: add in title and the atom list
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##',num2str(nmol_liquid));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##GEOM##','molecule liquid');
+    Atomlist = copy_atom_order(Minimized_Geom_File);
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
-    Top_Filename = fullfile(WorkDir,'Equil_Sol.top');
+    Top_Filename = fullfile(Settings.WorkDir,'Equil_Liq.top');
     
     % Save topology file
     fidTOP = fopen(Top_Filename,'wt');
     fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
     fclose(fidTOP);
     
-    TPR_File = fullfile(WorkDir,'Equil_Sol.tpr');
-    MDPout_File = fullfile(WorkDir,'Equil_Sol_out.mdp');
-    GrompLog_File = fullfile(WorkDir,'Equil_Sol_Grompplog.log');
+    TPR_File = fullfile(Settings.WorkDir,'Equil_Sol.tpr');
+    MDPout_File = fullfile(Settings.WorkDir,'Equil_Sol_out.mdp');
+    GrompLog_File = fullfile(Settings.WorkDir,'Equil_Sol_Grompplog.log');
     
     FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(SuperCellFile) ...
         ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
@@ -110,22 +337,22 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     end
 
     % Prepare Equilibration mdrun command
-    Log_File = fullfile(WorkDir,'Equil_Sol.log');
-    Energy_file = fullfile(WorkDir,'Equil_Sol.edr');
-    TRR_File = fullfile(WorkDir,'Equil_Sol.trr');
-    Final_Geom_File = fullfile(WorkDir,['Equil_Sol_out.' Settings.CoordType]);
+    Log_File = fullfile(Settings.WorkDir,'Equil_Sol.log');
+    Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
+    TRR_File = fullfile(Settings.WorkDir,'Equil_Sol.trr');
+    Final_Geom_File = fullfile(Settings.WorkDir,['Equil_Sol_out.' Settings.CoordType]);
 
     mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
         ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
         ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Final_Geom_File) ...
-        ' -deffnm ' windows2unix(fullfile(WorkDir,'Equil_Sol')) ...
+        ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Sol')) ...
         Settings.mdrun_opts];
 
     if Settings.Table_Req
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
 
-    % Final Equilibration
+    % Run solid Equilibration
     disp(['Beginning Solid Equilibration for ' num2str(Settings.Equilibrate_Solid) ' ps...'] )
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
@@ -137,7 +364,12 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
         error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
     end
     
-    Box_xvg_file = fullfile(WorkDir,'Equil_Sol_Box.xvg');
+    
+    
+    
+    
+    
+    Box_xvg_file = fullfile(Settings.WorkDir,'Equil_Sol_Box.xvg');
     
     % Create gmx traj command
     startpoint = Settings.Equilibrate_Solid*0.50; % ps. Average over second half of equilibration period
@@ -228,7 +460,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     end
     
     if Settings.Delete_Equil
-        rmdir(WorkDir,'s')
+        rmdir(Settings.WorkDir,'s')
     end
     
     if Settings.GenCluster
