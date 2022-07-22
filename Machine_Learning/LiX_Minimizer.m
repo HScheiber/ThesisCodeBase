@@ -1187,7 +1187,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 %     Finite_T_Data.Liquid_V_MP = nan;
 %     Finite_T_Data.Solid_V_MP = nan;
 %     Finite_T_Data.MP = nan;
-    Liq_Output = Calc_Liquid_Properties_at_MP(Settings);
+    Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.9 solid
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
 end
