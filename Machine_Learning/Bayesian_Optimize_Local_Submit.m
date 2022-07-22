@@ -82,6 +82,7 @@ for tidx = 1:length(Theories)
             Models(idx).JobSettings.OMP_Threads = 1;
             Models(idx).JobSettings.MPI_Ranks = 8;
             Models(idx).JobSettings.Cores = 8;
+            Models(idx).Cutoff_Buffer = 1.5;
             
             % Loss
             Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -92,7 +93,7 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
             Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
             Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
-            Models(idx).Equilibrate_Liquid = 20; % ps
+            Models(idx).Equilibrate_Liquid = 50; % ps
             Models(idx).Output_Coords = 1000;
             
             
