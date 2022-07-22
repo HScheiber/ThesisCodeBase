@@ -12,11 +12,11 @@ data = import_xvg('energy.xvg');
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
 figure
-plot(data(:,1),data(:,2)./nmol_liquid) % potential (kj/mol ion pairs)
+plot(data(:,1),data(:,2)./nmol_solid) % potential (kj/mol ion pairs)
 hold on
 plot(data(:,1),data(:,3))              % Pressure (bar)
-plot(data(:,1),data(:,4)./nmol_liquid) % Volume (nm^3 / ion pair)
-plot(data(:,1),data(:,5)./nmol_liquid) % Enthalpy ( kJ/mol ion pairs)
+plot(data(:,1),data(:,4)./nmol_solid) % Volume (nm^3 / ion pair)
+plot(data(:,1),data(:,5)./nmol_solid) % Enthalpy ( kJ/mol ion pairs)
 
 ylim([-2000 100])
 
@@ -24,8 +24,8 @@ midpoint = ceil(length(data)/2);
 
 
 P = data(midpoint:end,3);
-V = data(midpoint:end,4).*(10^3)./nmol_liquid;
-H = data(midpoint:end,5)./nmol_liquid;
+V = data(midpoint:end,4).*(10^3)./nmol_solid;
+H = data(midpoint:end,5)./nmol_solid;
 
 % Statistics on Pressure
 SEM = std(P)/sqrt(length(P));               % Standard Error

@@ -1,17 +1,24 @@
 function Output = Calc_Solid_Properties_at_MP(Settings)
     
     disp('*** Separate Equilibration of Solid Selected ***')
-
+    
     Settings.WorkDir = tempname;
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
     
     % Generate unit cell: Unit Cell Filename
-    Settings.JobName = [Settings.Theory '_TestModel'];
+    Settings.JobName = 'Equil_Sol';
+    
     Settings.UnitCellFile = fullfile(Settings.WorkDir,[Settings.JobName '_UnitCell.' Settings.CoordType]);
-    Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
-        [Settings.Structure '.' Settings.CoordType]);
+    Settings.Geometry = Convert_to_Primitive(Settings.Geometry);
+    if contained_in_cell(Settings.Structure,{'Rocksalt' 'Sphalerite' 'FiveFive'})
+        Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
+            [Settings.Structure '_Primitive.' Settings.CoordType]);
+    else
+        Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
+            [Settings.Structure '.' Settings.CoordType]);
+    end
     
     % Generate unit cell coord file text
     Coordinate_Text = fileread(Settings.Coordinate_File);
@@ -43,6 +50,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     Nb = ceil(Lb/(Settings.Geometry.b/10));
     Nc = ceil(Lc/(Settings.Geometry.c/10));
     
+    % Calculate number of formula units
+    nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
+    
     SuperCellFile = fullfile(Settings.WorkDir,['Equil_Sol.' Settings.CoordType]);
     Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
          ' -o ' windows2unix(SuperCellFile) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
@@ -56,7 +66,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     % Set the number of steps
     MD_nsteps = Settings.Equilibrate_Solid/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt);
-    Compressibility = 1e-6;
+    Compressibility = 1e-8;
     tau_p = Settings.MDP.dt; % ps
     tau_t = Settings.MDP.dt; % ps
 
@@ -76,7 +86,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
         ref_p = regexprep(num2str(ones(1,6).*Settings.Target_P(1)),' +',' ');
         Compresstxt = regexprep(num2str([ones(1,3) zeros(1,3)].*Compressibility),' +',' '); % bar^(-1)
     end
-    
     
     Table_Req = IsGmxTableRequired(Settings);
     Metal_Info = elements('Sym',Settings.Metal);
@@ -281,11 +290,11 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     % Ensure fast equilibration with Berendsen barostat + small time constant
     MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
     MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
-    MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad('isotropic',18));
+    MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad(isotropy,18));
     MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(tau_p),18));
     MDP_Template = strrep(MDP_Template,'##NSTPCOUPLE##',pad(num2str(nstpcouple),18));
-    MDP_Template = strrep(MDP_Template,'##COMPRESS##',pad(num2str(Compressibility),18));
-    MDP_Template = strrep(MDP_Template,'##REFP##',pad(num2str(Settings.Target_P(1)),18));
+    MDP_Template = strrep(MDP_Template,'##COMPRESS##',pad(Compresstxt,18));
+    MDP_Template = strrep(MDP_Template,'##REFP##',pad(ref_p,18));
     
     % Pair it with velocity rescale thermostat + small time constant
     MDP_Template = strrep(MDP_Template,'##THERMOSTAT##',pad('v-rescale',18));
@@ -302,17 +311,17 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' BH_TestModel']);
     
     % Save MDP file
-    MDP_Filename = fullfile(Settings.WorkDir,'Equil_Liq.mdp');
+    MDP_Filename = fullfile(Settings.WorkDir,'Equil_Sol.mdp');
     fidMDP = fopen(MDP_Filename,'wt');
     fwrite(fidMDP,regexprep(MDP_Template,'\r',''));
     fclose(fidMDP);
     
     % Finish the topology file: add in title and the atom list
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##',num2str(nmol_liquid));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##GEOM##','molecule liquid');
-    Atomlist = copy_atom_order(Minimized_Geom_File);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##',num2str(nmol_solid));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##GEOM##',['molecule ' Settings.Structure]);
+    Atomlist = copy_atom_order(SuperCellFile);
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
-    Top_Filename = fullfile(Settings.WorkDir,'Equil_Liq.top');
+    Top_Filename = fullfile(Settings.WorkDir,'Equil_Sol.top');
     
     % Save topology file
     fidTOP = fopen(Top_Filename,'wt');
@@ -347,8 +356,8 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
         ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Final_Geom_File) ...
         ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Sol')) ...
         Settings.mdrun_opts];
-
-    if Settings.Table_Req
+    
+    if Table_Req
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
 
@@ -364,107 +373,65 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
         error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
     end
     
+    % Check to ensure system remained in the correct solid structure
+    PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
+        pyargs('SystemName','Equil_Sol',...
+        'RefStructure',Settings.Structure,...
+        'CheckFullTrajectory',true,...
+        'FileType',Settings.CoordType,...
+        'ML_TimeLength',10,...
+        'ML_TimeStep',1,...
+        'TimePerFrame',Settings.Output_Coords*Settings.MDP.dt,...
+        'SaveTrajectory',true,...
+        'SavePredictionsImage',true));
+    Sol_Fraction = PyOut{4};
     
+    if Sol_Fraction < 0.9
+        disp('Detected Solid Phase change at Experimental MP')
+        Output.Solid_V_MP = nan;
+        Output.Solid_H_MP = nan;
+        return
+    end
     
+    En_xvg_file = fullfile(Settings.WorkDir,'Equil_Sol_Energy.xvg');
     
-    
-    
-    Box_xvg_file = fullfile(Settings.WorkDir,'Equil_Sol_Box.xvg');
-    
-    % Create gmx traj command
-    startpoint = Settings.Equilibrate_Solid*0.50; % ps. Average over second half of equilibration period
+    % Check energy options
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo 0 ' Settings.pipe ' gmx']) ...
-        ' traj -f ' windows2unix(TRR_File) ' -ob ' windows2unix(Box_xvg_file) ...
-        ' -s ' windows2unix(TPR_File) ' -b ' num2str(startpoint) ...
-        ' -e ' num2str(Settings.Equilibrate_Solid)];
+        ' energy -f ' windows2unix(Energy_file) ...
+        ' -s ' windows2unix(TPR_File)];
+    [~,outpt] = system(gmx_command);
+    
+    en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
+    En_set = '';
+    En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
+    En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Enthalpy','tokens','once'))];
+    En_set = [En_set ' 0'];
+    En_set = regexprep(En_set,' +',' ');
+    
+    % Grab second half of data from results
+    startpoint = Settings.Equilibrate_Solid*0.5; % ps
+    gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
+    ' energy -f ' windows2unix(Energy_file)...
+    ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
+    ' -b ' num2str(startpoint) ' -e ' num2str(Settings.Equilibrate_Solid)];
+    
     [err,~] = system(gmx_command);
-    
     if err ~= 0
-        error('Failed to collect box data.')
+        warndlg('Failed to collect data.')
+        return
     end
     
-    % Load data and calculate box vectors
-    Data = import_xvg(Box_xvg_file); % Gather X,Y,Z lengths
-    delete(Box_xvg_file) % remove temp output file
+    Data = import_xvg(En_xvg_file); % Gather X,Y,Z lengths
     
-    a_vec = [Data(:,2) zeros(size(Data,1),1) zeros(size(Data,1),1)];
-    b_vec = [Data(:,5) Data(:,3) zeros(size(Data,1),1)];
-    c_vec = [Data(:,6) Data(:,7) Data(:,4)];
-
-    a = vecnorm(a_vec,2,2);
-    b = vecnorm(b_vec,2,2);
-    c = vecnorm(c_vec,2,2);
+    Output.Solid_V_MP = mean(Data(:,2))*(10^3)/nmol_solid; % A^3 / ion pair
+    Output.Solid_H_MP = mean(Data(:,3))/nmol_solid; % kJ/mol
     
-%     hold on
-%     plot(Data(:,1),10.*a./Na)
-%     plot(Data(:,1),10.*b./Nb)
-%     plot(Data(:,1),10.*c./Nc)
-%     mean_a = mean(10.*a(ceil(length(a)/2):end)./Na)
-%     std_a = std(10.*a(ceil(length(a)/2):end)./Na)
-    
-    switch isotropy
-        case 'isotropic'
-            Settings.Geometry.a = 10*mean(a)./Na; % Angstroms
-            Settings.Geometry.b = Settings.Geometry.a; % Angstroms
-            Settings.Geometry.c = Settings.Geometry.a; % Angstroms 
-        case 'semiisotropic'
-            Settings.Geometry.a = 10*mean(a)./Na; % Angstroms
-            Settings.Geometry.b = Settings.Geometry.a; % Angstroms
-            Settings.Geometry.c = 10*mean(c)./Nc; % Angstroms 
-        case 'anisotropic'
-            Settings.Geometry.a = 10*mean(a)./Na; % Angstroms
-            Settings.Geometry.b = 10*mean(b)./Nb; % Angstroms
-            Settings.Geometry.c = 10*mean(c)./Nc; % Angstroms 
-    end
-    
-    % Load Coordinates text
-    Coordinate_Text = fileread(Settings.Coordinate_File);
-    
-    % Add Metal and Halide symbols
-    if strcmp(Settings.CoordType,'gro')
-        Met = pad(Settings.Metal,2,'left');
-        Hal = pad(Settings.Halide,2,'left');
-    elseif strcmp(Settings.CoordType,'g96')
-        Met = pad(Settings.Metal,2,'right');
-        Hal = pad(Settings.Halide,2,'right');
-    end
-    Coordinate_Text = strrep(Coordinate_Text,'##MET##',Met);
-    Coordinate_Text = strrep(Coordinate_Text,'##HAL##',Hal);
-    Coordinate_Text = AddCartesianCoord(Coordinate_Text,Settings.Geometry,1,false,Settings.CoordType); %input coordinates
-    
-    % Save the updated super cell file
-    if sum([Settings.N_Supercell_a Settings.N_Supercell_b Settings.N_Supercell_c]) > 3
-        
-        fid = fopen(Settings.UnitCellFile,'wt');
-        fwrite(fid,regexprep(Coordinate_Text,'\r',''));
-        fclose(fid);
-        
-        Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
-             ' -o ' windows2unix(Settings.SuperCellFile) ' -nbox ' Settings.Na ' ' Settings.Nb ' ' Settings.Nc];
-        
-        % Remove old supercell file
-        if isfile(Settings.SuperCellFile)
-            delete(Settings.SuperCellFile)
-        end
-         
-        [errcode,output] = system(Supercell_command);
-        
-        if errcode ~= 0
-            disp(output);
-            error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
-        end
-    else
-        fid = fopen(Settings.SuperCellFile,'wt');
-        fwrite(fid,regexprep(Coordinate_Text,'\r',''));
-        fclose(fid);
-    end
+    % plot(Data(:,1),(10^3).*Data(:,2)./nmol_solid)
+    % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
+    % stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
     
     if Settings.Delete_Equil
         rmdir(Settings.WorkDir,'s')
-    end
-    
-    if Settings.GenCluster
-        Build_Cluster(Settings)
     end
     
     disp('*** Separate Equilibration of Solid Complete ***')

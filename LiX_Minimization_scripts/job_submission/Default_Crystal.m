@@ -288,6 +288,7 @@ end
 Geometry.Transform = GenTransformMatrix(Geometry);
 Geometry.NF = Geometry.N/2;
 Geometry.Salt = Settings.Salt;
+Geometry.Structure = Settings.Structure;
 Geometry.Label = StructureLabel(Settings.Structure);
 [Geometry.Metal,Geometry.Halide] = Separate_Metal_Halide(Settings.Salt);
 Geometry.SkewFactor = det(Geometry.Transform);

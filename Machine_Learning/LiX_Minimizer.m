@@ -1181,17 +1181,10 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume] > tol) ...
         && ~Settings.skip_finite_T
-    
     if ~isempty(gcp('nocreate'))
         delete(gcp);
     end
-%     Finite_T_Data.Fusion_dH = nan;
-%     Finite_T_Data.Fusion_dV = nan;
-%     Finite_T_Data.Liquid_H_MP = nan;
-%     Finite_T_Data.Solid_H_MP = nan;
-%     Finite_T_Data.Liquid_V_MP = nan;
-%     Finite_T_Data.Solid_V_MP = nan;
-%     Finite_T_Data.MP = nan;
+    
     Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.9 solid
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;

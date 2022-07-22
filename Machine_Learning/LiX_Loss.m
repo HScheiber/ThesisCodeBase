@@ -66,6 +66,7 @@ function Loss = LiX_Loss(Settings)
     end
     DFT_RS_E = DFT.(Settings.Salt).Rocksalt.Energy;                          % DFT/Experimental-calculated   RS lattice energy
     
+    % Solid State T = 0 properties
     Loss = 0; % Initialize loss
     for idx = 1:N
         Structure = Settings.Minimization_Data{idx}.Structure;
@@ -156,7 +157,78 @@ function Loss = LiX_Loss(Settings)
         
         % Add to the total loss function
         Loss = Loss + Settings.Loss_Options.(Structure).Gap.Weight*reg(Delta_Gap);
-
+    end
+    
+    % Finite Temperature properties
+    %     Finite_T_Data.Fusion_dH = nan;
+    %     Finite_T_Data.Fusion_dV = nan;
+    %     Finite_T_Data.Liquid_V_MP = nan;
+    %     Finite_T_Data.Solid_V_MP = nan;
+    %     Finite_T_Data.MP = nan;
+    
+    %     Finite_T_Data.Exp_Fusion_dH % kJ/mol of Formula units
+    %     Finite_T_Data.Exp_Fusion_dV % Volume change on melting at MP: Ang^3 / Forumla unit
+    %     Finite_T_Data.Exp_Liquid_V_MP % Liquid Volume at MP in Ang^3 / Forumla unit
+    %     Finite_T_Data.Exp_Solid_V_MP % Solid Volume at MP in Ang^3 / Forumla unit
+    %     Finite_T_Data.Exp_MP % MP in K
+    
+    % Calculate loss for finite temperature properties
+    if ~Settings.skip_finite_T
+        
+        % Fit the Fusion enthalpy
+        if Settings.Loss_Options.Fusion_Enthalpy > tol
+            rel_er = Settings.Loss_Options.Fusion_Enthalpy*...
+                reg((Settings.Finite_T_Data.Fusion_dH - Settings.Finite_T_Data.Exp_Fusion_dH)/...
+                Settings.Finite_T_Data.Exp_Fusion_dH);
+            if isnan(rel_er)
+                rel_er = Settings.Loss_Options.Fusion_Enthalpy;
+            end
+            Loss = Loss + rel_er;
+        end
+        
+        % Fit the change in volume due to melting
+        if Settings.Loss_Options.MP_Volume_Change > tol
+            rel_er = Settings.Loss_Options.MP_Volume_Change*...
+                reg((Settings.Finite_T_Data.Fusion_dV - Settings.Finite_T_Data.Exp_Fusion_dV)/...
+                Settings.Finite_T_Data.Exp_Fusion_dV);
+            if isnan(rel_er)
+                rel_er = Settings.Loss_Options.MP_Volume_Change;
+            end
+            Loss = Loss + rel_er;
+        end
+        
+        % Fit the liquid molar volume at the MP
+        if Settings.Loss_Options.Liquid_MP_Volume > tol
+            rel_er = Settings.Loss_Options.Liquid_MP_Volume*...
+                reg((Settings.Finite_T_Data.Liquid_V_MP - Settings.Finite_T_Data.Exp_Liquid_V_MP)/...
+                Settings.Finite_T_Data.Exp_Liquid_V_MP);
+            if isnan(rel_er)
+                rel_er = Settings.Loss_Options.Liquid_MP_Volume;
+            end
+            Loss = Loss + rel_er;
+        end
+        
+        % Fit the solid molar volume at the MP
+        if Settings.Loss_Options.Solid_MP_Volume > tol
+            rel_er = Settings.Loss_Options.Solid_MP_Volume*...
+                reg((Settings.Finite_T_Data.Solid_V_MP - Settings.Finite_T_Data.Exp_Solid_V_MP)/...
+                Settings.Finite_T_Data.Exp_Solid_V_MP);
+            if isnan(rel_er)
+                rel_er = Settings.Loss_Options.Solid_MP_Volume;
+            end
+            Loss = Loss + rel_er;
+        end
+        
+        % Fit the experimental melting point
+        if Settings.Loss_Options.MP > tol
+            rel_er = Settings.Loss_Options.MP*...
+                reg((Settings.Finite_T_Data.MP - Settings.Finite_T_Data.Exp_MP)/...
+                Settings.Finite_T_Data.Exp_MP);
+            if isnan(rel_er)
+                rel_er = Settings.Loss_Options.MP;
+            end
+            Loss = Loss + rel_er;
+        end
     end
     
     Loss = real(log1p(Loss));

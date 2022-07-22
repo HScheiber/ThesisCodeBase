@@ -595,7 +595,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
     end
     
-    % Check to ensure system stayed as liquid
+    % Check to ensure system remained liquid
     PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
         pyargs('SystemName','Equil_Liq',...
         'RefStructure','Liquid',...
@@ -610,33 +610,33 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     if Liq_Fraction < 0.9
         disp('Detected Liquid Freezing at Experimental MP')
-        Output.Liquid_V_MP = nan;
-        Output.Liquid_H_MP = nan;
+        Output.Solid_V_MP = nan;
+        Output.Solid_H_MP = nan;
         return
     end
     
     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq_Energy.xvg');
-
+    
     % Check energy options
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo 0 ' Settings.pipe ' gmx']) ...
         ' energy -f ' windows2unix(Energy_file) ...
         ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
-
+    
     en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
     En_set = '';
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Enthalpy','tokens','once'))];
     En_set = [En_set ' 0'];
     En_set = regexprep(En_set,' +',' ');
-
+    
     % Grab second half of data from results
     startpoint = Settings.Equilibrate_Liquid*0.5; % ps
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
     ' energy -f ' windows2unix(Energy_file)...
     ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
     ' -b ' num2str(startpoint) ' -e ' num2str(Settings.Equilibrate_Liquid)];
-
+    
     [err,~] = system(gmx_command);
     if err ~= 0
         warndlg('Failed to collect data.')
@@ -647,11 +647,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     Output.Liquid_V_MP = mean(Data(:,2))*(10^3)/nmol_liquid; % A^3 / ion pair
     Output.Liquid_H_MP = mean(Data(:,3))/nmol_liquid; % kJ/mol
-
+    
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)
     % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
     % stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
-
+    
     if Settings.Delete_Equil
         rmdir(Settings.WorkDir,'s')
     end
