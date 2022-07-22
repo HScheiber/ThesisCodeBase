@@ -466,3 +466,352 @@ Beginning LiI Rocksalt BH Optimization...
  Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
     0      2     -970.538       -2.232                                         
     1      5     -2089.81       -1.116          0.5         -418     1.75e+03   
+    2      8     -2835.96      -0.5579          0.5    -2.17e+03     9.56e+03  Hessian modified twice  
+    3     11     -2982.31      -0.7737          0.5     -7.4e+03     2.45e+03   
+    4     13     -3095.98        -0.72            1    -2.45e+03     1.69e+03   
+    5     16     -3151.32      -0.6599          0.5    -1.69e+03         53.2   
+    6     18     -3151.35      -0.6617            1        -53.2         19.5   
+    7     20     -3151.35      -0.6612            1        -19.5        0.114   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:02:03
+Final Optimized Energy is -3151.3525205132 kJ/mol
+Lattice Parameter a = 3.76353301 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+1.1387E-01
+|   22 | Accept |      3.8036 |         124 |       1.963 |       1.963 |      0.11403 |      0.26811 |       360.39 |       85.274 |       23.625 |
+|   23 | Accept |      20.653 |     0.16521 |       1.963 |       1.963 |      0.21802 |      0.31104 |       788.78 |       418.85 |       10.987 |
+|   24 | Accept |      20.403 |     0.14919 |       1.963 |       1.963 |      0.33393 |      0.46326 |       627.17 |       559.79 |       48.037 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2      -1278.2       -2.232                                         
+    1      5     -2558.28       -1.116          0.5         -855     1.17e+04   
+    2      9     -2759.02       -1.374         0.25    -1.09e+04     2.66e+03   
+    3     11     -2887.31       -1.324            1    -2.66e+03     2.33e+03   
+    4     15     -3026.03       -1.232         0.25    -2.33e+03          219   
+    5     17     -3026.15       -1.222            1         -219          201   
+    6     19     -3026.59       -1.227            1         -201         6.55   
+    7     21     -3026.59       -1.227            1        -6.55        0.191   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:16
+Final Optimized Energy is -3026.5900497954 kJ/mol
+Lattice Parameter a = 4.56337160 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+1.9115E-01
+|   25 | Accept |      3.6594 |      77.132 |       1.963 |       1.963 |      0.25201 |      0.21071 |       185.91 |       252.77 |       37.344 |
+|   26 | Accept |      20.089 |     0.14646 |       1.963 |       1.963 |      0.24098 |      0.41372 |       511.31 |        366.3 |       17.167 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2      -1114.3       -2.232                                         
+    1      5     -2683.08       -1.116          0.5         -623          692   
+    2     13     -2683.09       -1.116       0.0156        -25.9         3.14   
+    3     15     -2683.09       -1.116            1        -3.14       0.0167   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:06
+Final Optimized Energy is -2683.0896340944 kJ/mol
+Lattice Parameter a = 4.40728631 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+1.6690E-02
+|   27 | Accept |      3.2523 |      66.372 |       1.963 |       1.963 |      0.11062 |      0.31779 |        98.86 |       123.37 |       39.228 |
+|   28 | Accept |      21.015 |     0.14698 |       1.963 |       1.963 |      0.35421 |        0.296 |       394.91 |       874.24 |       16.599 |
+|   29 | Accept |      20.316 |     0.16087 |       1.963 |       1.963 |      0.26321 |      0.41787 |        601.6 |       903.02 |       28.332 |
+|   30 | Accept |      8.4536 |     0.14509 |       1.963 |       1.963 |      0.14205 |      0.39837 |       260.57 |       174.99 |       19.849 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -937.525       -2.232                                         
+    1      5     -1893.81       -1.116          0.5         -371      1.5e+03   
+    2      8     -3772.45      -0.5579          0.5    -1.87e+03     3.35e+03  Hessian modified twice  
+    3     11     -4903.18       -0.279          0.5    -5.22e+03     6.28e+03  Hessian modified twice  
+    4     14      -4905.3      -0.3026          0.5    -1.06e+03          801   
+    5     16     -4909.75      -0.2924            1         -801         60.9   
+    6     18     -4909.77      -0.2916            1        -60.9         3.92   
+    7     20     -4909.77      -0.2916            1        -3.92       0.0204   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:03:32
+Final Optimized Energy is -4909.7711289669 kJ/mol
+Lattice Parameter a = 3.24087260 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+2.0407E-02
+|   31 | Accept |       5.281 |      213.19 |       1.963 |       1.963 |      0.21436 |      0.11888 |       160.78 |       715.47 |       20.129 |
+|   32 | Accept |      10.979 |     0.16286 |       1.963 |       1.963 |      0.15593 |      0.32497 |       207.67 |       978.72 |       27.824 |
+|   33 | Accept |      10.952 |     0.16209 |       1.963 |       1.963 |      0.30624 |      0.30435 |       989.08 |       13.321 |       45.336 |
+|   34 | Accept |      10.551 |     0.15352 |       1.963 |       1.963 |       0.2677 |      0.16997 |       865.83 |       590.41 |       48.755 |
+|   35 | Accept |      10.587 |     0.14688 |       1.963 |       1.963 |      0.16033 |      0.29538 |       569.04 |       831.23 |       37.732 |
+|   36 | Accept |       19.87 |      0.1425 |       1.963 |       1.963 |      0.22007 |      0.39756 |        374.5 |       557.06 |       13.114 |
+|   37 | Accept |      19.876 |     0.15543 |       1.963 |       1.963 |      0.20574 |      0.49102 |        712.4 |       832.66 |       36.434 |
+|   38 | Accept |      9.5364 |     0.14582 |       1.963 |       1.963 |       0.1187 |      0.41999 |       216.35 |       433.93 |       29.931 |
+|   39 | Accept |      10.872 |     0.15376 |       1.963 |       1.963 |      0.33477 |      0.45836 |       201.09 |       795.03 |        47.34 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -857.011       -2.232                                         
+    1      4      -5735.9            0            1         -256     1.09e+04   
+Active inequalities (to within options.ConstraintTolerance = 1e-06):
+  lower      upper     ineqlin   ineqnonlin
+    1                                 
+
+<a href = "matlab: helpview('optim','local_min_poss_with_constr','CSHelpWindow');">Local minimum possible. Constraints satisfied</a>.
+
+fmincon stopped because the <a href = "matlab: helpview('optim','norm_search_direction','CSHelpWindow');">size of the current search direction</a> is less than
+twice the value of the <a href = "matlab: helpview('optim','step_size_tol','CSHelpWindow');">step size tolerance</a> and constraints are 
+satisfied to within the value of the <a href = "matlab: helpview('optim','constraint_tolerance','CSHelpWindow');">constraint tolerance</a>.
+
+<<a href = "matlab: createExitMsg({'optimlib:nlconst:Exit4basic','fmincon'},{'optimlib:nlconst:Exit4detailed','0.000000e+00','1.000000e-10','0.000000e+00','1.000000e-06'},true,true);;">stopping criteria details</a>>
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:06
+Final Optimized Energy is -5735.9045768235 kJ/mol
+Lattice Parameter a = 2.82842712 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+1.1175E+04
+|   40 | Accept |      5.7895 |      66.947 |       1.963 |       1.963 |      0.16636 |      0.10626 |       284.66 |       938.33 |        45.81 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -1579.49       -2.232                                         
+    1      5     -5332.67       -1.116          0.5    -1.28e+03     1.43e+03   
+    2     14      -5334.9       -1.107      0.00781         -764          521   
+    3     16     -5335.21       -1.109            1         -277         15.2   
+    4     18     -5335.21       -1.109            1        -15.2        0.282   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:40
+Final Optimized Energy is -5335.2064626886 kJ/mol
+Lattice Parameter a = 4.39718537 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+2.8167E-01
+|==================================================================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|==================================================================================================================================================|
+|   41 | Accept |      5.5487 |       101.3 |       1.963 |       1.963 |       0.1659 |      0.27874 |       736.27 |       269.02 |       46.555 |
+|   42 | Accept |        20.9 |     0.16606 |       1.963 |       1.963 |      0.36206 |       0.2666 |       595.57 |       968.79 |       33.912 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -1388.55       -2.232                                         
+    1      5     -4678.68       -1.116          0.5    -1.01e+03     5.45e+03   
+    2     10     -5395.87      -0.9763        0.125    -6.46e+03     6.31e+03  Hessian modified twice  
+    3     13     -5397.71      -0.9611          0.5    -1.16e+03     1.02e+03   
+    4     15     -5400.97      -0.9682            1    -1.02e+03         78.3   
+    5     17     -5400.99      -0.9677            1        -78.3         4.86   
+    6     19     -5400.99      -0.9677            1        -4.86       0.0251   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:53
+Final Optimized Energy is -5400.9904865734 kJ/mol
+Lattice Parameter a = 4.19696432 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+-2.5094E-02
+|   43 | Accept |      5.5892 |      113.94 |       1.963 |       1.963 |      0.18483 |      0.23904 |       486.92 |       434.15 |       49.499 |
+|   44 | Accept |      8.2092 |       0.163 |       1.963 |       1.963 |      0.11488 |      0.25873 |       205.56 |       537.21 |       26.951 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -922.275       -2.232                                         
+    1      4     -9129.47            0            1         -349     2.46e+04   
+    2     11     -9219.98     -0.06875       0.0312    -2.42e+04     1.18e+04   
+    3     13     -9426.52      -0.0462            1    -1.18e+04      5.9e+03   
+    4     15     -9451.07     -0.02373            1     -5.9e+03     4.69e+03   
+    5     17     -9469.68     -0.03367            1    -4.69e+03          728   
+    6     19     -9470.22     -0.03234            1         -728         74.6   
+    7     21     -9470.23     -0.03218            1        -74.6         1.46   
+    8     23     -9470.23     -0.03219            1        -1.46     0.000386   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:05:33
+Final Optimized Energy is -9470.2263661892 kJ/mol
+Lattice Parameter a = 2.87394556 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+3.8644E-04
+|   45 | Accept |      7.3914 |      333.47 |       1.963 |       1.963 |      0.16886 |      0.12202 |       781.24 |       827.38 |       44.073 |
+|   46 | Accept |      21.436 |     0.14755 |       1.963 |       1.963 |      0.35149 |      0.14212 |       874.42 |       739.97 |       14.075 |
+|   47 | Accept |      10.164 |     0.14419 |       1.963 |       1.963 |       0.2849 |      0.19769 |       439.22 |       925.79 |       26.743 |
+|   48 | Accept |      19.879 |     0.13435 |       1.963 |       1.963 |       0.2965 |      0.32111 |       423.91 |       471.57 |       8.1732 |
+|   49 | Accept |      7.1647 |     0.14094 |       1.963 |       1.963 |      0.21562 |      0.20519 |       384.26 |       653.94 |       44.206 |
+|   50 | Accept |       9.221 |     0.12841 |       1.963 |       1.963 |       0.3899 |       0.2062 |       196.39 |       738.25 |       29.177 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -949.712       -2.232                                         
+    1      5     -1456.93       -1.116          0.5         -388     5.01e+03   
+    2      9     -1539.43       -1.373         0.25    -4.63e+03     1.02e+03   
+    3     11     -1585.48       -1.327            1    -1.02e+03          934   
+    4     15     -1642.97       -1.205         0.25         -934          393   
+    5     17     -1643.96       -1.241            1         -393          279   
+    6     19     -1646.43       -1.226            1         -279         42.4   
+    7     21     -1646.48       -1.223            1        -42.4         5.82   
+    8     23     -1646.48       -1.224            1        -5.82        0.105   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:19
+Final Optimized Energy is -1646.4822414627 kJ/mol
+Lattice Parameter a = 4.55884531 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+1.0515E-01
+|   51 | Best   |      1.6368 |      80.135 |      1.6368 |      1.6368 |      0.12442 |      0.33271 |       427.84 |       12.484 |       42.235 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -816.638       -2.232                                         
+    1      4     -2185.07            0            1         -199     2.07e+03   
+Active inequalities (to within options.ConstraintTolerance = 1e-06):
+  lower      upper     ineqlin   ineqnonlin
+    1                                 
+
+<a href = "matlab: helpview('optim','local_min_poss_with_constr','CSHelpWindow');">Local minimum possible. Constraints satisfied</a>.
+
+fmincon stopped because the <a href = "matlab: helpview('optim','norm_search_direction','CSHelpWindow');">size of the current search direction</a> is less than
+twice the value of the <a href = "matlab: helpview('optim','step_size_tol','CSHelpWindow');">step size tolerance</a> and constraints are 
+satisfied to within the value of the <a href = "matlab: helpview('optim','constraint_tolerance','CSHelpWindow');">constraint tolerance</a>.
+
+<<a href = "matlab: createExitMsg({'optimlib:nlconst:Exit4basic','fmincon'},{'optimlib:nlconst:Exit4detailed','0.000000e+00','1.000000e-10','0.000000e+00','1.000000e-06'},true,true);;">stopping criteria details</a>>
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:05
+Final Optimized Energy is -2185.0724193711 kJ/mol
+Lattice Parameter a = 2.82842712 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+2.2633E+03
+|   52 | Accept |      2.6038 |      65.476 |      1.6368 |      1.6368 |      0.10904 |       0.1075 |       628.55 |       70.963 |       49.967 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -816.411       -2.232                                         
+    1      4     -2159.07            0            1         -199      1.9e+03   
+Active inequalities (to within options.ConstraintTolerance = 1e-06):
+  lower      upper     ineqlin   ineqnonlin
+    1                                 
+
+<a href = "matlab: helpview('optim','local_min_poss_with_constr','CSHelpWindow');">Local minimum possible. Constraints satisfied</a>.
+
+fmincon stopped because the <a href = "matlab: helpview('optim','norm_search_direction','CSHelpWindow');">size of the current search direction</a> is less than
+twice the value of the <a href = "matlab: helpview('optim','step_size_tol','CSHelpWindow');">step size tolerance</a> and constraints are 
+satisfied to within the value of the <a href = "matlab: helpview('optim','constraint_tolerance','CSHelpWindow');">constraint tolerance</a>.
+
+<<a href = "matlab: createExitMsg({'optimlib:nlconst:Exit4basic','fmincon'},{'optimlib:nlconst:Exit4detailed','0.000000e+00','1.000000e-10','0.000000e+00','1.000000e-06'},true,true);;">stopping criteria details</a>>
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:00:59
+Final Optimized Energy is -2159.0712170820 kJ/mol
+Lattice Parameter a = 2.82842712 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+2.0995E+03
+|   53 | Accept |       2.565 |      59.622 |      1.6368 |      1.6368 |        0.166 |      0.10139 |       103.85 |       5.6537 |       30.296 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2       4441.3       -2.232                                         
+{Operation terminated by user during <a href="matlab:matlab.internal.language.introspective.errorDocCallback('distcomp.remoteparfor/getCompleteIntervals', 'C:\Program Files\MATLAB\R2021a\toolbox\parallel\distcomp\+distcomp\remoteparfor.m', 379)" style="font-weight:bold">distcomp.remoteparfor/getCompleteIntervals</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\parallel\distcomp\+distcomp\remoteparfor.m',379,0)">line 379</a>)
+
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('parallel_function>distributed_execution', 'C:\Program Files\MATLAB\R2021a\toolbox\matlab\lang\parallel_function.m', 741)" style="font-weight:bold">parallel_function>distributed_execution</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\matlab\lang\parallel_function.m',741,0)">line 741</a>)
+        [tags, out] = P.getCompleteIntervals(chunkSize);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('parallel_function', 'C:\Program Files\MATLAB\R2021a\toolbox\matlab\lang\parallel_function.m', 573)" style="font-weight:bold">parallel_function</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\matlab\lang\parallel_function.m',573,0)">line 573</a>)
+    R = distributed_execution(...
+
+In parfinitedifferences
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('nlconst', 'C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\nlconst.m', 348)" style="font-weight:bold">nlconst</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\nlconst.m',348,0)">line 348</a>)
+                    parfinitedifferences(XOUT,lb,ub,f, ...
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('fmincon', 'C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\fmincon.m', 811)" style="font-weight:bold">fmincon</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\fmincon.m',811,0)">line 811</a>)
+        nlconst(funfcn,X,l,u,full(A),B,full(Aeq),Beq,confcn,options,defaultopt, ...
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Structure_Minimization', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m', 522)" style="font-weight:bold">Structure_Minimization</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m',522,0)">line 522</a>)
+    [lattice_params,E,~,~,~,Gradient,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('LiX_Minimizer', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m', 1126)" style="font-weight:bold">LiX_Minimizer</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m',1126,0)">line 1126</a>)
+        Settings.Minimization_Data{idx} = Structure_Minimization(Settings,...
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_LiX_Parameters>@(x)LiX_Minimizer(Model,x)', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m', 162)" style="font-weight:bold">Bayesian_Optimize_LiX_Parameters>@(x)LiX_Minimizer(Model,x)</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',162,0)">line 162</a>)
+    fun = @(x)LiX_Minimizer(Model,x);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/callObjNormally', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2636)" style="font-weight:bold">BayesianOptimization_priv/callObjNormally</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2636,0)">line 2636</a>)
+                        Objective = this.ObjectiveFcn(conditionalizeX(this, X));
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/callObjFcn', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 467)" style="font-weight:bold">BayesianOptimization_priv/callObjFcn</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',467,0)">line 467</a>)
+                    = callObjNormally(this, X);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/runSerial', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2050)" style="font-weight:bold">BayesianOptimization_priv/runSerial</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2050,0)">line 2050</a>)
+                    ObjectiveFcnObjectiveEvaluationTime, ObjectiveNargout] = callObjFcn(this, this.XNext);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/run', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 1998)" style="font-weight:bold">BayesianOptimization_priv/run</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',1998,0)">line 1998</a>)
+                this = runSerial(this);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 457)" style="font-weight:bold">BayesianOptimization_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',457,0)">line 457</a>)
+            this = run(this);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('bayesopt_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m', 323)" style="font-weight:bold">bayesopt_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m',323,0)">line 323</a>)
+Results = BayesianOptimization_priv(Options);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_LiX_Parameters', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m', 343)" style="font-weight:bold">Bayesian_Optimize_LiX_Parameters</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',343,0)">line 343</a>)
+                results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',true,...
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_Local_Submit', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_Local_Submit.m', 126)" style="font-weight:bold">Bayesian_Optimize_Local_Submit</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_Local_Submit.m',126,0)">line 126</a>)
+    Bayesian_Optimize_LiX_Parameters(Model)
+} 

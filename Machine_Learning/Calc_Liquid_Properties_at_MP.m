@@ -478,7 +478,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         error(['Warning: Unknown theory type: "' Settings.Theory '".'])
     end
     
-    if Settings.MDP.Disp_Correction && ~Settings.Table_Req
+    if Settings.MDP.Disp_Correction && ~Table_Req
         MDP_Template = [MDP_Template newline newline ...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
