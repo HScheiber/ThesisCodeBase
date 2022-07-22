@@ -7,6 +7,14 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
         mkdir(WorkDir)
     end
     
+    % Generate unit cell
+    
+    % Unit Cell Filename
+    Settings.JobName = [Settings.Theory '_TestModel'];
+    Settings.UnitCellFile = fullfile(Settings.WorkDir,[Settings.JobName '_UnitCell.' Settings.CoordType]);
+    
+    
+    
     % Generate a box with the structure of interest containing the smallest
     % possible number of atoms for the given cutoff, plus a buffer in case of contraction
     La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
@@ -17,9 +25,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     Nb = ceil(Lb/(Settings.Geometry.b/10));
     Nc = ceil(Lc/(Settings.Geometry.c/10));
     
-    SuperCell_File = fullfile(WorkDir,['Equil_Sol.' Settings.CoordType]);
+    SuperCellFile = fullfile(WorkDir,['Equil_Sol.' Settings.CoordType]);
     Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
-         ' -o ' windows2unix(SuperCell_File) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
+         ' -o ' windows2unix(SuperCellFile) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
     [errcode,output] = system(Supercell_command);
     
     if errcode ~= 0
@@ -75,7 +83,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     fclose(fidMDP);
     
     % Complete a topology file for the liquid box to be minimized
-    Atomlist = copy_atom_order(SuperCell_File);
+    Atomlist = copy_atom_order(SuperCellFile);
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
     Top_Filename = fullfile(WorkDir,'Equil_Sol.top');
     
@@ -88,7 +96,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     MDPout_File = fullfile(WorkDir,'Equil_Sol_out.mdp');
     GrompLog_File = fullfile(WorkDir,'Equil_Sol_Grompplog.log');
     
-    FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(SuperCell_File) ...
+    FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(SuperCellFile) ...
         ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
         ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
         ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
