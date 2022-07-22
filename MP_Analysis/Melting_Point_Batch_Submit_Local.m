@@ -46,8 +46,8 @@ Experiment = Load_Experimental_Data;
 % JobStuff = {{'LiF' 'JC' 'FiveFive' 1336.8 '5-5'} ...
 %             {'LiBr' 'TF' 'Rocksalt' 802.9 'Liquid'} ...
 %             {'NaCl' 'TF' 'Rocksalt' 1081.4 'Liquid'} ...
-%             {'CsCl' 'TF' 'Rocksalt' 1179.9 'Rocksalt'}};
-JobStuff = {{'CsCl' 'TF' 'Rocksalt' 1179.9 'Rocksalt'}};
+%             {'CsCl' 'TF' 'Rocksalt' 1179.9 'Liquid'}};
+JobStuff = {{'NaCl' 'TF' 'Rocksalt' 1081.4 'Liquid'}};
 for jdx = 1:length(JobStuff)
     Salt = JobStuff{jdx}{1};
     Theory = JobStuff{jdx}{2};
@@ -130,4 +130,5 @@ for idx = 1:length(Settings_array)
     Settings = Settings_array(idx);
     setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
     Find_Melting_Point(Settings);
+    %save('Prod2_R_TF_NPT.inp','Settings','-mat')
 end
