@@ -580,7 +580,8 @@ else
     Output.FC_Halide = Def_Crystal.FC_Halide;
 end
 
-% Calculate volume in Ang^3/Formula unit
+% Calculate volume in Ang^3/Formula unit based on the current unit cell
+% (may be conventional or primitive)
 TM = Settings.Geometry.Transform.*[Settings.Geometry.a; Settings.Geometry.b; Settings.Geometry.c];
 a_vec = TM(1,:);
 b_vec = TM(2,:);
@@ -625,7 +626,7 @@ if Settings.MinMDP.Parallel_Min
     setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
     setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
     setenv('KMP_AFFINITY',env.KMP_AFFINITY);
-    delete(gcp('nocreate'));
+    %delete(gcp('nocreate'));
 end
 
 end

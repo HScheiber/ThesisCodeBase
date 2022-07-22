@@ -1090,6 +1090,36 @@ if Settings.Parallel_LiX_Minimizer
     end
 %% Serial mode    
 else
+    
+%     if Settings.Parallel_Struct_Min
+%         % Set up matlab parallel features
+%         PrefCores = feature('numcores');
+%         if ~isempty(gcp('nocreate'))
+%             Cur_Pool = gcp;
+%             Cur_Workers = Cur_Pool.NumWorkers;
+% 
+%             % Start the parallel pool
+%             if Cur_Workers ~= PrefCores
+%                 delete(Cur_Pool);
+%                 % Create a "local" cluster object
+%                 local_cluster = parcluster('local');
+% 
+%                 % Modify the JobStorageLocation to a temporary directory
+%                 tmp = tempname;
+%                 if ~isfolder(tmp)
+%                     mkdir(tmp)
+%                 end
+%                 local_cluster.JobStorageLocation = tmp;
+% 
+%                 parpool(local_cluster,PrefCores);
+%             else
+%                 % Keep current pool
+%             end
+%         else
+%             parpool(PrefCores);
+%         end
+%     end
+    
     for idx = 1:N
         Settings.Structure = Settings.Structures{idx};
         
@@ -1125,8 +1155,14 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
         V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
         
-        if V_Model_Mismatch > Settings.MaxVModelMismatch
-            Loss_add = Loss_add + log(1 + V_Model_Mismatch*Settings.BadFcnLossPenalty);
+        LE_model = Settings.Minimization_Data{strmatch}.E;
+        LE_exp = Settings.Finite_T_Data.Exp_Solid_LE;
+        E_Model_Mismatch = abs((LE_model - LE_exp)/LE_exp);
+        
+        Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+        
+        if Model_Mismatch > Settings.MaxModelMismatch
+            Loss_add = Loss_add + log(1 + Model_Mismatch);
             skip_finite_T = true;
         end
         Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3));
@@ -1140,6 +1176,11 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume] > tol) ...
         && ~skip_finite_T
+    
+    if ~isempty(gcp('nocreate'))
+        delete(gcp);
+    end
+    
     Output = Calc_Liquid_Properties_at_MP(Settings);
     Settings.Finite_T_Data;
 end
@@ -1149,11 +1190,19 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Solid_MP_Volume] > tol) ...
         && ~skip_finite_T
+    if ~isempty(gcp('nocreate'))
+        delete(gcp);
+    end
+    
     Settings.Finite_T_Data;
 end
 
 % Melting point
 if Settings.Loss_Options.MP > tol && ~skip_finite_T
+    if ~isempty(gcp('nocreate'))
+        delete(gcp);
+    end
+    
     Settings.Finite_T_Data;
 end
 

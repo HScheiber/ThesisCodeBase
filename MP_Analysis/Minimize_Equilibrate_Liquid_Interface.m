@@ -115,7 +115,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##RCOULOMB##',pad(num2str(MDP.RCoulomb_Cutoff),18));
     MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##RVDW##',pad(num2str(MDP.RVDW_Cutoff),18)); 
     
-    if Settings.Table_Req
+    if Settings.Table_Req || strcmp(Settings.Theory,'BH')
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad('user',18));
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWMOD##',pad(MDP.vdw_modifier,18));
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##CUTOFF##',pad('group',18));
@@ -125,7 +125,11 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
 
         % For minimization, add in a close-range repulsive wall to the
         % potential with the following function
-        TableFile_MX_old = Settings.TableFile_MX;
+        if isfield(Settings,'TableFile_MX')
+            TableFile_MX_old = Settings.TableFile_MX;
+        else
+            TableFile_MX_old = '';
+        end
         Settings.TableFile_MX = MakeTables(Settings);
     else
         % Modify the MDP file

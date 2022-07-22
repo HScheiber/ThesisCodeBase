@@ -99,7 +99,7 @@ Settings.MDP.VerletBT = 0.005; %  (0.005) [kJ mol-1 ps-1]This sets the maximum a
 Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
 Settings.MDP.VDWType = 'Cut-off'; % Define the type of van der waals potential used. One of 'PME' or 'Cut-off'
 Settings.MDP.RList_Cutoff = 1.5; % 1.5 % nm. This should be larger or equal to RCoulomb/RVDW
-Settings.MDP.RCoulomb_Cutoff = 1.4; % nm. if set to less than 0, then Rc = a;
+Settings.MDP.RCoulomb_Cutoff = 1.5; % nm. if set to less than 0, then Rc = a;
 Settings.MDP.RVDW_Cutoff = 1.4; % 1.2 nm. note that rlist ? rCoulomb = RVDW when using Verlet and VerletBT = -1
 Settings.MDP.Fourier_Spacing = 0.12; % used 0.1 in minimization. Default 0.12 nm. Grid dimensions in PME are controlled with fourierspacing
 Settings.MDP.PME_Order = 4; % Interpolation order for PME. 4 equals cubic interpolation (default).
@@ -114,7 +114,7 @@ Settings.Table_Length = 4.01; % How far should tabulated potentials extend in nm
 Settings.CoordType = 'gro'; % Either pdb, gro, or g96 (use g96 for extra precision)
 
 %% Trajectory update/output options: larger number of steps decreases resolution
-Settings.Output_Coords = 5000; % Number of steps between outputting coordinates
+Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
 Settings.Output_Coords_Compressed = 0; % Number of steps between outputting coordinates in compressed format
 Settings.Output_Velocity = 0; % Number of steps between outputting velocities
 Settings.Output_Forces = 0; % Number of steps between outputting forces

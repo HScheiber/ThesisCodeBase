@@ -92,6 +92,9 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
             Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
             Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
+            Models(idx).Equilibrate_Liquid = 20; % ps
+            Models(idx).Output_Coords = 1000;
+            
             
             Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
             Models(idx).SigmaEpsilon = true;

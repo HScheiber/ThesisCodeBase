@@ -22,5 +22,5 @@ function Finite_T_Data = Initialize_Finite_T_Data(Settings)
     Finite_T_Data.Exp_Solid_V_MP = Exp.(Settings.Salt).(Finite_T_Data.Structure).V_mp; % Solid Volume at MP in Ang^3 / Forumla unit
     Finite_T_Data.Exp_MP = Exp.(Settings.Salt).mp; % MP in K
     Finite_T_Data.Exp_Solid_V0 = Exp.(Settings.Salt).(Finite_T_Data.Structure).V_zero;
-    
+    Finite_T_Data.Exp_Solid_LE = Exp.(Settings.Salt).(Finite_T_Data.Structure).E;
 end

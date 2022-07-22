@@ -1,0 +1,468 @@
+
+
+******************************
+Model Input Parameters
+******************************
+                       Submit_Jobs: 1
+                         BatchMode: 1
+                          Continue: 0
+                       JobSettings: [1×1 struct]
+                              Salt: 'LiI'
+                         Structure: 'Rocksalt'
+                     Use_Conv_cell: 1
+                  Liquid_Interface: 0
+                   Liquid_Fraction: 0.5
+                            Theory: 'BH'
+                             Model: ''
+                        WaterModel: 'SPC/E'
+                             JobID: ''
+                           N_atoms: 5000
+                     Cutoff_Buffer: 1.2
+                     Prev_geom_loc: ''
+                    Prev_geom_time: []
+                    Target_Density: []
+                       TF_Paramset: 0
+                        Thermostat: 'v-rescale'
+                          Target_T: 0
+                   Time_Constant_T: 0.2
+                        Nsttcouple: 10
+                               MDP: [1×1 struct]
+                          Barostat: 'Berendsen'
+                          Isotropy: 'isotropic'
+                          Target_P: 1
+                   Time_Constant_P: 1
+                        Nstpcouple: 50
+              ScaleCompressibility: 1
+          UseMoltenCompressibility: 0
+                         Annealing: 'no'
+                   Annealing_Times: []
+                   Annealing_Temps: []
+                      Table_Length: 4.01
+                         CoordType: 'gro'
+                     Output_Coords: 1000
+          Output_Coords_Compressed: 0
+                   Output_Velocity: 0
+                     Output_Forces: 0
+                     Calc_Energies: 100
+                   Output_Energies: 1000
+              Update_NeighbourList: 10
+                 Skip_Minimization: 0
+                   Find_Min_Params: 1
+               Find_Similar_Params: 1
+                        Data_Types: 1
+                            MinMDP: [1×1 struct]
+                  PreEquilibration: 0
+                               pbc: 'on'
+                        GenCluster: 0
+                      Cluster_Frac: 0.5
+                         Expand_LP: 1
+                     Thermal_Solid: 0
+                       Expand_a_SC: 1
+                       Expand_b_SC: 1
+                       Expand_c_SC: 1
+                          Expand_a: 1
+                          Expand_b: 1
+                          Expand_c: 1
+                          c_over_a: 1
+                        Manual_Box: 0
+                      Manual_Box_a: 1
+                      Manual_Box_b: 1
+                      Manual_Box_c: 1
+                     Manual_Radius: 1
+                     Delete_MDPout: 0
+                      Delete_MDlog: 0
+                    Delete_ConfOut: 0
+                        Delete_TPR: 0
+                    Delete_Backups: 1
+                   Delete_Minimize: 0
+                      Delete_Equil: 1
+                    Delete_outputs: 0
+                      Delete_subms: 0
+                        Delete_cpt: 1
+                           MaxWarn: 1
+                     Top_gen_pairs: 'no'
+                       Top_fudgeLJ: 1
+                       Top_fudgeQQ: 1
+                    Table_StepSize: 0.0005
+                              home: 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase'
+                           project: 'C:\Users\Hayden\Documents\Patey_Lab'
+                          computer: 'unbearabull'
+                             slurm: 0
+                         BO_Models: 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models'
+                              qsub: ''
+                           passlog: ' ^&^> '
+                              pipe: '^|'
+                               wsl: 'wsl source ~/.bashrc; '
+                        MLModelDir: 'C:\Users\Hayden\Documents\Patey_Lab\Machine_Learning_Structure_Finder\LiX_Structure_Selector_Optimization'
+            Project_Directory_Name: 'Melting_Point_Studies'
+                         CheckTime: 25
+                      MaxCheckTime: 1000
+                                T0: 800
+                                lb: 500
+                                ub: 2000
+               MeltFreezeThreshold: 0.25
+                    SlopeThreshold: 0.0001
+                   MaxMPIterations: 10
+                     StepTolerance: 0
+                          MaxTDiff: 1
+               FinalDensityProfile: 1
+                  Delete_T_History: 0
+                 Equilibrate_Solid: 0
+                Equilibrate_Liquid: 20
+                 MinInterfaceWidth: 0.075
+                      RefStructure: 'Liquid'
+                         Optimizer: 'MPSearcher'
+                  ExplorationRatio: 2
+              Acquisition_Function: 'expected-improvement-plus'
+                     N_Seed_Points: 2
+                    KernelFunction: 'ardmatern52'
+                   InitialMeshSize: 100
+                MeshSizeMultiplier: 2
+                 FunctionTolerance: 0
+                  BracketThreshold: 5
+                       MinStepSize: 1
+            UseDerivativeWeighting: 0
+                      IgnoreBounds: 0
+                  RunPostProcessor: 1
+                    SaveTrajectory: 1
+              SavePredictionsImage: 1
+                      SaveFeatures: 0
+                   SavePredictions: 0
+                     ML_TimeLength: 21
+                       ML_TimeStep: 5
+                      TimePerFrame: 5
+                                 S: [1×1 struct]
+                           CR_Damp: [1×1 struct]
+                           C6_Damp: [1×1 struct]
+                        GAdjust_MX: [0 0 1]
+                        GAdjust_MM: [0 0 1]
+                        GAdjust_XX: [0 0 1]
+                          Trial_ID: 'XX1'
+                        Structures: {'Rocksalt'}
+               Restart_Calculation: 1
+                        Fix_Charge: 1
+                        Additivity: 1
+                Additional_MM_Disp: 0
+                      SigmaEpsilon: 1
+               Additional_Function: [1×1 struct]
+                         Fix_Alpha: 0
+                            Fix_C8: 0
+                        SDMM_Range: [0 1000]
+                        SDXX_Range: [0 40]
+                        SDMX_Range: [0 40]
+                       SDMM2_Range: [0 1000]
+                       SD6MM_Range: [0 1000]
+                       SD6XX_Range: [0 10]
+                       SD6MX_Range: [0 100]
+                       SD8MM_Range: [0 1000]
+                       SD8XX_Range: [0 20]
+                       SD8MX_Range: [0 200]
+                      SRTFMM_Range: [0.1 500]
+                      SRTFXX_Range: [0.1 20]
+                      SRTFMX_Range: [0.1 20]
+                        SAMM_Range: [0.1 10]
+                        SAXX_Range: [0.1 5]
+                        SAMX_Range: [0.1 5]
+                        SRMM_Range: [0.3 10]
+                        SRXX_Range: [0.3 5]
+                        SRMX_Range: [0.3 5]
+                       Sr0MM_Range: [0.1 0.4]
+                       Sr0XX_Range: [0.1 0.5]
+                       Sr0MX_Range: [0.1 0.5]
+                      SepsMM_Range: [0 1000]
+                      SepsXX_Range: [0 1000]
+                      SepsMX_Range: [0 1000]
+                      SgamMM_Range: [1 6.85714285714286]
+                      SgamXX_Range: [1 6.85714285714286]
+                      SgamMX_Range: [1 6.85714285714286]
+                    SgamMM_RangeBH: [6 50]
+                    SgamXX_RangeBH: [6 50]
+                    SgamMX_RangeBH: [6 50]
+                           Q_Range: [0.95 1.05]
+                           Q_value: 1
+                Additional_GAdjust: {}
+         Additional_GAdjust_Ranges: {}
+                            C6Damp: [1×1 struct]
+                            CRDamp: [1×1 struct]
+                  Extra_Properties: 1
+                      Loss_Options: [1×1 struct]
+                       CheckBadFcn: 1
+                  MinExpWallHeight: 100
+                   MaxRepWellDepth: 0
+                  MaxModelMismatch: 0.75
+                 BadFcnLossPenalty: 100
+                  initial_opt_type: 'bayesopt'
+           Max_Bayesian_Iterations: 800
+                MinSurrogatePoints: 20
+                 MinSampleDistance: 0.1
+                         ShowPlots: 1
+                   second_opt_type: 'bayesopt'
+          Max_Secondary_Iterations: 200
+    Secondary_Acquisition_Function: 'lower-confidence-bound'
+        ExplorationRatio_Secondary: 1
+           SecondaryKernelFunction: 'ardmatern52'
+              Max_Local_Iterations: 1000
+                       MaxFunEvals: 100
+                  Loss_Convergence: 1e-06
+                 Param_Convergence: 0.001
+                    final_opt_type: 'fminsearchbnd'
+                  switch_final_opt: 1
+            Parallel_LiX_Minimizer: 0
+               Parallel_Struct_Min: 1
+                 Parallel_Bayesopt: 0
+                             Metal: 'Li'
+                            Halide: 'I'
+                    Longest_Cutoff: 1.5
+                               gmx: 'wsl source ~/.bashrc; gmx_d'
+                           gmx_loc: 'wsl source ~/.bashrc; gmx_d'
+                        mdrun_opts: ' -v -ntmpi 8'
+
+******************************
+Structures:
+    {'Rocksalt'}
+
+Loss Function
+******************************
+Regularization: L2
+Reference Rocksalt Energy: Born-Haber Experimental
+Reference Rocksalt/Wurtzite Parameters: Experiment
+Enthalpy of Fusion at Experimental MP - Weight: 1
+Volume Change of Fusion at Experimental MP - Weight: 1
+Liquid Volume at Experimental MP - Weight: 1
+Solid Volume at Experimental MP - Weight: 1
+Melting Point - Weight: 1
+Rocksalt Absolute Lattice Energy - Weight: 1
+Rocksalt Lattice Parameter a - Weight: 1
+******************************
+******************************
+No checkpoint files found. Starting new calculation.
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -1836.08       -2.232                                         
+    1     13     -1836.11       -2.227      0.00195        -40.2         84.7   
+    2     15     -1836.13       -2.229            1        -24.6        0.358   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:00:47
+Final Optimized Energy is -1836.1319073532 kJ/mol
+Lattice Parameter a = 5.98056044 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+3.5786E-01
+<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m',1162,1)">1162 </a>        Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+V_Model_Mismatch
+
+V_Model_Mismatch =
+
+        0.0121314590637927
+
+V0_model
+
+V0_model =
+
+          53.4768304758786
+
+V0_exp
+
+V0_exp =
+
+          52.8358544702719
+
+E_Model_Mismatch
+
+E_Model_Mismatch =
+
+          1.40174219405259
+
+log(1 + Model_Mismatch)
+{Unrecognized function or variable 'Model_Mismatch'.
+} 
+Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch)
+
+Model_Mismatch =
+
+          1.40174219405259
+
+Settings.MaxModelMismatch
+
+ans =
+
+                      0.75
+
+log(1 + Model_Mismatch)
+
+ans =
+
+         0.876194388194214
+
+Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch)
+
+Model_Mismatch =
+
+          1.40174219405259
+
+if system_dependent('IsDebugMode')==1, dbcont; end
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -1836.08       -2.232                                         
+    1     13     -1836.11       -2.227      0.00195        -40.2         84.7   
+    2     15     -1836.13       -2.229            1        -24.6        0.358   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:00:50
+Final Optimized Energy is -1836.1319073532 kJ/mol
+Lattice Parameter a = 5.98056044 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+3.5786E-01
+V_Model_Mismatch
+
+V_Model_Mismatch =
+
+        0.0121314590637927
+
+E_Model_Mismatch
+
+E_Model_Mismatch =
+
+          1.40174219405259
+
+if system_dependent('IsDebugMode')==1, dbcont; end
+|==================================================================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|==================================================================================================================================================|
+|    1 | Best   |       1.963 |      78.554 |       1.963 |       1.963 |      0.25225 |      0.35437 |       169.04 |       75.108 |       39.541 |
+|    2 | Accept |      9.8403 |     0.15315 |       1.963 |       1.963 |      0.34698 |      0.35187 |       374.33 |       3.3562 |       13.638 |
+|    3 | Accept |      19.085 |     0.15636 |       1.963 |       1.963 |       0.3968 |      0.16983 |       329.66 |       431.04 |       15.351 |
+|    4 | Accept |      10.358 |     0.15937 |       1.963 |       1.963 |      0.23558 |      0.12813 |       604.91 |       247.64 |       11.343 |
+|    5 | Accept |      10.958 |     0.14674 |       1.963 |       1.963 |      0.15439 |      0.43444 |       296.69 |       745.16 |       23.908 |
+|    6 | Accept |      20.822 |     0.14181 |       1.963 |       1.963 |      0.36182 |      0.48989 |       924.23 |       440.55 |       49.855 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -894.306       -2.232                                         
+    1      4     -4750.25            0            1         -310     2.51e+04   
+    2     10     -5616.24      -0.1378       0.0625    -2.48e+04     4.01e+03   
+    3     12     -5678.96      -0.1186            1    -4.01e+03     2.45e+03   
+    4     14     -5703.34     -0.08848            1    -2.45e+03     1.08e+03   
+    5     16     -5707.42     -0.09766            1    -1.08e+03          161   
+    6     18     -5707.52     -0.09647            1         -161         8.58   
+    7     20     -5707.52      -0.0964            1        -8.58       0.0738   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:04:23
+Final Optimized Energy is -5707.5188263669 kJ/mol
+Lattice Parameter a = 2.96475704 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+-7.3762E-02
+<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m',1162,1)">1162 </a>        Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+V_Model_Mismatch
+
+V_Model_Mismatch =
+
+         0.876695592049784
+
+E_Model_Mismatch
+
+E_Model_Mismatch =
+
+          6.46568845829551
+
+log(1 + Model_Mismatch)
+{Unrecognized function or variable 'Model_Mismatch'.
+} 
+Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch)
+
+Model_Mismatch =
+
+          6.46568845829551
+
+log(1 + Model_Mismatch)
+
+ans =
+
+          2.01031765156061
+
+if system_dependent('IsDebugMode')==1, dbcont; end
+|    7 | Accept |      5.7729 |      299.85 |       1.963 |       1.963 |      0.18217 |      0.12589 |       508.09 |       185.96 |       23.506 |
+|    8 | Accept |      21.169 |     0.15837 |       1.963 |       1.963 |       0.2863 |      0.30236 |       818.43 |       847.78 |       33.878 |
+|    9 | Accept |      22.011 |     0.14661 |       1.963 |       1.963 |      0.30358 |      0.22432 |       981.61 |        864.8 |       8.2354 |
+|   10 | Accept |      21.103 |     0.13704 |       1.963 |       1.963 |      0.27443 |       0.1586 |       693.04 |       738.19 |       12.854 |
+|   11 | Accept |      9.7924 |     0.14047 |       1.963 |       1.963 |      0.27187 |      0.25746 |       173.11 |       682.65 |       29.093 |
+|   12 | Accept |      10.036 |     0.13966 |       1.963 |       1.963 |      0.13259 |      0.47145 |       654.82 |       1.5264 |       15.974 |
+|   13 | Accept |      8.5182 |     0.13952 |       1.963 |       1.963 |       0.3424 |      0.38005 |       38.137 |       380.27 |       45.881 |
+|   14 | Accept |      21.779 |     0.13683 |       1.963 |       1.963 |      0.26654 |      0.48225 |       699.46 |        861.6 |       9.6657 |
+|   15 | Accept |      6.3267 |     0.14127 |       1.963 |       1.963 |      0.25792 |      0.16353 |       273.72 |       817.74 |       28.812 |
+|   16 | Accept |       10.94 |     0.14375 |       1.963 |       1.963 |      0.32738 |      0.32923 |        176.5 |       951.01 |       45.104 |
+|   17 | Accept |      5.5246 |     0.14675 |       1.963 |       1.963 |      0.17844 |      0.44773 |       528.56 |       277.26 |       35.604 |
+|   18 | Accept |      18.299 |     0.14546 |       1.963 |       1.963 |      0.18217 |      0.38258 |       774.37 |       510.89 |       33.535 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -2775.63       -2.232                                         
+    1      6      -4058.8       -1.674         0.25    -2.92e+03     9.01e+03   
+    2     10     -4255.37       -1.768         0.25    -6.09e+03          792   
+    3     12     -4261.38       -1.757            1         -792          308   
+    4     14     -4262.34        -1.75            1         -308           32   
+    5     16     -4262.35       -1.751            1          -32         1.07   
+    6     18     -4262.35       -1.751            1        -1.07      0.00175   
+
+fmincon stopped by the <a href = "matlab: helpview('optim','msg_output_function','CSHelpWindow');">output or plot function</a>.
+
+Completed: LiI Rocksalt BH Geometry Optimization. Time 00:01:05
+Final Optimized Energy is -4262.3536316329 kJ/mol
+Lattice Parameter a = 5.30450813 Å.
+Fractional Coordinates for Li: 
+0.25000000 0.25000000 0.25000000
+Fractional Coordinates for I: 
+0.75000000 0.75000000 0.75000000
+Components of Final Gradient:
+1.7506E-03
+<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m',1162,1)">1162 </a>        Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+if system_dependent('IsDebugMode')==1, dbcont; end
+Model_Mismatch
+
+Model_Mismatch =
+
+          4.57534811201163
+
+LE_model
+
+LE_model =
+
+         -4262.35363163289
+
+if system_dependent('IsDebugMode')==1, dbcont; end
+|   19 | Accept |      4.8069 |      77.921 |       1.963 |       1.963 |      0.38377 |      0.12858 |       231.72 |       327.44 |       35.459 |
+|   20 | Accept |      19.601 |     0.16762 |       1.963 |       1.963 |      0.17651 |      0.23368 |       857.72 |       863.92 |       39.607 |
+|==================================================================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|==================================================================================================================================================|
+|   21 | Accept |      9.8963 |     0.14729 |       1.963 |       1.963 |      0.37971 |      0.17701 |       529.01 |       19.899 |        28.82 |
+Beginning LiI Rocksalt BH Optimization...
+
+                                Max     Line search  Directional  First-order 
+ Iter F-count        f(x)   constraint   steplength   derivative   optimality Procedure 
+    0      2     -970.538       -2.232                                         
+    1      5     -2089.81       -1.116          0.5         -418     1.75e+03   

@@ -7,8 +7,8 @@
 % Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
-Theory = 'BH';
-Basenum = 'G';
+Theory = 'TF';
+Basenum = 'H';
 Midnum = 'A';
 savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
@@ -161,7 +161,7 @@ if Target_Experimental_Energies || Target_Experimental_latpar
             DFT.(Salt).Rocksalt.c = EXP.(Salt).Rocksalt.c_zero;
             DFT.(Salt).Rocksalt.V = EXP.(Salt).Rocksalt.V_zero;
             DFT.(Salt).Rocksalt.density = EXP.(Salt).Rocksalt.density_zero;
-            if ~isnan(EXP.(Salt).Wurtzite.a)
+            if isfield(EXP.(Salt),'Wurtzite') && ~isnan(EXP.(Salt).Wurtzite.a)
                 DFT.(Salt).Wurtzite.a = EXP.(Salt).Wurtzite.a_zero;
                 DFT.(Salt).Wurtzite.b = EXP.(Salt).Wurtzite.b_zero;
                 DFT.(Salt).Wurtzite.c = EXP.(Salt).Wurtzite.c_zero;
@@ -174,7 +174,7 @@ if Target_Experimental_Energies || Target_Experimental_latpar
             DFT.(Salt).Rocksalt.c = EXP.(Salt).Rocksalt.c;
             DFT.(Salt).Rocksalt.V = EXP.(Salt).Rocksalt.V;
             DFT.(Salt).Rocksalt.density = EXP.(Salt).Rocksalt.density;
-            if ~isnan(EXP.(Salt).Wurtzite.a)
+            if isfield(EXP.(Salt),'Wurtzite') && ~isnan(EXP.(Salt).Wurtzite.a)
                 DFT.(Salt).Wurtzite.a = EXP.(Salt).Wurtzite.a;
                 DFT.(Salt).Wurtzite.b = EXP.(Salt).Wurtzite.b;
                 DFT.(Salt).Wurtzite.c = EXP.(Salt).Wurtzite.c;

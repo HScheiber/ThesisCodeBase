@@ -43,9 +43,9 @@ Settings.SRXX_Range = [0.3 5]; % Default range for XX repulsive prefactor scalin
 Settings.SRMX_Range = [0.3 5]; % Default range for MX repulsive prefactor scaling in JC/BH model.
 
 % Exp-C6 or Exp-C6-C8: "sigma-epsilon" version parameters
-Settings.Sr0MM_Range = [0.1 0.2];  % [nm] Default range for MM r0 parameter
-Settings.Sr0XX_Range = [0.1 0.25]; % [nm] Default range for XX r0 parameter
-Settings.Sr0MX_Range = [0.1 0.25]; % [nm] Default range for MX r0 parameter
+Settings.Sr0MM_Range = [0.1 0.4];  % [nm] Default range for MM r0 parameter
+Settings.Sr0XX_Range = [0.1 0.5]; % [nm] Default range for XX r0 parameter
+Settings.Sr0MX_Range = [0.1 0.5]; % [nm] Default range for MX r0 parameter
 
 Settings.SepsMM_Range = [0 1000]; % [kJ/mol] Default range for MM epsilon parameter
 Settings.SepsXX_Range = [0 1000]; % [kJ/mol] Default range for XX epsilon parameter
@@ -54,9 +54,9 @@ Settings.SepsMX_Range = [0 1000]; % [kJ/mol] Default range for MX epsilon parame
 Settings.SgamMM_Range = [1 48/7]; % [Unitless] Default range for MM gamma parameter in TF models
 Settings.SgamXX_Range = [1 48/7]; % [Unitless] Default range for XX gamma parameter in TF models
 Settings.SgamMX_Range = [1 48/7]; % [Unitless] Default range for MX gamma parameter in TF models
-Settings.SgamMM_RangeBH = [6 30]; % [Unitless] Default range for MM gamma parameter in BH models
-Settings.SgamXX_RangeBH = [6 30]; % [Unitless] Default range for XX gamma parameter in BH models
-Settings.SgamMX_RangeBH = [6 30]; % [Unitless] Default range for MX gamma parameter in BH models
+Settings.SgamMM_RangeBH = [6 50]; % [Unitless] Default range for MM gamma parameter in BH models
+Settings.SgamXX_RangeBH = [6 50]; % [Unitless] Default range for XX gamma parameter in BH models
+Settings.SgamMX_RangeBH = [6 50]; % [Unitless] Default range for MX gamma parameter in BH models
 
 Settings.Q_Range = [0.95 1.05]; % Default range for charge scaling. Only meaningful when Fix_Charge = false
 Settings.Q_value = 1.0; % Default value for the charge scale. Only meaningful when Fix_Charge = true
@@ -91,8 +91,8 @@ Settings.Loss_Options = init_loss_options; % default loss options
 Settings.CheckBadFcn = true; % Switch to turn on or off the checking of pathological functions, adding a loss penalty for such functions
 Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
-Settings.MaxVModelMismatch = 0.25; % [Fraction] This is the maximum allowed mismatch for the experimental vs model volume before a loss penalty is applied and finite T calculations are skipped
-Settings.BadFcnLossPenalty = 1000; % Penalty to give when function shape is deemed pathological
+Settings.MaxModelMismatch = 0.75; % [Fraction] This is the maximum allowed mismatch for the experimental vs model volume or energy before a loss penalty is applied and finite T calculations are skipped
+Settings.BadFcnLossPenalty = 100; % Penalty to give when function shape is deemed pathological
 
 % Intial optimization settings
 Settings.initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'

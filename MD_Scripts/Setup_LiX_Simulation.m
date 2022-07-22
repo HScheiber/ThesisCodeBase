@@ -248,7 +248,7 @@ elseif contains(Settings.Theory,'BH')
 
     % Modify the MDP file
     MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
-    MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad(Settings.MDP.CutOffScheme,18));
+    MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad('group',18));
     MDP_Template = regexprep(MDP_Template,'energygrp-table.+?\n','');
     MDP_Template = regexprep(MDP_Template,'ewald-rtol-lj.+?\n','');
     MDP_Template = regexprep(MDP_Template,'lj-pme-comb-rule.+?\n','');
@@ -256,13 +256,8 @@ elseif contains(Settings.Theory,'BH')
     MDP_Template = strrep(MDP_Template,'##RCOULOMB##',pad(num2str(Settings.MDP.RCoulomb_Cutoff),18));
     MDP_Template = strrep(MDP_Template,'##RVDW##',pad(num2str(Settings.MDP.RVDW_Cutoff),18));
     MDP_Template = strrep(MDP_Template,'##VDWMOD##',pad(Settings.MDP.vdw_modifier,18));
+    MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
     
-    % Add in Verlet Settings
-    if strcmp(Settings.MDP.CutOffScheme,'Verlet')
-        MDP_Template = strrep(MDP_Template,'##VerletBT##',pad(num2str(Settings.MDP.VerletBT),18));
-    else
-        MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
-    end
 else
     error(['Warning: Unknown theory type: "' Settings.Theory '".'])
 end
