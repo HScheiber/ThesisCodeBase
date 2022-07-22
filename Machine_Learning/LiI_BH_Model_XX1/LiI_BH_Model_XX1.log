@@ -2644,3 +2644,14 @@ ans =
 Settings.MDP_Template
 {Unrecognized field name "MDP_Template".
 } 
+if system_dependent('IsDebugMode')==1, dbquit all; end
+clear
+clc
+gitload
+Syncing ~/ThesisCodeBase with github...
+Already up to date.
+Sync Complete.
+open Calc_Liquid_Properties_at_MP.m
+open Calc_Liquid_Properties_at_MP.m
+which Calc_Liquid_Properties_at_MP
+C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Calc_Liquid_Properties_at_MP.m
