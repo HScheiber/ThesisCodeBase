@@ -42,9 +42,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
             
     % Generate a box with the structure of interest containing the smallest
     % possible number of atoms for the given cutoff, plus a buffer in case of contraction
-    La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
-    Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_b; % nm, the minimum box dimension
-    Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_c; % nm, the minimum box dimension
+    La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer*1.25/Settings.Geometry.Skew_a; % nm, the minimum box dimension
+    Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer*1.25/Settings.Geometry.Skew_b; % nm, the minimum box dimension
+    Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer*1.25/Settings.Geometry.Skew_c; % nm, the minimum box dimension
     
     Na = ceil(La/(Settings.Geometry.a/10));
     Nb = ceil(Lb/(Settings.Geometry.b/10));
