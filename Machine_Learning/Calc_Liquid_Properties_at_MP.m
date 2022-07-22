@@ -611,9 +611,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         'SavePredictionsImage',true));
     Liq_Fraction = PyOut{4};
     
-    if PyOut{4} < 0.9
+    if Liq_Fraction < 0.9
+        disp('Detected Liquid Freezing at Experimental MP')
         Output.Liquid_V_MP = nan;
-        Output.Solid_H_MP = nan;
+        Output.Liquid_H_MP = nan;
         return
     end
     
@@ -649,7 +650,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     delete(En_xvg_file) % remove temp output file
 
     Output.Liquid_V_MP = mean(Data(:,2))*(10^3)/nmol_liquid; % A^3 / ion pair
-    Output.Solid_H_MP = mean(Data(:,3))/nmol_liquid; % kJ/mol
+    Output.Liquid_H_MP = mean(Data(:,3))/nmol_liquid; % kJ/mol
 
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)
     % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule

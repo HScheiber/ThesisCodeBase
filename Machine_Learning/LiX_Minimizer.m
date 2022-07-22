@@ -1180,9 +1180,16 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
     if ~isempty(gcp('nocreate'))
         delete(gcp);
     end
-    
-    Output = Calc_Liquid_Properties_at_MP(Settings);
-    Settings.Finite_T_Data;
+%     Finite_T_Data.Fusion_dH = nan;
+%     Finite_T_Data.Fusion_dV = nan;
+%     Finite_T_Data.Liquid_H_MP = nan;
+%     Finite_T_Data.Solid_H_MP = nan;
+%     Finite_T_Data.Liquid_V_MP = nan;
+%     Finite_T_Data.Solid_V_MP = nan;
+%     Finite_T_Data.MP = nan;
+    Liq_Output = Calc_Liquid_Properties_at_MP(Settings);
+    Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
+    Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
 end
 
 % High T solid properties
@@ -1194,7 +1201,16 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         delete(gcp);
     end
     
-    Settings.Finite_T_Data;
+    Sol_Output = Calc_Solid_Properties_at_MP(Settings);
+    Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
+    Settings.Finite_T_Data.Solid_H_MP = Sol_Output.Solid_H_MP;
+    
+    Settings.Finite_T_Data.Fusion_dH = Settings.Finite_T_Data.Liquid_H_MP - ...
+        Settings.Finite_T_Data.Solid_H_MP;
+    
+    Settings.Finite_T_Data.Fusion_dV = Settings.Finite_T_Data.Liquid_V_MP - ...
+        Settings.Finite_T_Data.Solid_V_MP;
+    
 end
 
 % Melting point
@@ -1203,7 +1219,7 @@ if Settings.Loss_Options.MP > tol && ~skip_finite_T
         delete(gcp);
     end
     
-    Settings.Finite_T_Data;
+    Settings.Finite_T_Data.MP = Calc_Model_MP(Settings);
 end
 
 % If skipping the finite_T data, then loss comes through the Loss_add

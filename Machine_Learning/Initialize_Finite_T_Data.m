@@ -9,6 +9,8 @@ function Finite_T_Data = Initialize_Finite_T_Data(Settings)
     
     Finite_T_Data.Fusion_dH = nan;
     Finite_T_Data.Fusion_dV = nan;
+    Finite_T_Data.Liquid_H_MP = nan;
+    Finite_T_Data.Solid_H_MP = nan;
     Finite_T_Data.Liquid_V_MP = nan;
     Finite_T_Data.Solid_V_MP = nan;
     Finite_T_Data.MP = nan;
