@@ -22,15 +22,15 @@ Find_Similar_Params = p.Results.Find_Similar_Params; % When true, finds lowest e
 switch lower(Settings.Structure)
     case 'betabeo'
         Lattice_param_LBab = 4.0; % Angstroms, lower bound on the possible lattice parameter
-        Lattice_param_LBc = 2.0; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBc = 2.2; % Angstroms, lower bound on the possible lattice parameter
     case 'rocksalt'
-        Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
-        Lattice_param_LBc = 2.0; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBab = 2.2; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBc = 2.2; % Angstroms, lower bound on the possible lattice parameter
     case 'wurtzite'
         Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
         Lattice_param_LBc = 3.2; % Angstroms, lower bound on the possible lattice parameter
     case 'fivefive'
-        Lattice_param_LBab = 2.2; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
         Lattice_param_LBc = 2.8; % Angstroms, lower bound on the possible lattice parameter
     case 'sphalerite'
         Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
