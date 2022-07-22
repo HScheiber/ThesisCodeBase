@@ -363,3 +363,12 @@ Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback
 Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_Local_Submit', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_Local_Submit.m', 127)" style="font-weight:bold">Bayesian_Optimize_Local_Submit</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_Local_Submit.m',127,0)">line 127</a>)
     Bayesian_Optimize_LiX_Parameters(Model)
 } 
+open Structure_Minimization.m
+open OptimizationLoop
+clc
+1.25*1.25
+
+ans =
+
+                    1.5625
+
