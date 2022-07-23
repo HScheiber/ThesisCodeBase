@@ -54,6 +54,7 @@ Settings.WaterModel = 'SPC/E'; % For use with JC model
 Settings.JobID = ''; % An ID that is tacked onto the folder name of all current jobs
 Settings.N_atoms = 5000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
 Settings.Cutoff_Buffer = 1.2; % Set this value to some fraction greater than 1 to allow NPT simulation boxes to shrink without making the box size minimal axis smaller than the cutoff. Also allows for dynamic setting of rlist.
+Settings.ScaleInitialLiqDensity = 1; % Scale initial guess liquid density by this amount
 
 % Only active for 'previous' structures:
 Settings.Prev_geom_loc = '';
@@ -128,7 +129,7 @@ Settings.Find_Min_Params = true; % When true, finds lowest energy parameters for
 Settings.Find_Similar_Params = true; % If no exact minimized geometry is found for the input model, find geometry for a similar model
 Settings.Data_Types = 1; % Allowed data types for automatic search of initial conditions (0 = normal, 1 = cell optimized, 2 = full optimized, 3 = atom optimized only)
 Settings.MinMDP.Parallel_Min = true; % run minimization routine using matlab parallel when true
-Settings.MinMDP.Verbose = true; % Sets verbosity of minimization routine
+Settings.MinMDP.Verbose = false; % Sets verbosity of minimization routine
 Settings.MinMDP.OptPos = false; % Optimize both position and lattice parameters when true
 Settings.MinMDP.Maintain_Symmetry = true; % maintains cell symmetry when true
 Settings.MinMDP.emtol = 0.088439; %1e-3 [kJ mol-1 nm-1] The position minimization is converged (per cycle) when the maximum force is smaller than this value
@@ -231,6 +232,7 @@ Settings.Equilibrate_Solid = 0; % number of ps to equilibrate the solid for, use
 Settings.Equilibrate_Liquid = 0; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.MinInterfaceWidth = 0.075; % [nm] +- distance from the solid-liquid interface within which to minimize
 Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing
+Settings.QECompressibility = 1e-6; % Compressibility used during the rapid-equilibration stages
 
 % optimizer settings
 Settings.Optimizer = 'MPSearcher'; % One of fmincon, patternsearch, MPSearcher, or bayesopt

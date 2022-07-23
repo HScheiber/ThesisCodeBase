@@ -66,7 +66,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     % Set the number of steps
     MD_nsteps = Settings.Solid_Test_Time/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt);
-    Compressibility = 1e-8;
+    Compressibility = Settings.QECompressibility;
     tau_p = Settings.MDP.dt; % ps
     tau_t = Settings.MDP.dt; % ps
 

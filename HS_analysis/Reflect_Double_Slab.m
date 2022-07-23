@@ -13,11 +13,11 @@ atom_copy = atom;
 %% Reflect structure in the z dimension
 N_A = 6.0221409e23; % molecules/(mol of ion pair)
 cm3_per_Ang3 = (1e-8)^3; % cm^3/A^3
-ref_density_SI = 1/58.3; % mol/cm^3. Reference comes from equilibrated LiI system with modelA, at 2000 K
-ref_density = ref_density_SI*N_A*cm3_per_Ang3; % molecules/A^3
+Ref_Density_SI = 1/58.3; % mol/cm^3. Reference comes from equilibrated LiI system with modelA, at 2000 K
+Ref_Density = Ref_Density_SI*N_A*cm3_per_Ang3; % molecules/A^3
 box_area = data.Box_dim(1)*data.Box_dim(2); % A^2
 
-vaccuum_height = nmol/(box_area*ref_density);
+vaccuum_height = nmol/(box_area*Ref_Density);
 
 for idx = 1:data.nAtoms
     atom_copy(idx).z = -atom(idx).z + data.Box_dim(3)*2 + vaccuum_height; % Angstroms

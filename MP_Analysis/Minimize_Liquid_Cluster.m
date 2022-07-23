@@ -14,7 +14,7 @@ function Minimize_Liquid_Cluster(Settings)
     Cluster_Vol = (Settings.Cluster_N/2)/solid_density; % nm^3
     
     % Volume required for liquid
-    Liquid_Vol =  Settings.nmol_liquid/Settings.ref_density;
+    Liquid_Vol =  Settings.nmol_liquid/Settings.Ref_Density;
     
     Total_Vol = Cluster_Vol + Liquid_Vol;
     L = Total_Vol^(1/3); % box length in nm

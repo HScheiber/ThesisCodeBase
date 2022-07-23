@@ -34,7 +34,9 @@ end
 Settings.Cluster_N = 0;
 
 % Load Default Geometry info for Salt/Structure
-Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true);
+if ~isfield(Settings,'Geometry') || ~strcmp(Settings.Geometry.Structure,Settings.Structure)
+    Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true);
+end
 
 % Get Metal and Halide info
 [Settings.Metal,Settings.Halide] = Separate_Metal_Halide(Settings.Salt);

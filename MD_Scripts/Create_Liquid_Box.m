@@ -16,11 +16,11 @@ nmol = Settings.N_atoms/2; % number of atoms needed
 
 % Find the target density based on the temperature and pressure
 warning('off','MATLAB:UndefinedFunction')
-ref_density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
+Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
 warning('on','MATLAB:UndefinedFunction')
 
 % Calculate the dimensions for the box at the given density
-Vol = nmol/ref_density; % Volume in cubic nm
+Vol = nmol/Ref_Density; % Volume in cubic nm
 
 Settings.Geometry.a = ((Vol/Settings.c_over_a)^(1/3)); % nm
 Settings.Geometry.b = Settings.Geometry.a; % nm
@@ -60,7 +60,7 @@ if LatticeLength/2 <= Longest_Cutoff*Settings.Cutoff_Buffer
     
     % Update number of atoms to match the new box size
     Vol = New_a*New_b*New_c_tot;
-    nmol = ceil(ref_density*Vol);
+    nmol = ceil(Ref_Density*Vol);
     Settings.N_atoms = nmol*2;
     
     % Update lattice vectors
@@ -105,13 +105,13 @@ if Settings.GenCluster
     Box_Center = norm(a_vec).*[1/2 1/2 1/2];  
     
     % Calculate the radius needed for the given density
-    Vol_cluster = nmol_cluster/ref_density; % Volume in cubic nm
+    Vol_cluster = nmol_cluster/Ref_Density; % Volume in cubic nm
     R_cluster = ( (3/(4*pi))*Vol_cluster )^(1/3); % Radius in nm
     Inner_Box_Length = 2*(R_cluster);
 
     %% How many atoms should fit into a box with the same side length as the sphere?
     Box_Vol = Inner_Box_Length^3; % nm^3 volume
-    nmol_box = ceil(ref_density*Box_Vol);
+    nmol_box = ceil(Ref_Density*Box_Vol);
 
     % Create a positions.dat file
     pos_filename = fullfile(WorkDir,'positions.dat');

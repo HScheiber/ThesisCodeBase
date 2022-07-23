@@ -23,7 +23,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     
     % Calculate the Z box dimension needed for the given density
     XY_area = norm(cross(Supercell_file_data.a_vec,Supercell_file_data.b_vec)); % nm^2
-    Liq_Vol = Settings.nmol_liquid/Settings.ref_density; % Volume of Liq box in nm^3
+    Liq_Vol = Settings.nmol_liquid/(Settings.Ref_Density*Settings.ScaleInitialLiqDensity); % Volume of Liq box in nm^3
     Liq_Z = Liq_Vol/XY_area; % Liquid Z box length in nm
     
     if Liq_Z < norm(Supercell_file_data.c_vec)
@@ -149,7 +149,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     end
     
     % Add in dispersion corrections
-    if Settings.MDP.Disp_Correction && ~Settings.Table_Req
+    if Settings.MDP.Disp_Correction && ~(Settings.Table_Req || strcmp(Settings.Theory,'BH'))
         MDP.Minimization_txt = [MDP.Minimization_txt newline newline...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
@@ -168,8 +168,55 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
 
     % Complete a topology file for the liquid box to be minimized
     Atomlist = copy_atom_order(Prep_Liq_Random_Liq);
-    Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
     Top_Filename = fullfile(Settings.WorkDir,'Prep_Liq.top');
+    
+    % Buckingham potentials require recreating the topology text
+    if strcmp(Settings.Theory,'BH')
+        
+        % Load Topology template
+        Topology_Text = fileread(fullfile(Settings.home,'templates','Gromacs_Templates',...
+        'Topology.template'));
+        
+        % Add in global parameters to Topology template
+        Topology_Text = strrep(Topology_Text,'##GENPAIRS##',Settings.Top_gen_pairs);
+        Topology_Text = strrep(Topology_Text,'##FUDGELJ##',num2str(Settings.Top_fudgeLJ));
+        Topology_Text = strrep(Topology_Text,'##FUDGEQQ##',num2str(Settings.Top_fudgeQQ));
+
+        Metal_Info = elements('Sym',Settings.Metal);
+        Halide_Info = elements('Sym',Settings.Halide);
+
+        % Insert element info into topology template
+        Topology_Text = strrep(Topology_Text,'##MET##',pad(Settings.Metal,2));
+        Topology_Text = strrep(Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
+        Topology_Text = strrep(Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
+        Topology_Text = strrep(Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+
+        Topology_Text = strrep(Topology_Text,'##HAL##',pad(Settings.Halide,2));
+        Topology_Text = strrep(Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
+        Topology_Text = strrep(Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
+        Topology_Text = strrep(Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+
+        % Add number of unit cells to topology file
+        Topology_Text = strrep(Topology_Text,'##N##x##N##x##N##',num2str(Settings.nmol_liquid));
+        Topology_Text = strrep(Topology_Text,'##GEOM##','molecule liquid');
+        
+        % Define the function type as 1 (needed for tabulated functions)
+        Topology_Text = strrep(Topology_Text,'##NBFUNC##','1');
+
+        % Define the combination rules (Lorenz-berthelot)
+        Topology_Text = strrep(Topology_Text,'##COMBR##','1');
+
+        % Define all the parameters as 1.0 (already included in potentials)
+        Topology_Text = strrep(Topology_Text,'##METMETC##',pad('1.0',10));
+        Topology_Text = strrep(Topology_Text,'##HALHALC##',pad('1.0',10));
+        Topology_Text = strrep(Topology_Text,'##METHALC##',pad('1.0',10));
+        Topology_Text = strrep(Topology_Text,'##METMETA##','1.0');
+        Topology_Text = strrep(Topology_Text,'##HALHALA##','1.0');
+        Topology_Text = strrep(Topology_Text,'##METHALA##','1.0');
+        Topology_Text = strrep(Topology_Text,'##LATOMS##',Atomlist);
+    else
+        Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+    end
     
     % Save topology file
     fidTOP = fopen(Top_Filename,'wt');
@@ -205,7 +252,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq')) ...
         Settings.mdrun_opts];
 
-    if Settings.Table_Req
+    if Settings.Table_Req || strcmp(Settings.Theory,'BH')
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
 
@@ -224,11 +271,20 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     if Settings.Table_Req
     	Settings.TableFile_MX = TableFile_MX_old;
     end
+    % Buckingham potentials require recreating the topology text
+    if strcmp(Settings.Theory,'BH')
+        
+        % Save topology file
+        Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+        fidTOP = fopen(Top_Filename,'wt');
+        fwrite(fidTOP,regexprep(Topology_Text,'\r',''));
+        fclose(fidTOP);
+    end
     
     % Set the number of steps
     timesteps = Settings.Equilibrate_Liquid/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt,'Isotropy','isotropic','Molten',true);
-    Compressibility = '0 1e-6'; % bar^(-1)
+    Compressibility = ['0 ' num2str(Settings.QECompressibility)]; % bar^(-1)
     tau_p = Settings.MDP.dt; % ps
     tau_t = Settings.MDP.dt; % ps
     
@@ -304,11 +360,11 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         error(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
     end
     
-%     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq_Energy.xvg');
-%     Data = import_xvg(En_xvg_file);
-%     plot(Data(:,1),Data(:,2)./Settings.nmol_liquid) % Potential
-%     plot(Data(:,1),Data(:,3)./Settings.nmol_liquid) % Conversved Energy
-%     plot(Data(:,1),(10^3).*Data(:,4)./Settings.nmol_liquid) % Volume
+    En_xvg_file = fullfile(Settings.WorkDir,'energy.xvg');
+    Data = import_xvg(En_xvg_file);
+    plot(Data(:,1),Data(:,2)./Settings.nmol_liquid) % Potential
+    plot(Data(:,1),Data(:,3)./Settings.nmol_liquid) % Conversved Energy
+    plot(Data(:,1),(10^3).*Data(:,4)./Settings.nmol_liquid) % Volume
     
     if Settings.Delete_Equil
         rmdir(Settings.WorkDir,'s')

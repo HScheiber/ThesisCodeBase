@@ -97,7 +97,7 @@ Settings.MDP.Temp_Model = strrep(Settings.MDP.Temp_Model,'##FOURIER##',pad(num2s
 Settings.MDP.Temp_Model = strrep(Settings.MDP.Temp_Model,'##PMEORDER##',pad(num2str(Settings.MDP.PME_Order),18));
 Settings.MDP.Temp_Model = strrep(Settings.MDP.Temp_Model,'##EWALDTOL##',pad(num2str(Settings.MDP.Ewald_rtol),18));
 
-if Settings.Table_Req
+if Settings.Table_Req || strncmp(Settings.Theory,'BH',2)
     
     % Modify the MDP file
     Settings.MDP.Temp_Model = strrep(Settings.MDP.Temp_Model,'##VDWTYPE##',pad('user',18));

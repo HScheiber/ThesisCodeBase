@@ -7,7 +7,7 @@ function Minimize_Liquid_Interface(Settings)
     
     % Calculate the Z box dimension needed for the given density
     cell_area = norm(cross(Supercell_file_data.a_vec,Supercell_file_data.b_vec));
-    Liquid_Vol = Settings.nmol_liquid/Settings.ref_density; % Volume in cubic nm
+    Liquid_Vol = Settings.nmol_liquid/Settings.Ref_Density; % Volume in cubic nm
     L = Liquid_Vol/cell_area; % box length in nm
     
     a_vec = Supercell_file_data.a_vec;

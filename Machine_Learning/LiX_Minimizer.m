@@ -28,7 +28,7 @@ coupledconstraints = []; % No coupled constraints on the system
 % Optional inputs
 p = inputParser;
 p.FunctionName = 'LiX_Minimizer';
-addOptional(p,'Verbose',true,@(x)validateattributes(x,{'logical'},{'nonempty'}))
+addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Extra_Properties',Settings.Extra_Properties,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 
 parse(p,varargin{:});
@@ -1169,13 +1169,13 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
             Loss_add = Loss_add + log(1 + Model_Mismatch);
             Settings.skip_finite_T = true;
         else
-            Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3));
+            Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
             Settings.Geometry.a = Settings.Minimization_Data{strmatch}.a;
             Settings.Geometry.b = Settings.Minimization_Data{strmatch}.b;
             Settings.Geometry.c = Settings.Minimization_Data{strmatch}.c;
         end
     else
-        Settings.Ref_Density = 1/(Settings.Finite_T_Data.Exp_Liquid_V_MP*(0.1^3));
+        Settings.Ref_Density = 1/(Settings.Finite_T_Data.Exp_Liquid_V_MP*(0.1^3)); % molecules / nm^3
     end
 end
 
@@ -1219,6 +1219,11 @@ if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
     if ~isempty(gcp('nocreate'))
         delete(gcp);
     end
+    
+    Settings.BatchMode = false;
+    Settings.Submit_Jobs = false;
+    Settings.Skip_Minimization = true;
+    % Skip the automatic geometry minimization
     
     [Tm_estimate,WorkDir] = Find_Melting_Point(Settings);
     Settings.Finite_T_Data.MP = Tm_estimate;

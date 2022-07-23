@@ -281,7 +281,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         end
         
         % Catch corrupt files
-        if ~isfield(dat,'MinObjective') || isnan(dat.MinObjective)
+        if ~isfield(dat,'BayesoptResults') || isnan(dat.BayesoptResults.MinObjective)
             % Catch corrupt files
             disp('Unable to load intermediate bayesian optimization data.')
             disp('Attempting to load backup step.')

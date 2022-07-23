@@ -18,7 +18,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Grab reference density, cutoff, and corresponding box size
     L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer*1.25; % nm, the box dimension
     Volume = L^3; % Volume in nm^3
-    nmol_liquid = round(Volume*Settings.Ref_Density*0.75);
+    nmol_liquid = round(Volume*Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
 
     % Initialize empty cubic box
     Box.a_vec  = [L 0 0];
@@ -288,7 +288,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Set the number of steps
     MD_nsteps = Settings.Liquid_Test_Time/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt,'Isotropy','isotropic','Molten',true);
-    Compressibility = 1e-8; % bar^(-1)
+    Compressibility = Settings.QECompressibility; % bar^(-1)
     tau_p = Settings.MDP.dt; % ps
     tau_t = Settings.MDP.dt; % ps
 

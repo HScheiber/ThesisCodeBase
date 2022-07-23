@@ -132,7 +132,6 @@ if strcmpi(Settings.RefStructure,'Liquid')
 
             else
                 % Once a melting point bracket has been established, narrow it
-
                 if Settings.UseDerivativeWeighting && ~any(isnan(T_dat.df_bracket))
                     W = (1/abs(T_dat.df_bracket(1))) + (1/abs(T_dat.df_bracket(2)));
                     T = ((1/abs(T_dat.df_bracket(1)))*T_dat.dT(1) + (1/abs(T_dat.df_bracket(2)))*T_dat.dT(2))/W; % derivative-weighted average

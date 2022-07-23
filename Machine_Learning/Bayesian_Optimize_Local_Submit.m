@@ -83,6 +83,7 @@ for tidx = 1:length(Theories)
             Models(idx).JobSettings.MPI_Ranks = 8;
             Models(idx).JobSettings.Cores = 8;
             Models(idx).Cutoff_Buffer = 1.2; % This affects Structure_Minimization
+            Models(idx).ScaleInitialLiqDensity = 1; % scale back the initial liquid density by this factor to prevent the box blowing up
             
             % T=0 Loss
             Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -94,41 +95,43 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.Liquid_MP_Volume = 0; % Fitting the experimental volume per formula unit at the experimental MP
             Models(idx).Loss_Options.Solid_MP_Volume  = 0; % Fitting the experimental volume of the experimental solid structure at the experimental MP
             Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
-            Models(idx).Liquid_Test_Time = 50; % ps
-            Models(idx).Solid_Test_Time = 30;
-            Models(idx).Output_Coords = 1000;
             
-            % Finite T loss options (including MP options)
+            % Finite T options (including MP options)
+            Models(idx).c_over_a = 2;
+            Models(idx).Liquid_Test_Time = 50; % ps. simulation time to sample the liquid (second half averaged for enthalpy / volume)
+            Models(idx).Solid_Test_Time = 30; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
             Models(idx).Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
             Models(idx).Optimizer = 'MPSearcher';
             Models(idx).lb = 0; % K, lower bound on MP search
             Models(idx).ub = 3000; % K, upper bound on MP search
-
             Models(idx).MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number of atoms (1,inf) of liquid/solid required to establish a phase change
             Models(idx).BracketThreshold = 5; % [K] Sets the target bracket for the melting point
-            Models(idx).N_atoms = 2000;
+            Models(idx).N_atoms = 4000;
             Models(idx).MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
-            Models(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-            Models(idx).Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+            Models(idx).Equilibrate_Solid = 20; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+            Models(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
             Models(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
             Models(idx).InitialMeshSize = 10;
-    
+            Models(idx).QECompressibility = 1e-7;
             % Barostat Options
             Models(idx).Isotropy = 'semiisotropic';
             Models(idx).Target_P = [1 1]; % Bar
             Models(idx).Barostat = 'Parrinello-Rahman'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
             Models(idx).Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
             Models(idx).Nstpcouple = Get_nstcouple(Models(idx).Time_Constant_P,Models(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
-    
             % Thermostat Options
             Models(idx).Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'nose-hoover' (set NO for NVE)
             Models(idx).Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
             Models(idx).Nsttcouple = Get_nstcouple(Models(idx).Time_Constant_T,Models(idx).MDP.dt); %[ps] The frequency for coupling the temperature. 
-            
+            % Electrostatics
             Models(idx).MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
             Models(idx).MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of the Ewald-shifted direct potential at rcoulomb. Decreasing this will give a more accurate direct sum, but then you need more wave vectors for the reciprocal sum.
             Models(idx).MDP.Fourier_Spacing = 0.12;
             Models(idx).MDP.VerletBT = -1;
+            Models(idx).MDP.RList_Cutoff = 1.1; % 1.5 % nm. This should be larger or equal to RCoulomb/RVDW
+            Models(idx).MDP.RCoulomb_Cutoff = 1.1; % nm. if set to less than 0, then Rc = a;
+            Models(idx).MDP.RVDW_Cutoff = 1.0; % 1.2 nm. note that rlist ? rCoulomb = RVDW when using Verlet and VerletBT = -1
+            % End of Finite T options
             
             % Aux options
             Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);

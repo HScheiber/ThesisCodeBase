@@ -1,5 +1,3 @@
-WorkDir = 'C:\Users\Hayden\AppData\Local\Temp\tp8527fc7b_41e0_4886_bfd6_d3c880cd5871\Test6';
-
 data = import_xvg('energy.xvg');
 
 % @ s0 legend "Potential"
@@ -10,6 +8,8 @@ data = import_xvg('energy.xvg');
 % @    yaxis  label "(kJ/mol), (bar), (nm^3)"
 
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
+
+nmol_solid = 864/2;
 
 figure
 plot(data(:,1),data(:,2)./nmol_solid) % potential (kj/mol ion pairs)
