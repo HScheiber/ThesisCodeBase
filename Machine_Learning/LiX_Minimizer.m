@@ -1223,6 +1223,7 @@ if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
     Settings.BatchMode = false;
     Settings.Submit_Jobs = false;
     Settings.Skip_Minimization = true;
+    Settings.RefStructure = Settings.Finite_T_Data.Structure;
     % Skip the automatic geometry minimization
     
     [Tm_estimate,WorkDir] = Find_Melting_Point(Settings);
