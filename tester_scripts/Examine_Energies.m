@@ -9,10 +9,11 @@ data = import_xvg('energy.xvg');
 
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
-nmol_solid = 864/2;
+nmol_solid = 1000/2;
 
 figure
 plot(data(:,1),data(:,2)./nmol_solid) % potential (kj/mol ion pairs)
+ylim([-2000 100])
 hold on
 plot(data(:,1),data(:,3))              % Pressure (bar)
 plot(data(:,1),data(:,4)./nmol_solid) % Volume (nm^3 / ion pair)

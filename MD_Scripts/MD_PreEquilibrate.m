@@ -16,7 +16,7 @@ disp('*** Fast Pre-Equilibration Selected ***')
 
 % Set the number of steps
 timesteps = Settings.PreEquilibration/Settings.MDP.dt;
-Compressibility = 1e-6.*ones(1,length(Settings.Target_P)); % bar^(-1)
+Compressibility = Settings.QECompressibility.*ones(1,length(Settings.Target_P)); % bar^(-1)
 if length(Compressibility) > 2
     Compressibility(4:6) = 0;
 end
@@ -96,13 +96,13 @@ else
     disp(mdrun_output);
     error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
 end
-    
-%     En_xvg_file = fullfile(Settings.WorkDir,'Equil_System_Energy.xvg');
-%     Data = import_xvg(En_xvg_file);
-%     plot(Data(:,1),Data(:,2)./Settings.nmol_liquid) % Potential
-%     plot(Data(:,1),Data(:,3)./Settings.nmol_liquid) % Conversved Energy
-%     plot(Data(:,1),(10^3).*Data(:,4)./Settings.nmol_liquid) % Volume
 
+%     system(['wsl source ~/.bashrc; echo "5 8 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+%     En_xvg_file = fullfile(Settings.WorkDir,'Equil_System.xvg');
+%     Data = import_xvg(En_xvg_file);
+%     plot(Data(:,1),Data(:,2)./Settings.N_atoms) % Potential
+%     plot(Data(:,1),Data(:,3)./Settings.N_atoms) % Conversved Energy
+%     plot(Data(:,1),(10^3).*Data(:,4)./Settings.N_atoms) % Volume
 
 % Update MDP file and overwrite
 MDP_Template = regexprep(Settings.MDP_Template,'(gen-vel *= *)yes(.+?\n)','$1no $2');

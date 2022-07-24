@@ -82,8 +82,7 @@ for tidx = 1:length(Theories)
             Models(idx).JobSettings.OMP_Threads = 1;
             Models(idx).JobSettings.MPI_Ranks = 8;
             Models(idx).JobSettings.Cores = 8;
-            Models(idx).Cutoff_Buffer = 1.2; % This affects Structure_Minimization
-            Models(idx).ScaleInitialLiqDensity = 1; % scale back the initial liquid density by this factor to prevent the box blowing up
+            Models(idx).Cutoff_Buffer = 1.2; % This affects Structure_Minimization as well as other aspects of code
             
             % T=0 Loss
             Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -106,13 +105,15 @@ for tidx = 1:length(Theories)
             Models(idx).ub = 3000; % K, upper bound on MP search
             Models(idx).MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number of atoms (1,inf) of liquid/solid required to establish a phase change
             Models(idx).BracketThreshold = 5; % [K] Sets the target bracket for the melting point
-            Models(idx).N_atoms = 4000;
+            Models(idx).N_atoms = 2000;
             Models(idx).MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
-            Models(idx).Equilibrate_Solid = 20; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+            Models(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
             Models(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
             Models(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
             Models(idx).InitialMeshSize = 10;
-            Models(idx).QECompressibility = 1e-7;
+            Models(idx).QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
+            Models(idx).MinInterfaceWidth = 0.15; % [nm] +- distance from the solid-liquid interface within which to minimize
+            
             % Barostat Options
             Models(idx).Isotropy = 'semiisotropic';
             Models(idx).Target_P = [1 1]; % Bar

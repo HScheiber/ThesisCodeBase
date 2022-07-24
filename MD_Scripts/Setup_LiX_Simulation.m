@@ -43,7 +43,9 @@ end
 Metal_Info = elements('Sym',Settings.Metal);
 Halide_Info = elements('Sym',Settings.Halide);
 
-[Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+if ~isfield(Settings,'WorkDir')
+    [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+end
 disp(['Current Job: ' Settings.Salt ' ' Settings.JobName])
 
 % Create the working directory if it does not exist

@@ -213,8 +213,10 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         Topology_Text = strrep(Topology_Text,'##METMETA##','1.0');
         Topology_Text = strrep(Topology_Text,'##HALHALA##','1.0');
         Topology_Text = strrep(Topology_Text,'##METHALA##','1.0');
+        Topology_Text_Min = Topology_Text;
         Topology_Text = strrep(Topology_Text,'##LATOMS##',Atomlist);
     else
+        Topology_Text_Min = Settings.Topology_Text;
         Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
     end
     
@@ -273,7 +275,6 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     end
     % Buckingham potentials require recreating the topology text
     if strcmp(Settings.Theory,'BH')
-        
         % Save topology file
         Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
         fidTOP = fopen(Top_Filename,'wt');
@@ -360,17 +361,21 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         error(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
     end
     
-    En_xvg_file = fullfile(Settings.WorkDir,'energy.xvg');
-    Data = import_xvg(En_xvg_file);
-    plot(Data(:,1),Data(:,2)./Settings.nmol_liquid) % Potential
-    plot(Data(:,1),Data(:,3)./Settings.nmol_liquid) % Conversved Energy
-    plot(Data(:,1),(10^3).*Data(:,4)./Settings.nmol_liquid) % Volume
+%     system(['wsl source ~/.bashrc; echo "5 8 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+%     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq.xvg');
+%     Data = import_xvg(En_xvg_file);
+%     plot(Data(:,1),Data(:,2)./Settings.nmol_liquid) % Potential
+%     plot(Data(:,1),Data(:,3)./Settings.nmol_liquid) % Conversved Energy
+%     plot(Data(:,1),(10^3).*Data(:,4)./Settings.nmol_liquid) % Volume
     
     if Settings.Delete_Equil
         rmdir(Settings.WorkDir,'s')
     end
     
     disp('*** Separate Equilibration of Liquid Complete ***')
+    
+    %% Liquid is now equilibrated, attach solid + liquid and minimize interface
+    
     disp('*** Attaching Equilibrated Liquid to Solid and Minimizing Interface ***')
     Settings.WorkDir = MinDir;
     
@@ -381,6 +386,8 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     Liq_atoms_at_edge = Liquid_file_data.xyz(:,3) < Settings.MinInterfaceWidth | Liquid_file_data.xyz(:,3) > (Liq_Z - Settings.MinInterfaceWidth); % index of atoms within +-1 angstrom of of liquid-solid interfaces
     Sol_Z = norm(Solid_file_data.c_vec);
     Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < Settings.MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - Settings.MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
+    
+    %buffer_vec = 0.*(Liquid_file_data.c_vec)/norm(Liquid_file_data.c_vec); % 1 Angstrom buffer
     
     a_vec = Solid_file_data.a_vec;
     b_vec = Solid_file_data.b_vec;
@@ -479,7 +486,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     
     % Complete a topology file for the liquid box to be minimized
     Atomlist = copy_atom_order(Comb_Equil_Geom_File);
-    Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+    Topology_Text = strrep(Topology_Text_Min,'##LATOMS##',Atomlist);
     Top_Filename = fullfile(Settings.WorkDir,'Comb_Equil.top');
     
     % Save topology file
@@ -516,14 +523,14 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Comb_Equil')) ...
         Settings.mdrun_opts];
     
-    if Settings.Table_Req
+    if Settings.Table_Req || strcmp(Settings.Theory,'BH')
         Settings.TableFile_MX = MakeTables(Settings);
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
 
     % Remove previous supercell
     delete(Settings.SuperCellFile)
-
+    
     % Final minimization, saving output to supercell file in outer directory
     disp('Beginning Combined System minimization...')
     mintimer = tic;
@@ -534,10 +541,12 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         disp(mdrun_output);
         error(['Error running mdrun for system minimization. Problem command: ' newline mdrun_command]);
     end
-    
-%     En_xvg_file = fullfile(Settings.WorkDir,'Comp_Equil_Min.xvg');
+
+%     system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+%     En_xvg_file = fullfile(Settings.WorkDir,'Comb_Equil.xvg');
 %     Data = import_xvg(En_xvg_file);
-%     plot(Data(:,1),Data(:,2)./Settings.nmol_liquid) % Potential
+%     plot(Data(:,1),Data(:,2)./(2*Settings.nmol_liquid)) % Potential
+%     ylim([-1000 1000])
     disp('*** Minimization of Solid-Liquid Interface Complete ***')
     
     % Remove backups
