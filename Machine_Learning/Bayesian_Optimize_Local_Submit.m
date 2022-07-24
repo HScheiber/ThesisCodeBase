@@ -49,7 +49,7 @@
 clear;
 idx = 0;
 
-%% BH Model (Test) XX
+%% BH Model (MP Test) XY
 Salts = {'LiI'};
 Theories = {'BH'};
 Replicates = 1;
@@ -68,7 +68,7 @@ for tidx = 1:length(Theories)
             Models(idx) = Initialize_LiX_BO_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
-            Models(idx).Trial_ID = ['XX' Rep];
+            Models(idx).Trial_ID = ['XY' Rep];
             Models(idx).final_opt_type = 'fminsearchbnd';
             if Replicates(ridx) > 5
                 Models(idx).Loss_Convergence = 1e-8;
