@@ -387,16 +387,16 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     Sol_Z = norm(Solid_file_data.c_vec);
     Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < Settings.MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - Settings.MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
     
-    %buffer_vec = 0.*(Liquid_file_data.c_vec)/norm(Liquid_file_data.c_vec); % 1 Angstrom buffer
+    buffer_vec = 0.1.*(Liquid_file_data.c_vec)/norm(Liquid_file_data.c_vec); % 1 Angstrom buffer
     
     a_vec = Solid_file_data.a_vec;
     b_vec = Solid_file_data.b_vec;
-    c_vec = Solid_file_data.c_vec + Liquid_file_data.c_vec;
+    c_vec = Solid_file_data.c_vec + Liquid_file_data.c_vec + buffer_vec;
     
     Combined_file_data = Solid_file_data;
     Combined_file_data.N_atoms = Solid_file_data.N_atoms + Liquid_file_data.N_atoms;
     Combined_file_data.c_vec = c_vec;
-    Combined_file_data.xyz = [Solid_file_data.xyz; (Liquid_file_data.xyz + Solid_file_data.c_vec)];
+    Combined_file_data.xyz = [Solid_file_data.xyz; (Liquid_file_data.xyz + Solid_file_data.c_vec + 0.5.*buffer_vec)];
     Combined_file_data.vel = [Liquid_file_data.vel; Liquid_file_data.vel];
     Combined_file_data.res_number = [Solid_file_data.res_number; (Liquid_file_data.res_number + Solid_file_data.res_number(end))];
     Combined_file_data.res_name = [Solid_file_data.res_name; Liquid_file_data.res_name];
@@ -542,11 +542,12 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         error(['Error running mdrun for system minimization. Problem command: ' newline mdrun_command]);
     end
 
-%     system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
-%     En_xvg_file = fullfile(Settings.WorkDir,'Comb_Equil.xvg');
-%     Data = import_xvg(En_xvg_file);
-%     plot(Data(:,1),Data(:,2)./(2*Settings.nmol_liquid)) % Potential
-%     ylim([-1000 1000])
+%    system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+    system(['echo "4 0" | gmx_d energy -f ' Energy_file ' -o ' strrep(Energy_file,'.edr','.xvg')])
+    En_xvg_file = fullfile(Settings.WorkDir,'Comb_Equil.xvg');
+    Data = import_xvg(En_xvg_file);
+    plot(Data(:,1),Data(:,2)./(2*Settings.nmol_liquid)) % Potential
+    ylim([-1000 1000])
     disp('*** Minimization of Solid-Liquid Interface Complete ***')
     
     % Remove backups

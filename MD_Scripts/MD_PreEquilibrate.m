@@ -97,12 +97,13 @@ else
     error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
 end
 
-%     system(['wsl source ~/.bashrc; echo "5 8 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
-%     En_xvg_file = fullfile(Settings.WorkDir,'Equil_System.xvg');
-%     Data = import_xvg(En_xvg_file);
-%     plot(Data(:,1),Data(:,2)./Settings.N_atoms) % Potential
-%     plot(Data(:,1),Data(:,3)./Settings.N_atoms) % Conversved Energy
-%     plot(Data(:,1),(10^3).*Data(:,4)./Settings.N_atoms) % Volume
+%    system(['wsl source ~/.bashrc; echo "5 8 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+    system(['echo "5 8 15 0" | gmx_d energy -f ' Energy_file ' -o ' strrep(Energy_file,'.edr','.xvg')])
+    En_xvg_file = fullfile(Settings.WorkDir,'Equil_System.xvg');
+    Data = import_xvg(En_xvg_file);
+    plot(Data(:,1),Data(:,2)./Settings.N_atoms) % Potential
+    plot(Data(:,1),Data(:,3)./Settings.N_atoms) % Conversved Energy
+    plot(Data(:,1),(10^3).*Data(:,4)./Settings.N_atoms) % Volume
 
 % Update MDP file and overwrite
 MDP_Template = regexprep(Settings.MDP_Template,'(gen-vel *= *)yes(.+?\n)','$1no $2');
