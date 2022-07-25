@@ -260,7 +260,7 @@ MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##RLIST##',pad(num2str(Setti
 MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##RCOULOMB##',pad(num2str(Settings.MDP.RCoulomb_Cutoff),18));
 MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##RVDW##',pad(num2str(Settings.MDP.RVDW_Cutoff),18));
 
-if Settings.Table_Req
+if Settings.Table_Req || strcmp(Settings.Theory,'BH')
     MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##VDWTYPE##',pad('user',18));
     MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##VDWMOD##',pad(Settings.MDP.vdw_modifier,18));
     MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##CUTOFF##',pad('group',18));
@@ -291,7 +291,7 @@ else
 end
 
 % Add in dispersion corrections
-if Settings.MDP.Disp_Correction && ~Settings.Table_Req
+if Settings.MDP.Disp_Correction && ~(Settings.Table_Req || strcmp(Settings.Theory,'BH'))
     MDP_Minimization_txt = [MDP_Minimization_txt newline newline...
         '; Long-range dispersion correction' newline ...
         'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
@@ -309,14 +309,59 @@ fclose(fidMDP);
 
 % Complete a topology file for the liquid box to be minimized
 Atomlist = copy_atom_order(tmp_liquid_file);
-Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
-Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N## ##GEOM##',...
-    ['Liquid with ' num2str(Settings.N_atoms) ' atoms.']);
 Top_Filename = fullfile(WorkDir,'tmp_liquid.top');
+
+% Buckingham potentials require recreating the topology text
+if strcmp(Settings.Theory,'BH')
+
+    % Load Topology template
+    Topology_Text = fileread(fullfile(Settings.home,'templates','Gromacs_Templates',...
+    'Topology.template'));
+
+    % Add in global parameters to Topology template
+    Topology_Text = strrep(Topology_Text,'##GENPAIRS##',Settings.Top_gen_pairs);
+    Topology_Text = strrep(Topology_Text,'##FUDGELJ##',num2str(Settings.Top_fudgeLJ));
+    Topology_Text = strrep(Topology_Text,'##FUDGEQQ##',num2str(Settings.Top_fudgeQQ));
+
+    Metal_Info = elements('Sym',Settings.Metal);
+    Halide_Info = elements('Sym',Settings.Halide);
+
+    % Insert element info into topology template
+    Topology_Text = strrep(Topology_Text,'##MET##',pad(Settings.Metal,2));
+    Topology_Text = strrep(Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
+    Topology_Text = strrep(Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
+    Topology_Text = strrep(Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+
+    Topology_Text = strrep(Topology_Text,'##HAL##',pad(Settings.Halide,2));
+    Topology_Text = strrep(Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
+    Topology_Text = strrep(Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
+    Topology_Text = strrep(Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+
+    % Add number of unit cells to topology file
+    Topology_Text = strrep(Topology_Text,'##N##x##N##x##N##',num2str(Settings.nmol_liquid));
+    Topology_Text = strrep(Topology_Text,'##GEOM##','molecule liquid');
+
+    % Define the function type as 1 (needed for tabulated functions)
+    Topology_Text = strrep(Topology_Text,'##NBFUNC##','1');
+
+    % Define the combination rules (Lorenz-berthelot)
+    Topology_Text = strrep(Topology_Text,'##COMBR##','1');
+
+    % Define all the parameters as 1.0 (already included in potentials)
+    Topology_Text = strrep(Topology_Text,'##METMETC##',pad('1.0',10));
+    Topology_Text = strrep(Topology_Text,'##HALHALC##',pad('1.0',10));
+    Topology_Text = strrep(Topology_Text,'##METHALC##',pad('1.0',10));
+    Topology_Text = strrep(Topology_Text,'##METMETA##','1.0');
+    Topology_Text = strrep(Topology_Text,'##HALHALA##','1.0');
+    Topology_Text = strrep(Topology_Text,'##METHALA##','1.0');
+end
+Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+Topology_Text = strrep(Topology_Text,'##N##x##N##x##N## ##GEOM##',...
+    ['Liquid with ' num2str(Settings.N_atoms) ' atoms.']);
 
 % Save topology file
 fidTOP = fopen(Top_Filename,'wt');
-fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
+fwrite(fidTOP,regexprep(Topology_Text,'\r',''));
 fclose(fidTOP);
 
 TPR_File = fullfile(WorkDir,'tmp_liquid.tpr');
@@ -345,7 +390,7 @@ mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
     ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Settings.SuperCellFile) ...
     Settings.mdrun_opts];
 
-if Settings.Table_Req
+if Settings.Table_Req || strcmp(Settings.Theory,'BH')
     mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
 end
 
@@ -362,6 +407,9 @@ else
 end
 
 % Generate final topology file for molecular dynamics
+Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N## ##GEOM##',...
+    ['Liquid with ' num2str(Settings.N_atoms) ' atoms.']);
 fidTOP = fopen(Settings.Topology_File,'wt');
 fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
 fclose(fidTOP);

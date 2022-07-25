@@ -5,7 +5,7 @@ function Equil_density = Equilibrate_Liquid(Settings)
     % Create a cubic box with the smallest possible system size for a given cutoff
     % Increase that box size by Settings.Cutoff_Buffer to account for possibility of shrinkage
     % Randomly fill box with appropriate number of atoms to reach experimental density
-    % Use Make_Tables function if necessary, run a brief ~500 step minimization
+    % Use Make_Tables function if necessary, run a brief ~1000 step minimization
     % Run NPT simulation for [Settings.Equilibrate_Liquid] amount of time using fast equilibration settings (Berendsen baro and Velocity-Rescale thermo)
     % Calculate average density of equilibrated box based on last 25% of simulation
     % Give new density as output
@@ -105,7 +105,7 @@ function Equil_density = Equilibrate_Liquid(Settings)
     MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##RCOULOMB##',pad(num2str(MDP.RCoulomb_Cutoff),18));
     MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##RVDW##',pad(num2str(MDP.RVDW_Cutoff),18));
 
-    if Settings.Table_Req
+    if Settings.Table_Req || strcmp(Settings.Theory,'BH')
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad('user',18));
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWMOD##',pad(MDP.vdw_modifier,18));
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##CUTOFF##',pad('group',18));
@@ -115,6 +115,11 @@ function Equil_density = Equilibrate_Liquid(Settings)
 
         % For minimization, add in a close-range repulsive wall to the
         % potential with the following function
+        if isfield(Settings,'TableFile_MX')
+            TableFile_MX_old = Settings.TableFile_MX;
+        else
+            TableFile_MX_old = '';
+        end
         Settings.TableFile_MX = MakeTables(Settings);
     else
         % Modify the MDP file
@@ -134,7 +139,7 @@ function Equil_density = Equilibrate_Liquid(Settings)
     end
 
     % Add in dispersion corrections
-    if Settings.MDP.Disp_Correction && ~Settings.Table_Req
+    if Settings.MDP.Disp_Correction && ~(Settings.Table_Req || strcmp(Settings.Theory,'BH'))
         MDP.Minimization_txt = [MDP.Minimization_txt newline newline...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
@@ -153,12 +158,59 @@ function Equil_density = Equilibrate_Liquid(Settings)
 
     % Complete a topology file for the liquid box to be minimized
     Atomlist = copy_atom_order(Prep_Liq_Random_Liq);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
     Top_Filename = fullfile(Settings.WorkDir,'Prep_Liq.top');
+    
+    % Buckingham potentials require recreating the topology text
+    if strcmp(Settings.Theory,'BH')
+        
+        % Load Topology template
+        Topology_Text = fileread(fullfile(Settings.home,'templates','Gromacs_Templates',...
+        'Topology.template'));
+        
+        % Add in global parameters to Topology template
+        Topology_Text = strrep(Topology_Text,'##GENPAIRS##',Settings.Top_gen_pairs);
+        Topology_Text = strrep(Topology_Text,'##FUDGELJ##',num2str(Settings.Top_fudgeLJ));
+        Topology_Text = strrep(Topology_Text,'##FUDGEQQ##',num2str(Settings.Top_fudgeQQ));
 
+        Metal_Info = elements('Sym',Settings.Metal);
+        Halide_Info = elements('Sym',Settings.Halide);
+
+        % Insert element info into topology template
+        Topology_Text = strrep(Topology_Text,'##MET##',pad(Settings.Metal,2));
+        Topology_Text = strrep(Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
+        Topology_Text = strrep(Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
+        Topology_Text = strrep(Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+
+        Topology_Text = strrep(Topology_Text,'##HAL##',pad(Settings.Halide,2));
+        Topology_Text = strrep(Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
+        Topology_Text = strrep(Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
+        Topology_Text = strrep(Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+
+        % Add number of unit cells to topology file
+        Topology_Text = strrep(Topology_Text,'##N##x##N##x##N##',num2str(Settings.nmol_liquid));
+        Topology_Text = strrep(Topology_Text,'##GEOM##','molecule liquid');
+        
+        % Define the function type as 1 (needed for tabulated functions)
+        Topology_Text = strrep(Topology_Text,'##NBFUNC##','1');
+
+        % Define the combination rules (Lorenz-berthelot)
+        Topology_Text = strrep(Topology_Text,'##COMBR##','1');
+
+        % Define all the parameters as 1.0 (already included in potentials)
+        Topology_Text = strrep(Topology_Text,'##METMETC##',pad('1.0',10));
+        Topology_Text = strrep(Topology_Text,'##HALHALC##',pad('1.0',10));
+        Topology_Text = strrep(Topology_Text,'##METHALC##',pad('1.0',10));
+        Topology_Text = strrep(Topology_Text,'##METMETA##','1.0');
+        Topology_Text = strrep(Topology_Text,'##HALHALA##','1.0');
+        Topology_Text = strrep(Topology_Text,'##METHALA##','1.0');
+        Topology_Text = strrep(Topology_Text,'##LATOMS##',Atomlist);
+    else
+        Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+    end
+    
     % Save topology file
     fidTOP = fopen(Top_Filename,'wt');
-    fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
+    fwrite(fidTOP,regexprep(Topology_Text,'\r',''));
     fclose(fidTOP);
 
     TPR_File = fullfile(Settings.WorkDir,'Prep_Liq.tpr');
@@ -190,10 +242,10 @@ function Equil_density = Equilibrate_Liquid(Settings)
         ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq')) ...
         Settings.mdrun_opts];
 
-    if Settings.Table_Req
+    if Settings.Table_Req || strcmp(Settings.Theory,'BH')
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
-
+    
     % Liquid Minimization
     disp('Begining Liquid Minimization...')
     mintimer = tic;
@@ -204,14 +256,25 @@ function Equil_density = Equilibrate_Liquid(Settings)
         disp(mdrun_output);
         error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
     end
-
-
+    
     %% System is now minimized, run a fast equilibration
-
+    if Settings.Table_Req
+    	Settings.TableFile_MX = TableFile_MX_old;
+    end
+    
+    % Buckingham potentials require recreating the topology text
+    if strcmp(Settings.Theory,'BH')
+        % Save topology file
+        Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+        fidTOP = fopen(Top_Filename,'wt');
+        fwrite(fidTOP,regexprep(Topology_Text,'\r',''));
+        fclose(fidTOP);
+    end
+    
     % Set the number of steps
     timesteps = Settings.Equilibrate_Liquid/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt,'Isotropy','isotropic','Molten',true);
-    Compressibility = 1e-6; % bar^(-1)
+    Compressibility = Settings.QECompressibility; % bar^(-1)
     tau_p = Settings.MDP.dt; % ps
     tau_t = Settings.MDP.dt; % ps
 
