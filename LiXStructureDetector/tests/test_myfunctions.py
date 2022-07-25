@@ -189,7 +189,7 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\T_1042.0000'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\T_742.0000'
 Salt = 'LiI'
 SystemName = 'Test_MP'
 RefStructure='Rocksalt'
@@ -215,8 +215,8 @@ Spatial_Reassignment = False
 Spatial_Interfacial = None
 SaveTrajectoryAux = 2
 LoadFeatures = True
-T = 1042.0000
-T_Ref = 1042.0000
+T = 742.0000
+T_Ref = 742.0000
 RefChangeThreshold = 0.25
 CheckFullTrajectory = True
 
