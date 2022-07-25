@@ -64,7 +64,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     mtimer = tic;
     Prep_Liq_Metal_Only = fullfile(Settings.WorkDir,['Prep_Liq_Metal_Only.' Settings.CoordType]);
     cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
-        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(Settings.nmol_liquid) ' -try 200'];
+        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(Settings.nmol_liquid) ' -try 200 -scale 0.4'];
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
@@ -78,7 +78,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     disp(['Randomly adding ' num2str(Settings.nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
     htimer = tic;
     cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
-        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(Settings.nmol_liquid) ' -try 400'];
+        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(Settings.nmol_liquid) ' -try 400 -scale 0.4'];
 
     [errcode,output] = system(cmd);
 
@@ -382,10 +382,12 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     Solid_file_data = load_gro_file(Settings.SuperCellFile);
     Liquid_file_data = load_gro_file(Equilibrated_Geom_File);
     
+    MinInterfaceWidth = Settings.Geometry.a/20;
+    
     Liq_Z = norm(Liquid_file_data.c_vec);
-    Liq_atoms_at_edge = Liquid_file_data.xyz(:,3) < Settings.MinInterfaceWidth | Liquid_file_data.xyz(:,3) > (Liq_Z - Settings.MinInterfaceWidth); % index of atoms within +-1 angstrom of of liquid-solid interfaces
+    Liq_atoms_at_edge = Liquid_file_data.xyz(:,3) < MinInterfaceWidth | Liquid_file_data.xyz(:,3) > (Liq_Z - MinInterfaceWidth); % index of atoms within +-1 angstrom of of liquid-solid interfaces
     Sol_Z = norm(Solid_file_data.c_vec);
-    Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < Settings.MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - Settings.MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
+    Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
     
     buffer_vec = 0.1.*(Liquid_file_data.c_vec)/norm(Liquid_file_data.c_vec); % 1 Angstrom buffer
     

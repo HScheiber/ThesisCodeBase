@@ -112,7 +112,8 @@ for tidx = 1:length(Theories)
             Models(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
             Models(idx).InitialMeshSize = 10;
             Models(idx).QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
-            Models(idx).MinInterfaceWidth = 0.15; % [nm] +- distance from the solid-liquid interface within which to minimize
+            %Models(idx).MinInterfaceWidth = 0.15; % [nm] +- distance from the solid-liquid interface within which to minimize
+            Models(idx).ScaleInitialLiqDensity = 1.25; 
             
             % Barostat Options
             Models(idx).Isotropy = 'semiisotropic';
