@@ -222,7 +222,7 @@ CheckFullTrajectory = True
 
 
 
-[system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac] = LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=SystemName, T=T,
+[system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt] = LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=SystemName, T=T,
                               T_Ref=T_Ref, RefStructure=RefStructure, CheckFullTrajectory=CheckFullTrajectory, 
                               SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
                               SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage,

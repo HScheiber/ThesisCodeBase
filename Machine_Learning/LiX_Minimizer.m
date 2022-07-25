@@ -1176,6 +1176,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         end
     else
         Settings.Ref_Density = 1/(Settings.Finite_T_Data.Exp_Liquid_V_MP*(0.1^3)); % molecules / nm^3
+        Model_Mismatch = Settings.BadFcnLossPenalty;
     end
 end
 
@@ -1211,7 +1212,6 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
     
     Settings.Finite_T_Data.Fusion_dV = Settings.Finite_T_Data.Liquid_V_MP - ...
         Settings.Finite_T_Data.Solid_V_MP;
-    
 end
 
 % Melting point
@@ -1226,9 +1226,16 @@ if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
     Settings.RefStructure = Settings.Finite_T_Data.Structure;
     % Skip the automatic geometry minimization
     
-    [Tm_estimate,WorkDir] = Find_Melting_Point(Settings);
-    Settings.Finite_T_Data.MP = Tm_estimate;
+    [Tm_estimate,WorkDir,Aborted] = Find_Melting_Point(Settings);
     rmdir(WorkDir,'s');
+    
+    if Aborted
+        Loss_add = Loss_add + log(1 + 2*Model_Mismatch);
+        Settings.skip_finite_T = true;
+    else
+        Settings.Finite_T_Data.MP = Tm_estimate;
+    end
+    
 end
 
 % Remember: If skipping the finite_T data, then loss comes through the Loss_add

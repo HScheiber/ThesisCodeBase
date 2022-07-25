@@ -1,5 +1,6 @@
-function [Tm_estimate,WorkDir] = Find_Melting_Point(Settings)
+function [Tm_estimate,WorkDir,Aborted] = Find_Melting_Point(Settings)
 total_timer = tic;
+Aborted = false;
 
 if ~isstruct(Settings)
     Settings = load(Settings,'-mat').Settings;
@@ -28,9 +29,18 @@ if isfile(ResultsFile) && ~Settings.Continue
         Min_T_Melt = min(T_dat.T_Melt_Trace);
         T_dat.dT = [Max_T_freeze Min_T_Melt];
         Tm_estimate = mean(T_dat.dT);
+        if ~isfield(T_dat,'Alt_Structure')
+            T_dat.Alt_Structure = false;
+        end
+        
         disp(repmat('*',1,40));
-        disp(['Calculation previously completed. Melting Point estimated at Tm = ' num2str(Tm_estimate,'%.4f') ' K. Error bounds: Tm = ' ...
-            num2str(Max_T_freeze,'%.4f') ' - ' num2str(Min_T_Melt,'%.4f') ' K.']);
+        if T_dat.Alt_Structure
+            disp(['Calculation previously aborted due to incorrect structure freezing out at T = ' num2str(T_dat.T,'%.4f') ' K.']);
+            Aborted = true;
+        else
+            disp(['Calculation previously completed. Melting Point estimated at Tm = ' num2str(Tm_estimate,'%.4f') ' K. Error bounds: Tm = ' ...
+                num2str(Max_T_freeze,'%.4f') ' - ' num2str(Min_T_Melt,'%.4f') ' K.']);
+        end
         disp(repmat('*',1,40));
         return
     catch
@@ -57,6 +67,10 @@ if isfile(Settings.CurrentTFile)
             end
         end
     end
+    
+    if ~isfield(T_dat,'Alt_Structure')
+        T_dat.Alt_Structure = false;
+    end
 end
 
 if ~Loaded_Prev_Data
@@ -77,6 +91,7 @@ if ~Loaded_Prev_Data
     T_dat.Melt_Trace = []; % Keeps track of whether the process melted at each iteration
     T_dat.T_Freeze_Trace = []; % This will be a trace of only the temperatures where freezing was detected
     T_dat.T_Melt_Trace = []; % This will be a trace of only the temperatures where melting was detected
+    T_dat.Alt_Structure = False; % This is a switch to kill the calculation if the wrong structure is freezing out
     save(Settings.CurrentTFile,'T_dat')
 
     % Rename the gro file at the given reference temperature
@@ -178,6 +193,7 @@ end
 
 % Copy the final melting temperature and history into the results file
 copyfile(Settings.CurrentTFile, ResultsFile)
+T_dat = load(ResultsFile,'T_dat').T_dat;
 
 % Copy over contents from the T = Tm simulation folder
 Tmtxt = num2str(Tm,'%.4f');
@@ -224,6 +240,9 @@ end
 
 Tm_estimate = mean(T_dat.dT);
 WorkDir = Settings.WorkDir;
+if T_dat.Alt_Structure
+    Aborted = true;
+end
 disp(['Calculation complete. Epalsed Time: ' datestr(seconds(toc(total_timer)),'HH:MM:SS')])
 
 end

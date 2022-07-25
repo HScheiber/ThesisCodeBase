@@ -2,6 +2,9 @@ function varargout = Melting_Point_Check(T,Settings)
 
     % Load the data trace
     T_dat = load(Settings.CurrentTFile,'T_dat').T_dat;
+    if ~isfield(T_dat,'Alt_Structure')
+        T_dat.Alt_Structure = false;
+    end
     
     if istable(T)
         T = T{1,1};
@@ -15,7 +18,6 @@ function varargout = Melting_Point_Check(T,Settings)
         if f <= 0 && Settings.Continue
             % Continue a calculation from the previously determined melting point with new updated settings
         else
-            
             switch lower(Settings.Optimizer)
             case 'fmincon'
                 varargout = cell(1,2); % Outputs function and derivative
@@ -280,6 +282,8 @@ function varargout = Melting_Point_Check(T,Settings)
             'T_Ref',T_dat.T_ref));
         Froze = logical(PyOut{1});
         Melted = logical(PyOut{2});
+        Froze_alt = logical(PyOut{6});
+        
         IsNotComplete = ~Froze && ~Melted;
         
         ext_idx = str2double(cpt_number{1}) + 1; % increment step
@@ -375,12 +379,13 @@ function varargout = Melting_Point_Check(T,Settings)
             'T_Ref',T_dat.T_ref));
         Froze = logical(PyOut{1});
         Melted = logical(PyOut{2});
+        Froze_alt = logical(PyOut{6});
         
         IsNotComplete = ~Froze && ~Melted;
         ext_idx = 2;
     end
     
-    while IsNotComplete && (CheckTime*ext_idx <= Settings.MaxCheckTime)
+    while IsNotComplete && ~Froze_alt && (CheckTime*ext_idx <= Settings.MaxCheckTime) 
         
         disp(['Simulation inconclusive, extending simulation to step ' num2str(ext_idx,'%03.f') '/' max_steps ...
             ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ' ps).' ...
@@ -444,6 +449,7 @@ function varargout = Melting_Point_Check(T,Settings)
             'T_Ref',T_dat.T_ref));
         Froze = logical(PyOut{1});
         Melted = logical(PyOut{2});
+        Froze_alt = logical(PyOut{6});
         
 %         % Delete previous cpt and tpr files
 %         if Settings.Delete_Backups
@@ -480,13 +486,24 @@ function varargout = Melting_Point_Check(T,Settings)
     Froze = logical(PyOut{1});
     Melted = logical(PyOut{2});
     time_to_phase_change = PyOut{3};
-    if ~Froze && ~Melted
+    Froze_alt = logical(PyOut{6});
+    
+    if Froze_alt
+        if time_to_phase_change < 1
+            time_to_phase_change = 1;
+        end
+        f = -1;
+        df = 0;
+        T_dat.Alt_Structure = true;
+        disp(['Detected system freezing into unexpected structure at ' num2str(time_to_phase_change) ' ps.'])
+        disp('Aborting Melting Point calculation.')
+    elseif ~Froze && ~Melted
         f = -1;
         df = 0;
         
         disp(repmat('*',1,40));
-        disp(['System has not melted or froze after max time of ' num2str(Settings.MaxCheckTime) ' ps. Melting point found!'])
-        disp(['Melting Point detected at Tm = ' num2str(T,'%.4f') ' K. Error bounds: Tm = ' ...
+        disp(['System has not melted or froze after max time of ' num2str(Settings.MaxCheckTime) ' ps. Indeterminate point found.'])
+        disp(['Indeterminate point found at T = ' num2str(T,'%.4f') ' K. Error bounds: Tm = ' ...
             num2str(T_dat.dT(1),'%.4f') ' - ' num2str(T_dat.dT(2),'%.4f') ' K.']);
         disp(repmat('*',1,40));
     elseif Froze

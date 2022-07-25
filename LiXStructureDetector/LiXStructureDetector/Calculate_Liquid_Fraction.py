@@ -874,6 +874,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     # Determine the fraction of liquid, find first time step where liquid becomes less than or greater than the given threshold 
     system_melting = False
     system_freezing = False
+    system_frzing_alt = False
             
     # Leave SlopeThreshold and InitialRefFrac as fractions or convert them to absolute numbers
     if RefChangeThreshold <= 1:
@@ -893,10 +894,11 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         Threshold_Lower_sol = max(InitialRefFrac - RefChangeThreshold,t.atoms.n_atoms*0.05) # Below this number indicates freezing/melting [liquid/solid]
         Threshold_Upper_liq = min(InitialLiqFrac + RefChangeThreshold,t.atoms.n_atoms*0.95) # Above this number indicates melting/freezing [liquid/solid]
         Threshold_Lower_liq = max(InitialLiqFrac - RefChangeThreshold,t.atoms.n_atoms*0.05) # Below this number indicates freezing/melting [liquid/solid]
-    
+        
     if ref_idx == 0: # Reference Structure is Liquid
         is_frozen = ref_fraction <= Threshold_Lower_liq
         is_melted = ref_fraction >= Threshold_Upper_liq
+        is_frozen_alt = False # unable to check if only looking at liquid
         # Check slope of last 90% of trajectory (fit linear regression)
         if CheckFullTrajectory:
             x1 = x[x >= max_time*SlopeCheckBegin] # [ps] time points
@@ -920,15 +922,21 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         is_frozen = is_frozen_sol | is_frozen_liq
         is_melted = is_melted_sol | is_melted_liq
         
+        alt_fraction = 1 - (liq_fraction + ref_fraction)
+        is_frozen_alt = alt_fraction >= RefChangeThreshold
+        
         # Check slope of last $SlopeCheckBegin% of trajectory
         if CheckFullTrajectory:
             x1 = x[x >= max_time*SlopeCheckBegin] # [ps] time points
             y1 = ref_fraction[x >= max_time*SlopeCheckBegin] # fraction (or absolute number) of reference structure
             y2 = liq_fraction[x >= max_time*SlopeCheckBegin]
+            y3 = alt_fraction[x >= max_time*SlopeCheckBegin]
             regmodel_sol = linregress(x1, y1)
             regmodel_liq = linregress(x1, y2)
+            regmodel_alt = linregress(x1, y3)
             slope_sol = regmodel_sol.slope
             slope_liq = regmodel_liq.slope
+            slope_alt = regmodel_alt.slope
             if slope_sol > SlopeThreshold:
                 system_freezing = True
                 est_time_to_phase_change = (Threshold_Upper_sol - y1[0])/slope_sol + x1[0]
@@ -941,10 +949,14 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
             elif slope_liq > SlopeThreshold:
                 system_melting = True
                 est_time_to_phase_change = (Threshold_Lower_liq - y2[0])/slope_liq + x1[0]
+            elif slope_alt > SlopeThreshold:
+                system_frzing_alt = True
+                est_time_to_phase_change = (RefChangeThreshold - y3[0])/slope_sol + x1[0]
 
     # If system is passed the threshold into frozen or melting, use that
     system_froze = any(is_frozen)
     system_melted = any(is_melted)
+    system_frz_alt = any(is_frozen_alt) | system_frzing_alt
     
     # Otherwise, if the system is not yet frozen or melting, check if it is freezing/melting based on slope
     if not system_froze and not system_melted:
@@ -961,7 +973,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
             system_melted = True
     
     # If liquid has neither fully melted nor fully frozen, report back
-    if not system_froze and not system_melted:
+    if not system_froze and not system_melted and not system_frz_alt:
         time_to_phase_change = np.nan
     elif system_froze:
         if any(is_frozen):
@@ -976,7 +988,14 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
             time_to_phase_change = x[idx_phase_change]
         else:
             time_to_phase_change = est_time_to_phase_change
+    elif system_frz_alt:
+        if any(is_frozen_alt):
+            idx_phase_change = np.where(is_frozen_alt)[0][0]
+            time_to_phase_change = x[idx_phase_change]
+        else:
+            time_to_phase_change = est_time_to_phase_change
+        
     if not CheckFullTrajectory:
         time_to_phase_change = np.nan
     
-    return [system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac]
+    return [system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt]

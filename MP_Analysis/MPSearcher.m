@@ -76,6 +76,11 @@ else
     TBracket = diff(T_dat.dT);
 end
 
+% Check for abort calculation flag
+if T_dat.Alt_Structure
+    Tm = T;
+    return
+end
 
 while TBracket > Settings.BracketThreshold
 
@@ -195,6 +200,10 @@ while TBracket > Settings.BracketThreshold
         return
     elseif T == lb && df > 0  % derivative greater than 0 indicates the system melted
         disp('System melted at lower T bound. Unable to bracket melting point within bounds!')
+        Tm = T;
+        return
+    end
+    if T_dat.Alt_Structure % Check for abort calculation flag
         Tm = T;
         return
     end
