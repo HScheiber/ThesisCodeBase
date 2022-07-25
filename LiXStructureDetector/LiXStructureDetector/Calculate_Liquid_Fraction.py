@@ -48,7 +48,8 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                                 system geometry.
         T                       The actual system temperature.
         RefStructure            Tells the algorithm which structure to check 
-                                for melting/freezing.
+                                for melting/freezing. If a solid structure is selected,
+                                the algorithm checks both the liquid and the solid.
         CheckFullTrajectory     Checks the entire trajectory when true, or 
                                 only the final time point when false. Note that 
                                 when false, the time_to_phase_change output is 
@@ -107,7 +108,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                                 0 = No auxiliary data, 1 = max probability of any one class,
                                 2 = also include liquid probability, ... Up to 10.
     
-    @author: Hayden
+    @author: Hayden Scheiber
     """
     
     # % Import libraries and define functions
@@ -334,6 +335,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         n_classes += 1
     
     ref_idx = list(map_dict.keys())[list(map_dict.values()).index(RefStructure)]
+    liq_idx = list(map_dict.keys())[list(map_dict.values()).index('Liquid')]
     
     if T_Ref is None:
         T_txt = ""
@@ -757,6 +759,11 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         d = hist_laxis(predicted_classes_init, n_classes, [0,n_classes])
         d_norm = d/t.atoms.n_atoms
         InitialRefFrac = d_norm[ref_idx]
+        InitialLiqFrac = d_norm[liq_idx]
+        if liq_idx != ref_idx:
+            logging.info('\nInitial Fraction of ' + map_dict[liq_idx] + 
+                         ' Phase is: {:.2f} %.'.format(
+                             InitialLiqFrac*100))
         logging.info('\nInitial Fraction of ' + map_dict[ref_idx] + 
                      ' Phase is: {:.2f} %. Time to calculate: {:.1f} s.'.format(
                          InitialRefFrac*100,
@@ -799,10 +806,17 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         d = hist_laxis(predicted_classes_init, n_classes, [0,n_classes])
         d_norm = d/t.atoms.n_atoms
         InitialRefFrac = d_norm[ref_idx]
+        InitialLiqFrac = d_norm[liq_idx]
+        if liq_idx != ref_idx:
+            logging.info('\nInitial Fraction of ' + map_dict[liq_idx] + 
+                         ' Phase is: {:.2f} %.'.format(
+                             InitialLiqFrac*100))
         logging.info('\nInitial Fraction of ' + map_dict[ref_idx] + 
                      ' Phase is: {:.2f} %. Time to calculate: {:.1f} s.'.format(
                          InitialRefFrac*100,
                          time.time() - t_if))
+    else:
+        InitialLiqFrac = 1 - InitialRefFrac
     
     # Finally, generate a series of line plots: partitions vs time
     y_max = 100
@@ -815,6 +829,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     d = hist_laxis(predicted_classes, n_classes, [0,n_classes])
     d_norm = d/t.atoms.n_atoms
     final_ref_frac = d_norm[-1,ref_idx]
+    final_liq_frac = d_norm[-1,liq_idx]
     x = np.array([i * traj_timestep + min_traj_time for i in Traj_starts])
     
     if CheckFullTrajectory and SavePredictionsImage:
@@ -862,19 +877,26 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
             
     # Leave SlopeThreshold and InitialRefFrac as fractions or convert them to absolute numbers
     if RefChangeThreshold <= 1:
-        Threshold_Upper = min(InitialRefFrac + RefChangeThreshold,0.85) # Above this number indicates melting/freezing [liquid/solid]
-        Threshold_Lower = max(InitialRefFrac - RefChangeThreshold,0.15) # Below this number indicates freezing/melting [liquid/solid]
+        Threshold_Upper_sol = min(InitialRefFrac + RefChangeThreshold,0.95) # Above this number indicates melting/freezing [solid]
+        Threshold_Lower_sol = max(InitialRefFrac - RefChangeThreshold,0.05) # Below this number indicates freezing/melting [solid]
+        Threshold_Upper_liq = min(InitialLiqFrac + RefChangeThreshold,0.95) # Above this number indicates melting/freezing [liquid]
+        Threshold_Lower_liq = max(InitialLiqFrac - RefChangeThreshold,0.05) # Below this number indicates freezing/melting [liquid]
         ref_fraction = d_norm[:,ref_idx]
+        liq_fraction = d_norm[:,liq_idx]
     else: # Convert to absolute units
         ref_fraction = d[:,ref_idx]
+        liq_fraction = d[:,liq_idx]
         SlopeThreshold = SlopeThreshold*t.atoms.n_atoms # [Structure Fraction/ps] -> [Atoms/ps]
         InitialRefFrac = InitialRefFrac*t.atoms.n_atoms # Initial fraction -> Initial Num atoms
-        Threshold_Upper = min(InitialRefFrac + RefChangeThreshold,t.atoms.n_atoms*0.85) # Above this number indicates melting/freezing [liquid/solid]
-        Threshold_Lower = max(InitialRefFrac - RefChangeThreshold,t.atoms.n_atoms*0.15) # Below this number indicates freezing/melting [liquid/solid]
+        InitialLiqFrac = InitialLiqFrac*t.atoms.n_atoms # Initial fraction -> Initial Num atoms
+        Threshold_Upper_sol = min(InitialRefFrac + RefChangeThreshold,t.atoms.n_atoms*0.95) # Above this number indicates melting/freezing [liquid/solid]
+        Threshold_Lower_sol = max(InitialRefFrac - RefChangeThreshold,t.atoms.n_atoms*0.05) # Below this number indicates freezing/melting [liquid/solid]
+        Threshold_Upper_liq = min(InitialLiqFrac + RefChangeThreshold,t.atoms.n_atoms*0.95) # Above this number indicates melting/freezing [liquid/solid]
+        Threshold_Lower_liq = max(InitialLiqFrac - RefChangeThreshold,t.atoms.n_atoms*0.05) # Below this number indicates freezing/melting [liquid/solid]
     
     if ref_idx == 0: # Reference Structure is Liquid
-        is_frozen = ref_fraction <= Threshold_Lower
-        is_melted = ref_fraction >= Threshold_Upper
+        is_frozen = ref_fraction <= Threshold_Lower_liq
+        is_melted = ref_fraction >= Threshold_Upper_liq
         # Check slope of last 90% of trajectory (fit linear regression)
         if CheckFullTrajectory:
             x1 = x[x >= max_time*SlopeCheckBegin] # [ps] time points
@@ -889,20 +911,36 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                 est_time_to_phase_change = (Threshold_Lower - y1[0])/slope + x1[0]
 
     else: # Reference structure is a solid structure
-        is_frozen = ref_fraction >= Threshold_Upper
-        is_melted = ref_fraction <= Threshold_Lower
-        # Check slope of last 90% of trajectory
+        is_frozen_sol = ref_fraction >= Threshold_Upper_sol
+        is_melted_sol = ref_fraction <= Threshold_Lower_sol
+        
+        is_frozen_liq = liq_fraction <= Threshold_Lower_liq
+        is_melted_liq = liq_fraction >= Threshold_Upper_liq
+        
+        is_frozen = is_frozen_sol | is_frozen_liq
+        is_melted = is_melted_sol | is_melted_liq
+        
+        # Check slope of last $SlopeCheckBegin% of trajectory
         if CheckFullTrajectory:
             x1 = x[x >= max_time*SlopeCheckBegin] # [ps] time points
             y1 = ref_fraction[x >= max_time*SlopeCheckBegin] # fraction (or absolute number) of reference structure
-            regmodel = linregress(x1, y1)
-            slope = regmodel.slope
-            if slope > SlopeThreshold:
+            y2 = liq_fraction[x >= max_time*SlopeCheckBegin]
+            regmodel_sol = linregress(x1, y1)
+            regmodel_liq = linregress(x1, y2)
+            slope_sol = regmodel_sol.slope
+            slope_liq = regmodel_liq.slope
+            if slope_sol > SlopeThreshold:
                 system_freezing = True
-                est_time_to_phase_change = (Threshold_Upper - y1[0])/slope + x1[0]
-            elif slope < -SlopeThreshold:
+                est_time_to_phase_change = (Threshold_Upper_sol - y1[0])/slope_sol + x1[0]
+            elif slope_liq < -SlopeThreshold:
+                system_freezing = True
+                est_time_to_phase_change = (Threshold_Upper_liq - y2[0])/slope_liq + x1[0]
+            elif slope_sol < -SlopeThreshold:
                 system_melting = True
-                est_time_to_phase_change = (Threshold_Lower - y1[0])/slope + x1[0]
+                est_time_to_phase_change = (Threshold_Lower_sol - y1[0])/slope_sol + x1[0]
+            elif slope_liq > SlopeThreshold:
+                system_melting = True
+                est_time_to_phase_change = (Threshold_Lower_liq - y2[0])/slope_liq + x1[0]
 
     # If system is passed the threshold into frozen or melting, use that
     system_froze = any(is_frozen)
@@ -941,4 +979,4 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     if not CheckFullTrajectory:
         time_to_phase_change = np.nan
     
-    return [system_froze,system_melted,time_to_phase_change,final_ref_frac]
+    return [system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac]
