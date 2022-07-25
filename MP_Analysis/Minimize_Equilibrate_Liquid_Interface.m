@@ -544,12 +544,12 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         error(['Error running mdrun for system minimization. Problem command: ' newline mdrun_command]);
     end
 
-%    system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
-    system(['echo "4 0" | gmx_d energy -f ' Energy_file ' -o ' strrep(Energy_file,'.edr','.xvg')])
-    En_xvg_file = fullfile(Settings.WorkDir,'Comb_Equil.xvg');
-    Data = import_xvg(En_xvg_file);
-    plot(Data(:,1),Data(:,2)./(2*Settings.nmol_liquid)) % Potential
-    ylim([-1000 1000])
+%     system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+%     system(['echo "4 0" | gmx_d energy -f ' Energy_file ' -o ' strrep(Energy_file,'.edr','.xvg')])
+%     En_xvg_file = fullfile(Settings.WorkDir,'Comb_Equil.xvg');
+%     Data = import_xvg(En_xvg_file);
+%     plot(Data(:,1),Data(:,2)./(2*Settings.nmol_liquid)) % Potential
+%     ylim([-1000 1000])
     disp('*** Minimization of Solid-Liquid Interface Complete ***')
     
     % Remove backups
