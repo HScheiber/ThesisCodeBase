@@ -91,7 +91,7 @@ if ~Loaded_Prev_Data
     T_dat.Melt_Trace = []; % Keeps track of whether the process melted at each iteration
     T_dat.T_Freeze_Trace = []; % This will be a trace of only the temperatures where freezing was detected
     T_dat.T_Melt_Trace = []; % This will be a trace of only the temperatures where melting was detected
-    T_dat.Alt_Structure = False; % This is a switch to kill the calculation if the wrong structure is freezing out
+    T_dat.Alt_Structure = false; % This is a switch to kill the calculation if the wrong structure is freezing out
     save(Settings.CurrentTFile,'T_dat')
 
     % Rename the gro file at the given reference temperature

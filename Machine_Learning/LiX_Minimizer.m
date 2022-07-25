@@ -1230,8 +1230,8 @@ if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
     rmdir(WorkDir,'s');
     
     if Aborted
-        Loss_add = Loss_add + log(1 + 2*Model_Mismatch);
-        Settings.skip_finite_T = true;
+        Loss_add = Loss_add + log(1 + Model_Mismatch);
+        Settings.Finite_T_Data.MP = 0;
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
     end
