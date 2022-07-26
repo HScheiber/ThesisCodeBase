@@ -189,17 +189,17 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\T_742.0000'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiI_BH_Model_XY1\a6f2565d4140f1916bfac50c7d25811a'
 Salt = 'LiI'
-SystemName = 'Test_MP'
-RefStructure='Rocksalt'
+SystemName = 'Equil_Liq'
+RefStructure='Liquid'
 SaveTrajectory=True
 SaveFeatures=False
 SavePredictions=False 
 SavePredictionsImage=True
-ML_TimeLength=20
-ML_TimeStep=5
-TimePerFrame=5
+ML_TimeLength=10
+ML_TimeStep=1
+TimePerFrame=1
 FileType='gro'
 Verbose=True
 StartPoint = None
@@ -215,14 +215,15 @@ Spatial_Reassignment = False
 Spatial_Interfacial = None
 SaveTrajectoryAux = 2
 LoadFeatures = True
-T = 742.0000
-T_Ref = 742.0000
+T = None
+T_Ref = None
 RefChangeThreshold = 0.25
 CheckFullTrajectory = True
 
 
 
-[system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt] = LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=SystemName, T=T,
+[system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt] = LiXStructureDetector.Calculate_Liquid_Fraction(
+                              WorkDir, Salt, SystemName=SystemName, T=T,
                               T_Ref=T_Ref, RefStructure=RefStructure, CheckFullTrajectory=CheckFullTrajectory, 
                               SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
                               SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage,

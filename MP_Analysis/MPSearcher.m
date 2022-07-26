@@ -110,28 +110,17 @@ while TBracket > Settings.BracketThreshold
 
     % If there are no known indeterminate points, attempt to narrow the bracket
     else
-        [T_Freeze_Max,TFMidx] = max(T_dat.T_Trace(logical(T_dat.Freeze_Trace)));
-        [T_Melt_Min,TMMidx] = min(T_dat.T_Trace(logical(T_dat.Melt_Trace)));
+        T_Freeze_Max = max(T_dat.T_Trace(logical(T_dat.Freeze_Trace)));
+        T_Melt_Min = min(T_dat.T_Trace(logical(T_dat.Melt_Trace)));
 
         if isempty(T_Freeze_Max) % If only melting points have been found so far
             % Update the stepsize
-            if (1/T_dat.f_Trace(TMMidx)) < 2*Settings.CheckTime
-                StepSize = (Settings.MeshSizeMultiplier^(length(T_dat.T_Melt_Trace)))*Settings.InitialMeshSize;
-            else
-                StepSize = Settings.InitialMeshSize;
-            end
+            StepSize = (Settings.MeshSizeMultiplier^(length(T_dat.T_Melt_Trace)))*Settings.InitialMeshSize;
             T = max(T_Melt_Min - StepSize,lb);
-
         elseif isempty(T_Melt_Min) % If only freezing points have been found so far
             % Update the stepsize
-            if (1/T_dat.f_Trace(TFMidx)) < 2*Settings.CheckTime
-                StepSize = (Settings.MeshSizeMultiplier^(length(T_dat.T_Freeze_Trace)))*Settings.InitialMeshSize; 
-            else
-                StepSize = Settings.InitialMeshSize;
-            end
-
+            StepSize = (Settings.MeshSizeMultiplier^(length(T_dat.T_Freeze_Trace)))*Settings.InitialMeshSize; 
             T = min(T_Freeze_Max + StepSize,ub);
-
         else
             % Once a melting point bracket has been established, narrow it
             if Settings.UseDerivativeWeighting && ~any(isnan(T_dat.df_bracket))

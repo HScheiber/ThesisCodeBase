@@ -898,7 +898,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     if ref_idx == 0: # Reference Structure is Liquid
         is_frozen = ref_fraction <= Threshold_Lower_liq
         is_melted = ref_fraction >= Threshold_Upper_liq
-        is_frozen_alt = False # unable to check if only looking at liquid
+        is_frozen_alt = np.array([False]) # unable to check if only looking at liquid
         # Check slope of last 90% of trajectory (fit linear regression)
         if CheckFullTrajectory:
             x1 = x[x >= max_time*SlopeCheckBegin] # [ps] time points
