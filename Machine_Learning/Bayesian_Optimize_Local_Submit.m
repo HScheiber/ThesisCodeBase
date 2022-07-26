@@ -142,8 +142,8 @@ for tidx = 1:length(Theories)
             Models(idx).SigmaEpsilon = true;
             Models(idx).Fix_Charge = true;
             Models(idx).Additivity = true;
-            Models(idx).Parallel_Bayesopt = true;
-            Models(idx).Parallel_Struct_Min = false;
+            Models(idx).Parallel_Bayesopt = false;
+            Models(idx).Parallel_Struct_Min = true;
             Models(idx).Parallel_LiX_Minimizer = false;
             
         end
