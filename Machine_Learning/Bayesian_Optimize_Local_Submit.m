@@ -114,7 +114,7 @@ for tidx = 1:length(Theories)
             Models(idx).MeshSizeMultiplier = 5;
             Models(idx).QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
             %Models(idx).MinInterfaceWidth = 0.15; % [nm] +- distance from the solid-liquid interface within which to minimize
-            Models(idx).ScaleInitialLiqDensity = 1.25; 
+            Models(idx).ScaleInitialLiqDensity = 0.8; 
             
             % Barostat Options
             Models(idx).Isotropy = 'semiisotropic';
