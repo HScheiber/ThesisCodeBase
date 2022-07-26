@@ -627,8 +627,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     if Liq_Fraction < 0.9
         disp('Detected Liquid Freezing at Experimental MP')
-        Output.Solid_V_MP = nan;
-        Output.Solid_H_MP = nan;
+        Output.Liquid_V_MP = nan;
+        Output.Liquid_H_MP = nan;
         return
     end
     
