@@ -1,13 +1,11 @@
 function Output = Calc_Solid_Properties_at_MP(Settings)
     
     Settings.WorkDir = GetMDWorkdir(Settings);
-    diary off
-    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
-    
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
-    
+    diary off
+    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
     
     disp('*** Separate Equilibration of Solid Selected ***')
     

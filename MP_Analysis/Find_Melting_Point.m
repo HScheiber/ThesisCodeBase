@@ -8,9 +8,6 @@ end
 
 % Grab some additional settings that depend on inputs
 [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-diary off
-diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
-
 [Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
 Settings.mdrun_opts = regexprep(Settings.mdrun_opts,' -maxh [0-9]+','','once');
 Settings.CurrentTFile = fullfile(Settings.WorkDir,[Settings.JobName '_MP.mat']);
@@ -23,6 +20,8 @@ ResultsFile = fullfile(Settings.WorkDir,[Settings.JobName '_MPResults.mat']);
 if ~exist(Settings.RefGeomDir,'dir')
     mkdir(Settings.RefGeomDir);
 end
+diary off
+diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
 
 % Check if calculation already completed
 if isfile(ResultsFile) && ~Settings.Continue

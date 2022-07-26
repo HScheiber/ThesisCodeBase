@@ -10,13 +10,12 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Calculate average density of equilibrated box based on last 25% of simulation
     % Give new density as output
     
-    Settings.WorkDir = GetMDWorkdir(Settings);
-    diary off
-    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
-    
+    Settings.WorkDir = GetMDWorkdir(Settings);    
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
+    diary off
+    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
 
     % Grab reference density, cutoff, and corresponding box size
     L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer; % nm, the box dimension
