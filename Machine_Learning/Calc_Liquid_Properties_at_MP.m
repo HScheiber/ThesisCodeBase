@@ -10,7 +10,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Calculate average density of equilibrated box based on last 25% of simulation
     % Give new density as output
     
-    Settings.WorkDir = tempname;
+    Settings.WorkDir = GetMDWorkdir(Settings);
+    
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
@@ -49,7 +50,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     mtimer = tic;
     Prep_Liq_Metal_Only = fullfile(Settings.WorkDir,['Prep_Liq_Metal_Only.' Settings.CoordType]);
     cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
-        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(nmol_liquid) ' -try 200 -scale 0.57'];
+        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(nmol_liquid) ' -try 200 -scale 0.4'];
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
@@ -63,7 +64,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
     htimer = tic;
     cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
-        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 400 -scale 0.57'];
+        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 400 -scale 0.4'];
 
     [errcode,output] = system(cmd);
 
@@ -282,6 +283,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         disp(mdrun_output);
         error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
     end
+    
+%     system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+%     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
+%     Data = import_xvg(En_xvg_file);
+%     plot(Data(:,1),Data(:,2)./nmol_liquid) % Potential
+%     ylim([-1000 1000])
+    
     
     %% System is now minimized, run a fast equilibration to get equilibrium properties at requested T and P
 
@@ -595,6 +603,12 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
     end
     
+%     system(['wsl source ~/.bashrc; echo "5 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+%     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq.xvg');
+%     Data = import_xvg(En_xvg_file);
+%     plot(Data(:,1),Data(:,2)./nmol_liquid) % Potential
+%     plot(Data(:,1),(10^3).*Data(:,3)./nmol_liquid) % Volume
+    
     % Check to ensure system remained liquid
     PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
         pyargs('SystemName','Equil_Liq',...
@@ -630,8 +644,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     En_set = [En_set ' 0'];
     En_set = regexprep(En_set,' +',' ');
     
-    % Grab second half of data from results
-    startpoint = Settings.Liquid_Test_Time*0.5; % ps
+    % Grab last 20% of data from results
+    startpoint = Settings.Liquid_Test_Time*0.8; % ps
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
     ' energy -f ' windows2unix(Energy_file)...
     ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...

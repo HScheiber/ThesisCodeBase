@@ -2,7 +2,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     
     disp('*** Separate Equilibration of Solid Selected ***')
     
-    Settings.WorkDir = tempname;
+    Settings.WorkDir = GetMDWorkdir(Settings);
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end

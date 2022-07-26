@@ -3,7 +3,16 @@ function [WorkDir,JobName,Full_Model_Name] = GetMDWorkdir(Settings)
 % If this is part of a bayesopt calculation, return a temporary folder as
 % the working directory
 if isfield(Settings,'initial_opt_type')
-    WorkDir = tempname;
+    Hashobj.S = Settings.S;
+    Hashobj.CR_Damp = Settings.CR_Damp;
+    Hashobj.Model = Settings.Model;
+    Hashobj.Theory = Settings.Theory;
+    Hashobj.C6_Damp = Settings.C6_Damp;
+    Hashobj.GAdjust_MM = Settings.GAdjust_MM;
+    Hashobj.GAdjust_MX = Settings.GAdjust_MX;
+    Hashobj.GAdjust_XX = Settings.GAdjust_XX;
+    
+    WorkDir = fullfile(pwd,DataHash(Hashobj));
     JobName = 'Test_MP';
     Full_Model_Name = Settings.Model;
     return
