@@ -90,11 +90,11 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.Rocksalt.a = 1;
             
             % Finite T loss
-            Models(idx).Loss_Options.Fusion_Enthalpy = 0; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-            Models(idx).Loss_Options.MP_Volume_Change = 0; % Fitting the experimental change in volume due to melting at the experimental MP
-            Models(idx).Loss_Options.Liquid_MP_Volume = 0; % Fitting the experimental volume per formula unit at the experimental MP
-            Models(idx).Loss_Options.Solid_MP_Volume  = 0; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-            Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
+            Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.MP  = 0; % Fitting the experimental MP, using the experimental structure as the solid
             
             % Finite T options (including MP options)
             Models(idx).c_over_a = 2;
