@@ -1227,7 +1227,13 @@ if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
     % Skip the automatic geometry minimization
     
     [Tm_estimate,WorkDir,Aborted] = Find_Melting_Point(Settings);
-    %rmdir(WorkDir,'s');
+    
+    if Settings.Delete_Equil
+        try
+            rmdir(WorkDir,'s')
+        catch
+        end
+    end
     
     if Aborted
         Loss_add = Loss_add + log(1 + Model_Mismatch);

@@ -82,6 +82,7 @@ for tidx = 1:length(Theories)
             Models(idx).JobSettings.OMP_Threads = 1;
             Models(idx).JobSettings.MPI_Ranks = 8;
             Models(idx).JobSettings.Cores = 8;
+            Models(idx).JobSettings.dd = [1 2 4];
             Models(idx).Cutoff_Buffer = 1.2; % This affects Structure_Minimization as well as other aspects of code
             
             % T=0 Loss
@@ -113,8 +114,8 @@ for tidx = 1:length(Theories)
             Models(idx).InitialMeshSize = 20;
             Models(idx).MeshSizeMultiplier = 5;
             Models(idx).QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
-            %Models(idx).MinInterfaceWidth = 0.15; % [nm] +- distance from the solid-liquid interface within which to minimize
-            Models(idx).ScaleInitialLiqDensity = 0.8; 
+            Models(idx).ScaleInitialLiqDensity = 0.8;
+            Models(idx).Delete_Equil = false; % switch to delete temporary calculation folders for finite T calcs
             
             % Barostat Options
             Models(idx).Isotropy = 'semiisotropic';
@@ -143,6 +144,7 @@ for tidx = 1:length(Theories)
             Models(idx).Additivity = true;
             Models(idx).Parallel_Bayesopt = false;
             Models(idx).Parallel_Struct_Min = true;
+            
         end
     end
 end
