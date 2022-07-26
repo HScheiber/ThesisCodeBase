@@ -74,7 +74,7 @@ function Equilibrate_Solid(Settings)
     fwrite(fidMDP,regexprep(MDP_Template,'\r',''));
     fclose(fidMDP);
     
-    % Complete a topology file for the liquid box to be minimized
+    % Complete a topology file for the box to be minimized
     Atomlist = copy_atom_order(SuperCell_File);
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
     Top_Filename = fullfile(WorkDir,'Equil_Sol.top');

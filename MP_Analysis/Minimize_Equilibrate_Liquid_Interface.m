@@ -96,7 +96,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
         error('Not all requested liquid atoms were added!')
     end
     
-    % Minimize the randomly-generated liquid: build MDP file
+    %% Minimize the randomly-generated liquid: build MDP file
     MDP = Settings.MDP;
     MDP.Minimization_txt = fileread(fullfile(Settings.home,'templates','Gromacs_Templates',...
     'MDP.template'));
