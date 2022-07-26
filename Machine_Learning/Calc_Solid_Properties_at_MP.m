@@ -426,12 +426,16 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     Output.Solid_V_MP = mean(Data(:,2))*(10^3)/nmol_solid; % A^3 / ion pair
     Output.Solid_H_MP = mean(Data(:,3))/nmol_solid; % kJ/mol
     
-    % plot(Data(:,1),(10^3).*Data(:,2)./nmol_solid)
-    % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
-    % stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
+%     plot(Data(:,1),(10^3).*Data(:,2)./nmol_solid)
+%     plot(Data(:,1),Data(:,3)./nmol_solid)
+%     V = mean((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
+%     stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
     
     if Settings.Delete_Equil
-        rmdir(Settings.WorkDir,'s')
+        try
+            rmdir(Settings.WorkDir,'s')
+        catch
+        end
     end
     
     disp('*** Separate Equilibration of Solid Complete ***')

@@ -114,8 +114,8 @@ for tidx = 1:length(Theories)
             Models(idx).InitialMeshSize = 20;
             Models(idx).MeshSizeMultiplier = 5;
             Models(idx).QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
-            %Models(idx).MinInterfaceWidth = 0.15; % [nm] +- distance from the solid-liquid interface within which to minimize
-            Models(idx).ScaleInitialLiqDensity = 0.8; 
+            Models(idx).ScaleInitialLiqDensity = 0.8;
+            Models(idx).Delete_Equil = false; % switch to delete temporary calculation folders for finite T calcs
             
             % Barostat Options
             Models(idx).Isotropy = 'semiisotropic';
@@ -144,6 +144,7 @@ for tidx = 1:length(Theories)
             Models(idx).Additivity = true;
             Models(idx).Parallel_Bayesopt = false;
             Models(idx).Parallel_Struct_Min = true;
+            
         end
     end
 end

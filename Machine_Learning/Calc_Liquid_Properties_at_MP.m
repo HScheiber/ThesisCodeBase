@@ -17,7 +17,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     end
 
     % Grab reference density, cutoff, and corresponding box size
-    L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer*1.25; % nm, the box dimension
+    L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer; % nm, the box dimension
     Volume = L^3; % Volume in nm^3
     nmol_liquid = round(Volume*Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
 
@@ -645,7 +645,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     En_set = regexprep(En_set,' +',' ');
     
     % Grab last 20% of data from results
-    startpoint = Settings.Liquid_Test_Time*0.8; % ps
+    startpoint = Settings.Liquid_Test_Time*0.5; % ps
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
     ' energy -f ' windows2unix(Energy_file)...
     ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
@@ -667,7 +667,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
     
     if Settings.Delete_Equil
-        rmdir(Settings.WorkDir,'s')
+        try
+            rmdir(Settings.WorkDir,'s')
+        catch
+        end
     end
     
     disp('*** Separate Equilibration of Liquid Complete ***')
