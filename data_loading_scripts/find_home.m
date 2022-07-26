@@ -29,6 +29,14 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
             slurm = true;
             qsub = 'sbatch';
 			StrSelModels = '/home/scheiber/project/LiX_Structure_Selector';
+        elseif strcmp(server,'nar')
+            home = '/home/scheiber/ThesisCodeBase';     
+            project = '/project/6001647/scheiber';
+            computer = 'narval';
+            slurm = true;
+            BO_Models = '/home/scheiber/project/Model_Building/Completed';
+            qsub = 'sbatch';
+			StrSelModels = '/home/scheiber/project/LiX_Structure_Selector';
         elseif ~isempty(regexp(server,'se[0-9]','ONCE')) || strcmpi(server,'log')
             home = '/home/haydensc/ThesisCodeBase';
             project = '/scratch/st-gpatey-1/haydensc';

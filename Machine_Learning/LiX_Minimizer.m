@@ -1041,7 +1041,6 @@ if Loss_add >= 1
     return
 end
 
-
 %% Parallel Setup
 N = length(Settings.Structures);
 if Settings.Parallel_LiX_Minimizer
@@ -1059,12 +1058,19 @@ if Settings.Parallel_LiX_Minimizer
             local_cluster = parcluster('local');
 
             % Modify the JobStorageLocation to a temporary directory
-            tmp = tempname;
+            [~,~,computer] = find_home;
+            switch computer
+                case {'cedar' 'graham' 'narval'}
+                    tmp = fullfile(getenv('SLURM_TMPDIR'),'local_cluster_jobs');
+                case 'sockeye'
+                    tmp = fullfile(getenv('TMPDIR'),'local_cluster_jobs');
+                otherwise
+                    tmp = fullfile(tempname,'local_cluster_jobs');
+            end
             if ~isfolder(tmp)
                 mkdir(tmp)
             end
             local_cluster.JobStorageLocation = tmp;
-
             ppool = parpool(local_cluster,min(Parcores,N));
         else
             ppool = Cur_Pool;
@@ -1090,39 +1096,8 @@ if Settings.Parallel_LiX_Minimizer
     end
 %% Serial mode    
 else
-    
-%     if Settings.Parallel_Struct_Min
-%         % Set up matlab parallel features
-%         PrefCores = feature('numcores');
-%         if ~isempty(gcp('nocreate'))
-%             Cur_Pool = gcp;
-%             Cur_Workers = Cur_Pool.NumWorkers;
-% 
-%             % Start the parallel pool
-%             if Cur_Workers ~= PrefCores
-%                 delete(Cur_Pool);
-%                 % Create a "local" cluster object
-%                 local_cluster = parcluster('local');
-% 
-%                 % Modify the JobStorageLocation to a temporary directory
-%                 tmp = tempname;
-%                 if ~isfolder(tmp)
-%                     mkdir(tmp)
-%                 end
-%                 local_cluster.JobStorageLocation = tmp;
-% 
-%                 parpool(local_cluster,PrefCores);
-%             else
-%                 % Keep current pool
-%             end
-%         else
-%             parpool(PrefCores);
-%         end
-%     end
-    
     for idx = 1:N
         Settings.Structure = Settings.Structures{idx};
-        
         Settings.Minimization_Data{idx} = Structure_Minimization(Settings,...
             'Extra_Properties',Extra_Properties);
     end
@@ -1135,7 +1110,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume ...
         Settings.Loss_Options.Solid_MP_Volume ...
-        Settings.Loss_Options.MP] > tol)
+        Settings.Loss_Options.MP] > tol) || Extra_Properties
     
     Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
     
@@ -1165,7 +1140,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         
         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
         
-        if Model_Mismatch > Settings.MaxModelMismatch
+        if ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Extra_Properties
             Loss_add = Loss_add + log(1 + Model_Mismatch);
             Settings.skip_finite_T = true;
         else
@@ -1181,11 +1156,17 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 end
 
 % High T liquid properties
-if any([Settings.Loss_Options.Fusion_Enthalpy ...
+if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume] > tol) ...
-        && ~Settings.skip_finite_T
-    if ~isempty(gcp('nocreate'))
+        && ~Settings.skip_finite_T ) || Extra_Properties
+    
+    if Settings.Parallel_Bayesopt % Run serially
+        Settings.JobSettings.Cores = 1;
+        Settings.JobSettings.MPI_Ranks = 1;
+        Settings.JobSettings.OMP_Threads = 1;
+        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+    elseif ~isempty(gcp('nocreate')) % Run in parallel
         delete(gcp);
     end
     
@@ -1195,11 +1176,17 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 end
 
 % High T solid properties
-if any([Settings.Loss_Options.Fusion_Enthalpy ...
+if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Solid_MP_Volume] > tol) ...
-        && ~Settings.skip_finite_T
-    if ~isempty(gcp('nocreate'))
+        && ~Settings.skip_finite_T ) || Extra_Properties
+    
+    if Settings.Parallel_Bayesopt % Run serially
+        Settings.JobSettings.Cores = 1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+        Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+    elseif ~isempty(gcp('nocreate')) % Run in parallel
         delete(gcp);
     end
     
@@ -1215,17 +1202,21 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 end
 
 % Melting point
-if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
-    if ~isempty(gcp('nocreate'))
+if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Extra_Properties
+    
+    if Settings.Parallel_Bayesopt % Run serially
+        Settings.JobSettings.Cores = 1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+        Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+    elseif ~isempty(gcp('nocreate')) % Run in parallel
         delete(gcp);
     end
     
     Settings.BatchMode = false;
     Settings.Submit_Jobs = false;
-    Settings.Skip_Minimization = true;
+    Settings.Skip_Minimization = true; % Skip the automatic geometry minimization
     Settings.RefStructure = Settings.Finite_T_Data.Structure;
-    % Skip the automatic geometry minimization
-    
     [Tm_estimate,WorkDir,Aborted] = Find_Melting_Point(Settings);
     
     if Settings.Delete_Equil
@@ -1235,7 +1226,7 @@ if Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T
         end
     end
     
-    if Aborted
+    if Aborted && ~Extra_Properties
         Loss_add = Loss_add + log(1 + Model_Mismatch);
         Settings.Finite_T_Data.MP = 0;
     else
