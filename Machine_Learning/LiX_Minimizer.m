@@ -1184,7 +1184,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.9 solid
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
-    if Settings.MinMDP.Parallel_Min
+    if Settings.Parallel_Bayesopt
         setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
         setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
         setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
@@ -1225,7 +1225,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     
     Settings.Finite_T_Data.Fusion_dV = Settings.Finite_T_Data.Liquid_V_MP - ...
         Settings.Finite_T_Data.Solid_V_MP;
-    if Settings.MinMDP.Parallel_Min
+    if Settings.Parallel_Bayesopt
         setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
         setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
         setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
@@ -1273,7 +1273,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
     end
-    if Settings.MinMDP.Parallel_Min
+    if Settings.Parallel_Bayesopt
         setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
         setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
         setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
