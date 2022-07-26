@@ -4,6 +4,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
+    save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
     

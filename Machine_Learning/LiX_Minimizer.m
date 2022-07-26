@@ -942,6 +942,7 @@ else
 end
 
 Settings.Minimization_Data = Initialize_Minimization_Data(Settings);
+Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 
 % Calculate loss due to infeasible TF / BH models with no well minima (only works reliably in sigma-epsilon form)
 Loss_add = 0;
@@ -1040,6 +1041,8 @@ end
 
 if Loss_add >= 1
     Loss = Loss_add;
+    UserData.Minimization_Data = Settings.Minimization_Data;
+    UserData.Finite_T_Data = Settings.Finite_T_Data;
     return
 end
 
@@ -1108,7 +1111,6 @@ end
 % Initialize Finite T Data structure and update Settings
 tol = sqrt(eps);
 Settings.skip_finite_T = false;
-Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume ...

@@ -22,6 +22,7 @@ ResultsFile = fullfile(Settings.WorkDir,[Settings.JobName '_MPResults.mat']);
 if ~exist(Settings.RefGeomDir,'dir')
     mkdir(Settings.RefGeomDir);
 end
+save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
 diary off
 diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
 
