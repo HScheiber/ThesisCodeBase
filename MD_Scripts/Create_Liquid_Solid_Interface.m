@@ -5,9 +5,7 @@ function Create_Liquid_Solid_Interface(Settings)
     
     % Find the approximate experimental density based on the temperature and pressure
     if ~isfield(Settings,'Ref_Density')
-        warning('off','MATLAB:UndefinedFunction')
         Settings.Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
-        warning('on','MATLAB:UndefinedFunction')
     end
     
     % Run a short equilibrating NPT simulation of the solid to obtain the correct solid density

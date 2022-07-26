@@ -9,6 +9,7 @@ function Minimize_Liquid_Interface(Settings)
     cell_area = norm(cross(Supercell_file_data.a_vec,Supercell_file_data.b_vec));
     Liquid_Vol = Settings.nmol_liquid/Settings.Ref_Density; % Volume in cubic nm
     L = Liquid_Vol/cell_area; % box length in nm
+    R0 = num2str(min(0.4*Get_LiX_Liquid_Density(Settings)/Settings.Ref_Density,0.4),'%0.3f');
     
     a_vec = Supercell_file_data.a_vec;
     b_vec = Supercell_file_data.b_vec;

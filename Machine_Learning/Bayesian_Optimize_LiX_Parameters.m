@@ -154,12 +154,18 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     params = bayesopt_params(Model);
     seed_points = length(params)*10;
 
-    if Model.Parallel_LiX_Minimizer && Model.Parallel_Struct_Min
-        disp('Cannot use Parallel version of both LiX_Minimizer and Structure_Minimization. Using Parallel_LiX_Minimizer only.')
+    if Model.Parallel_Bayesopt
         Model.Parallel_Struct_Min = false;
+        Model.Parallel_LiX_Minimizer = false;
+        Model.MinMDP.Parallel_Min = false;
+    elseif Model.Parallel_LiX_Minimizer
         Model.Parallel_Bayesopt = false;
-    elseif Model.Parallel_LiX_Minimizer || Model.Parallel_Struct_Min
+        Model.Parallel_Struct_Min = false;
+        Model.MinMDP.Parallel_Min = false;
+    elseif Model.Parallel_Struct_Min
         Model.Parallel_Bayesopt = false;
+        Model.Parallel_LiX_Minimizer = false;
+        Model.MinMDP.Parallel_Min = true;
     end
 
     fun = @(x)LiX_Minimizer(Model,x);
@@ -764,8 +770,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     Model.Parallel_LiX_Minimizer = true;
     Model.Parallel_Struct_Min    = false;
     Model.Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
-    [loss,~,Minimization_Data] = LiX_Minimizer(Model,full_opt_point,...
-        'Verbose',true,'Extra_Properties',true);
+    [loss,~,UserData] = LiX_Minimizer(Model,full_opt_point,...
+        'Verbose',true,'Extra_Properties',true,'Therm_Prop_Override',true);
     
     if Model.SigmaEpsilon && Model.Additivity && strcmp(Model.Theory,'JC')        
         % Sigma scaling
@@ -1169,17 +1175,17 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     format long g
     En = zeros(size(Model.Structures));
     for idx = 1:length(Model.Structures)
-        En(idx) = Minimization_Data{idx}.E;
+        En(idx) = UserData.Minimization_Data{idx}.E;
         switch Model.Structures{idx}
             case {'Rocksalt' 'Sphalerite'}
-                En(end+1) = Minimization_Data{idx}.a;
+                En(end+1) = UserData.Minimization_Data{idx}.a;
             case {'Wurtzite' 'NiAs' 'FiveFive'}
-                En(end+1) = Minimization_Data{idx}.a;
-                En(end+1) = Minimization_Data{idx}.c;
+                En(end+1) = UserData.Minimization_Data{idx}.a;
+                En(end+1) = UserData.Minimization_Data{idx}.c;
         end
         disp(Model.Structures{idx})
-        disp(Minimization_Data{idx})
-        Minimization_Data{idx}.Structure = Model.Structures{idx};
+        disp(UserData.Minimization_Data{idx})
+        UserData.Minimization_Data{idx}.Structure = Model.Structures{idx};
     end
 
     disp(['Final Optimized Loss: ' num2str(loss,'%.10f')])
@@ -1201,6 +1207,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     % Save final results
     save(Full_opt_filename,'full_opt_results','loss','full_opt_point',...
-        'Minimization_Data','Pars','Calculation_properties');
+        'UserData','Pars','Calculation_properties');
     
 end

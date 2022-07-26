@@ -21,7 +21,7 @@
 % are the same)
 % When Model.Parallel_Struct_Min = true, this uses the parallel version of the subroutine Structure_Minimization (Note: each instance of gromacs is single-core in either mode)
 %% Inputs
-function [Loss,coupledconstraints,Settings] = LiX_Minimizer(Settings,Param,varargin)
+function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varargin)
 
 coupledconstraints = []; % No coupled constraints on the system
 
@@ -30,10 +30,12 @@ p = inputParser;
 p.FunctionName = 'LiX_Minimizer';
 addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Extra_Properties',Settings.Extra_Properties,@(x)validateattributes(x,{'logical'},{'nonempty'}))
+addOptional(p,'Therm_Prop_Override',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 
 parse(p,varargin{:});
 Settings.MinMDP.Verbose = p.Results.Verbose;
 Extra_Properties = p.Results.Extra_Properties;
+Therm_Prop_Override = p.Results.Therm_Prop_Override;
 
 if Settings.Parallel_LiX_Minimizer && Settings.Parallel_Struct_Min
     Settings.Parallel_Struct_Min = false;
@@ -1106,13 +1108,12 @@ end
 % Initialize Finite T Data structure and update Settings
 tol = sqrt(eps);
 Settings.skip_finite_T = false;
+Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume ...
         Settings.Loss_Options.Solid_MP_Volume ...
-        Settings.Loss_Options.MP] > tol) || Extra_Properties
-    
-    Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
+        Settings.Loss_Options.MP] > tol) || Therm_Prop_Override
     
     Settings.T0 = Settings.Finite_T_Data.Exp_MP; % K, Initial temperature
     Settings.Target_T = Settings.Finite_T_Data.Exp_MP; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
@@ -1140,7 +1141,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         
         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
         
-        if ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Extra_Properties
+        if ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Therm_Prop_Override
             Loss_add = Loss_add + log(1 + Model_Mismatch);
             Settings.skip_finite_T = true;
         else
@@ -1159,13 +1160,21 @@ end
 if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume] > tol) ...
-        && ~Settings.skip_finite_T ) || Extra_Properties
+        && ~Settings.skip_finite_T ) || Therm_Prop_Override
     
     if Settings.Parallel_Bayesopt % Run serially
-        Settings.JobSettings.Cores = 1;
-        Settings.JobSettings.MPI_Ranks = 1;
-        Settings.JobSettings.OMP_Threads = 1;
-        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
+        env.GMX_PME_NUM_THREADS = getenv('GMX_PME_NUM_THREADS');
+        env.GMX_PME_NTHREADS = getenv('GMX_PME_NTHREADS');
+        env.GMX_OPENMP_MAX_THREADS = getenv('GMX_OPENMP_MAX_THREADS');
+        env.KMP_AFFINITY = getenv('KMP_AFFINITY');
+        setenv('OMP_NUM_THREADS','1');
+        setenv('GMX_PME_NUM_THREADS','1');
+        setenv('GMX_PME_NTHREADS','1');
+        setenv('GMX_OPENMP_MAX_THREADS','1');
+        setenv('KMP_AFFINITY','disabled');
+        Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
+        Settings.gmx = Settings.gmx_loc;
     elseif ~isempty(gcp('nocreate')) % Run in parallel
         delete(gcp);
     end
@@ -1173,19 +1182,34 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.9 solid
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
+    if Settings.MinMDP.Parallel_Min
+        setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
+        setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
+        setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
+        setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
+        setenv('KMP_AFFINITY',env.KMP_AFFINITY);
+    end
 end
 
 % High T solid properties
 if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Solid_MP_Volume] > tol) ...
-        && ~Settings.skip_finite_T ) || Extra_Properties
+        && ~Settings.skip_finite_T ) || Therm_Prop_Override
     
     if Settings.Parallel_Bayesopt % Run serially
-        Settings.JobSettings.Cores = 1; % Minimum number of cores to request for calculation. Set to -1 for entire node
-        Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
+        env.GMX_PME_NUM_THREADS = getenv('GMX_PME_NUM_THREADS');
+        env.GMX_PME_NTHREADS = getenv('GMX_PME_NTHREADS');
+        env.GMX_OPENMP_MAX_THREADS = getenv('GMX_OPENMP_MAX_THREADS');
+        env.KMP_AFFINITY = getenv('KMP_AFFINITY');
+        setenv('OMP_NUM_THREADS','1');
+        setenv('GMX_PME_NUM_THREADS','1');
+        setenv('GMX_PME_NTHREADS','1');
+        setenv('GMX_OPENMP_MAX_THREADS','1');
+        setenv('KMP_AFFINITY','disabled');
+        Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
+        Settings.gmx = Settings.gmx_loc;
     elseif ~isempty(gcp('nocreate')) % Run in parallel
         delete(gcp);
     end
@@ -1199,16 +1223,31 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     
     Settings.Finite_T_Data.Fusion_dV = Settings.Finite_T_Data.Liquid_V_MP - ...
         Settings.Finite_T_Data.Solid_V_MP;
+    if Settings.MinMDP.Parallel_Min
+        setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
+        setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
+        setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
+        setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
+        setenv('KMP_AFFINITY',env.KMP_AFFINITY);
+    end
 end
 
 % Melting point
-if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Extra_Properties
+if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_Override
     
     if Settings.Parallel_Bayesopt % Run serially
-        Settings.JobSettings.Cores = 1; % Minimum number of cores to request for calculation. Set to -1 for entire node
-        Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
+        env.GMX_PME_NUM_THREADS = getenv('GMX_PME_NUM_THREADS');
+        env.GMX_PME_NTHREADS = getenv('GMX_PME_NTHREADS');
+        env.GMX_OPENMP_MAX_THREADS = getenv('GMX_OPENMP_MAX_THREADS');
+        env.KMP_AFFINITY = getenv('KMP_AFFINITY');
+        setenv('OMP_NUM_THREADS','1');
+        setenv('GMX_PME_NUM_THREADS','1');
+        setenv('GMX_PME_NTHREADS','1');
+        setenv('GMX_OPENMP_MAX_THREADS','1');
+        setenv('KMP_AFFINITY','disabled');
+        Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
+        Settings.gmx = Settings.gmx_loc;
     elseif ~isempty(gcp('nocreate')) % Run in parallel
         delete(gcp);
     end
@@ -1226,13 +1265,19 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Extra_Proper
         end
     end
     
-    if Aborted && ~Extra_Properties
+    if Aborted && ~Therm_Prop_Override
         Loss_add = Loss_add + log(1 + Model_Mismatch);
         Settings.Finite_T_Data.MP = 0;
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
     end
-    
+    if Settings.MinMDP.Parallel_Min
+        setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
+        setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
+        setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
+        setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
+        setenv('KMP_AFFINITY',env.KMP_AFFINITY);
+    end
 end
 
 % Remember: If skipping the finite_T data, then loss comes through the Loss_add
@@ -1240,5 +1285,7 @@ end
 % a switch to disable re-calculating loss from finite T data
 % Calculate Loss function from data
 Loss = LiX_Loss(Settings) + Loss_add;
+UserData.Finite_T_Data = Settings.Finite_T_Data;
+UserData.Minimization_Data = Settings.Minimization_Data;
 
 end

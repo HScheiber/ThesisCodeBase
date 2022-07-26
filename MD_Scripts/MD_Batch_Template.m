@@ -258,7 +258,7 @@ if ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') % sockeye
         '##CLEANUP##' newline ...
         'echo "Job completed at `date`"' newline ... 
         'exit 0'];
-elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') % Cedar and graham
+elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') || strcmpi(Server,'nar') % Cedar, graham, and narval
     
     % Number of cores per node
     if strcmpi(Server,'ced') || strcmpi(Server,'cdr') % Cedar
@@ -273,7 +273,7 @@ elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') %
         end
     else
         if Settings.Cores < 1
-            Cores_per_node = 32; % Graham or testing pc
+            Cores_per_node = 32; % Graham
         else
             Cores_per_node = Settings.Cores/max(Settings.Nodes,1);
         end

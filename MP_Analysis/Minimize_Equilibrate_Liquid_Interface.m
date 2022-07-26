@@ -25,6 +25,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     XY_area = norm(cross(Supercell_file_data.a_vec,Supercell_file_data.b_vec)); % nm^2
     Liq_Vol = Settings.nmol_liquid/(Settings.Ref_Density*Settings.ScaleInitialLiqDensity); % Volume of Liq box in nm^3
     Liq_Z = Liq_Vol/XY_area; % Liquid Z box length in nm
+    R0 = num2str(min(0.5*((3/(4*pi))*(Volume/nmol_liquid))^(1/3),0.57),'%0.3f');
     
     if Liq_Z < norm(Supercell_file_data.c_vec)
         Liq_Z = norm(Supercell_file_data.c_vec);
@@ -64,7 +65,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     mtimer = tic;
     Prep_Liq_Metal_Only = fullfile(Settings.WorkDir,['Prep_Liq_Metal_Only.' Settings.CoordType]);
     cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
-        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(Settings.nmol_liquid) ' -try 200 -scale 0.4'];
+        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(Settings.nmol_liquid) ' -try 200 -scale ' R0 ' -radius ' R0];
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
@@ -78,7 +79,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     disp(['Randomly adding ' num2str(Settings.nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
     htimer = tic;
     cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
-        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(Settings.nmol_liquid) ' -try 400 -scale 0.4'];
+        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(Settings.nmol_liquid) ' -try 400 -scale ' R0 ' -radius ' R0];
 
     [errcode,output] = system(cmd);
 

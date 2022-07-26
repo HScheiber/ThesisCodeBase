@@ -14,6 +14,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
+    save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
 
@@ -21,7 +22,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer; % nm, the box dimension
     Volume = L^3; % Volume in nm^3
     nmol_liquid = round(Volume*Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
-
+    R0 = num2str(min(0.5*((3/(4*pi))*(Volume/nmol_liquid))^(1/3),0.57),'%0.3f');
+    
     % Initialize empty cubic box
     Box.a_vec  = [L 0 0];
     Box.b_vec  = [0 L 0];
@@ -51,7 +53,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     mtimer = tic;
     Prep_Liq_Metal_Only = fullfile(Settings.WorkDir,['Prep_Liq_Metal_Only.' Settings.CoordType]);
     cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
-        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(nmol_liquid) ' -try 200 -scale 0.4'];
+        ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(nmol_liquid) ' -try 200 -scale ' R0 ' -radius ' R0];
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
@@ -65,7 +67,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
     htimer = tic;
     cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
-        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 400 -scale 0.4'];
+        ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 400 -scale ' R0 ' -radius ' R0];
 
     [errcode,output] = system(cmd);
 
@@ -601,7 +603,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     else
         disp('Equilibration failed. Stopping.')
         disp(mdrun_output);
-        error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+        error(['Error running mdrun for equilibration. Problem command: ' newline mdrun_command]);
     end
     
 %     system(['wsl source ~/.bashrc; echo "5 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])

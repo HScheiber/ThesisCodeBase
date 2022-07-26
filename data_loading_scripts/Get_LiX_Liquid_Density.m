@@ -1,6 +1,6 @@
 % Returns density in units of [molecules]/[nm^3]
 function density = Get_LiX_Liquid_Density(Settings)
-    
+    warning('off','MATLAB:dispatcher:UnresolvedFunctionHandle')
     home = find_home;
     datdir = fullfile(home,'data','ThermExp');
     Exp_Model = [Settings.Salt '_L_Exp.mat']; % Use this model if no matching model is available
@@ -47,9 +47,10 @@ function density = Get_LiX_Liquid_Density(Settings)
     catch
         dat = load(fullfile(datdir,Exp_Model));
     end
+    
     Volume = dat.mdl.predict(Settings.Target_T); % Units of: [Angstrom^3]/[formula unit]
     
     % Convert to [molecules]/[nm^3]
     density = Scale_density/(Volume.*(0.001));
-    
+    warning('on','MATLAB:dispatcher:UnresolvedFunctionHandle')
 end

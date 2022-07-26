@@ -8,7 +8,9 @@ end
 
 % Grab some additional settings that depend on inputs
 [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-[Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+if ~isfield(Settings,'gmx')
+    [Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+end
 Settings.mdrun_opts = regexprep(Settings.mdrun_opts,' -maxh [0-9]+','','once');
 Settings.CurrentTFile = fullfile(Settings.WorkDir,[Settings.JobName '_MP.mat']);
 Settings.PrevTFile = fullfile(Settings.WorkDir,[Settings.JobName '_MP.mat.PREV']);

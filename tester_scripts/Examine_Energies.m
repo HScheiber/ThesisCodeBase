@@ -1,3 +1,10 @@
+Energy_file = 'Prep_Liq.edr';
+system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
+%     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
+%     Data = import_xvg(En_xvg_file);
+%     plot(Data(:,1),Data(:,2)./nmol_liquid) % Potential
+%     ylim([-1000 1000])
+
 data = import_xvg('energy.xvg');
 
 % @ s0 legend "Potential"
@@ -9,11 +16,11 @@ data = import_xvg('energy.xvg');
 
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
-nmol_solid = 1000/2;
+nmol_solid = 1352/2;
 
 figure
 plot(data(:,1),data(:,2)./nmol_solid) % potential (kj/mol ion pairs)
-ylim([-2000 100])
+ylim([-5000 100])
 hold on
 plot(data(:,1),data(:,3))              % Pressure (bar)
 plot(data(:,1),data(:,4)./nmol_solid) % Volume (nm^3 / ion pair)

@@ -18,6 +18,16 @@ N_atoms = p.Results.N_atoms; % Minimum number of atoms to include in super cell
 Find_Min_Params = p.Results.Find_Min_Params; % When true, finds lowest energy parameters for IC based on Data_Types. When false, uses input IC
 Find_Similar_Params = p.Results.Find_Similar_Params; % When true, finds lowest energy parameters for IC if possible, but if no data is available, also looks for the same IC with non-scaled model
 
+if isfield(Settings,'Parallel_LiX_Minimizer') && Settings.Parallel_LiX_Minimizer
+    gmx_serial = true;
+elseif isfield(Settings,'Parallel_Bayesopt') && Settings.Parallel_Bayesopt
+    gmx_serial = true;
+elseif Settings.MinMDP.Parallel_Min
+    gmx_serial = true;
+else
+    gmx_serial = false;
+end   
+
 % Minimum lattice bounds
 switch lower(Settings.Structure)
     case 'betabeo'
@@ -59,7 +69,7 @@ if ~isfield(Settings,'gmx')
     [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
 end
 
-if Settings.MinMDP.Parallel_Min % Since using matlab parallel, make sure gromacs runs in serial
+if gmx_serial % Since using matlab parallel, make sure gromacs runs in serial
     env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
     env.GMX_PME_NUM_THREADS = getenv('GMX_PME_NUM_THREADS');
     env.GMX_PME_NTHREADS = getenv('GMX_PME_NTHREADS');
@@ -620,7 +630,7 @@ if Delete_output_files
 end
 
 % Return environmental variables back if changed, turn off parallel pool
-if Settings.MinMDP.Parallel_Min
+if gmx_serial
     setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
     setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
     setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
