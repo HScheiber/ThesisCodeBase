@@ -142,8 +142,8 @@ for tidx = 1:length(Theories)
             Models(idx).SigmaEpsilon = true;
             Models(idx).Fix_Charge = true;
             Models(idx).Additivity = true;
-            Models(idx).Parallel_Bayesopt = true;
-            Models(idx).Parallel_Struct_Min = false;
+            Models(idx).Parallel_Bayesopt = false;
+            Models(idx).Parallel_Struct_Min = true;
             Models(idx).Parallel_LiX_Minimizer = false;
             
         end
@@ -157,7 +157,7 @@ for idx = 1:length(Models)
     Model = Models(idx);
     Calc_Name = [Model.Salt '_' Model.Theory '_Model_' Model.Trial_ID];
     Calc_Dir = [workdir filesep Calc_Name];
-    Diary_Loc = [Calc_Dir filesep Calc_Name '.log'];
+    Model.Diary_Loc = [Calc_Dir filesep Calc_Name '.log'];
     
     % Move to new directory
     if ~isfolder(Calc_Dir)
@@ -166,7 +166,7 @@ for idx = 1:length(Models)
     cd(Calc_Dir);
     
     % Turn diary on and submit job
-    diary(Diary_Loc);
+    diary(Model.Diary_Loc);
     Bayesian_Optimize_LiX_Parameters(Model)
     diary('off')
     close all % closes figures

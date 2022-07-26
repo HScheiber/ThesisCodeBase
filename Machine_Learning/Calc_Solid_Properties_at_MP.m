@@ -1,11 +1,15 @@
 function Output = Calc_Solid_Properties_at_MP(Settings)
     
-    disp('*** Separate Equilibration of Solid Selected ***')
-    
     Settings.WorkDir = GetMDWorkdir(Settings);
+    diary off
+    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
+    
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
+    
+    
+    disp('*** Separate Equilibration of Solid Selected ***')
     
     % Generate unit cell: Unit Cell Filename
     Settings.JobName = 'Equil_Sol';
@@ -439,4 +443,8 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     end
     
     disp('*** Separate Equilibration of Solid Complete ***')
+    diary off
+    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+        diary(Settings.Diary_Loc)
+    end
 end

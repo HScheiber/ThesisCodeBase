@@ -15,6 +15,7 @@ Settings.SigmaEpsilon = false; % For the JC model, recasts the search space in t
 Settings.Additional_Function = Init_Additional_Function; % Adding additional function options
 Settings.Fix_Alpha = false; % Active for TF and BH models only when NOT using SigmaEpsilon form. When active, the value of exponential repulsion parameter, which is related to compressibility, is fixed to its default
 Settings.Fix_C8 = false; % Active for TF model only when NOT using SigmaEpsilon form. When active, the value of C8 is fixed by the value of C6, and is no longer a free parameter
+Settings.Diary_Loc = '';
 
 % Parameter Ranges
 Settings.SDMM_Range = [0 1000]; % Default range for MM dispersion scaling in JC model.
