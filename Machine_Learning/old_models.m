@@ -1703,7 +1703,6 @@ for ridx = 1:length(Replicates)
     
 end
 
-
 %% JC Models CA, CB, CC
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Replicates = {'a' 'b' 'c' 'd' 'e'};
@@ -3725,7 +3724,101 @@ for sidx = 1:length(Salts)
     end
 end
 
+%% JC Models EV EW, EX
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+    
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+        
+        %% Model JC: EV
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EV' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Loss_Convergence = 1e-8;
+            Models(idx).Param_Convergence = 1e-5;
+        else
+            Models(idx).Loss_Convergence = 1e-6;
+            Models(idx).Param_Convergence = 1e-3;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Q_value = 0.97; % Value for the charge scale. Only meaningful when Fix_Charge = true
 
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EW
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EW' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Loss_Convergence = 1e-8;
+            Models(idx).Param_Convergence = 1e-5;
+        else
+            Models(idx).Loss_Convergence = 1e-6;
+            Models(idx).Param_Convergence = 1e-3;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Q_value = 0.97; % Value for the charge scale. Only meaningful when Fix_Charge = true
+
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+        %% Model JC: EW
+        idx = idx+1;
+        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EW' Rep];
+        Models(idx).final_opt_type = 'fminsearchbnd';
+        if Replicates(ridx) > 5
+            Models(idx).Loss_Convergence = 1e-8;
+            Models(idx).Param_Convergence = 1e-5;
+        else
+            Models(idx).Loss_Convergence = 1e-6;
+            Models(idx).Param_Convergence = 1e-3;
+        end
+        
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1/3;
+        Models(idx).Q_value = 0.97; % Value for the charge scale. Only meaningful when Fix_Charge = true
+
+        
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+        
+    end
+end
 
 %% TF Models CA, CB, CC, CD
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
@@ -4955,6 +5048,287 @@ for tidx = 1:length(Theories)
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['FI' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.FiveFive.RLE = 1;
+            Models(idx).Loss_Options.Sphalerite.RLE = 1;
+            Models(idx).Loss_Options.BetaBeO.RLE = 1;
+            Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+            Models(idx).Loss_Options.NiAs.RLE = 1;
+            Models(idx).Loss_Options.CsCl.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+            
+        end
+    end
+end
+
+%% TF & BH Models GA, GB, GC, GD
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'BH' 'TF'};
+Replicates = 1:5;
+
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model TF & BH: GA
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GA' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: GB
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GB' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: GC
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GC' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = false;
+            
+            %% Model TF & BH: GD
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GD' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+            
+        end
+    end
+end
+
+%% TF & BH Models GE, GF, GG, GH, GI
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'BH' 'TF'};
+Replicates = 1:5;
+
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model TF & BH: GE
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GE' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.FiveFive.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: GF
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GF' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Wurtzite.a = 2/3;
+            Models(idx).Loss_Options.Wurtzite.c = 1/3;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: GG
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GG' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.FiveFive.RLE = 1;
+            Models(idx).Loss_Options.Sphalerite.RLE = 1;
+            Models(idx).Loss_Options.BetaBeO.RLE = 1;
+            Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+            Models(idx).Loss_Options.NiAs.RLE = 1;
+            Models(idx).Loss_Options.CsCl.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            
+            %% Model TF & BH: GH
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GH' Rep];
+            Models(idx).final_opt_type = 'fminsearchbnd';
+            if Replicates(ridx) > 5
+                Models(idx).Loss_Convergence = 1e-8;
+                Models(idx).Param_Convergence = 1e-5;
+            else
+                Models(idx).Loss_Convergence = 1e-6;
+                Models(idx).Param_Convergence = 1e-3;
+            end
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.FiveFive.RLE = 1;
+            Models(idx).Loss_Options.Sphalerite.RLE = 1;
+            Models(idx).Loss_Options.BetaBeO.RLE = 1;
+            Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+            Models(idx).Loss_Options.NiAs.RLE = 1;
+            Models(idx).Loss_Options.CsCl.RLE = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = false;
+            
+            %% Model TF & BH: GI
+            idx = idx+1;
+            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['GI' Rep];
             Models(idx).final_opt_type = 'fminsearchbnd';
             if Replicates(ridx) > 5
                 Models(idx).Loss_Convergence = 1e-8;

@@ -7,9 +7,9 @@
 % Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
-Theory = 'TF';
-Basenum = 'H';
-Midnum = 'A';
+Theory = 'JC';
+Basenum = 'E';
+Midnum = 'B';
 savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
 

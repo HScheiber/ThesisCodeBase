@@ -82,7 +82,7 @@ for tidx = 1:length(Theories)
             Models(idx).JobSettings.OMP_Threads = 1;
             Models(idx).JobSettings.MPI_Ranks = 8;
             Models(idx).JobSettings.Cores = 8;
-            Models(idx).JobSettings.dd = [1 2 4];
+            Models(idx).JobSettings.dd = [];
             Models(idx).Cutoff_Buffer = 1.2; % This affects Structure_Minimization as well as other aspects of code
             
             % T=0 Loss

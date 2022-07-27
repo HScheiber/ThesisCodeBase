@@ -78,7 +78,7 @@ Calculation.nodes = 1;
 Calculation.cpus_per_node = 12;
 Calculation.pbs_memory = [num2str(floor((186/32)*Calculation.cpus_per_node)) 'gb']; % Total memory request: floor(186gb / number of cores)
 % Set up models below
-skip_models = 1:120;
+skip_models = [];
 check_complete = true; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs
 continue_completed = false; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
@@ -88,7 +88,7 @@ idx=0;
 
 %% JC Models EV EW, EX
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-Replicates = 1:10;
+Replicates = 1:5;
 for sidx = 1:length(Salts)
     Salt = Salts{sidx};
     

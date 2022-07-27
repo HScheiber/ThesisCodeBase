@@ -355,7 +355,7 @@ if strcmp(Settings.Theory,'BH')
     Topology_Text = strrep(Topology_Text,'##HALHALA##','1.0');
     Topology_Text = strrep(Topology_Text,'##METHALA##','1.0');
 end
-Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+Topology_Text = strrep(Topology_Text,'##LATOMS##',Atomlist);
 Topology_Text = strrep(Topology_Text,'##N##x##N##x##N## ##GEOM##',...
     ['Liquid with ' num2str(Settings.N_atoms) ' atoms.']);
 
