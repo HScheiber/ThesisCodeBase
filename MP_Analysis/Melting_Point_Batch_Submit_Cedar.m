@@ -13,18 +13,18 @@ Shared_Settings = Initialize_MD_Settings;
 Shared_Settings.Project_Directory_Name = 'Model_Building';
 Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
-Shared_Settings.JobSettings.N_Calc = 4; % Number of chained calculations
+Shared_Settings.JobSettings.N_Calc = 1; % Number of chained calculations
 Shared_Settings.JobSettings.Hours = 6; % Max time for each job (hours)
 Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
-Shared_Settings.JobSettings.Nodes = 1; % Minimum number of cores to request for calculation.
-Shared_Settings.JobSettings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Shared_Settings.JobSettings.Nodes = 0; % Minimum number of cores to request for calculation.
+Shared_Settings.JobSettings.Cores = 12; % Minimum number of cores to request for calculation. Set to -1 for entire node
 Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-Shared_Settings.JobSettings.BigNode = true; % For cedar and sockeye, choose the large node types when true.
-Shared_Settings.JobSettings.MPI_Ranks = 8;%6; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1;%8; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = [];%2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [];%[1 2 2]; % Domain decomposition
+Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
+Shared_Settings.JobSettings.npme = 1; % Number of rank assigned to PME
+Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
 
 
 % Shared calculation parameters
@@ -51,7 +51,7 @@ idx=0;
 %% JC Models EB, EC, ...
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theory = 'JC';
-Models = {'EB'};
+Models = {'EB' 'EC' 'EF' 'EH' 'EI' 'EK' 'EL' 'EN' 'EO' 'EQ' 'ER' 'EU'};
 Reps = 1:10;
 for jdx = 1:length(Salts)
     Salt = Salts{jdx};
@@ -158,7 +158,12 @@ for idx = 1:length(Settings_array)
     Batch_Template = strrep(Batch_Template,['##EXT2##' newline],'');
     
     [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings,Settings.JobID);
-    Settings.WorkDir = fullfile(Settings.WorkDir,'BestPoint_Thermal');
+    OuterDir = Settings.WorkDir;
+    if ~exist(Settings.WorkDir, 'dir')
+    	% Model not found
+    	continue
+    end
+    Settings.WorkDir = fullfile(OuterDir,'BestPoint_Thermal');
     Batch_Template = strrep(Batch_Template,'##DIRECTORY##',Settings.WorkDir);
     TaskName = [Settings.Salt '_' Settings.JobName];
     
@@ -169,8 +174,8 @@ for idx = 1:length(Settings_array)
     cd(Settings.WorkDir);
     
     % Check if job is already complete
-    ResultsFile = fullfile(Settings.WorkDir,[Settings.JobName '_MPResults.mat']);
-    if check_complete && isfile(ResultsFile)
+    FlagCompleteFile = fullfile(Settings.WorkDir,'Thermal_Properties_Complete');
+    if check_complete && isfile(FlagCompleteFile)
         disp([TaskName ': Job already completed. Skipping Job Submission.'])
         continue
     end
@@ -195,7 +200,7 @@ for idx = 1:length(Settings_array)
         if jdx == 1
             calc_cmd_idx_jdx = calc_cmd_idx;
         else
-            EXT1 = ['if [[ ! -f "' ResultsFile '" ]]; then'];
+            EXT1 = ['if [[ ! -f "' FlagCompleteFile '" ]]; then'];
             EXT2 = 'fi';
             calc_cmd_idx_jdx = [EXT1 newline calc_cmd_idx newline EXT2];
         end

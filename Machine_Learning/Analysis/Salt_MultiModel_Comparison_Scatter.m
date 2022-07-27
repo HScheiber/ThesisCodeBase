@@ -9,7 +9,7 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
 Theory = 'JC';
 Basenum = 'E';
-Midnum = 'B';
+Midnum = 'U';
 savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
 
@@ -729,8 +729,6 @@ if contained_in_cell('CsCl',Structures)
     end
     ylim(cscl_ax,cylim_cscl);
 end
-
-
 
 if savefile
     set(figh,'renderer','opengl')

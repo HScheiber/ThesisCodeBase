@@ -1255,7 +1255,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
     Settings.Submit_Jobs = false;
     Settings.Skip_Minimization = true; % Skip the automatic geometry minimization
     Settings.RefStructure = Settings.Finite_T_Data.Structure;
-    [Tm_estimate,WorkDir,Aborted] = Find_Melting_Point(Settings);
+    [Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings);
     
     if Settings.Delete_Equil
         try
@@ -1263,7 +1263,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
         catch
         end
     end
-    
+    Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted && ~Therm_Prop_Override
         Loss_add = Loss_add + log(1 + Model_Mismatch);
         Settings.Finite_T_Data.MP = 0;

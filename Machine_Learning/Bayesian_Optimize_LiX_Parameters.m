@@ -1234,7 +1234,9 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     Calculation_properties.SigmaEpsilon = Model.SigmaEpsilon;    
     
     % Save final results
+    Minimization_Data = UserData.Minimization_Data;
+    Finite_T_Data = UserData.Finite_T_Data;
     save(Full_opt_filename,'full_opt_results','loss','full_opt_point',...
-        'UserData','Pars','Calculation_properties');
+        'Minimization_Data','Finite_T_Data','Pars','Calculation_properties');
     
 end

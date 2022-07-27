@@ -89,5 +89,8 @@ end
 % Re-Save Data and output a flag
 MinDat.Finite_T_Data = Settings.Finite_T_Data;
 save(Full_opt_filename,'-struct','MinDat');
+
+% Save a flag to note end of calculation
+fclose(fopen(fullfile(WorkDir,'Thermal_Properties_Complete'), 'w'));
     
 end
