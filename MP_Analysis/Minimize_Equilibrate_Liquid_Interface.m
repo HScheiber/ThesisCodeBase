@@ -25,7 +25,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     XY_area = norm(cross(Supercell_file_data.a_vec,Supercell_file_data.b_vec)); % nm^2
     Liq_Vol = Settings.nmol_liquid/(Settings.Ref_Density*Settings.ScaleInitialLiqDensity); % Volume of Liq box in nm^3
     Liq_Z = Liq_Vol/XY_area; % Liquid Z box length in nm
-    R0 = num2str(min(0.5*((3/(4*pi))*(Volume/nmol_liquid))^(1/3),0.57),'%0.3f');
+    R0 = num2str(min(0.5*((3/(4*pi))*(Liq_Vol/Settings.nmol_liquid))^(1/3),0.57),'%0.3f');
     
     if Liq_Z < norm(Supercell_file_data.c_vec)
         Liq_Z = norm(Supercell_file_data.c_vec);

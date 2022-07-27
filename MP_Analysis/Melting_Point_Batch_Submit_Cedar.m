@@ -33,12 +33,15 @@ Shared_Settings.MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number
 Shared_Settings.Optimizer = 'MPSearcher';
 Shared_Settings.lb = 0; % K, lower bound on MP search
 Shared_Settings.ub = 2200; % K, upper bound on MP search
-Shared_Settings.BracketThreshold = 1; % [K] Sets the target bracket for the melting point
+Shared_Settings.BracketThreshold = 5; % [K] Sets the target bracket for the melting point
 Shared_Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearcher algorithm
 Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
 Shared_Settings.Liquid_Fraction = 0.50;
 Shared_Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
 Shared_Settings.MaxWarn = 2;
+Shared_Settings.Liquid_Test_Time = 50; % ps. simulation time to sample the liquid (second half averaged for enthalpy / volume)
+Shared_Settings.Solid_Test_Time = 30; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
+
 
 Exp = Load_Experimental_Data;
 
@@ -86,7 +89,7 @@ for jdx = 1:length(Salts)
             Settings_array(idx).QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
             Settings_array(idx).ScaleInitialLiqDensity = 0.8;
             Settings_array(idx).Delete_Equil = false; % switch to delete temporary calculation folders for finite T calcs
-
+            
             % Barostat Options
             Settings_array(idx).Isotropy = 'semiisotropic';
             Settings_array(idx).Target_P = [1 1]; % Bar
@@ -138,8 +141,7 @@ end
 
 %% Prepare batch scripts
 [~,~,~,Slurm] = find_home;
-calc_cmd = 'matlab -nodisplay -r "Find_Melting_Point(##INPUTFILE##)" >> ##LOGFILE##';
-calc_cmd2= 'matlab -nodisplay -r "Thermal_Properties_At_MP(##INPUTFILE##)" >> ##LOGFILE##';
+calc_cmd = 'matlab -nodisplay -r "Thermal_Properties_At_MP(##INPUTFILE##)" >> ##LOGFILE##';
 
 % Loop through all models and build their submission file
 for idx = 1:length(Settings_array)
@@ -186,9 +188,6 @@ for idx = 1:length(Settings_array)
     % Create input command
     calc_cmd_idx = strrep(calc_cmd,'##INPUTFILE##',['''' Settings.JobName '.inp' '''']);
     calc_cmd_idx = strrep(calc_cmd_idx,'##LOGFILE##',[Settings.JobName '.MPlog']);
-    
-    calc_cmd2_idx = strrep(calc_cmd2,'##INPUTFILE##',['''' Settings.JobName '.inp' '''']);
-    calc_cmd2_idx = strrep(calc_cmd2_idx,'##LOGFILE##',[Settings.JobName '.FTlog']);
     
     % Set up job links
     for jdx = 1:Settings.JobSettings.N_Calc

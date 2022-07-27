@@ -10,8 +10,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Calculate average density of equilibrated box based on last 25% of simulation
     % Give new density as output
     
-    Settings.WorkDir = GetMDWorkdir(Settings);
-    Settings.WorkDir = [Settings.WorkDir '_LP'];
+    if ~isfield(Settings,'WorkDir')
+        Settings.WorkDir = GetMDWorkdir(Settings);
+        Settings.WorkDir = [Settings.WorkDir '_LP'];
+    end
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end

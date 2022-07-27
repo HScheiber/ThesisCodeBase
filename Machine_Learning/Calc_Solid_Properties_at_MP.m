@@ -1,7 +1,9 @@
 function Output = Calc_Solid_Properties_at_MP(Settings)
     
-    Settings.WorkDir = GetMDWorkdir(Settings);
-    Settings.WorkDir = [Settings.WorkDir '_SP'];
+    if ~isfield(Settings,'WorkDir')
+        Settings.WorkDir = GetMDWorkdir(Settings);
+        Settings.WorkDir = [Settings.WorkDir '_SP'];
+    end
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end

@@ -1,4 +1,4 @@
-function [Tm_estimate,WorkDir,Aborted] = Find_Melting_Point(Settings)
+function [Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings)
 total_timer = tic;
 Aborted = false;
 
