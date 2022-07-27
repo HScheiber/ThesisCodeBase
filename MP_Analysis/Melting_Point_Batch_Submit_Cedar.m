@@ -21,10 +21,10 @@ Shared_Settings.JobSettings.Cores = -1; % Minimum number of cores to request for
 Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
 Shared_Settings.JobSettings.BigNode = true; % For cedar and sockeye, choose the large node types when true.
-Shared_Settings.JobSettings.MPI_Ranks = 6; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 8; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 2]; % Domain decomposition
+Shared_Settings.JobSettings.MPI_Ranks = 8;%6; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 1;%8; % Set the number of OMP threads per MPI rank
+Shared_Settings.JobSettings.npme = [];%2; % Number of rank assigned to PME
+Shared_Settings.JobSettings.dd = [];%[1 2 2]; % Domain decomposition
 
 
 % Shared calculation parameters

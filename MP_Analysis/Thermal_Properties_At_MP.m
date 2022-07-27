@@ -12,7 +12,8 @@ Settings.RefStructure = Settings.Finite_T_Data.Structure;
 Settings.Structure = Settings.Finite_T_Data.Structure;
 
 % Get rocksalt geometry and settings
-OuterDir = strrep(Settings.WorkDir,[filesep 'BestPoint_Thermal'],'');
+WorkDir = Settings.WorkDir;
+OuterDir = strrep(WorkDir,[filesep 'BestPoint_Thermal'],'');
 BO_Settings = load(fullfile(OuterDir,[Settings.Salt '_' Settings.JobName '.inp']),'-mat').Model;
 Full_opt_filename = fullfile(OuterDir,[Settings.Salt '_' Settings.JobName '_fullopt.mat']);
 MinDat = load(Full_opt_filename,'-mat');
@@ -26,6 +27,7 @@ for idx = 1:N
     Structures{idx} = Settings.Minimization_Data{idx}.Structure;
 end
 
+% Load bestpoint geometry
 Settings.Geometry = Default_Crystal(Settings);
 Settings.Geometry.a = Settings.Minimization_Data{strcmpi(Structures,Settings.RefStructure)}.a;
 Settings.Geometry.b = Settings.Minimization_Data{strcmpi(Structures,Settings.RefStructure)}.b;
@@ -42,10 +44,18 @@ Settings.GAdjust_MM = BO_Settings.GAdjust_MM;
 Settings.GAdjust_XX = BO_Settings.GAdjust_XX;
 
 % Liquid properties
+dd = Settings.JobSettings.dd;
+npme = Settings.JobSettings.npme;
+Settings.JobSettings.dd = [];
+Settings.JobSettings.npme = [];
+[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+Settings.WorkDir = fullfile(WorkDir,'Liq_Properties_at_MP');
 Liq_Output = Calc_Liquid_Properties_at_MP(Settings);
 Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
 Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
 
+% Solid properties
+Settings.WorkDir = fullfile(WorkDir,'Sol_Properties_at_MP');
 Sol_Output = Calc_Solid_Properties_at_MP(Settings);
 Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
 Settings.Finite_T_Data.Solid_H_MP = Sol_Output.Solid_H_MP;
@@ -58,6 +68,12 @@ Settings.Finite_T_Data.Fusion_dV = Settings.Finite_T_Data.Liquid_V_MP - ...
     Settings.Finite_T_Data.Solid_V_MP;
 
 % Melting point
+dd = Settings.JobSettings.dd;
+npme = Settings.JobSettings.npme;
+Settings.dd = dd;
+Settings.npme = npme;
+[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+Settings.WorkDir = fullfile(WorkDir,'Melting_Point');
 Settings.BatchMode = false;
 Settings.Submit_Jobs = false;
 Settings.Skip_Minimization = true; % Skip the automatic geometry minimization
