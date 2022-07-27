@@ -270,6 +270,17 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
         error(['Warning: Unknown theory type: "' Settings.Theory '".'])
     end
     
+    if Settings.MDP.Disp_Correction && ~Table_Req
+        MDP_Template = [MDP_Template newline newline ...
+            '; Long-range dispersion correction' newline ...
+            'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
+    elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
+        disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        MDP_Template = [MDP_Template newline newline ...
+            '; Long-range dispersion correction' newline ...
+            'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
+    end
+    
     % Add in parameters to MDP template
     MDP_Template = strrep(MDP_Template,'##NSTEPS##',pad(num2str(MD_nsteps),18));
     MDP_Template = strrep(MDP_Template,'##INTEGR##',pad(Settings.MDP.integrator,18));
