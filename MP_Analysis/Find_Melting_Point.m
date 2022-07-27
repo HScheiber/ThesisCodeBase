@@ -7,7 +7,9 @@ if ~isstruct(Settings)
 end
 
 % Grab some additional settings that depend on inputs
-[Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+if ~isfield(Settings,'WorkDir')
+    [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+end
 if ~isfield(Settings,'gmx')
     [Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
 end

@@ -907,10 +907,10 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
             slope = regmodel.slope
             if slope > SlopeThreshold:
                 system_melting = True
-                est_time_to_phase_change = (Threshold_Upper - y1[0])/slope + x1[0]
+                est_time_to_phase_change = (Threshold_Upper_liq - y1[0])/slope + x1[0]
             elif slope < -SlopeThreshold:
                 system_freezing = True
-                est_time_to_phase_change = (Threshold_Lower - y1[0])/slope + x1[0]
+                est_time_to_phase_change = (Threshold_Lower_liq - y1[0])/slope + x1[0]
 
     else: # Reference structure is a solid structure
         is_frozen_sol = ref_fraction >= Threshold_Upper_sol

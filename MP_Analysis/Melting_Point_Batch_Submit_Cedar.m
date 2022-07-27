@@ -10,6 +10,7 @@ check_running = true; % Checks if a job is already running, skips running jobs
 
 % Load shared resource and mdrun settings
 Shared_Settings = Initialize_MD_Settings;
+Shared_Settings.Project_Directory_Name = 'Model_Building';
 Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Shared_Settings.JobSettings.N_Calc = 4; % Number of chained calculations
@@ -138,6 +139,7 @@ end
 %% Prepare batch scripts
 [~,~,~,Slurm] = find_home;
 calc_cmd = 'matlab -nodisplay -r "Find_Melting_Point(##INPUTFILE##)" >> ##LOGFILE##';
+calc_cmd2= 'matlab -nodisplay -r "Thermal_Properties_At_MP(##INPUTFILE##)" >> ##LOGFILE##';
 
 % Loop through all models and build their submission file
 for idx = 1:length(Settings_array)
@@ -153,18 +155,19 @@ for idx = 1:length(Settings_array)
     Batch_Template = strrep(Batch_Template,['##EXT1##' newline],'');
     Batch_Template = strrep(Batch_Template,['##EXT2##' newline],'');
     
-    [WorkDir,JobName,Full_Model_Name] = GetMDWorkdir(Settings);
-    Batch_Template = strrep(Batch_Template,'##DIRECTORY##',WorkDir);
-    TaskName = [Settings.Salt '_' JobName];
+    [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings,Settings.JobID);
+    Settings.WorkDir = fullfile(Settings.WorkDir,'BestPoint_Thermal');
+    Batch_Template = strrep(Batch_Template,'##DIRECTORY##',Settings.WorkDir);
+    TaskName = [Settings.Salt '_' Settings.JobName];
     
     % Generate and move to the submission directory
-    if ~exist(WorkDir, 'dir')
-       mkdir(WorkDir)
+    if ~exist(Settings.WorkDir, 'dir')
+       mkdir(Settings.WorkDir)
     end
-    cd(WorkDir);
+    cd(Settings.WorkDir);
     
     % Check if job is already complete
-    ResultsFile = fullfile(WorkDir,[JobName '_MPResults.mat']);
+    ResultsFile = fullfile(Settings.WorkDir,[Settings.JobName '_MPResults.mat']);
     if check_complete && isfile(ResultsFile)
         disp([TaskName ': Job already completed. Skipping Job Submission.'])
         continue
@@ -177,12 +180,15 @@ for idx = 1:length(Settings_array)
     end
     
     % Save input file
-    inp_file = fullfile(WorkDir,[JobName '.inp']);
+    inp_file = fullfile(Settings.WorkDir,[Settings.JobName '.inp']);
     save(inp_file,'Settings','-mat')
     
     % Create input command
-    calc_cmd_idx = strrep(calc_cmd,'##INPUTFILE##',['''' JobName '.inp' '''']);
-    calc_cmd_idx = strrep(calc_cmd_idx,'##LOGFILE##',[JobName '.MPlog']);
+    calc_cmd_idx = strrep(calc_cmd,'##INPUTFILE##',['''' Settings.JobName '.inp' '''']);
+    calc_cmd_idx = strrep(calc_cmd_idx,'##LOGFILE##',[Settings.JobName '.MPlog']);
+    
+    calc_cmd2_idx = strrep(calc_cmd2,'##INPUTFILE##',['''' Settings.JobName '.inp' '''']);
+    calc_cmd2_idx = strrep(calc_cmd2_idx,'##LOGFILE##',[Settings.JobName '.FTlog']);
     
     % Set up job links
     for jdx = 1:Settings.JobSettings.N_Calc
@@ -202,7 +208,7 @@ for idx = 1:length(Settings_array)
         Batch_Template_jdx = strrep(Batch_Template_jdx,'##ERROR##',TaskName_jdx);
 
         % Save job submission script
-        subm_file_jdx = fullfile(WorkDir,[JobName '-' num2str(jdx,'%03.f') '.subm']);
+        subm_file_jdx = fullfile(Settings.WorkDir,[Settings.JobName '-' num2str(jdx,'%03.f') '.subm']);
         fid = fopen(subm_file_jdx,'wt');
         fwrite(fid,regexprep(Batch_Template_jdx,{'\r'}',{''}));
         fclose(fid);
