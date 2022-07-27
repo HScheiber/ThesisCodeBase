@@ -947,25 +947,22 @@ Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 % Calculate loss due to infeasible TF / BH models with no well minima (only works reliably in sigma-epsilon form)
 Loss_add = 0;
 if Settings.CheckBadFcn
-    DefMDSettings = Initialize_MD_Settings;
-    DefMDSettings.Salt = Settings.Salt;
-    DefMDSettings.C6_Damp = Settings.C6_Damp;
-    DefMDSettings.CR_Damp = Settings.CR_Damp;
-    DefMDSettings.S = Settings.S;
-    DefMDSettings.GAdjust_MX = Settings.GAdjust_MX;
-    DefMDSettings.GAdjust_MM = Settings.GAdjust_MM;
-    DefMDSettings.GAdjust_XX = Settings.GAdjust_XX;
-    
+    tl = Settings.Table_Length;
+    ss = Settings.Table_StepSize;
+    Settings.Table_Length = 10; % nm
+    Settings.Table_StepSize = 0.002;
     if strcmp(Settings.Theory,'BH')
-        [U_MX, U_MM, U_XX] = BH_Potential_Generator(DefMDSettings,...
+        [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
             'Startpoint',0.01,'ReturnAsStructure',true);
     elseif strcmp(Settings.Theory,'TF')
-        [U_MX, U_MM, U_XX] = TF_Potential_Generator(DefMDSettings,...
+        [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
             'Startpoint',0.01,'ReturnAsStructure',true);
     elseif strcmp(Settings.Theory,'JC')
-        [U_MX, U_MM, U_XX] = JC_Potential_Generator(DefMDSettings,...
+        [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,...
             'Startpoint',0.01,'ReturnAsStructure',true);
     end
+    Settings.Table_Length = tl; % nm
+    Settings.Table_StepSize = ss;
     
     %% Grab the peaks and valleys of the MX attractive potential
     peaks_idx = islocalmax(U_MX.Total);
@@ -984,11 +981,6 @@ if Settings.CheckBadFcn
         Threshold = Settings.MinExpWallHeight; % kJ/mol
         dU = maxima_U - minima_U;
         Loss_add = Loss_add + log(1 + max(Threshold - dU,0)*Settings.BadFcnLossPenalty/Threshold);
-        
-%         dU = 0:0.01:50;
-%         Loss_add = log(1 + max(Threshold - dU,0).*1000./25);
-%         plot(dU,Loss_add)
-        
     end
 %     plot(U_MX.r,U_MX.Total)
 %     hold on
@@ -1000,9 +992,12 @@ if Settings.CheckBadFcn
     for U = [U_MM,U_XX]
         peaks_idx = islocalmax(U.Total);
         valleys_idx = islocalmin(U.Total);
-
+        
         maxima_U = U.Total(peaks_idx);
         minima_U = U.Total(valleys_idx);
+        
+        maxima_r = U.r(peaks_idx);
+        minima_r = U.r(valleys_idx);
 
 %         plot(U.r,U.Total)
 %         hold on
@@ -1020,21 +1015,23 @@ if Settings.CheckBadFcn
             Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
         elseif length(maxima_U) == 1 && isempty(minima_U) % One peak, no valley (this is a normal case for TF and BH repulsive potentials)
             % Do nothing
-        elseif length(maxima_U) == 1 && length(minima_U) == 1 % One peaks visible + one valley in between, and (possibly) one hidden peak to the right
+        elseif length(maxima_U) == 1 && length(minima_U) == 1 % One peak visible + one valley in between, and (possibly) one hidden peak to the right
             Threshold = Settings.MaxRepWellDepth; % kJ/mol
-            if strcmp(Settings.Theory,'JC')
+            if minima_r < maxima_r
                 dU = maxima_U - minima_U;
             else
+                % Case of hidden peak to the right
                 % Ensure valley depth is not greater than the threshold
                 dU = U.Total(end) - minima_U;
             end
             Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
-        elseif length(minima_U) == 1 % well minima is available but no peaks are visible
+        elseif length(minima_U) == 1 % well minima is available but no peaks are visible, there must be a hidden peak to the right
             Threshold = Settings.MaxRepWellDepth; % kJ/mol
             dU = U.Total(end) - minima_U;
             Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
         else
             % This should never be reached...
+            warning('Possible issue with the potential!')
         end
     end
 end

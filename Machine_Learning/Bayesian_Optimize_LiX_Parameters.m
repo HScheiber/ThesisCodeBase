@@ -468,9 +468,18 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         case 'fminsearch'
             
             % First, reset the parallelization scheme for fminsearch as it has no parallel option
-            Model.Parallel_LiX_Minimizer = true; % Run the parallel version of the LiX_Minimizer subroutine when true (this is generally less efficient)
-            Model.Parallel_Struct_Min = false; % Run the parallel version of the LiX_Minimizer subroutine when true
-
+            % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
+            if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
+                Model.Parallel_Bayesopt = false;
+                Model.Parallel_Struct_Min = false;
+                Model.Parallel_LiX_Minimizer = true;
+                Model.MinMDP.Parallel_Min = false;
+            elseif Model.Parallel_Struct_Min
+                Model.Parallel_Bayesopt = false;
+                Model.Parallel_Struct_Min = true;
+                Model.Parallel_LiX_Minimizer = false;
+                Model.MinMDP.Parallel_Min = true;
+            end
             fun = @(x)LiX_Minimizer(Model,x);
 
             % Options for the Nelder–Mead search
@@ -529,9 +538,18 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
             ub = Ranges(2:2:end);
 
             % First, reset the parallelization scheme for fminsearch as it has no parallel option
-            Model.Parallel_LiX_Minimizer = true; % Run the parallel version of the LiX_Minimizer subroutine when true (this is generally less efficient)
-            Model.Parallel_Struct_Min = false; % Run the parallel version of the LiX_Minimizer subroutine when true
-
+            % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
+            if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
+                Model.Parallel_Bayesopt = false;
+                Model.Parallel_Struct_Min = false;
+                Model.Parallel_LiX_Minimizer = true;
+                Model.MinMDP.Parallel_Min = false;
+            elseif Model.Parallel_Struct_Min
+                Model.Parallel_Bayesopt = false;
+                Model.Parallel_Struct_Min = true;
+                Model.Parallel_LiX_Minimizer = false;
+                Model.MinMDP.Parallel_Min = true;
+            end
             fun = @(x)LiX_Minimizer(Model,x);
 
             % Options for the Nelder–Mead search
@@ -767,8 +785,18 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
     
     %% Final test of parameters on all structures for output
-    Model.Parallel_LiX_Minimizer = true;
-    Model.Parallel_Struct_Min    = false;
+    % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
+    if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
+        Model.Parallel_Bayesopt = false;
+        Model.Parallel_Struct_Min = false;
+        Model.Parallel_LiX_Minimizer = true;
+        Model.MinMDP.Parallel_Min = false;
+    elseif Model.Parallel_Struct_Min
+        Model.Parallel_Bayesopt = false;
+        Model.Parallel_LiX_Minimizer = false;
+        Model.MinMDP.Parallel_Min = true;
+    end
+    Model.Delete_Equil = false; % save the final MP calculation directories
     Model.Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
     [loss,~,UserData] = LiX_Minimizer(Model,full_opt_point,...
         'Verbose',true,'Extra_Properties',true,'Therm_Prop_Override',true);
