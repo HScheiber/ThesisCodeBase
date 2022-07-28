@@ -873,6 +873,7 @@ for idx = 1:length(Models)
     
     % Generate and move to the submission directory
     submit_dir = fullfile(project,'Model_Building',Model.Salt,Model_Name_abrv);
+    Batch_Template = strrep(Batch_Template,'##DIRECTORY##',submit_dir);
     if ~exist(submit_dir, 'dir')
        mkdir(submit_dir)
     end
