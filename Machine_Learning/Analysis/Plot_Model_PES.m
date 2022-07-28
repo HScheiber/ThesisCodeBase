@@ -73,10 +73,10 @@
 
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 Settings = Initialize_MD_Settings;
-Settings.Salt = 'LiF';
-Settings.Theory = 'BH';
-Basenum = 'F';
-Midnum = 'E';
+Settings.Salt = 'LiI';
+Settings.Theory = 'TF';
+Basenum = 'H';
+Midnum = 'A';
 
 % Find reps of models
 files = {dir(fullfile(ML_results_dir,['*' Basenum Midnum '*'])).name};
@@ -102,7 +102,7 @@ Col_MX = max(min(Col_MX,1),0);
 
 
 %% Other parameters
-savefile = true; % switch to save the final plots to file
+savefile = false; % switch to save the final plots to file
 fs = 28; % font size
 lw = 3; % line width
 Startpoint = 0.001;
@@ -245,8 +245,8 @@ if savefile
 else
     Model_Labels = [{[Metal '$^{+}$' Halide '$^{-}$']}  ...
         {[Metal '$^{+}$' Metal '$^{+}$']} ...
-        {[Halide '$^{-}$' Halide '$^{-}$']} ...
-        Model_Labels{2:end}];
-    legend(ax,[h_MX(1); h_MM(1); h_XX(1); h_MX(2:end)],Model_Labels,'Interpreter','latex','location','northeast',...
-        'NumColumns',2);
+        {[Halide '$^{-}$' Halide '$^{-}$']}];
+    legend(ax,[h_MX(1); h_MM(1); h_XX(1)],Model_Labels,'Interpreter','latex','location','northeast',...
+        'NumColumns',1);
+    
 end
