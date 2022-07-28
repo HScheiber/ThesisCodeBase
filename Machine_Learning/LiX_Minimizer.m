@@ -1178,7 +1178,13 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         delete(gcp);
     end
     
+    dd = Settings.JobSettings.dd;
+    npme = Settings.JobSettings.npme;
+    Settings.JobSettings.dd = [];
+    Settings.JobSettings.npme = [];
     Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.9 solid
+    Settings.JobSettings.dd = dd;
+    Settings.JobSettings.npme = npme;
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
     if Settings.Parallel_Bayesopt
@@ -1213,7 +1219,14 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         delete(gcp);
     end
     
+    dd = Settings.JobSettings.dd;
+    npme = Settings.JobSettings.npme;
+    Settings.JobSettings.dd = [];
+    Settings.JobSettings.npme = [];
     Sol_Output = Calc_Solid_Properties_at_MP(Settings);
+    Settings.JobSettings.dd = dd;
+    Settings.JobSettings.npme = npme;
+    
     Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
     Settings.Finite_T_Data.Solid_H_MP = Sol_Output.Solid_H_MP;
     

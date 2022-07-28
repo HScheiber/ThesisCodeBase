@@ -68,8 +68,6 @@ Settings.Finite_T_Data.Fusion_dV = Settings.Finite_T_Data.Liquid_V_MP - ...
     Settings.Finite_T_Data.Solid_V_MP;
 
 % Melting point
-dd = Settings.JobSettings.dd;
-npme = Settings.JobSettings.npme;
 Settings.dd = dd;
 Settings.npme = npme;
 [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
