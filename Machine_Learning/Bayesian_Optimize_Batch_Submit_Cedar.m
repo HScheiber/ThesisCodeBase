@@ -755,7 +755,7 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
             
             Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-            Models(idx).SigmaEpsilon = true;
+            Models(idx).SigmaEpsilon = false;
             Models(idx).Fix_Charge = true;
             Models(idx).Additivity = true;
             Models(idx).MinExpWallHeight = 100; % kJ/mol
@@ -783,7 +783,7 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
             
             Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-            Models(idx).SigmaEpsilon = true;
+            Models(idx).SigmaEpsilon = false;
             Models(idx).Fix_Charge = true;
             Models(idx).Additivity = true;
             Models(idx).MinExpWallHeight = 100; % kJ/mol
@@ -812,7 +812,7 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
 
             Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-            Models(idx).SigmaEpsilon = true;
+            Models(idx).SigmaEpsilon = false;
             Models(idx).Fix_Charge = false;
             Models(idx).Additivity = true;
             Models(idx).MinExpWallHeight = 100; % kJ/mol
