@@ -846,39 +846,10 @@ else
 end
 
 %% Prepare batch scripts
-[home,project,computer] = find_home;
-
-switch computer
-    case 'cedar'
-        pbs = false;
-        account = 'rrg-patey-ad';
-    case 'graham'
-        pbs = false;
-        account = 'def-patey';
-    case 'sockeye'
-        pbs = true;
-    case 'patey'
-        pbs = false;
-    case 'unbearabull'
-        pbs = false;
-end
-
 % Find the scheduler and get the batch script template file
-if pbs
-    fn = fullfile(home,'Machine_Learning','templates','PBS_template.subm');
-    subm_txt = fileread(fn);
-    subm_txt = strrep(subm_txt,'##MEMORY##',Calculation.pbs_memory);
-else % slurm
-    fn = fullfile(home,'Machine_Learning','templates','SLURM_template.subm');
-    subm_txt = fileread(fn);
-    subm_txt = strrep(subm_txt,'##MEMORY##',Calculation.slurm_memory);
-    subm_txt = strrep(subm_txt,'##ACCOUNT##',account);
-end
-
-% Add in some global calculation parameters
-subm_txt = strrep(subm_txt,'##HOURS##',num2str(Calculation.hours));
-subm_txt = strrep(subm_txt,'##NODES##',num2str(Calculation.nodes));
-subm_txt = strrep(subm_txt,'##CPUS##',num2str(Calculation.cpus_per_node));
+[home,project,~,Slurm] = find_home;
+calc_cmd = 'matlab -nodisplay -r "Bayesian_Optimize_LiX_Parameters(''##TASKNAME##.inp'')" >> ##TASKNAME##.log';
+clean_cmd =  'matlab -r "cleanup_BO_log(''##TASKNAME##.log'')"';
 
 % Loop through all models and build their submission file
 for idx = 1:length(Models)
@@ -886,9 +857,19 @@ for idx = 1:length(Models)
         continue
     end
     Model = Models(idx);
+    
+    Batch_Template = MD_Batch_Template(Model.JobSettings);
+    Batch_Template = strrep(Batch_Template,['##PREMIN##' newline],'');
+    Batch_Template = strrep(Batch_Template,'##MDRUN##',calc_cmd);
+    Batch_Template = strrep(Batch_Template,'##CLEANUP##',clean_cmd);
+    Batch_Template = strrep(Batch_Template,['##EXT1##' newline],'');
+    Batch_Template = strrep(Batch_Template,['##EXT2##' newline],'');
+    
+    
     Model_Name = [Model.Salt '_' Model.Theory '_Model_' Model.Trial_ID];
     Model_Name_abrv = [Model.Theory '_Model_' Model.Trial_ID];
-    subm_txt_fin = strrep(subm_txt,'##MODEL_NAME##',Model_Name);
+    Batch_Template = strrep(Batch_Template,'##TASKNAME##',Model_Name);
+    Batch_Template = strrep(Batch_Template,'##ERROR##',Model_Name);
     
     % Generate and move to the submission directory
     submit_dir = fullfile(project,'Model_Building',Model.Salt,Model_Name_abrv);
@@ -930,7 +911,7 @@ for idx = 1:length(Models)
     % Save job submission script
     subm_file = fullfile(submit_dir,[Model_Name '.subm']);
     fid = fopen(subm_file,'wt');
-    fwrite(fid,regexprep(subm_txt_fin,{'\r'}',{''}));
+    fwrite(fid,regexprep(Batch_Template,{'\r'}',{''}));
     fclose(fid);
     
     % Submit job
