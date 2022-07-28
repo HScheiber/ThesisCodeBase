@@ -201,7 +201,7 @@ for sidx = 1:length(Salts)
         
         %% Model JC: EW
         idx = idx+1;
-        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx) = Shared_Settings;
         Models(idx).Salt = Salt;
         Models(idx).Theory = 'JC';
         Models(idx).Trial_ID = ['EW' Rep];
@@ -229,7 +229,7 @@ for sidx = 1:length(Salts)
         
         %% Model JC: EW
         idx = idx+1;
-        Models(idx) = Initialize_LiX_BO_Settings;
+        Models(idx) = Shared_Settings;
         Models(idx).Salt = Salt;
         Models(idx).Theory = 'JC';
         Models(idx).Trial_ID = ['EW' Rep];
@@ -314,7 +314,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: IB
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['IB' Rep];
@@ -341,7 +341,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: IC
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['IC' Rep];
@@ -368,7 +368,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: ID
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['ID' Rep];
@@ -456,7 +456,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: IF
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['IF' Rep];
@@ -485,7 +485,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: IG
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['IG' Rep];
@@ -518,7 +518,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: IH
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['IH' Rep];
@@ -551,7 +551,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: II
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['II' Rep];
@@ -644,7 +644,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: JB
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['JB' Rep];
@@ -673,7 +673,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: JC
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['JC' Rep];
@@ -762,7 +762,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: JB
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['JB' Rep];
@@ -791,7 +791,7 @@ for tidx = 1:length(Theories)
             
             %% Model BH: JC
             idx = idx+1;
-            Models(idx) = Initialize_LiX_BO_Settings;
+            Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['JC' Rep];
