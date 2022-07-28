@@ -916,7 +916,7 @@ for idx = 1:length(Models)
     fclose(fid);
     
     % Submit job
-    MultiSubmitBayesOpt(Calculation.N_Calc,submit_dir,[Model_Name '.subm'])
+    MultiSubmitBayesOpt(Model.JobSettings.N_Calc,submit_dir,[Model_Name '.subm'])
     delete(subm_file); % This is used as a template and can be removed
 end
 
