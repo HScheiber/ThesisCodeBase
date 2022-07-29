@@ -89,7 +89,7 @@ end
 Model = ModelName(Settings);
 % Get default system geometry
 Settings.Use_Conv_cell = Settings.MinMDP.Use_Conv_cell;
-Settings.Geometry = Default_Crystal(Settings);
+Settings.Geometry = Default_Crystal(Settings,'Scale',Settings.S);
 
 % Find minimum lattice parameter for this
 % salt/structure/model (or use initial ones)
