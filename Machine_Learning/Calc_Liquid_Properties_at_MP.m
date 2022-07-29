@@ -108,6 +108,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##RVDW##',pad(num2str(MDP.RVDW_Cutoff),18));
     
     Table_Req = IsGmxTableRequired(Settings);
+    Settings.JobName = [Settings.Theory '_TestModel'];
     
     if Table_Req || strncmp(Settings.Theory,'BH',2) % Buckingham potential is incompatible with verlet cutoff
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad('user',18));
@@ -119,7 +120,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         
         % For minimization, add in a close-range repulsive wall to the
         % potential with the following function
-        Settings.JobName = [Settings.Theory '_TestModel'];
         Settings.TableFile_MX = MakeTables(Settings);
     else
         % Modify the MDP file
