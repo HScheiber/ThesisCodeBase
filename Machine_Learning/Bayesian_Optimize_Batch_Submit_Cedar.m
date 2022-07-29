@@ -99,6 +99,7 @@ Shared_Settings.Liquid_Fraction = 0.50;
 Shared_Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
 Shared_Settings.Liquid_Test_Time = 50; % ps. simulation time to sample the liquid (second half averaged for enthalpy / volume)
 Shared_Settings.Solid_Test_Time = 30; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
+Shared_Settings.Delete_Equil = true; % switch to delete temporary calculation folders for finite T calcs
 
 % More Finite T setings
 Shared_Settings.Manual_Box = false; % When set to true, rather than setting the number of atoms in a box, user sets the a, b, and c dimensions of the box
