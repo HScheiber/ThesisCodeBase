@@ -10,6 +10,7 @@ end
 if ~isfield(Settings,'WorkDir')
     [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
 end
+WorkDir = Settings.WorkDir;
 if ~isfield(Settings,'gmx')
     [Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
 end
@@ -246,7 +247,6 @@ if Settings.Delete_T_History
 end
 
 Tm_estimate = mean(T_dat.dT);
-WorkDir = Settings.WorkDir;
 if T_dat.Alt_Structure
     Aborted = true;
 end
