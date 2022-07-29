@@ -43,18 +43,16 @@ function Loss = LiX_Loss(Settings)
         if Settings.Loss_Options.Experimental_LP
             RS_a_Correction = Experimental.(Settings.Salt).Rocksalt.a_zero - DFT.(Settings.Salt).Rocksalt.a;
             RS_V_correction = Experimental.(Settings.Salt).Rocksalt.V_zero - DFT.(Settings.Salt).Rocksalt.V;
-            WZ_a_Correction = Experimental.(Settings.Salt).Wurtzite.a_zero - DFT.(Settings.Salt).Wurtzite.a;
-            WZ_c_Correction = Experimental.(Settings.Salt).Wurtzite.c_zero - DFT.(Settings.Salt).Wurtzite.c;
-            WZ_V_correction = Experimental.(Settings.Salt).Wurtzite.V_zero - DFT.(Settings.Salt).Wurtzite.V;
-            
             DFT.(Settings.Salt).Rocksalt.a = DFT.(Settings.Salt).Rocksalt.a + RS_a_Correction;
             DFT.(Settings.Salt).Rocksalt.V = DFT.(Settings.Salt).Rocksalt.V + RS_V_correction;
-            if ~isnan(WZ_a_Correction)
+            if isfield(Experimental.(Settings.Salt),'Wurtzite')
+                WZ_a_Correction = Experimental.(Settings.Salt).Wurtzite.a_zero - DFT.(Settings.Salt).Wurtzite.a;
+                WZ_c_Correction = Experimental.(Settings.Salt).Wurtzite.c_zero - DFT.(Settings.Salt).Wurtzite.c;
+                WZ_V_correction = Experimental.(Settings.Salt).Wurtzite.V_zero - DFT.(Settings.Salt).Wurtzite.V;
                 DFT.(Settings.Salt).Wurtzite.a = DFT.(Settings.Salt).Wurtzite.a + WZ_a_Correction;
                 DFT.(Settings.Salt).Wurtzite.c = DFT.(Settings.Salt).Wurtzite.c + WZ_c_Correction;
                 DFT.(Settings.Salt).Wurtzite.V = DFT.(Settings.Salt).Wurtzite.V + WZ_V_correction;
             end
-            
         end
     end
     
