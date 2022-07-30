@@ -1,5 +1,12 @@
-function Output = Calc_Solid_Properties_at_MP(Settings)
+function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     
+    p = inputParser;
+    p.FunctionName = 'Calc_Solid_Properties_at_MP';
+    addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
+
+    parse(p,varargin{:});
+    Verbose = p.Results.Verbose;
+
     if ~isfield(Settings,'WorkDir')
         Settings.WorkDir = GetMDWorkdir(Settings);
         Settings.WorkDir = [Settings.WorkDir '_SP'];
@@ -11,7 +18,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
     
-    disp('*** Separate Equilibration of Solid Selected ***')
+    if Verbose
+        disp('*** Separate Equilibration of Solid Selected ***')
+    end
     
     % Generate unit cell: Unit Cell Filename
     Settings.JobName = 'Equil_Sol';
@@ -379,11 +388,15 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     end
 
     % Run solid Equilibration
-    disp(['Beginning Solid Equilibration for ' num2str(Settings.Solid_Test_Time) ' ps...'] )
+    if Verbose
+        disp(['Beginning Solid Equilibration for ' num2str(Settings.Solid_Test_Time) ' ps...'] )
+    end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
-        disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        if Verbose
+            disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
     else
         disp('Equilibration failed. Stopping.')
         disp(mdrun_output);
@@ -404,7 +417,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
     Sol_Fraction = PyOut{4};
     
     if Sol_Fraction < 0.9
-        disp('Detected Solid Phase change at Experimental MP')
+        if Verbose
+            disp('Detected Solid Phase change at Experimental MP')
+        end
         Output.Solid_V_MP = nan;
         Output.Solid_H_MP = nan;
         return
@@ -455,7 +470,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings)
         end
     end
     
-    disp('*** Separate Equilibration of Solid Complete ***')
+    if Verbose
+        disp('*** Separate Equilibration of Solid Complete ***')
+    end
     diary off
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
         diary(Settings.Diary_Loc)

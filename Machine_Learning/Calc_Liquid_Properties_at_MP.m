@@ -1,4 +1,4 @@
-function Output = Calc_Liquid_Properties_at_MP(Settings)
+function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
 
     %% What this function does:
     % Initialize density based on experiment
@@ -9,6 +9,14 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Run NPT simulation for [Settings.Liquid_Test_Time] amount of time using fast equilibration settings (Berendsen baro and Velocity-Rescale thermo)
     % Calculate average density of equilibrated box based on last 25% of simulation
     % Give new density as output
+    
+    % Optional inputs
+    p = inputParser;
+    p.FunctionName = 'Calc_Liquid_Properties_at_MP';
+    addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
+
+    parse(p,varargin{:});
+    Verbose = p.Results.Verbose;
     
     if ~isfield(Settings,'WorkDir')
         Settings.WorkDir = GetMDWorkdir(Settings);
@@ -52,7 +60,9 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Ref_X = fullfile(Settings.home,'templates','GRO_Templates',[Settings.Halide '_Box.gro']);
 
     % Add metal
-    disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Metal ' ions to liquid box...'])
+    if Verbose
+        disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Metal ' ions to liquid box...'])
+    end
     mtimer = tic;
     Prep_Liq_Metal_Only = fullfile(Settings.WorkDir,['Prep_Liq_Metal_Only.' Settings.CoordType]);
     cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
@@ -63,11 +73,15 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         disp(output);
         error(['Error adding ' Settings.Metal ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
+    if Verbose
+        disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
+    end
 
     % Add Halide
     Prep_Liq_Random_Liq = fullfile(Settings.WorkDir,['Prep_Liq_Random_Liq.' Settings.CoordType]);
-    disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
+    if Verbose
+        disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
+    end
     htimer = tic;
     cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
         ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 400 -scale ' R0 ' -radius ' R0];
@@ -78,7 +92,9 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         disp(output);
         error(['Error adding ' Settings.Halide ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
+    if Verbose
+        disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
+    end
 
     % Load current randomly-generated liquid file data
     Random_Liquid_data = load_gro_file(Prep_Liq_Random_Liq);
@@ -280,11 +296,15 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     end
 
     % Liquid Minimization
-    disp('Begining Liquid Minimization...')
+    if Verbose
+        disp('Begining Liquid Minimization...')
+    end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
-        disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        if Verbose
+            disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
     else
         disp(mdrun_output);
         error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
@@ -598,11 +618,15 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     end
 
     % Run Liquid Equilibration
-    disp(['Begining Liquid Equilibration for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
+    if Verbose
+        disp(['Begining Liquid Equilibration for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
+    end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
-        disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        if Verbose
+            disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
     else
         disp('Equilibration failed. Stopping.')
         disp(mdrun_output);
@@ -629,7 +653,9 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Liq_Fraction = PyOut{4};
     
     if Liq_Fraction < 0.9
-        disp('Detected Liquid Freezing at Experimental MP')
+        if Verbose
+            disp('Detected Liquid Freezing at Experimental MP')
+        end
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         return
@@ -679,7 +705,9 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         end
     end
     
-    disp('*** Separate Equilibration of Liquid Complete ***')
+    if Verbose
+        disp('*** Separate Equilibration of Liquid Complete ***')
+    end
     diary off
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
         diary(Settings.Diary_Loc)

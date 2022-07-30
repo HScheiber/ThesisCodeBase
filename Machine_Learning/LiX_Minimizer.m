@@ -34,6 +34,7 @@ addOptional(p,'Therm_Prop_Override',false,@(x)validateattributes(x,{'logical'},{
 
 parse(p,varargin{:});
 Settings.MinMDP.Verbose = p.Results.Verbose;
+Verbose = p.Results.Verbose;
 Extra_Properties = p.Results.Extra_Properties;
 Therm_Prop_Override = p.Results.Therm_Prop_Override;
 
@@ -1183,7 +1184,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     Settings.JobSettings.dd = [];
     Settings.JobSettings.npme = [];
     [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
-    Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.9 solid
+    Liq_Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose); % Output is nan if liquid converts to >0.9 solid
     Settings.JobSettings.dd = dd;
     Settings.JobSettings.npme = npme;
     [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
@@ -1227,7 +1228,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     Settings.JobSettings.dd = [];
     Settings.JobSettings.npme = [];
     [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
-    Sol_Output = Calc_Solid_Properties_at_MP(Settings);
+    Sol_Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
     Settings.JobSettings.dd = dd;
     Settings.JobSettings.npme = npme;
     [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);

@@ -121,7 +121,6 @@ Shared_Settings.InitialMeshSize = 20;
 Shared_Settings.MeshSizeMultiplier = 5;
 Shared_Settings.QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
 Shared_Settings.ScaleInitialLiqDensity = 0.8;
-Shared_Settings.Delete_Equil = false; % switch to delete temporary calculation folders for finite T calcs
 
 % Barostat Options
 Shared_Settings.Isotropy = 'semiisotropic';
