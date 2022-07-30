@@ -531,21 +531,22 @@ classdef BayesianOptimization_priv
             SaveFilename = bo.PrivOptions.SaveFileName;
             prevFilename = sprintf('%s.PREV', SaveFilename);
             try
-                if exist(['./' SaveFilename], 'file')
-                    if exist(['./' prevFilename], 'file')
-                        delete(['./' prevFilename]);
+                if isfile(SaveFilename)
+                    if isfile(prevFilename)
+                        delete(prevFilename);
                     end
                     copyfile(SaveFilename, prevFilename);
                 end
                 BayesoptResults = bo;
                 save(SaveFilename, 'BayesoptResults', '-v7.3');
             catch me
-                if exist(['./' SaveFilename], 'file')
-                    copyfile(['./' SaveFilename], ['./' prevFilename]);
+                if isfile(SaveFilename)
+                    copyfile(SaveFilename,prevFilename);
                 end
-                save(['./' SaveFilename], 'BayesoptResults', '-v7.3');
+                save(SaveFilename, 'BayesoptResults', '-v7.3');
                 bayesoptim_priv.warn('SaveToFileFailed', SaveFilename);
                 disp(me);
+                disp(['Current directory: ' pwd])
             end
         end
         
