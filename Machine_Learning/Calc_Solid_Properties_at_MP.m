@@ -398,9 +398,15 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        disp('Equilibration failed. Stopping.')
-        disp(mdrun_output);
-        error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+        Settings.QECompressibility = Settings.QECompressibility/2;
+        if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+            Output = Calc_Solid_Properties_at_MP(Settings,'Verbpse',Verbose);
+            return
+        else
+            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp(mdrun_output);
+            error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+        end
     end
     
     % Check to ensure system remained in the correct solid structure

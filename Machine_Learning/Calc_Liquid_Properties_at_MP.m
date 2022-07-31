@@ -628,9 +628,16 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
             disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        disp('Equilibration failed. Stopping.')
-        disp(mdrun_output);
-        error(['Error running mdrun for equilibration. Problem command: ' newline mdrun_command]);
+        disp('Equilibration failed. Retrying with stiffer compressibility.')
+        Settings.QECompressibility = Settings.QECompressibility/2;
+        if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+            Output = Calc_Liquid_Properties_at_MP(Settings,'Verbpse',Verbose);
+            return
+        else
+            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp(mdrun_output);
+            error(['Error running mdrun for equilibration. Problem command: ' newline mdrun_command]);
+        end
     end
     
 %     system(['wsl source ~/.bashrc; echo "5 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])

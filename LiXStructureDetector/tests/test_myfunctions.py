@@ -189,9 +189,9 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\6e8289d068a9a65f1b307ffbdcd52496'
-Salt = 'LiI'
-SystemName = 'Equil_Sol'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\5cb0ed95a412fb231facfc093907a837_LP'
+Salt = 'LiF'
+SystemName = 'Equil_Liq'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
@@ -199,7 +199,7 @@ SavePredictions=False
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=0.001
+TimePerFrame=0.01
 FileType='gro'
 Verbose=True
 StartPoint = None
@@ -222,29 +222,29 @@ CheckFullTrajectory = True
 
 
 
-[system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt] = LiXStructureDetector.Calculate_Liquid_Fraction(
-                              WorkDir, Salt, SystemName=SystemName, T=T,
-                              T_Ref=T_Ref, RefStructure=RefStructure, CheckFullTrajectory=CheckFullTrajectory, 
-                              SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
-                              SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage,
-                              InitialRefFrac=None, RefChangeThreshold=RefChangeThreshold, 
-                              SlopeThreshold=1e10, SlopeCheckBegin=0.1,
-                              ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
-                              FileType=FileType, Verbose=Verbose, Version=Version,
-                              Temporal_Cutoff=Temporal_Cutoff, Voronoi=Voronoi, Qlm_Average=Qlm_Average,
-                              Prob_Interfacial=Prob_Interfacial, Spatial_Reassignment=Spatial_Reassignment,
-                              Spatial_Interfacial=Spatial_Interfacial)
+# [system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt] = LiXStructureDetector.Calculate_Liquid_Fraction(
+#                               WorkDir, Salt, SystemName=SystemName, T=T,
+#                               T_Ref=T_Ref, RefStructure=RefStructure, CheckFullTrajectory=CheckFullTrajectory, 
+#                               SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
+#                               SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage,
+#                               InitialRefFrac=None, RefChangeThreshold=RefChangeThreshold, 
+#                               SlopeThreshold=1e10, SlopeCheckBegin=0.1,
+#                               ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
+#                               FileType=FileType, Verbose=Verbose, Version=Version,
+#                               Temporal_Cutoff=Temporal_Cutoff, Voronoi=Voronoi, Qlm_Average=Qlm_Average,
+#                               Prob_Interfacial=Prob_Interfacial, Spatial_Reassignment=Spatial_Reassignment,
+#                               Spatial_Interfacial=Spatial_Interfacial)
 
-# LiXStructureDetector.Check_Structures(WorkDir, Salt, SystemName=SystemName,
-#                         SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
-#                         SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage, 
-#                         ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
-#                         FileType=FileType, Verbose=Verbose, StartPoint = StartPoint,
-#                         EndPoint=EndPoint, Version=Version, SaveDir=SaveDir,
-#                         InMemory=InMemory, Temporal_Cutoff=Temporal_Cutoff,
-#                         Voronoi=Voronoi, Qlm_Average=Qlm_Average,
-#                         Prob_Interfacial=Prob_Interfacial,
-#                         Spatial_Reassignment=Spatial_Reassignment,
-#                         Spatial_Interfacial=Spatial_Interfacial,
-#                         SaveTrajectoryAux=SaveTrajectoryAux,
-#                         LoadFeatures=LoadFeatures)
+LiXStructureDetector.Check_Structures(WorkDir, Salt, SystemName=SystemName,
+                        SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
+                        SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage, 
+                        ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
+                        FileType=FileType, Verbose=Verbose, StartPoint = StartPoint,
+                        EndPoint=EndPoint, Version=Version, SaveDir=SaveDir,
+                        InMemory=InMemory, Temporal_Cutoff=Temporal_Cutoff,
+                        Voronoi=Voronoi, Qlm_Average=Qlm_Average,
+                        Prob_Interfacial=Prob_Interfacial,
+                        Spatial_Reassignment=Spatial_Reassignment,
+                        Spatial_Interfacial=Spatial_Interfacial,
+                        SaveTrajectoryAux=SaveTrajectoryAux,
+                        LoadFeatures=LoadFeatures)
