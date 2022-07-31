@@ -17,6 +17,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
 
     parse(p,varargin{:});
     Verbose = p.Results.Verbose;
+    Inp_Settings = Settings;
     
     if ~isfield(Settings,'WorkDir')
         Settings.WorkDir = GetMDWorkdir(Settings);
@@ -629,14 +630,15 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         end
     else
         disp('Equilibration failed. Retrying with stiffer compressibility.')
+        Settings = Inp_Settings;
         Settings.QECompressibility = Settings.QECompressibility/2;
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-            Output = Calc_Liquid_Properties_at_MP(Settings,'Verbpse',Verbose);
+            Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
         else
             disp('Equilibration failed. Stiffer compressibility did not resolve.')
             disp(mdrun_output);
-            error(['Error running mdrun for equilibration. Problem command: ' newline mdrun_command]);
+            error(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
         end
     end
     

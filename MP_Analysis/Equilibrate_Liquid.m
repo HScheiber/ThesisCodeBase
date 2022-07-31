@@ -13,6 +13,7 @@ function Equil_density = Equilibrate_Liquid(Settings)
     %% Possibility 1 Implemented
     disp('*** Separate Equilibration of Liquid Selected ***')
     
+    Inp_Settings = Settings;
     Settings.WorkDir = fullfile(Settings.WorkDir,'Equil_Liq');
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
@@ -342,9 +343,17 @@ function Equil_density = Equilibrate_Liquid(Settings)
     if state == 0
         disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
     else
-        disp('Equilibration failed. Stopping.')
-        disp(mdrun_output);
-        error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+        disp('Equilibration failed. Retrying with stiffer compressibility.')
+        Settings = Inp_Settings;
+        Settings.QECompressibility = Settings.QECompressibility/2;
+        if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+            Equil_density = Equilibrate_Liquid(Settings);
+            return
+        else
+            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp(mdrun_output);
+            error(['Error running mdrun for equilibration. Problem command: ' newline mdrun_command]);
+        end
     end
 
     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq_Energy.xvg');

@@ -1,11 +1,11 @@
 function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
-    
     p = inputParser;
     p.FunctionName = 'Calc_Solid_Properties_at_MP';
     addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 
     parse(p,varargin{:});
     Verbose = p.Results.Verbose;
+	Inp_Settings = Settings;
 
     if ~isfield(Settings,'WorkDir')
         Settings.WorkDir = GetMDWorkdir(Settings);
@@ -398,9 +398,11 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
+        disp('Equilibration failed. Retrying with stiffer compressibility.')
+        Settings = Inp_Settings;
         Settings.QECompressibility = Settings.QECompressibility/2;
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-            Output = Calc_Solid_Properties_at_MP(Settings,'Verbpse',Verbose);
+            Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
         else
             disp('Equilibration failed. Stiffer compressibility did not resolve.')

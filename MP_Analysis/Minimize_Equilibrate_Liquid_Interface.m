@@ -12,6 +12,7 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     % Fix all atoms except atoms within -+0.5 Angstroms of the solid-liquid interface interface. Re-minimize interfacial atoms using Make-Tables    
     
     disp('*** Separate Equilibration of Liquid Selected ***')
+    Inp_Settings = Settings;
     MinDir = Settings.WorkDir;
     Settings.WorkDir = fullfile(Settings.WorkDir,'Equil_Liq');
     if ~isfolder(Settings.WorkDir)
@@ -357,9 +358,17 @@ function Minimize_Equilibrate_Liquid_Interface(Settings)
     if state == 0
         disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
     else
-        disp('Equilibration failed. Stopping.')
-        disp(mdrun_output);
-        error(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
+        disp('Equilibration failed. Retrying with stiffer compressibility.')
+        Settings = Inp_Settings;
+        Settings.QECompressibility = Settings.QECompressibility/2;
+        if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+            Minimize_Equilibrate_Liquid_Interface(Settings);
+            return
+        else
+            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp(mdrun_output);
+            error(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
+        end
     end
     
 %     system(['wsl source ~/.bashrc; echo "5 8 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])

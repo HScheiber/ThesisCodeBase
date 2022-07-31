@@ -1,7 +1,8 @@
 function Equilibrate_Solid(Settings)
     
     disp('*** Separate Equilibration of Solid Selected ***')
-
+    
+    Inp_Settings = Settings;
     WorkDir = fullfile(Settings.WorkDir,'Equil_Sol');
     if ~isfolder(WorkDir)
         mkdir(WorkDir)
@@ -124,9 +125,17 @@ function Equilibrate_Solid(Settings)
     if state == 0
         disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
     else
-        disp('Equilibration failed. Stopping.')
-        disp(mdrun_output);
-        error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+        disp('Equilibration failed. Retrying with stiffer compressibility.')
+        Settings = Inp_Settings;
+        Settings.QECompressibility = Settings.QECompressibility/2;
+        if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+            Equilibrate_Solid(Settings);
+            return
+        else
+            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp(mdrun_output);
+            error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+        end
     end
     
     Box_xvg_file = fullfile(WorkDir,'Equil_Sol_Box.xvg');

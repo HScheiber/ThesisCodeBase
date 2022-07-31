@@ -10,6 +10,7 @@ if isfield(Settings,'Settings')
     end
     Settings = rmfield(Settings,'Settings');
 end
+Inp_Settings = Settings;
 Settings.WorkDir = Directory;
 
 disp('*** Fast Pre-Equilibration Selected ***')
@@ -84,7 +85,7 @@ if Settings.Table_Req
     mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
 end
     
-% Run Liquid Equilibration
+% Run system Equilibration
 disp(['Beginning System Pre-Equilibration for ' num2str(Settings.PreEquilibration) ' ps...'] )
 mintimer = tic;
 [state,mdrun_output] = system(mdrun_command);
@@ -92,9 +93,19 @@ if state == 0
     disp(['System Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
     copyfile(Equilibrated_Geom_File,Settings.SuperCellFile)
 else
-    disp('Equilibration failed. Stopping.')
-    disp(mdrun_output);
-    error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+    disp('Equilibration failed. Retrying with stiffer compressibility.')
+    Settings = Inp_Settings;
+    Settings.QECompressibility = Settings.QECompressibility/2;
+    save(fullfile(Directory,'TempJobInfo.mat'),'Settings')
+    
+    if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+        MD_PreEquilibrate(Directory);
+        return
+    else
+        disp('Equilibration failed. Stiffer compressibility did not resolve.')
+        disp(mdrun_output);
+        error(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
+    end
 end
 
 %     system(['wsl source ~/.bashrc; echo "5 8 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
