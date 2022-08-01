@@ -17,7 +17,7 @@ OuterDir = strrep(WorkDir,[filesep 'BestPoint_Thermal'],'');
 BO_Settings = load(fullfile(OuterDir,[Settings.Salt '_' Settings.JobName '.inp']),'-mat').Model;
 Full_opt_filename = fullfile(OuterDir,[Settings.Salt '_' Settings.JobName '_fullopt.mat']);
 MinDat = load(Full_opt_filename,'-mat');
-OptParam = MinDat.Pars;
+OptParam = MinDat.full_opt_point;
 
 Settings.Minimization_Data = MinDat.Minimization_Data;
 
