@@ -27,8 +27,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         mkdir(Settings.WorkDir)
     end
     save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
-    diary off
-    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
 
     % Grab reference density, cutoff, and corresponding box size
     L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer; % nm, the box dimension
@@ -709,18 +707,14 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     if Verbose
         disp('*** Separate Equilibration of Liquid Complete ***')
     end
-    diary off
     if Settings.Delete_Equil
         try
             cd(Settings.OuterDir)
+            fclose('all');
             rmdir(Settings.WorkDir,'s')
         catch
             disp(['Unable to remove directory: ' Settings.WorkDir])
         end
-    end
-    
-    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-        diary(Settings.Diary_Loc)
     end
 
 end

@@ -6,7 +6,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     parse(p,varargin{:});
     Verbose = p.Results.Verbose;
 	Inp_Settings = Settings;
-
+    
     if ~isfield(Settings,'WorkDir')
         Settings.WorkDir = GetMDWorkdir(Settings);
         Settings.WorkDir = [Settings.WorkDir '_SP'];
@@ -15,8 +15,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         mkdir(Settings.WorkDir)
     end
     save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
-    diary off
-    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
     
     if Verbose
         disp('*** Separate Equilibration of Solid Selected ***')
@@ -474,7 +472,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         disp('*** Separate Equilibration of Solid Complete ***')
     end
     
-    diary off
     if Settings.Delete_Equil
         try
             cd(Settings.OuterDir)
@@ -482,9 +479,5 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         catch
             disp(['Unable to remove directory: ' Settings.WorkDir])
         end
-    end
-    
-    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-        diary(Settings.Diary_Loc)
     end
 end

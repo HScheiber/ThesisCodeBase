@@ -1143,7 +1143,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
         
         if ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Therm_Prop_Override
-            Loss_add = Loss_add + log(1 + Model_Mismatch);
+            Loss_add = Loss_add + log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
             Settings.skip_finite_T = true;
         else
             Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
@@ -1176,8 +1176,8 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-    elseif ~isempty(gcp('nocreate')) % Run in parallel
-        delete(gcp);
+%     elseif ~isempty(gcp('nocreate')) % Run in parallel
+%         delete(gcp);
     end
     
     dd = Settings.JobSettings.dd;
@@ -1219,9 +1219,9 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('GMX_OPENMP_MAX_THREADS','1');
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
-        Settings.gmx = Settings.gmx_loc;
-    elseif ~isempty(gcp('nocreate')) % Run in parallel
-        delete(gcp);
+%         Settings.gmx = Settings.gmx_loc;
+%     elseif ~isempty(gcp('nocreate')) % Run in parallel
+%         delete(gcp);
     end
     
     dd = Settings.JobSettings.dd;
@@ -1267,8 +1267,8 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-    elseif ~isempty(gcp('nocreate')) % Run in parallel
-        delete(gcp);
+%     elseif ~isempty(gcp('nocreate')) % Run in parallel
+%         delete(gcp);
     end
     
     Settings.BatchMode = false;
