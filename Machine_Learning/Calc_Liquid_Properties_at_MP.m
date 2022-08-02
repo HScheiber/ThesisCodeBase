@@ -706,18 +706,19 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)
     % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
     % stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
-    
-    if Settings.Delete_Equil
-        try
-            rmdir(Settings.WorkDir,'s')
-        catch
-        end
-    end
-    
     if Verbose
         disp('*** Separate Equilibration of Liquid Complete ***')
     end
     diary off
+    if Settings.Delete_Equil
+        try
+            cd(Settings.OuterDir)
+            rmdir(Settings.WorkDir,'s')
+        catch
+            disp(['Unable to remove directory: ' Settings.WorkDir])
+        end
+    end
+    
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
         diary(Settings.Diary_Loc)
     end
