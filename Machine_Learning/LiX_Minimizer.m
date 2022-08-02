@@ -1276,7 +1276,6 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
     
     if Settings.Delete_Equil
         try
-            cd(Settings.OuterDir)
             rmdir(WorkDir,'s')
         catch
             disp(['Unable to remove directory: ' WorkDir])
