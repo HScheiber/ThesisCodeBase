@@ -31,14 +31,12 @@ p.FunctionName = 'LiX_Minimizer';
 addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Extra_Properties',Settings.Extra_Properties,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Therm_Prop_Override',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
-addOptional(p,'OuterDir',pwd)
 
 parse(p,varargin{:});
 Settings.MinMDP.Verbose = p.Results.Verbose;
 Verbose = p.Results.Verbose;
 Extra_Properties = p.Results.Extra_Properties;
 Therm_Prop_Override = p.Results.Therm_Prop_Override;
-Settings.OuterDir = p.Results.OuterDir;
 
 if Settings.Parallel_LiX_Minimizer && Settings.Parallel_Struct_Min
     Settings.Parallel_Struct_Min = false;
@@ -1109,6 +1107,7 @@ else
 end
 
 % Initialize Finite T Data structure and update Settings
+cd(Settings.OuterDir)
 tol = sqrt(eps);
 Settings.skip_finite_T = false;
 if any([Settings.Loss_Options.Fusion_Enthalpy ...
