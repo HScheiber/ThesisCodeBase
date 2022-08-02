@@ -143,7 +143,7 @@ Shared_Settings.MDP.VerletBT = -1;
 
 % Set up models below
 Exp = Load_Experimental_Data;
-skip_models = [1:240 242 244:1000];
+skip_models = [1:240 243 245:1000];
 check_complete = true; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs
 continue_completed = false; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
@@ -583,8 +583,8 @@ for tidx = 1:length(Theories)
 end
 
 %% BH Models JA, JB, JC
-Shared_Settings.Parallel_Bayesopt = true;
-Shared_Settings.Parallel_Struct_Min = false;
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
 Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank

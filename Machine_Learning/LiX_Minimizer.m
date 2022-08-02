@@ -1176,8 +1176,8 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-%     elseif ~isempty(gcp('nocreate')) % Run in parallel
-%         delete(gcp);
+    elseif ~isempty(gcp('nocreate')) % Run in parallel
+        delete(gcp);
     end
     
     dd = Settings.JobSettings.dd;
@@ -1220,8 +1220,8 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-%     elseif ~isempty(gcp('nocreate')) % Run in parallel
-%         delete(gcp);
+    elseif ~isempty(gcp('nocreate')) % Run in parallel
+        delete(gcp);
     end
     
     dd = Settings.JobSettings.dd;
@@ -1267,8 +1267,8 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-%     elseif ~isempty(gcp('nocreate')) % Run in parallel
-%         delete(gcp);
+    elseif ~isempty(gcp('nocreate')) % Run in parallel
+        delete(gcp);
     end
     
     Settings.BatchMode = false;
