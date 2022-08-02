@@ -659,9 +659,17 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         'SavePredictionsImage',true));
     Liq_Fraction = PyOut{4};
     
-    if Liq_Fraction < 0.9
+    if Liq_Fraction < 0.85
         if Verbose
             disp('Detected Liquid Freezing at Experimental MP')
+        end
+        if Settings.Delete_Equil
+            try
+                cd(Settings.OuterDir)
+                rmdir(Settings.WorkDir,'s')
+            catch
+                disp(['Unable to remove directory: ' Settings.WorkDir])
+            end
         end
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
@@ -710,7 +718,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     if Settings.Delete_Equil
         try
             cd(Settings.OuterDir)
-            fclose('all');
             rmdir(Settings.WorkDir,'s')
         catch
             disp(['Unable to remove directory: ' Settings.WorkDir])

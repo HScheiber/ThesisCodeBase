@@ -422,9 +422,17 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         'SavePredictionsImage',true));
     Sol_Fraction = PyOut{4};
     
-    if Sol_Fraction < 0.9
+    if Sol_Fraction < 0.85
         if Verbose
             disp('Detected Solid Phase change at Experimental MP')
+        end
+        if Settings.Delete_Equil
+            try
+                cd(Settings.OuterDir)
+                rmdir(Settings.WorkDir,'s')
+            catch
+                disp(['Unable to remove directory: ' Settings.WorkDir])
+            end
         end
         Output.Solid_V_MP = nan;
         Output.Solid_H_MP = nan;
