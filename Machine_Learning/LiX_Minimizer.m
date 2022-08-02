@@ -1219,7 +1219,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('GMX_OPENMP_MAX_THREADS','1');
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
-%         Settings.gmx = Settings.gmx_loc;
+        Settings.gmx = Settings.gmx_loc;
 %     elseif ~isempty(gcp('nocreate')) % Run in parallel
 %         delete(gcp);
     end
