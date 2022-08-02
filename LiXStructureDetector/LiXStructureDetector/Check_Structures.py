@@ -174,6 +174,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     # Check that the input directory is valid
     if not os.path.isdir(WorkDir):
         raise NotADirectoryError(WorkDir + ' is not a valid directory.')
+    cdir = os.getcwd()
     os.chdir(WorkDir)
     
     # Load some model parameters
@@ -656,5 +657,6 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
             fig.savefig(ML_Name + '_' + Salt + '_' + SystemName + '.png', dpi=300, format='png')
         else:
             fig.savefig(os.path.join(SaveDir,ML_Name + '_' + Salt + '_' + SystemName + '.png'), dpi=300, format='png')
-        
+    
+    os.chdir(cdir)
     return

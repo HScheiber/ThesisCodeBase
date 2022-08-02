@@ -234,6 +234,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     # Check that the input directory is valid
     if not os.path.isdir(WorkDir):
         raise NotADirectoryError(WorkDir + ' is not a valid directory.')
+    cdir = os.getcwd()
     os.chdir(WorkDir)
     
     RefStructure = GetRefStructure(RefStructure)
@@ -998,4 +999,5 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     if not CheckFullTrajectory:
         time_to_phase_change = np.nan
     
+    os.chdir(cdir)
     return [system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt]

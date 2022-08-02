@@ -1176,19 +1176,18 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-%     elseif ~isempty(gcp('nocreate')) % Run in parallel
-%         delete(gcp);
+        Liq_Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose); % Output is nan if liquid converts to >0.85 solid
+    else
+        dd = Settings.JobSettings.dd;
+        npme = Settings.JobSettings.npme;
+        Settings.JobSettings.dd = [];
+        Settings.JobSettings.npme = [];
+        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        Liq_Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose); % Output is nan if liquid converts to >0.85 solid
+        Settings.JobSettings.dd = dd;
+        Settings.JobSettings.npme = npme;
+        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
     end
-    
-    dd = Settings.JobSettings.dd;
-    npme = Settings.JobSettings.npme;
-    Settings.JobSettings.dd = [];
-    Settings.JobSettings.npme = [];
-    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
-    Liq_Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose); % Output is nan if liquid converts to >0.9 solid
-    Settings.JobSettings.dd = dd;
-    Settings.JobSettings.npme = npme;
-    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
     
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
@@ -1220,19 +1219,18 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-%     elseif ~isempty(gcp('nocreate')) % Run in parallel
-%         delete(gcp);
+        Sol_Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
+    else
+        dd = Settings.JobSettings.dd;
+        npme = Settings.JobSettings.npme;
+        Settings.JobSettings.dd = [];
+        Settings.JobSettings.npme = [];
+        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        Sol_Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
+        Settings.JobSettings.dd = dd;
+        Settings.JobSettings.npme = npme;
+        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
     end
-    
-    dd = Settings.JobSettings.dd;
-    npme = Settings.JobSettings.npme;
-    Settings.JobSettings.dd = [];
-    Settings.JobSettings.npme = [];
-    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
-    Sol_Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
-    Settings.JobSettings.dd = dd;
-    Settings.JobSettings.npme = npme;
-    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
     
     Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
     Settings.Finite_T_Data.Solid_H_MP = Sol_Output.Solid_H_MP;
