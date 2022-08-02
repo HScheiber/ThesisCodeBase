@@ -76,7 +76,7 @@ Shared_Settings = Initialize_LiX_BO_Settings;
 Shared_Settings.Project_Directory_Name = 'Model_Building';
 Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
-Shared_Settings.JobSettings.N_Calc = 1; % Number of chained calculations
+Shared_Settings.JobSettings.N_Calc = 4; % Number of chained calculations
 Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
 Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.JobSettings.Nodes = 0; % Minimum number of cores to request for calculation.
@@ -143,7 +143,7 @@ Shared_Settings.MDP.VerletBT = -1;
 
 % Set up models below
 Exp = Load_Experimental_Data;
-skip_models = [1:240];
+skip_models = [1:60 65:240 240:1000];
 check_complete = true; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs
 continue_completed = false; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
