@@ -143,7 +143,7 @@ Shared_Settings.MDP.VerletBT = -1;
 
 % Set up models below
 Exp = Load_Experimental_Data;
-skip_models = [1:240 241 243:1000];
+skip_models = [1:240 242 244:1000];
 check_complete = true; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs
 continue_completed = false; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
@@ -419,9 +419,6 @@ for tidx = 1:length(Theories)
         Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
         Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
         Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-        Shared_Settings.Parallel_Bayesopt = true;
-        Shared_Settings.Parallel_Struct_Min = false;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
 
         for ridx = 1:length(Replicates)
             Rep = num2str(Replicates(ridx));
@@ -608,9 +605,6 @@ for tidx = 1:length(Theories)
         Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
         Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
         Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
 
         for ridx = 1:length(Replicates)
             Rep = num2str(Replicates(ridx));
@@ -726,9 +720,6 @@ for tidx = 1:length(Theories)
         Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
         Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
         Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
 
         for ridx = 1:length(Replicates)
             Rep = num2str(Replicates(ridx));
