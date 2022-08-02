@@ -428,7 +428,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         end
         if Settings.Delete_Equil
             try
-                cd(Settings.OuterDir)
                 rmdir(Settings.WorkDir,'s')
             catch
                 disp(['Unable to remove directory: ' Settings.WorkDir])
@@ -482,7 +481,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     
     if Settings.Delete_Equil
         try
-            cd(Settings.OuterDir)
             rmdir(Settings.WorkDir,'s')
         catch
             disp(['Unable to remove directory: ' Settings.WorkDir])

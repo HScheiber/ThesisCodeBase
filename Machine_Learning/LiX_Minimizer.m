@@ -1107,7 +1107,6 @@ else
 end
 
 % Initialize Finite T Data structure and update Settings
-cd(Settings.OuterDir)
 tol = sqrt(eps);
 Settings.skip_finite_T = false;
 if any([Settings.Loss_Options.Fusion_Enthalpy ...

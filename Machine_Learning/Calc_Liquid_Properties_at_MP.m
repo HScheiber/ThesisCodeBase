@@ -665,7 +665,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         end
         if Settings.Delete_Equil
             try
-                cd(Settings.OuterDir)
                 rmdir(Settings.WorkDir,'s')
             catch
                 disp(['Unable to remove directory: ' Settings.WorkDir])
