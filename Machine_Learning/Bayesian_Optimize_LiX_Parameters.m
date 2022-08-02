@@ -13,10 +13,10 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
     
     Model.OuterDir = pwd;
-    Intermediate_BO_file = fullfile(OuterDir,'intermediate_bayesian_opt.mat');
-    Intermediate_BO_backup = fullfile(OuterDir,'intermediate_bayesian_opt.mat.PREV');
-    Intermediate_Secondary_file = fullfile(OuterDir,'intermediate_secondary_opt.mat');
-    Intermediate_Seconary_backup = fullfile(OuterDir,'intermediate_secondary_opt.mat.PREV');
+    Intermediate_BO_file = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat');
+    Intermediate_BO_backup = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat.PREV');
+    Intermediate_Secondary_file = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat');
+    Intermediate_Seconary_backup = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat.PREV');
     
     % Initialize some global settings for later
     [Model.Metal,Model.Halide] = Separate_Metal_Halide(Model.Salt);
