@@ -365,9 +365,16 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         pbc_on = False
         
     # Load the trajectory and grab some basic info
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        t = md.Universe(grofile, trajfile)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            t = md.Universe(grofile, trajfile)
+    except:
+        npz_file = os.path.join(WorkDir, '.' + SystemName + ".trr_offsets.npz"
+        os.remove(npz_file)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            t = md.Universe(grofile, trajfile)
     
     traj_timestep = (t.trajectory[-1].time - t.trajectory[0].time)/(t.trajectory.n_frames-1) # ps, time per trajectory frame
     if CheckFullTrajectory:
