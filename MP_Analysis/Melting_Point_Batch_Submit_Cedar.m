@@ -23,7 +23,7 @@ Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single pr
 Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
 Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
 Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 1; % Number of rank assigned to PME
+Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
 Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
 
 
