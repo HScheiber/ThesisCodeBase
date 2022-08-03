@@ -143,7 +143,7 @@ Shared_Settings.MDP.VerletBT = -1;
 
 % Set up models below
 Exp = Load_Experimental_Data;
-skip_models = [1:60 65:240 240:1000];
+skip_models = [1:60 240:1000]; % 1:60 61:240
 check_complete = true; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs
 continue_completed = false; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
