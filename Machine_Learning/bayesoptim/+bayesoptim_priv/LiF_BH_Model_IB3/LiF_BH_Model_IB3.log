@@ -1,0 +1,1065 @@
+
+
+******************************
+Model Input Parameters
+******************************
+                       Submit_Jobs: 0
+                         BatchMode: 0
+                          Continue: 0
+                       JobSettings: [1×1 struct]
+                              Salt: 'LiF'
+                         Structure: 'Rocksalt'
+                     Use_Conv_cell: 1
+                  Liquid_Interface: 1
+                   Liquid_Fraction: 0.5000
+                            Theory: 'BH'
+                             Model: ''
+                        WaterModel: 'SPC/E'
+                             JobID: ''
+                           N_atoms: 2000
+                     Cutoff_Buffer: 1.2000
+            ScaleInitialLiqDensity: 0.8000
+                     Prev_geom_loc: ''
+                    Prev_geom_time: []
+                    Target_Density: []
+                       TF_Paramset: 0
+                        Thermostat: 'v-rescale'
+                          Target_T: 1.1214e+03
+                   Time_Constant_T: 0.2000
+                        Nsttcouple: 10
+                               MDP: [1×1 struct]
+                          Barostat: 'Parrinello-Rahman'
+                          Isotropy: 'semiisotropic'
+                          Target_P: [1 1]
+                   Time_Constant_P: 1
+                        Nstpcouple: 50
+              ScaleCompressibility: 1
+          UseMoltenCompressibility: 0
+                         Annealing: 'no'
+                   Annealing_Times: []
+                   Annealing_Temps: []
+                      Table_Length: 4.0100
+                         CoordType: 'gro'
+                     Output_Coords: 1000
+          Output_Coords_Compressed: 0
+                   Output_Velocity: 0
+                     Output_Forces: 0
+                     Calc_Energies: 100
+                   Output_Energies: 1000
+              Update_NeighbourList: 10
+                 Skip_Minimization: 0
+                   Find_Min_Params: 1
+               Find_Similar_Params: 1
+                        Data_Types: 1
+                            MinMDP: [1×1 struct]
+                  PreEquilibration: 0.3000
+                               pbc: 'on'
+                        GenCluster: 0
+                      Cluster_Frac: 0.5000
+                         Expand_LP: 1
+                     Thermal_Solid: 0
+                       Expand_a_SC: 1
+                       Expand_b_SC: 1
+                       Expand_c_SC: 1
+                          Expand_a: 1
+                          Expand_b: 1
+                          Expand_c: 1
+                          c_over_a: 2
+                        Manual_Box: 0
+                      Manual_Box_a: 1
+                      Manual_Box_b: 1
+                      Manual_Box_c: 1
+                     Manual_Radius: 1
+                     Delete_MDPout: 0
+                      Delete_MDlog: 0
+                    Delete_ConfOut: 0
+                        Delete_TPR: 0
+                    Delete_Backups: 1
+                   Delete_Minimize: 0
+                      Delete_Equil: 1
+                    Delete_outputs: 0
+                      Delete_subms: 0
+                        Delete_cpt: 1
+                           MaxWarn: 2
+                     Top_gen_pairs: 'no'
+                       Top_fudgeLJ: 1
+                       Top_fudgeQQ: 1
+                    Table_StepSize: 5.0000e-04
+                              home: 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase'
+                           project: 'C:\Users\Hayden\Documents\Patey_Lab'
+                          computer: 'unbearabull'
+                             slurm: 0
+                         BO_Models: 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models'
+                              qsub: ''
+                           passlog: ' ^&^> '
+                              pipe: '^|'
+                               wsl: 'wsl source ~/.bashrc; '
+                        MLModelDir: 'C:\Users\Hayden\Documents\Patey_Lab\Machine_Learning_Structure_Finder\LiX_Structure_Selector_Optimization'
+            Project_Directory_Name: 'Model_Building'
+                         CheckTime: 25
+                      MaxCheckTime: 5000
+                                T0: 1.1214e+03
+                                lb: 0
+                                ub: 2200
+               MeltFreezeThreshold: 0.2500
+                    SlopeThreshold: 1.0000e+10
+                   MaxMPIterations: 10
+                     StepTolerance: 0
+                          MaxTDiff: 0.0100
+               FinalDensityProfile: 1
+                  Delete_T_History: 0
+                 Equilibrate_Solid: 15
+                Equilibrate_Liquid: 10
+                 MinInterfaceWidth: 0.0750
+                      RefStructure: 'Liquid'
+                 QECompressibility: 1.0000e-07
+                         Optimizer: 'MPSearcher'
+                  ExplorationRatio: 2
+              Acquisition_Function: 'expected-improvement-plus'
+                     N_Seed_Points: 2
+                    KernelFunction: 'ardmatern52'
+                   InitialMeshSize: 20
+                MeshSizeMultiplier: 5
+                 FunctionTolerance: 0
+                  BracketThreshold: 5
+                       MinStepSize: 0.2500
+            UseDerivativeWeighting: 0
+                      IgnoreBounds: 0
+                  RunPostProcessor: 1
+                    SaveTrajectory: 1
+              SavePredictionsImage: 1
+                      SaveFeatures: 0
+                   SavePredictions: 0
+                     ML_TimeLength: 21
+                       ML_TimeStep: 5
+                      TimePerFrame: 5
+                                 S: [1×1 struct]
+                           CR_Damp: [1×1 struct]
+                           C6_Damp: [1×1 struct]
+                        GAdjust_MX: [0 0 1]
+                        GAdjust_MM: [0 0 1]
+                        GAdjust_XX: [0 0 1]
+                          Trial_ID: 'IB3'
+                        Structures: {'Rocksalt'  'Wurtzite'}
+               Restart_Calculation: 1
+                        Fix_Charge: 1
+                        Additivity: 1
+                Additional_MM_Disp: 0
+                      SigmaEpsilon: 1
+               Additional_Function: [1×1 struct]
+                         Fix_Alpha: 0
+                            Fix_C8: 0
+                         Diary_Loc: ''
+                        SDMM_Range: [0 1000]
+                        SDXX_Range: [0 40]
+                        SDMX_Range: [0 40]
+                       SDMM2_Range: [0 1000]
+                       SD6MM_Range: [0 1000]
+                       SD6XX_Range: [0 10]
+                       SD6MX_Range: [0 100]
+                       SD8MM_Range: [0 1000]
+                       SD8XX_Range: [0 20]
+                       SD8MX_Range: [0 200]
+                      SRTFMM_Range: [0.1000 500]
+                      SRTFXX_Range: [0.1000 20]
+                      SRTFMX_Range: [0.1000 20]
+                        SAMM_Range: [0.1000 10]
+                        SAXX_Range: [0.1000 5]
+                        SAMX_Range: [0.1000 5]
+                        SRMM_Range: [0.3000 10]
+                        SRXX_Range: [0.3000 5]
+                        SRMX_Range: [0.3000 5]
+                       Sr0MM_Range: [0.1000 0.4000]
+                       Sr0XX_Range: [0.1000 0.5000]
+                       Sr0MX_Range: [0.1000 0.5000]
+                      SepsMM_Range: [0 1000]
+                      SepsXX_Range: [0 1000]
+                      SepsMX_Range: [0 1000]
+                      SgamMM_Range: [1 6.8571]
+                      SgamXX_Range: [1 6.8571]
+                      SgamMX_Range: [1 6.8571]
+                    SgamMM_RangeBH: [6 50]
+                    SgamXX_RangeBH: [6 50]
+                    SgamMX_RangeBH: [6 50]
+                           Q_Range: [0.9500 1.0500]
+                           Q_value: 1
+                Additional_GAdjust: {}
+         Additional_GAdjust_Ranges: {}
+                  Extra_Properties: 1
+                      Loss_Options: [1×1 struct]
+                       CheckBadFcn: 1
+                  MinExpWallHeight: 100
+                   MaxRepWellDepth: 0
+                  MaxModelMismatch: 0.5000
+                 BadFcnLossPenalty: 1000
+                  initial_opt_type: 'bayesopt'
+           Max_Bayesian_Iterations: 800
+                MinSurrogatePoints: 20
+                 MinSampleDistance: 0.1000
+                         ShowPlots: 1
+                   second_opt_type: 'bayesopt'
+          Max_Secondary_Iterations: 200
+    Secondary_Acquisition_Function: 'lower-confidence-bound'
+        ExplorationRatio_Secondary: 1
+           SecondaryKernelFunction: 'ardmatern52'
+              Max_Local_Iterations: 1000
+                       MaxFunEvals: 100
+                  Loss_Convergence: 1.0000e-06
+                 Param_Convergence: 1.0000e-03
+                    final_opt_type: 'patternsearch'
+                  switch_final_opt: 0
+            Parallel_LiX_Minimizer: 0
+               Parallel_Struct_Min: 0
+                 Parallel_Bayesopt: 0
+                  Liquid_Test_Time: 50
+                   Solid_Test_Time: 30
+                          OuterDir: 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\LiF_BH_Model_IB3'
+                             Metal: 'Li'
+                            Halide: 'F'
+                    Longest_Cutoff: 1.1000
+                               gmx: 'wsl source ~/.bashrc; gmx_d'
+                           gmx_loc: 'wsl source ~/.bashrc; gmx_d'
+                        mdrun_opts: ' -v -ntmpi 12 -dd 1 2 5 -npme 2'
+
+******************************
+Structures:
+    {'Rocksalt'}    {'Wurtzite'}
+
+Loss Function
+******************************
+Regularization: L2
+Reference Rocksalt Energy: Born-Haber Experimental
+Reference Rocksalt/Wurtzite Parameters: Experiment
+Rocksalt Absolute Lattice Energy - Weight: 1
+Rocksalt Lattice Parameter a - Weight: 1
+Wurtzite Relative Lattice Energy - Weight: 1
+******************************
+******************************
+No checkpoint files found. Starting new calculation.
+|==================================================================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|==================================================================================================================================================|
+|    1 | Best   |      21.976 |     0.15183 |      21.976 |      21.976 |      0.38729 |      0.29005 |       128.75 |       697.76 |       12.543 |
+|    2 | Best   |      12.946 |     0.15407 |      12.946 |      12.946 |      0.27548 |      0.20015 |       669.75 |        186.7 |       15.278 |
+|    3 | Accept |      13.594 |     0.10147 |      12.946 |      12.946 |      0.21132 |       0.4402 |       28.777 |       974.54 |       48.924 |
+|    4 | Accept |      17.468 |    0.091497 |      12.946 |      12.946 |      0.36165 |      0.36785 |       87.462 |       322.52 |           38 |
+|    5 | Accept |      26.487 |    0.087215 |      12.946 |      12.946 |      0.37277 |      0.26877 |       865.67 |          721 |       33.514 |
+|    6 | Best   |      11.886 |     0.08946 |      11.886 |      11.886 |      0.15511 |      0.48393 |       457.48 |       18.422 |        45.77 |
+|    7 | Accept |      26.064 |    0.096665 |      11.886 |      11.886 |      0.21565 |      0.49659 |       641.92 |        751.1 |       19.781 |
+|    8 | Accept |      23.041 |     0.10385 |      11.886 |      11.886 |      0.19052 |      0.15929 |       808.85 |       332.91 |       11.115 |
+|    9 | Accept |      12.788 |    0.093108 |      11.886 |      11.886 |      0.33395 |      0.23938 |       46.814 |       624.57 |       21.136 |
+|   10 | Best   |      9.9695 |    0.088184 |      9.9695 |      9.9695 |      0.39452 |      0.45609 |        140.4 |        19.13 |       17.989 |
+|   11 | Accept |      12.765 |    0.084127 |      9.9695 |      9.9695 |      0.39063 |      0.12617 |       518.13 |       125.07 |       45.454 |
+|   12 | Accept |      24.717 |    0.082577 |      9.9695 |      9.9695 |      0.25562 |      0.10354 |       454.47 |        715.8 |       40.341 |
+|   13 | Accept |       26.24 |    0.084789 |      9.9695 |      9.9695 |      0.21095 |      0.46132 |       582.89 |       977.01 |       42.532 |
+|   14 | Accept |      24.189 |    0.088972 |      9.9695 |      9.9695 |      0.21876 |      0.21825 |       510.96 |       399.48 |        15.33 |
+|   15 | Accept |      25.485 |    0.083602 |      9.9695 |      9.9695 |       0.1185 |      0.35735 |       702.74 |       629.99 |       38.302 |
+|   16 | Accept |      21.091 |    0.081493 |      9.9695 |      9.9695 |      0.10118 |      0.20259 |       564.49 |       195.32 |       35.163 |
+|   17 | Accept |       24.93 |    0.085369 |      9.9695 |      9.9695 |      0.28442 |      0.38989 |       304.12 |       732.91 |       48.087 |
+|   18 | Accept |      25.831 |    0.087506 |      9.9695 |      9.9695 |      0.37508 |       0.4512 |       398.51 |       915.05 |       16.013 |
+|   19 | Accept |      25.184 |    0.089323 |      9.9695 |      9.9695 |      0.23993 |      0.40607 |       442.99 |       667.96 |       11.906 |
+|   20 | Accept |      13.382 |    0.088863 |      9.9695 |      9.9695 |      0.27266 |      0.27509 |        30.52 |       916.24 |        15.01 |
+|==================================================================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|==================================================================================================================================================|
+|   21 | Accept |      23.321 |    0.079512 |      9.9695 |      9.9695 |      0.19964 |      0.12405 |        268.3 |       667.19 |       47.066 |
+|   22 | Accept |      10.963 |    0.083602 |      9.9695 |      9.9695 |      0.17993 |      0.28699 |       98.334 |       221.52 |       34.687 |
+|   23 | Accept |      25.774 |    0.088342 |      9.9695 |      9.9695 |       0.2222 |      0.26894 |       745.61 |       645.25 |       9.9208 |
+|   24 | Accept |      11.897 |    0.082468 |      9.9695 |      9.9695 |      0.24173 |      0.19912 |       365.37 |       113.27 |       37.865 |
+|   25 | Accept |      25.741 |     0.09056 |      9.9695 |      9.9695 |      0.35798 |      0.30182 |       438.51 |       818.11 |       22.389 |
+|   26 | Accept |      23.677 |    0.089797 |      9.9695 |      9.9695 |      0.30356 |      0.38952 |       185.74 |       753.13 |       23.046 |
+|   27 | Accept |      24.807 |    0.081758 |      9.9695 |      9.9695 |      0.21204 |      0.18148 |       537.96 |       523.91 |       33.234 |
+|   28 | Accept |      25.358 |    0.088376 |      9.9695 |      9.9695 |      0.29635 |      0.48463 |       331.04 |       869.29 |       32.354 |
+|   29 | Accept |      26.191 |    0.084245 |      9.9695 |      9.9695 |      0.32806 |      0.35568 |       604.98 |       891.29 |       8.1163 |
+|   30 | Accept |       23.83 |    0.087315 |      9.9695 |      9.9695 |      0.35639 |      0.11264 |       193.32 |       975.89 |       18.827 |
+|   31 | Accept |       26.54 |     0.08491 |      9.9695 |      9.9695 |      0.37061 |      0.45749 |       911.26 |       624.85 |       48.642 |
+|   32 | Accept |      22.279 |    0.087691 |      9.9695 |      9.9695 |      0.29272 |      0.43809 |        196.4 |       234.82 |       39.605 |
+             :-) GROMACS - gmx mdrun, 2019.5 (double precision) (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2018, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx mdrun, version 2019.5 (double precision)
+Executable:   /usr/local/gromacs2019_5/bin/gmx_d
+Data prefix:  /usr/local/gromacs2019_5
+Working dir:  /mnt/c/Users/Hayden/Documents/Patey_Lab/ThesisCodeBase/Machine_Learning/bayesoptim/+bayesoptim_priv/LiF_BH_Model_IB3
+Command line:
+  gmx_d mdrun -s /mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.tpr -o /mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.trr -g /mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.log -e /mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.edr -c /mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPTOutConf.g96 -rerun /mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.g96 -v -ntmpi 12 -dd 1 2 5 -npme 2
+
+Reading file /mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.tpr, VERSION 2019.5 (double precision)
+Multiple energy groups is not implemented for GPUs, falling back to the CPU. For better performance, run on the GPU without energy groups and then do gmx mdrun -rerun option on the trajectory with an energy group .tpr file.
+
+-------------------------------------------------------
+Program:     gmx mdrun, version 2019.5
+Source file: src/gromacs/domdec/box.cpp (line 146)
+MPI rank:    0 (out of 12)
+
+Fatal error:
+Domain decomposition has not been implemented for box vectors that have
+non-zero components in directions that do not use domain decomposition: ncells
+= 1 2 5, box vector[2] = 2.698000 4.673073 0.000000
+
+For more information and tips for troubleshooting, please check the GROMACS
+website at http://www.gromacs.org/Documentation/Errors
+-------------------------------------------------------
+
+{Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback('OptimizationLoop', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\OptimizationLoop.m', 166)" style="font-weight:bold">OptimizationLoop</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\OptimizationLoop.m',166,0)">line 166</a>)
+Error running mdrun. Problem command:
+wsl source ~/.bashrc; gmx_d mdrun -s
+/mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.tpr -o
+/mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.trr -g
+/mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.log -e
+/mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.edr -c
+/mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPTOutConf.g96
+-rerun /mnt/c/Users/Hayden/AppData/Local/Temp/tp52744d8b_feea_4fd5_aecd_1a6a4b36af94/tp0127fde3_a3c2_4664_b2ba_a2fee22828dc/LiF_R_BH_CELLOPT.g96
+-v -ntmpi 12 -dd 1 2 5 -npme 2
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Calculate_Crystal_Energy', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Calculate_Crystal_Energy.m', 39)" style="font-weight:bold">Calculate_Crystal_Energy</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Calculate_Crystal_Energy.m',39,0)">line 39</a>)
+OptimizationLoop(Settings);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Structure_Minimization>@(x)Calculate_Crystal_Energy(x,Settings)', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m', 508)" style="font-weight:bold">Structure_Minimization>@(x)Calculate_Crystal_Energy(x,Settings)</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m',508,0)">line 508</a>)
+fun = @(x)Calculate_Crystal_Energy(x,Settings);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('fmincon', 'C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\fmincon.m', 567)" style="font-weight:bold">fmincon</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\shared\optimlib\fmincon.m',567,0)">line 567</a>)
+      initVals.f = feval(funfcn{3},X,varargin{:});
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Structure_Minimization', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m', 535)" style="font-weight:bold">Structure_Minimization</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m',535,0)">line 535</a>)
+    [lattice_params,E,~,~,~,Gradient,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('LiX_Minimizer', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m', 1104)" style="font-weight:bold">LiX_Minimizer</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m',1104,0)">line 1104</a>)
+        Settings.Minimization_Data{idx} = Structure_Minimization(Settings,...
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_LiX_Parameters>@(x)LiX_Minimizer(Model,x)', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m', 182)" style="font-weight:bold">Bayesian_Optimize_LiX_Parameters>@(x)LiX_Minimizer(Model,x)</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',182,0)">line 182</a>)
+    fun = @(x)LiX_Minimizer(Model,x);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/callObjNormally', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2648)" style="font-weight:bold">BayesianOptimization_priv/callObjNormally</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2648,0)">line 2648</a>)
+                        [Objective, ConstraintViolations, UserData] = this.ObjectiveFcn(conditionalizeX(this, X));
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/callObjFcn', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 467)" style="font-weight:bold">BayesianOptimization_priv/callObjFcn</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',467,0)">line 467</a>)
+                    = callObjNormally(this, X);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/runSerial', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2055)" style="font-weight:bold">BayesianOptimization_priv/runSerial</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2055,0)">line 2055</a>)
+                    ObjectiveFcnObjectiveEvaluationTime, ObjectiveNargout] = callObjFcn(this, this.XNext);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/run', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2003)" style="font-weight:bold">BayesianOptimization_priv/run</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2003,0)">line 2003</a>)
+                this = runSerial(this);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 457)" style="font-weight:bold">BayesianOptimization_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',457,0)">line 457</a>)
+            this = run(this);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('bayesopt_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m', 323)" style="font-weight:bold">bayesopt_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m',323,0)">line 323</a>)
+Results = BayesianOptimization_priv(Options);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_LiX_Parameters', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m', 358)" style="font-weight:bold">Bayesian_Optimize_LiX_Parameters</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',358,0)">line 358</a>)
+                results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_Local_Testing', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Test_Scripts\Bayesian_Optimize_Local_Testing.m', 179)" style="font-weight:bold">Bayesian_Optimize_Local_Testing</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Test_Scripts\Bayesian_Optimize_Local_Testing.m',179,0)">line 179</a>)
+Bayesian_Optimize_LiX_Parameters(Model)
+
+Caused by:
+    Failure in initial objective function evaluation. FMINCON cannot continue.
+} 
+opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\OptimizationLoop.m',166,0)
+clear
+clc
+Bayesian_Optimize_Local_Testing
+<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m',72,1)">72  </a>if gmx_serial % Since using matlab parallel, make sure gromacs runs in serial
+gmx_serial
+
+gmx_serial =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+Settings.Use_Conv_cell
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+Settings.Geometry
+{Unrecognized field name "Geometry".
+} 
+Settings.MinMDP.Use_Conv_cell
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+if system_dependent('IsDebugMode')==1, dbquit all; end
+Bayesian_Optimize_Local_Testing
+<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m',76,1)">76  </a>if gmx_serial % Since using matlab parallel, make sure gromacs runs in serial
+close all
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+Settings.gmx
+
+ans =
+
+    'wsl source ~/.bashrc; gmx_d'
+
+Settings.gmx_loc
+
+ans =
+
+    'wsl source ~/.bashrc; gmx_d'
+
+Settings.mdrun_opts
+
+ans =
+
+    ' -v -ntmpi 12'
+
+if system_dependent('IsDebugMode')==1, dbquit; end
+2*4
+
+ans =
+
+     8
+
+2*3
+
+ans =
+
+     6
+
+Bayesian_Optimize_Local_Testing
+|   33 | Best   |     0.56999 |      87.881 |     0.56999 |     0.56999 |      0.10026 |      0.10891 |       153.34 |       74.625 |       48.226 |
+|   34 | Accept |      23.038 |     0.11259 |     0.56999 |     0.56999 |      0.20971 |      0.23401 |       331.22 |       326.12 |       26.744 |
+|   35 | Accept |      21.876 |      0.1049 |     0.56999 |     0.56999 |      0.10163 |      0.11845 |       536.95 |       657.43 |       8.9194 |
+|   36 | Accept |      10.891 |     0.10502 |     0.56999 |     0.56999 |      0.12621 |      0.13668 |       6.1995 |       393.37 |       17.646 |
+|   37 | Accept |      31.663 |     0.10726 |     0.56999 |     0.56999 |      0.28671 |      0.33531 |       407.04 |       610.64 |       7.2245 |
+|   38 | Accept |      25.631 |     0.11764 |     0.56999 |     0.56999 |      0.31768 |       0.4283 |       753.81 |       399.06 |       44.309 |
+|   39 | Accept |      27.962 |     0.10617 |     0.56999 |     0.56999 |      0.34125 |      0.38521 |       902.08 |       517.75 |       6.1647 |
+|   40 | Accept |       10.57 |     0.11278 |     0.56999 |     0.56999 |      0.13288 |      0.29014 |       458.23 |       144.28 |       8.7006 |
+|==================================================================================================================================================|
+| Iter | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|==================================================================================================================================================|
+|   41 | Accept |      25.499 |     0.10094 |     0.56999 |     0.56999 |      0.30603 |      0.17237 |       525.13 |       710.05 |       37.872 |
+|   42 | Accept |      12.776 |     0.10641 |     0.56999 |     0.56999 |      0.14838 |      0.34714 |       108.78 |       569.18 |       10.131 |
+|   43 | Accept |      25.961 |    0.094448 |     0.56999 |     0.56999 |      0.17523 |      0.14736 |       845.37 |       772.36 |       33.932 |
+|   44 | Accept |      12.823 |     0.10382 |     0.56999 |     0.56999 |      0.26151 |      0.13156 |       614.45 |       35.697 |       28.329 |
+|   45 | Accept |      11.867 |    0.098344 |     0.56999 |     0.56999 |      0.10144 |      0.32903 |       241.62 |       314.03 |       28.466 |
+|   46 | Accept |      20.523 |    0.096057 |     0.56999 |     0.56999 |      0.38612 |      0.20831 |       95.815 |       506.03 |       33.412 |
+|   47 | Accept |      26.118 |     0.10006 |     0.56999 |     0.56999 |      0.22307 |      0.36839 |       828.51 |       605.98 |       21.378 |
+|   48 | Accept |      13.222 |     0.10268 |     0.56999 |     0.56999 |      0.36766 |      0.48169 |       14.284 |       703.81 |       46.933 |
+|   49 | Accept |       23.86 |    0.085686 |     0.56999 |     0.56999 |      0.13434 |      0.15698 |       392.83 |       678.93 |       37.432 |
+|   50 | Accept |      13.067 |    0.096581 |     0.56999 |     0.56999 |      0.14773 |      0.48971 |       160.38 |       619.47 |       43.575 |
+<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\copy_atom_order.m',54,1)">54  </a>            if i == N % last one but different from previous
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+MERIT2
+
+MERIT2 =
+
+  -1.7932e+03
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+ConstraintViolations
+{Unrecognized function or variable 'ConstraintViolations'.
+} 
+if system_dependent('IsDebugMode')==1, dbstep; end
+ConstraintViolations
+
+ConstraintViolations =
+
+     []
+
+UserData
+
+UserData = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+        Finite_T_Data: [1×1 struct]
+    Minimization_Data: {2×1 cell}
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+PrivOptions.IsObjectiveDeterministic
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+KernelParams0
+
+KernelParams0 =
+
+    0.1500
+    0.2000
+  500.0000
+  500.0000
+   22.0000
+    5.1427
+
+ConstantKernelParameters
+
+ConstantKernelParameters =
+
+  6×1 <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a> array
+
+   0
+   0
+   0
+   0
+   0
+   0
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+SigmaLowerBound = max(1e-8, 1e-4*nanstd(FTrain))
+
+SigmaLowerBound =
+
+   7.2728e-04
+
+FTrain
+
+FTrain =
+
+  Columns 1 through 14
+
+   21.9761   12.9457   13.5944   17.4678   26.4872   11.8856   26.0642   23.0409   12.7883    9.9695   12.7647   24.7167   26.2405   24.1886
+
+  Columns 15 through 28
+
+   25.4849   21.0915   24.9296   25.8311   25.1842   13.3823   23.3209   10.9630   25.7744   11.8975   25.7405   23.6772   24.8068   25.3581
+
+  Columns 29 through 42
+
+   26.1906   23.8297   26.5403   22.2791    0.5700   23.0379   21.8759   10.8909   31.6626   25.6310   27.9618   10.5701   25.4988   12.7765
+
+  Columns 43 through 51
+
+   25.9608   12.8231   11.8672   20.5225   26.1176   13.2218   23.8603   13.0671    0.4626
+
+nanstd(FTrain)
+
+ans =
+
+    7.2728
+
+SigmaLowerBound
+
+SigmaLowerBound =
+
+   7.2728e-04
+
+KernelParams0
+
+KernelParams0 =
+
+    0.1500
+    0.2000
+  500.0000
+  500.0000
+   22.0000
+    5.1427
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+FitMethodArgs
+
+FitMethodArgs =
+
+  1×2 <a href="matlab:helpPopup cell" style="font-weight:bold">cell</a> array
+
+    {'FitMethod'}    {'exact'}
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+SigmaLowerBound
+
+SigmaLowerBound =
+
+   7.2728e-04
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+SigmaLowerBound
+
+SigmaLowerBound =
+
+   7.2728e-04
+
+varargin{:}
+
+ans =
+
+    'BasisFunction'
+
+
+ans =
+
+    'constant'
+
+
+ans =
+
+    'ConstantKernelParameters'
+
+
+ans =
+
+  6×1 <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a> array
+
+   0
+   0
+   0
+   0
+   0
+   0
+
+
+ans =
+
+    'ConstantSigma'
+
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+
+ans =
+
+    'KernelFunction'
+
+
+ans =
+
+    'ardmatern52'
+
+
+ans =
+
+    'KernelParameters'
+
+
+ans =
+
+    0.1500
+    0.2000
+  500.0000
+  500.0000
+   22.0000
+    5.1427
+
+
+ans =
+
+    'PredictMethod'
+
+
+ans =
+
+    'exact'
+
+
+ans =
+
+    'Sigma'
+
+
+ans =
+
+   7.2728e-04
+
+
+ans =
+
+    'Standardize'
+
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+
+ans =
+
+    'FitMethod'
+
+
+ans =
+
+    'exact'
+
+GPModel = compact(fitrgp(X, Y, varargin{:}, 'SigmaLowerBound', SigmaLowerBound))
+
+GPModel = 
+
+  <a href="matlab: helpPopup classreg.learning.regr.CompactRegressionGP">CompactRegressionGP</a>
+             ResponseName: 'Y'
+    CategoricalPredictors: []
+        ResponseTransform: 'none'
+           KernelFunction: 'ARDMatern52'
+        KernelInformation: [1×1 struct]
+            BasisFunction: 'Constant'
+                     Beta: 17.2200
+                    Sigma: 7.2828e-04
+        PredictorLocation: []
+           PredictorScale: []
+                    Alpha: [51×1 double]
+         ActiveSetVectors: [51×5 double]
+            PredictMethod: 'Exact'
+            ActiveSetSize: 51
+
+
+  <a href="matlab: properties('classreg.learning.regr.CompactRegressionGP')">Properties</a>, <a href="matlab: methods('classreg.learning.regr.CompactRegressionGP')">Methods</a>
+
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+IsOptimizing
+
+IsOptimizing =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+RemainingArgs{:}
+
+ans =
+
+    'BasisFunction'
+
+
+ans =
+
+    'constant'
+
+
+ans =
+
+    'ConstantKernelParameters'
+
+
+ans =
+
+  6×1 <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a> array
+
+   0
+   0
+   0
+   0
+   0
+   0
+
+
+ans =
+
+    'ConstantSigma'
+
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+
+ans =
+
+    'KernelFunction'
+
+
+ans =
+
+    'ardmatern52'
+
+
+ans =
+
+    'KernelParameters'
+
+
+ans =
+
+    0.1500
+    0.2000
+  500.0000
+  500.0000
+   22.0000
+    5.1427
+
+
+ans =
+
+    'PredictMethod'
+
+
+ans =
+
+    'exact'
+
+
+ans =
+
+    'Sigma'
+
+
+ans =
+
+   7.2728e-04
+
+
+ans =
+
+    'Standardize'
+
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+
+ans =
+
+    'FitMethod'
+
+
+ans =
+
+    'exact'
+
+
+ans =
+
+    'SigmaLowerBound'
+
+
+ans =
+
+   7.2728e-04
+
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+temp
+
+temp = 
+
+Fit template for regression GP.
+
+              KernelFunction: 'ARDMatern52'
+            KernelParameters: [6×1 double]
+               BasisFunction: 'Constant'
+                        Beta: []
+                       Sigma: 7.2728e-04
+                   FitMethod: 'Exact'
+               PredictMethod: 'Exact'
+                   ActiveSet: []
+               ActiveSetSize: []
+             ActiveSetMethod: []
+                 Standardize: 0
+                     Verbose: []
+                   CacheSize: []
+                     Options: [1×1 struct]
+                   Optimizer: []
+            OptimizerOptions: []
+    ConstantKernelParameters: [6×1 logical]
+               ConstantSigma: 1
+             InitialStepSize: []
+                     Version: 1
+                      Method: 'GP'
+                        Type: 'regression'
+
+temp.KernelParameters
+{Unrecognized method, property, or field 'KernelParameters' for class 'classreg.learning.FitTemplate'.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('classreg.learning.internal.DisallowVectorOps/subsref', 'C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\+internal\DisallowVectorOps.m', 22)" style="font-weight:bold">classreg.learning.internal.DisallowVectorOps/subsref</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\+internal\DisallowVectorOps.m',22,0)">line 22</a>)
+                [varargout{1:nargout}] = builtin('subsref',this,s);
+} 
+temp
+
+temp = 
+
+Fit template for regression GP.
+
+              KernelFunction: 'ARDMatern52'
+            KernelParameters: [6×1 double]
+               BasisFunction: 'Constant'
+                        Beta: []
+                       Sigma: 7.2728e-04
+                   FitMethod: 'Exact'
+               PredictMethod: 'Exact'
+                   ActiveSet: []
+               ActiveSetSize: []
+             ActiveSetMethod: []
+                 Standardize: 0
+                     Verbose: []
+                   CacheSize: []
+                     Options: [1×1 struct]
+                   Optimizer: []
+            OptimizerOptions: []
+    ConstantKernelParameters: [6×1 logical]
+               ConstantSigma: 1
+             InitialStepSize: []
+                     Version: 1
+                      Method: 'GP'
+                        Type: 'regression'
+

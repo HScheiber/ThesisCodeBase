@@ -69,6 +69,10 @@ if ~isfield(Settings,'gmx')
     [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
 end
 
+% Get default system geometry
+Settings.Use_Conv_cell = Settings.MinMDP.Use_Conv_cell;
+Settings.Geometry = Default_Crystal(Settings,'Scale',Settings.S);
+
 if gmx_serial % Since using matlab parallel, make sure gromacs runs in serial
     env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
     env.GMX_PME_NUM_THREADS = getenv('GMX_PME_NUM_THREADS');
@@ -83,13 +87,14 @@ if gmx_serial % Since using matlab parallel, make sure gromacs runs in serial
     setenv('KMP_AFFINITY','disabled');
     Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
     Settings.gmx = Settings.gmx_loc;
+elseif ~Settings.Use_Conv_cell
+    Settings.JobSettings.dd = [];
+    Settings.JobSettings.npme = [];
+    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
 end
 
 % Generate name for model with current scaling parameters
 Model = ModelName(Settings);
-% Get default system geometry
-Settings.Use_Conv_cell = Settings.MinMDP.Use_Conv_cell;
-Settings.Geometry = Default_Crystal(Settings,'Scale',Settings.S);
 
 % Find minimum lattice parameter for this
 % salt/structure/model (or use initial ones)
@@ -246,7 +251,6 @@ else
         case {'FiveFive' 'Rocksalt' 'Sphalerite'}
             conv = '_Primitive';
         otherwise
-            
             conv = '';
     end
 end

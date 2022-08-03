@@ -1,0 +1,484 @@
+
+
+******************************
+Model Input Parameters
+******************************
+                       Submit_Jobs: 0
+                         BatchMode: 0
+                          Continue: 0
+                       JobSettings: [1×1 struct]
+                              Salt: 'LiF'
+                         Structure: 'Rocksalt'
+                     Use_Conv_cell: 1
+                  Liquid_Interface: 1
+                   Liquid_Fraction: 0.5000
+                            Theory: 'BH'
+                             Model: ''
+                        WaterModel: 'SPC/E'
+                             JobID: ''
+                           N_atoms: 2000
+                     Cutoff_Buffer: 1.2000
+            ScaleInitialLiqDensity: 0.8000
+                     Prev_geom_loc: ''
+                    Prev_geom_time: []
+                    Target_Density: []
+                       TF_Paramset: 0
+                        Thermostat: 'v-rescale'
+                          Target_T: 1.1214e+03
+                   Time_Constant_T: 0.2000
+                        Nsttcouple: 10
+                               MDP: [1×1 struct]
+                          Barostat: 'Parrinello-Rahman'
+                          Isotropy: 'semiisotropic'
+                          Target_P: [1 1]
+                   Time_Constant_P: 1
+                        Nstpcouple: 50
+              ScaleCompressibility: 1
+          UseMoltenCompressibility: 0
+                         Annealing: 'no'
+                   Annealing_Times: []
+                   Annealing_Temps: []
+                      Table_Length: 4.0100
+                         CoordType: 'gro'
+                     Output_Coords: 1000
+          Output_Coords_Compressed: 0
+                   Output_Velocity: 0
+                     Output_Forces: 0
+                     Calc_Energies: 100
+                   Output_Energies: 1000
+              Update_NeighbourList: 10
+                 Skip_Minimization: 0
+                   Find_Min_Params: 1
+               Find_Similar_Params: 1
+                        Data_Types: 1
+                            MinMDP: [1×1 struct]
+                  PreEquilibration: 0.3000
+                               pbc: 'on'
+                        GenCluster: 0
+                      Cluster_Frac: 0.5000
+                         Expand_LP: 1
+                     Thermal_Solid: 0
+                       Expand_a_SC: 1
+                       Expand_b_SC: 1
+                       Expand_c_SC: 1
+                          Expand_a: 1
+                          Expand_b: 1
+                          Expand_c: 1
+                          c_over_a: 2
+                        Manual_Box: 0
+                      Manual_Box_a: 1
+                      Manual_Box_b: 1
+                      Manual_Box_c: 1
+                     Manual_Radius: 1
+                     Delete_MDPout: 0
+                      Delete_MDlog: 0
+                    Delete_ConfOut: 0
+                        Delete_TPR: 0
+                    Delete_Backups: 1
+                   Delete_Minimize: 0
+                      Delete_Equil: 1
+                    Delete_outputs: 0
+                      Delete_subms: 0
+                        Delete_cpt: 1
+                           MaxWarn: 2
+                     Top_gen_pairs: 'no'
+                       Top_fudgeLJ: 1
+                       Top_fudgeQQ: 1
+                    Table_StepSize: 5.0000e-04
+                              home: 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase'
+                           project: 'C:\Users\Hayden\Documents\Patey_Lab'
+                          computer: 'unbearabull'
+                             slurm: 0
+                         BO_Models: 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models'
+                              qsub: ''
+                           passlog: ' ^&^> '
+                              pipe: '^|'
+                               wsl: 'wsl source ~/.bashrc; '
+                        MLModelDir: 'C:\Users\Hayden\Documents\Patey_Lab\Machine_Learning_Structure_Finder\LiX_Structure_Selector_Optimization'
+            Project_Directory_Name: 'Model_Building'
+                         CheckTime: 25
+                      MaxCheckTime: 5000
+                                T0: 1.1214e+03
+                                lb: 0
+                                ub: 2200
+               MeltFreezeThreshold: 0.2500
+                    SlopeThreshold: 1.0000e+10
+                   MaxMPIterations: 10
+                     StepTolerance: 0
+                          MaxTDiff: 0.0100
+               FinalDensityProfile: 1
+                  Delete_T_History: 0
+                 Equilibrate_Solid: 15
+                Equilibrate_Liquid: 10
+                 MinInterfaceWidth: 0.0750
+                      RefStructure: 'Liquid'
+                 QECompressibility: 1.0000e-07
+                         Optimizer: 'MPSearcher'
+                  ExplorationRatio: 2
+              Acquisition_Function: 'expected-improvement-plus'
+                     N_Seed_Points: 2
+                    KernelFunction: 'ardmatern52'
+                   InitialMeshSize: 20
+                MeshSizeMultiplier: 5
+                 FunctionTolerance: 0
+                  BracketThreshold: 5
+                       MinStepSize: 0.2500
+            UseDerivativeWeighting: 0
+                      IgnoreBounds: 0
+                  RunPostProcessor: 1
+                    SaveTrajectory: 1
+              SavePredictionsImage: 1
+                      SaveFeatures: 0
+                   SavePredictions: 0
+                     ML_TimeLength: 21
+                       ML_TimeStep: 5
+                      TimePerFrame: 5
+                                 S: [1×1 struct]
+                           CR_Damp: [1×1 struct]
+                           C6_Damp: [1×1 struct]
+                        GAdjust_MX: [0 0 1]
+                        GAdjust_MM: [0 0 1]
+                        GAdjust_XX: [0 0 1]
+                          Trial_ID: 'IB3'
+                        Structures: {'Rocksalt'  'Wurtzite'}
+               Restart_Calculation: 1
+                        Fix_Charge: 1
+                        Additivity: 1
+                Additional_MM_Disp: 0
+                      SigmaEpsilon: 1
+               Additional_Function: [1×1 struct]
+                         Fix_Alpha: 0
+                            Fix_C8: 0
+                         Diary_Loc: ''
+                        SDMM_Range: [0 1000]
+                        SDXX_Range: [0 40]
+                        SDMX_Range: [0 40]
+                       SDMM2_Range: [0 1000]
+                       SD6MM_Range: [0 1000]
+                       SD6XX_Range: [0 10]
+                       SD6MX_Range: [0 100]
+                       SD8MM_Range: [0 1000]
+                       SD8XX_Range: [0 20]
+                       SD8MX_Range: [0 200]
+                      SRTFMM_Range: [0.1000 500]
+                      SRTFXX_Range: [0.1000 20]
+                      SRTFMX_Range: [0.1000 20]
+                        SAMM_Range: [0.1000 10]
+                        SAXX_Range: [0.1000 5]
+                        SAMX_Range: [0.1000 5]
+                        SRMM_Range: [0.3000 10]
+                        SRXX_Range: [0.3000 5]
+                        SRMX_Range: [0.3000 5]
+                       Sr0MM_Range: [0.1000 0.4000]
+                       Sr0XX_Range: [0.1000 0.5000]
+                       Sr0MX_Range: [0.1000 0.5000]
+                      SepsMM_Range: [0 1000]
+                      SepsXX_Range: [0 1000]
+                      SepsMX_Range: [0 1000]
+                      SgamMM_Range: [1 6.8571]
+                      SgamXX_Range: [1 6.8571]
+                      SgamMX_Range: [1 6.8571]
+                    SgamMM_RangeBH: [6 50]
+                    SgamXX_RangeBH: [6 50]
+                    SgamMX_RangeBH: [6 50]
+                           Q_Range: [0.9500 1.0500]
+                           Q_value: 1
+                Additional_GAdjust: {}
+         Additional_GAdjust_Ranges: {}
+                  Extra_Properties: 1
+                      Loss_Options: [1×1 struct]
+                       CheckBadFcn: 1
+                  MinExpWallHeight: 100
+                   MaxRepWellDepth: 0
+                  MaxModelMismatch: 0.5000
+                 BadFcnLossPenalty: 1000
+                  initial_opt_type: 'bayesopt'
+           Max_Bayesian_Iterations: 800
+                MinSurrogatePoints: 20
+                 MinSampleDistance: 0.1000
+                         ShowPlots: 1
+                   second_opt_type: 'bayesopt'
+          Max_Secondary_Iterations: 200
+    Secondary_Acquisition_Function: 'lower-confidence-bound'
+        ExplorationRatio_Secondary: 1
+           SecondaryKernelFunction: 'ardmatern52'
+              Max_Local_Iterations: 1000
+                       MaxFunEvals: 100
+                  Loss_Convergence: 1.0000e-06
+                 Param_Convergence: 1.0000e-03
+                    final_opt_type: 'patternsearch'
+                  switch_final_opt: 0
+            Parallel_LiX_Minimizer: 0
+               Parallel_Struct_Min: 0
+                 Parallel_Bayesopt: 1
+                  Liquid_Test_Time: 50
+                   Solid_Test_Time: 30
+                          OuterDir: 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiF_BH_Model_IB3'
+                             Metal: 'Li'
+                            Halide: 'F'
+                    Longest_Cutoff: 1.1000
+                               gmx: 'wsl source ~/.bashrc; gmx_d'
+                           gmx_loc: 'wsl source ~/.bashrc; gmx_d'
+                        mdrun_opts: ' -v -ntmpi 12 -dd 1 2 5 -npme 2'
+
+******************************
+Structures:
+    {'Rocksalt'}    {'Wurtzite'}
+
+Loss Function
+******************************
+Regularization: L2
+Reference Rocksalt Energy: Born-Haber Experimental
+Reference Rocksalt/Wurtzite Parameters: Experiment
+Rocksalt Absolute Lattice Energy - Weight: 1
+Rocksalt Lattice Parameter a - Weight: 1
+Wurtzite Relative Lattice Energy - Weight: 1
+******************************
+******************************
+Starting parallel pool (parpool) using the 'local' profile ...
+Connected to the parallel pool (number of workers: 8).
+No checkpoint files found. Starting new calculation.
+Copying objective function to workers...
+Done copying objective function to workers.
+|============================================================================================================================================================|
+| Iter | Active  | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | workers | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|============================================================================================================================================================|
+|    1 |       1 | Accept |      18.729 |     0.58151 |      13.484 |      13.484 |      0.17695 |      0.28066 |       222.88 |       872.06 |       14.453 |
+|    2 |       1 | Accept |      24.289 |     0.54004 |      13.484 |      13.484 |      0.22551 |      0.12258 |        644.6 |       458.38 |       35.632 |
+|    3 |       1 | Accept |       23.27 |     0.53584 |      13.484 |      13.484 |      0.21321 |      0.48554 |       341.67 |       230.72 |       44.163 |
+|    4 |       1 | Accept |      24.517 |     0.52032 |      13.484 |      13.484 |      0.31969 |      0.10409 |       413.18 |       662.38 |       36.958 |
+|    5 |       1 | Accept |      25.231 |     0.48111 |      13.484 |      13.484 |      0.22024 |      0.49801 |       549.69 |       452.99 |       41.089 |
+|    6 |       1 | Accept |      22.388 |     0.43264 |      13.484 |      13.484 |      0.25401 |      0.20141 |       585.78 |       223.95 |       19.762 |
+|    7 |       1 | Accept |      26.474 |      0.4487 |      13.484 |      13.484 |      0.37235 |      0.17972 |       825.23 |       849.34 |       29.581 |
+|    8 |       1 | Best   |      13.484 |     0.43527 |      13.484 |      13.484 |      0.30098 |      0.26439 |        983.6 |       117.03 |       10.176 |
+|    9 |       8 | Accept |      24.905 |     0.19281 |      13.484 |      13.484 |      0.24068 |      0.12849 |       504.05 |       646.49 |       49.577 |
+|   10 |       2 | Accept |      12.803 |     0.22525 |      9.9483 |      9.9483 |      0.28542 |      0.34722 |       583.93 |       62.698 |       43.947 |
+|   11 |       2 | Best   |      9.9483 |     0.22702 |      9.9483 |      9.9483 |      0.35004 |       0.2363 |       139.32 |       101.72 |       37.937 |
+|   12 |       2 | Accept |       26.67 |     0.21636 |      9.9483 |      9.9483 |      0.31029 |      0.31357 |       835.11 |       865.84 |       20.433 |
+|   13 |       2 | Accept |      24.279 |     0.20429 |      9.9483 |      9.9483 |      0.20262 |      0.45595 |       407.63 |       403.68 |        18.17 |
+|   14 |       2 | Accept |      25.526 |     0.20736 |      9.9483 |      9.9483 |      0.32563 |      0.35109 |       434.72 |       682.12 |       49.237 |
+|   15 |       2 | Accept |      13.594 |     0.23293 |      9.9483 |      9.9483 |      0.39631 |      0.48333 |       992.93 |       17.187 |       30.845 |
+|   16 |       2 | Accept |      12.507 |     0.22983 |      9.9483 |      9.9483 |      0.16592 |      0.49957 |       613.73 |       8.2671 |       23.396 |
+|   17 |       8 | Accept |      24.428 |     0.16684 |      9.9483 |      9.9483 |      0.32859 |      0.34346 |       649.78 |        244.3 |       31.098 |
+|   18 |       2 | Accept |      24.526 |     0.20056 |      9.9483 |      9.9483 |      0.12196 |      0.40489 |       452.86 |       815.72 |       19.208 |
+|   19 |       2 | Accept |      24.917 |     0.22023 |      9.9483 |      9.9483 |      0.22141 |      0.10148 |       427.96 |       973.36 |       16.776 |
+|   20 |       2 | Accept |      26.195 |     0.22558 |      9.9483 |      9.9483 |      0.38129 |      0.44003 |        997.4 |       455.93 |       19.049 |
+|============================================================================================================================================================|
+| Iter | Active  | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | workers | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|============================================================================================================================================================|
+|   21 |       2 | Accept |      23.785 |     0.20827 |      9.9483 |      9.9483 |      0.38422 |      0.31388 |       365.31 |       314.16 |       10.905 |
+|   22 |       2 | Accept |      24.927 |     0.20217 |      9.9483 |      9.9483 |      0.25947 |      0.37392 |        733.8 |       291.01 |       33.961 |
+|   23 |       2 | Accept |      26.093 |     0.21648 |      9.9483 |      9.9483 |      0.25506 |      0.16038 |       910.04 |        696.4 |       28.197 |
+|   24 |       2 | Accept |      25.849 |      0.2016 |      9.9483 |      9.9483 |      0.34729 |      0.38037 |       412.01 |       915.28 |       28.624 |
+|   25 |       8 | Accept |      12.252 |     0.20549 |      9.9483 |      9.9483 |      0.24475 |      0.25872 |       76.204 |       438.82 |       21.065 |
+|   26 |       2 | Accept |      26.389 |     0.19046 |      9.9483 |      9.9483 |      0.18448 |      0.48561 |       875.11 |       715.94 |       17.743 |
+|   27 |       2 | Accept |      20.672 |     0.20866 |      9.9483 |      9.9483 |      0.11265 |      0.39183 |       297.66 |        329.9 |       42.052 |
+|   28 |       2 | Accept |      13.365 |     0.18766 |      9.9483 |      9.9483 |      0.23554 |      0.31694 |       922.44 |       73.295 |       39.294 |
+|   29 |       2 | Accept |      23.479 |     0.19873 |      9.9483 |      9.9483 |      0.27219 |       0.2897 |       578.22 |       198.42 |       43.744 |
+|   30 |       2 | Accept |      23.708 |     0.18816 |      9.9483 |      9.9483 |      0.24919 |      0.46984 |       407.24 |       223.27 |       47.042 |
+|   31 |       2 | Accept |      26.076 |     0.18816 |      9.9483 |      9.9483 |      0.11563 |      0.25144 |       977.17 |       719.76 |       22.432 |
+|   32 |       2 | Accept |      13.539 |     0.20361 |      9.9483 |      9.9483 |      0.37861 |      0.19737 |       976.62 |       4.3611 |        10.17 |
+|   33 |       8 | Accept |      25.827 |     0.14003 |      9.9483 |      9.9483 |      0.38359 |      0.11446 |       730.67 |       784.36 |        22.71 |
+|   34 |       2 | Accept |      24.325 |     0.18059 |      9.9483 |      9.9483 |       0.2547 |      0.22319 |       372.97 |       533.03 |       15.632 |
+|   35 |       2 | Accept |      24.107 |     0.34047 |      9.9483 |      9.9483 |      0.32616 |      0.11994 |       501.75 |       492.25 |       21.872 |
+|   36 |       2 | Accept |      26.232 |     0.34324 |      9.9483 |      9.9483 |       0.1509 |      0.47042 |       846.41 |       822.11 |       9.2901 |
+|   37 |       2 | Accept |      22.749 |     0.35979 |      9.9483 |      9.9483 |      0.32316 |      0.19083 |       925.62 |       196.11 |       45.492 |
+|   38 |       2 | Accept |      25.119 |     0.35108 |      9.9483 |      9.9483 |      0.38311 |      0.49841 |       298.75 |       744.34 |        15.49 |
+|   39 |       2 | Accept |      26.715 |     0.34326 |      9.9483 |      9.9483 |      0.26623 |      0.47182 |       879.92 |       804.84 |       31.413 |
+|   40 |       2 | Accept |      24.854 |      0.3503 |      9.9483 |      9.9483 |      0.14152 |      0.19341 |       464.87 |       818.71 |       31.781 |
+|============================================================================================================================================================|
+| Iter | Active  | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | workers | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|============================================================================================================================================================|
+|   41 |       8 | Accept |      26.615 |      0.1234 |      9.9483 |      9.9483 |       0.3621 |      0.35923 |       821.66 |       774.63 |       49.526 |
+|   42 |       2 | Accept |      24.503 |     0.19687 |      9.9483 |      9.9483 |       0.1042 |      0.36234 |        642.8 |       834.58 |       8.0253 |
+|   43 |       2 | Accept |      12.946 |     0.21512 |      9.9483 |      9.9483 |      0.13336 |      0.28767 |       899.02 |        130.1 |       12.929 |
+|   44 |       2 | Accept |      25.539 |     0.19271 |      9.9483 |      9.9483 |      0.21326 |      0.31037 |       890.06 |       400.68 |       36.888 |
+|   45 |       2 | Accept |      24.062 |     0.21913 |      9.9483 |      9.9483 |      0.18349 |      0.10214 |          704 |       544.46 |       16.368 |
+|   46 |       2 | Accept |      24.428 |     0.21162 |      9.9483 |      9.9483 |      0.13418 |       0.1626 |       660.56 |       495.79 |       19.628 |
+|   47 |       2 | Accept |      24.644 |     0.21027 |      9.9483 |      9.9483 |      0.23981 |      0.12072 |       939.04 |       456.57 |       22.455 |
+|   48 |       2 | Accept |      21.915 |     0.19796 |      9.9483 |      9.9483 |      0.32331 |      0.22691 |       761.12 |       158.77 |       41.031 |
+|   49 |       8 | Accept |      26.565 |     0.14131 |      9.9483 |      9.9483 |       0.2948 |      0.14838 |        982.8 |       866.55 |       36.594 |
+|   50 |       3 | Accept |      22.518 |     0.15428 |      9.9483 |      9.9483 |      0.18931 |      0.13485 |       535.25 |       322.91 |       25.798 |
+|   51 |       3 | Accept |      21.962 |     0.16221 |      9.9483 |      9.9483 |      0.12147 |      0.36246 |       616.21 |       154.53 |       14.621 |
+|   52 |       3 | Accept |      23.859 |     0.16525 |      9.9483 |      9.9483 |      0.14639 |      0.31988 |       791.04 |        203.3 |       49.545 |
+|   53 |       3 | Accept |      13.319 |     0.15752 |      9.9483 |      9.9483 |      0.15679 |      0.27304 |       181.11 |       857.44 |       47.693 |
+|   54 |       3 | Accept |      26.052 |     0.17956 |      9.9483 |      9.9483 |      0.22201 |      0.24177 |       630.68 |       886.83 |       18.689 |
+|   55 |       3 | Accept |      11.673 |     0.17073 |      9.9483 |      9.9483 |      0.15964 |      0.16574 |       36.371 |       412.93 |       28.881 |
+|   56 |       8 | Accept |      11.269 |     0.10832 |      9.9483 |      9.9483 |      0.39732 |      0.16571 |       226.57 |       37.582 |       13.153 |
+|   57 |       3 | Accept |      12.236 |     0.15537 |      9.9483 |      9.9483 |      0.39862 |      0.18384 |        357.1 |       12.663 |       49.118 |
+|   58 |       3 | Accept |      25.786 |     0.15785 |      9.9483 |      9.9483 |      0.32819 |      0.48316 |       445.47 |       768.81 |        32.13 |
+|   59 |       3 | Accept |      12.164 |     0.17043 |      9.9483 |      9.9483 |       0.2306 |      0.48231 |       118.78 |       324.18 |       24.171 |
+|   60 |       3 | Accept |      25.733 |     0.14243 |      9.9483 |      9.9483 |      0.14302 |      0.43648 |       681.98 |       712.56 |        17.76 |
+|============================================================================================================================================================|
+| Iter | Active  | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | workers | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|============================================================================================================================================================|
+|   61 |       3 | Accept |      10.377 |     0.16234 |      9.9483 |      9.9483 |      0.33865 |      0.40279 |       169.08 |       74.804 |       23.133 |
+|   62 |       3 | Accept |      24.542 |     0.14043 |      9.9483 |      9.9483 |      0.29478 |      0.35005 |       233.38 |       844.65 |       45.029 |
+|   63 |       8 | Accept |      13.555 |     0.11265 |      9.9483 |      9.9483 |      0.20002 |      0.37466 |       1.6599 |       968.13 |       49.101 |
+|   64 |       3 | Accept |      13.271 |     0.14303 |      9.9483 |      9.9483 |      0.10077 |      0.27468 |       6.8875 |       826.01 |       47.971 |
+|   65 |       3 | Accept |      24.732 |     0.14865 |      9.9483 |      9.9483 |      0.37158 |      0.36226 |       967.47 |       230.38 |       13.841 |
+|   66 |       3 | Accept |      26.768 |     0.17286 |      9.9483 |      9.9483 |      0.33382 |      0.43885 |       766.24 |        933.3 |       30.263 |
+|   67 |       3 | Accept |       24.01 |     0.16212 |      9.9483 |      9.9483 |       0.3767 |      0.47805 |       784.42 |        148.2 |       31.905 |
+|   68 |       3 | Accept |      32.563 |     0.14685 |      9.9483 |      9.9483 |      0.34346 |      0.49158 |       874.37 |       690.19 |       7.6188 |
+|   69 |       3 | Accept |      22.362 |     0.17321 |      9.9483 |      9.9483 |      0.28393 |      0.36322 |       405.52 |       149.61 |       25.373 |
+|   70 |       4 | Accept |      13.077 |     0.12971 |      9.9483 |      9.9483 |       0.1299 |      0.29606 |       999.69 |       18.609 |       10.649 |
+|   71 |       4 | Accept |      25.311 |     0.14115 |      9.9483 |      9.9483 |      0.39799 |      0.26134 |       523.54 |       511.51 |        26.72 |
+|   72 |       4 | Accept |      25.738 |     0.11516 |      9.9483 |      9.9483 |      0.25007 |      0.11904 |       696.17 |       807.97 |       29.062 |
+|   73 |       4 | Accept |      25.858 |     0.12259 |      9.9483 |      9.9483 |      0.18445 |      0.44115 |       629.09 |       733.19 |       19.193 |
+|   74 |       4 | Accept |      24.227 |     0.13584 |      9.9483 |      9.9483 |      0.12599 |      0.17378 |        980.4 |       315.58 |       41.581 |
+|   75 |       8 | Accept |      13.399 |     0.18314 |      9.9483 |      9.9483 |      0.10627 |      0.43617 |       178.78 |       830.44 |        33.83 |
+|   76 |       5 | Accept |      23.776 |     0.15911 |      9.9483 |      9.9483 |      0.23032 |      0.29417 |       935.39 |       180.67 |       34.676 |
+|   77 |       5 | Accept |      12.769 |     0.16642 |      9.9483 |      9.9483 |      0.29246 |      0.31489 |       104.22 |        572.1 |        13.95 |
+|   78 |       5 | Accept |       25.19 |      0.1806 |      9.9483 |      9.9483 |      0.13275 |      0.25021 |       509.05 |       907.27 |       26.047 |
+|   79 |       5 | Accept |        13.2 |     0.15514 |      9.9483 |      9.9483 |      0.18073 |      0.48487 |       33.317 |       690.96 |       40.649 |
+|   80 |       8 | Accept |      11.615 |     0.15066 |      9.9483 |      9.9483 |       0.2787 |      0.29138 |       3.8116 |       286.78 |       48.552 |
+|============================================================================================================================================================|
+| Iter | Active  | Eval   | Objective   | Objective   | BestSoFar   | BestSoFar   |        r0_MM |        r0_XX |   epsilon_MM |   epsilon_XX |     gamma_MX |
+|      | workers | result |             | runtime     | (observed)  | (estim.)    |              |              |              |              |              |
+|============================================================================================================================================================|
+|   81 |       5 | Accept |      19.782 |     0.20276 |      9.9483 |      9.9483 |      0.17815 |      0.13933 |       804.66 |       15.913 |       8.3056 |
+|   82 |       5 | Accept |      25.468 |     0.17635 |      9.9483 |      9.9483 |      0.24484 |      0.19676 |       849.88 |       482.33 |       25.957 |
+|   83 |       5 | Accept |      11.189 |     0.18213 |      9.9483 |      9.9483 |      0.23042 |      0.17927 |       73.425 |        326.2 |       32.905 |
+|   84 |       5 | Accept |      23.991 |     0.18926 |      9.9483 |      9.9483 |      0.17653 |      0.10283 |       778.43 |       517.81 |       16.231 |
+|   85 |       8 | Accept |      12.999 |     0.13429 |      9.9483 |      9.9483 |      0.28252 |       0.1288 |       671.67 |       4.1742 |       47.272 |
+|   86 |       5 | Accept |       12.43 |     0.17678 |      9.9483 |      9.9483 |      0.16296 |      0.37033 |       577.81 |       5.2913 |       47.879 |
+|   87 |       5 | Accept |      13.015 |     0.18792 |      9.9483 |      9.9483 |      0.11024 |      0.11424 |       126.79 |       979.68 |        16.68 |
+|   88 |       5 | Accept |      24.619 |     0.19814 |      9.9483 |      9.9483 |      0.11931 |      0.41894 |       459.92 |       728.84 |       32.406 |
+|   89 |       5 | Accept |      20.975 |     0.19264 |      9.9483 |      9.9483 |      0.11203 |      0.33318 |       343.61 |       329.56 |       22.592 |
+|   90 |       8 | Accept |      10.228 |     0.15045 |      9.9483 |      9.9483 |      0.39733 |      0.38968 |       136.62 |       25.921 |       44.145 |
+|   91 |       5 | Best   |      9.1286 |     0.16658 |      9.1286 |      9.1286 |       0.3476 |      0.43252 |        52.87 |       95.923 |       49.131 |
+|   92 |       5 | Accept |       12.31 |     0.17886 |      9.1286 |      9.1286 |      0.25308 |       0.4004 |       446.05 |       9.9054 |       43.926 |
+|   93 |       5 | Accept |      25.906 |     0.18131 |      9.1286 |      9.1286 |      0.37798 |      0.49225 |       538.68 |       635.38 |       48.341 |
+|   94 |       5 | Accept |      20.635 |     0.17925 |      9.1286 |      9.1286 |      0.27084 |      0.20033 |       134.47 |        876.6 |        23.94 |
+|   95 |       8 | Best   |      6.6827 |     0.13788 |      6.6827 |      6.6827 |      0.36456 |      0.12956 |       93.967 |       74.314 |       29.496 |
+|   96 |       6 | Accept |      25.983 |     0.20183 |      6.6827 |      6.6827 |      0.29177 |      0.41523 |       527.49 |        811.8 |       19.497 |
+|   97 |       6 | Accept |      13.321 |     0.16794 |      6.6827 |      6.6827 |      0.18839 |      0.32042 |       11.392 |       827.99 |       45.197 |
+|   98 |       6 | Accept |      12.613 |     0.18056 |      6.6827 |      6.6827 |      0.18106 |      0.19285 |       616.96 |       36.169 |       32.928 |
+{Operation terminated by the user.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/callPlotFcn', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 3235)" style="font-weight:bold">BayesianOptimization_priv/callPlotFcn</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',3235,0)">line 3235</a>)
+                drawnow;
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/updateTimingPlotsAndOutput', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2203)" style="font-weight:bold">BayesianOptimization_priv/updateTimingPlotsAndOutput</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2203,0)">line 2203</a>)
+            this = callPlotFcn(this, 'iteration');
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/runParallel', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2171)" style="font-weight:bold">BayesianOptimization_priv/runParallel</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2171,0)">line 2171</a>)
+                this = updateTimingPlotsAndOutput(this, FinishedIterationNums);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/run', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2001)" style="font-weight:bold">BayesianOptimization_priv/run</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2001,0)">line 2001</a>)
+                this = runParallel(this);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 457)" style="font-weight:bold">BayesianOptimization_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',457,0)">line 457</a>)
+            this = run(this);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('bayesopt_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m', 323)" style="font-weight:bold">bayesopt_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m',323,0)">line 323</a>)
+Results = BayesianOptimization_priv(Options);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_LiX_Parameters', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m', 358)" style="font-weight:bold">Bayesian_Optimize_LiX_Parameters</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',358,0)">line 358</a>)
+                results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_Local_Testing', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Test_Scripts\Bayesian_Optimize_Local_Testing.m', 179)" style="font-weight:bold">Bayesian_Optimize_Local_Testing</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Test_Scripts\Bayesian_Optimize_Local_Testing.m',179,0)">line 179</a>)
+diary('off')
+} 
+{Operation terminated by user during <a href="matlab:matlab.internal.language.introspective.errorDocCallback('tabular/getProperty', 'C:\Program Files\MATLAB\R2021a\toolbox\matlab\datatypes\tabular\@tabular\getProperty.m', 27)" style="font-weight:bold">tabular/getProperty</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\matlab\datatypes\tabular\@tabular\getProperty.m',27,0)">line 27</a>)
+
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('tabular/subsrefDot', 'C:\Program Files\MATLAB\R2021a\toolbox\matlab\datatypes\tabular\@tabular\subsrefDot.m', 65)" style="font-weight:bold">tabular/subsrefDot</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\matlab\datatypes\tabular\@tabular\subsrefDot.m',65,0)">line 65</a>)
+                        b = t.getProperty(s(2:end));
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('tabular/subsref', 'C:\Program Files\MATLAB\R2021a\toolbox\matlab\datatypes\tabular\@tabular\subsref.m', 114)" style="font-weight:bold">tabular/subsref</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\matlab\datatypes\tabular\@tabular\subsref.m',114,0)">line 114</a>)
+            b = t.subsrefDot(s);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/checkAndPrepareTableForPrediction', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 3764)" style="font-weight:bold">BayesianOptimization_priv/checkAndPrepareTableForPrediction</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',3764,0)">line 3764</a>)
+                    if ~ismember(VarNames{i}, XTable.Properties.VariableNames)
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/predictConstraints', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 308)" style="font-weight:bold">BayesianOptimization_priv/predictConstraints</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',308,0)">line 308</a>)
+            XTable = checkAndPrepareTableForPrediction(this, XTable, 'predictConstraints');
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/chooseNextPointParallel', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2423)" style="font-weight:bold">BayesianOptimization_priv/chooseNextPointParallel</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2423,0)">line 2423</a>)
+                PendingMeanConstraints  = predictConstraints(this, PendingXTable);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/runParallel', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2166)" style="font-weight:bold">BayesianOptimization_priv/runParallel</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2166,0)">line 2166</a>)
+                this = chooseNextPointParallel(this);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv/run', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 2001)" style="font-weight:bold">BayesianOptimization_priv/run</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2001,0)">line 2001</a>)
+                this = runParallel(this);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('BayesianOptimization_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m', 457)" style="font-weight:bold">BayesianOptimization_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',457,0)">line 457</a>)
+            this = run(this);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('bayesopt_priv', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m', 323)" style="font-weight:bold">bayesopt_priv</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\bayesopt_priv.m',323,0)">line 323</a>)
+Results = BayesianOptimization_priv(Options);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_LiX_Parameters', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m', 358)" style="font-weight:bold">Bayesian_Optimize_LiX_Parameters</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',358,0)">line 358</a>)
+                results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Bayesian_Optimize_Local_Testing', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Test_Scripts\Bayesian_Optimize_Local_Testing.m', 179)" style="font-weight:bold">Bayesian_Optimize_Local_Testing</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Test_Scripts\Bayesian_Optimize_Local_Testing.m',179,0)">line 179</a>)
+diary('off')
+} 
+delete(gcp)
+Parallel pool using the 'local' profile is shutting down.
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\GPStrategy.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\fitrmultigp.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\MultiGPStrategy.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\MultiGP.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\ModelStrategy.m',1)
+run('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\GPStrategy.m')
+{Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback('run', 'C:\Program Files\MATLAB\R2021a\toolbox\matlab\lang\run.m', 68)" style="font-weight:bold">run</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\matlab\lang\run.m',68,0)">line 68</a>)
+RUN cannot execute the file 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\GPStrategy.m'. RUN
+requires a valid MATLAB script
+} 
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\GPStrategy.m',1)
+Model.MinMDP
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+              Parallel_Min: 1
+                   Verbose: 0
+                    OptPos: 0
+         Maintain_Symmetry: 1
+                     emtol: 0.0884
+                 MaxCycles: 100
+                Energy_Tol: 1
+          Gradient_Tol_RMS: 0.5000
+          Gradient_Tol_Max: 0.7500
+                  E_Unphys: -Inf
+              nsteps_point: 0
+          point_integrator: 'md'
+                        dt: 1.0000e-03
+            min_integrator: 'steep'
+                nsteps_min: 1000
+              CutOffScheme: 'Verlet'
+                  VerletBT: -1
+                   VDWType: 'Cut-off'
+               Auto_Cutoff: 0
+              RList_Cutoff: 1.9000
+           RCoulomb_Cutoff: 1.9000
+               RVDW_Cutoff: 1.9000
+               rvdw_switch: 1.8000
+           Fourier_Spacing: 0.1000
+                 PME_Order: 4
+                Ewald_rtol: 1.0000e-07
+              vdw_modifier: 'Potential-shift'
+                 CoordType: 'g96'
+           Disp_Correction: 0
+    Disp_Correction_Tables: 0
+             Use_Conv_cell: 0
+
+Model.MinMDP.Parallel_Min
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+clear
+clc
+Bayesian_Optimize_Local_Testing
