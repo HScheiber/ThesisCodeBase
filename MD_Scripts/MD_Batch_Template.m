@@ -272,7 +272,7 @@ elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') .
         else
             Cores_per_node = Settings.Cores/max(Settings.Nodes,1);
         end
-    elseif strcmpi(Server,'nar')
+    elseif strcmpi(Server,'nar') || ~isempty(regexp(Server,'nc[0-9]','ONCE'))
         if Settings.Cores < 1
             Cores_per_node = 64; % Narval
         else
