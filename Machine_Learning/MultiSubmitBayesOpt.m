@@ -76,7 +76,7 @@ end
 
 % SLURM Scheduler
 if strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') ...
-        || strcmpi(Server,'bel') || strcmpi(Server,'nar')
+        || strcmpi(Server,'bel') || strcmpi(Server,'nar') || ~isempty(regexp(Server,'nc[0-9]','ONCE'))
     Slurm = true;
     disp('SLURM scheduler detected.')
 % PBS Scheduler

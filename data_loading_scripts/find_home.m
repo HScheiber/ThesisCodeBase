@@ -29,7 +29,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
             slurm = true;
             qsub = 'sbatch';
 			StrSelModels = '/home/scheiber/project/LiX_Structure_Selector';
-        elseif strcmp(server,'nar')
+        elseif strcmp(server,'nar') || ~isempty(regexp(server,'nc[0-9]','ONCE'))
             home = '/home/scheiber/ThesisCodeBase';     
             project = '/project/6001647/scheiber';
             computer = 'narval';

@@ -258,7 +258,8 @@ if ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') % sockeye
         '##CLEANUP##' newline ...
         'echo "Job completed at `date`"' newline ... 
         'exit 0'];
-elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') || strcmpi(Server,'nar') % Cedar, graham, and narval
+elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') ...
+        || strcmpi(Server,'nar') || ~isempty(regexp(Server,'nc[0-9]','ONCE'))% Cedar, graham, and narval
     
     % Number of cores per node
     if strcmpi(Server,'ced') || strcmpi(Server,'cdr') % Cedar

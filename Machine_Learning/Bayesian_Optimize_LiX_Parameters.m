@@ -12,6 +12,9 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         error('Input model does not exist, or is not a compatible data structure.')
     end
     
+    % Disable an annoying warning
+    warning('off','stats:classreg:learning:impl:GPImpl:GPImpl:SigmaMustBeGreaterThanSigmaLowerBound');
+    
     Model.OuterDir = pwd;
     Intermediate_BO_file = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat');
     Intermediate_BO_backup = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat.PREV');
@@ -197,7 +200,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 % Modify the JobStorageLocation to a temporary directory
                 [~,~,computer,~] = find_home;
                 switch computer
-                    case 'cedar'
+                    case {'cedar' 'narval' 'graham'}
                         tmp = fullfile(getenv('SLURM_TMPDIR'),'local_cluster_jobs');
                     case 'sockeye'
                         tmp = fullfile(getenv('TMPDIR'),'local_cluster_jobs');
@@ -205,7 +208,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         tmp = fullfile(tempname,'local_cluster_jobs');
                 end
                 if ~isfolder(tmp)
-                    mkdir(tmp)
+                    mkdir(tmp);
                 end
                 local_cluster.JobStorageLocation = tmp;
 

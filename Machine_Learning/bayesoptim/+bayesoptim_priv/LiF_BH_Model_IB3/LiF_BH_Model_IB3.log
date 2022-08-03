@@ -1063,3 +1063,1020 @@ Fit template for regression GP.
                       Method: 'GP'
                         Type: 'regression'
 
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+open Bayesian_Optimize_LiX_Parameters
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\GPStrategy.m',1)
+if system_dependent('IsDebugMode')==1, dbcont; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+SigmaLowerBound
+
+SigmaLowerBound =
+
+    0.0154
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+GPModel
+
+GPModel = 
+
+  <a href="matlab: helpPopup classreg.learning.regr.CompactRegressionGP">CompactRegressionGP</a>
+             ResponseName: 'Y'
+    CategoricalPredictors: []
+        ResponseTransform: 'none'
+           KernelFunction: 'ARDMatern52'
+        KernelInformation: [1×1 struct]
+            BasisFunction: 'Constant'
+                     Beta: 0.2931
+                    Sigma: 0.0260
+        PredictorLocation: []
+           PredictorScale: []
+                    Alpha: [51×1 double]
+         ActiveSetVectors: [51×5 double]
+            PredictMethod: 'Exact'
+            ActiveSetSize: 51
+
+
+  <a href="matlab: properties('classreg.learning.regr.CompactRegressionGP')">Properties</a>, <a href="matlab: methods('classreg.learning.regr.CompactRegressionGP')">Methods</a>
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+ConstantKernelParameters
+
+ConstantKernelParameters =
+
+  6×1 <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a> array
+
+   0
+   0
+   0
+   0
+   0
+   0
+
+KernelParams0
+
+KernelParams0 =
+
+    0.1500
+    0.2000
+  500.0000
+  500.0000
+   22.0000
+   58.7071
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+|   51 | Best   |     0.46261 |      588.23 |     0.46261 |     0.46261 |      0.10054 |      0.20141 |       154.61 |       1.0906 |       26.033 |
+<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2077,1)">2077 </a>                iteration = iteration + 1;
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+open Bayesian_Optimize_LiX_Parameters
+open fitmodels
+{Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback('open', 'C:\Program Files\MATLAB\R2021a\toolbox\matlab\general\open.m', 87)" style="font-weight:bold">open</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\matlab\general\open.m',87,0)">line 87</a>)
+File 'fitmodels' not found.
+} 
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\BayesoptOptions.m',1)
+useFitMethodNone
+
+useFitMethodNone =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+this.PrivOptions.ModelType
+
+ans =
+
+    'GaussianProcess'
+
+useFitMethodNone
+
+useFitMethodNone =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+if system_dependent('IsDebugMode')==1, dbstep in; end
+this.PrivOptions.FitModels
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+BullAdjustment
+
+BullAdjustment =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+BullAdjustmentN
+
+BullAdjustmentN =
+
+     1
+
+useFitMethodNone
+
+useFitMethodNone =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+FTrain
+
+FTrain =
+
+  Columns 1 through 14
+
+   21.9761   12.9457   13.5944   17.4678   26.4872   11.8856   26.0642   23.0409   12.7883    9.9695   12.7647   24.7167   26.2405   24.1886
+
+  Columns 15 through 28
+
+   25.4849   21.0915   24.9296   25.8311   25.1842   13.3823   23.3209   10.9630   25.7744   11.8975   25.7405   23.6772   24.8068   25.3581
+
+  Columns 29 through 42
+
+   26.1906   23.8297   26.5403   22.2791    0.5700   23.0379   21.8759   10.8909   31.6626   25.6310   27.9618   10.5701   25.4988   12.7765
+
+  Columns 43 through 52
+
+   25.9608   12.8231   11.8672   20.5225   26.1176   13.2218   23.8603   13.0671    0.4626    0.5416
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+useFitMethodNone
+
+useFitMethodNone =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+useFitMethodNone && ~isempty(this)
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+[KernelParams0, ConstantKernelParameters] = kernelParamsForFitrgp(this, FTrain, PrivOptions)
+
+KernelParams0 =
+
+    0.1500
+    0.2000
+  500.0000
+  500.0000
+   22.0000
+    5.4302
+
+
+ConstantKernelParameters =
+
+  6×1 <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a> array
+
+   0
+   0
+   0
+   0
+   0
+   0
+
+FTrain
+
+FTrain =
+
+  Columns 1 through 14
+
+   21.9761   12.9457   13.5944   17.4678   26.4872   11.8856   26.0642   23.0409   12.7883    9.9695   12.7647   24.7167   26.2405   24.1886
+
+  Columns 15 through 28
+
+   25.4849   21.0915   24.9296   25.8311   25.1842   13.3823   23.3209   10.9630   25.7744   11.8975   25.7405   23.6772   24.8068   25.3581
+
+  Columns 29 through 42
+
+   26.1906   23.8297   26.5403   22.2791    0.5700   23.0379   21.8759   10.8909   31.6626   25.6310   27.9618   10.5701   25.4988   12.7765
+
+  Columns 43 through 52
+
+   25.9608   12.8231   11.8672   20.5225   26.1176   13.2218   23.8603   13.0671    0.4626    0.5416
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+SigmaLowerBound = max(1e-8, 1e-4*nanstd(FTrain))
+
+SigmaLowerBound =
+
+   7.6795e-04
+
+nanstd(FTrain)
+
+ans =
+
+    7.6795
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+FitMethodArgs
+
+FitMethodArgs =
+
+  1×2 <a href="matlab:helpPopup cell" style="font-weight:bold">cell</a> array
+
+    {'FitMethod'}    {'exact'}
+
+SigmaLowerBound
+
+SigmaLowerBound =
+
+   7.6795e-04
+
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+SigmaLowerBound
+
+SigmaLowerBound =
+
+   7.6795e-04
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+GPModel = compact(fitrgp(X, Y, varargin{:}, 'SigmaLowerBound', SigmaLowerBound))
+
+GPModel = 
+
+  <a href="matlab: helpPopup classreg.learning.regr.CompactRegressionGP">CompactRegressionGP</a>
+             ResponseName: 'Y'
+    CategoricalPredictors: []
+        ResponseTransform: 'none'
+           KernelFunction: 'ARDMatern52'
+        KernelInformation: [1×1 struct]
+            BasisFunction: 'Constant'
+                     Beta: 17.1660
+                    Sigma: 7.6895e-04
+        PredictorLocation: []
+           PredictorScale: []
+                    Alpha: [52×1 double]
+         ActiveSetVectors: [52×5 double]
+            PredictMethod: 'Exact'
+            ActiveSetSize: 52
+
+
+  <a href="matlab: properties('classreg.learning.regr.CompactRegressionGP')">Properties</a>, <a href="matlab: methods('classreg.learning.regr.CompactRegressionGP')">Methods</a>
+
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+temp = classreg.learning.FitTemplate.make('GP','type','regression',varargin{:})
+
+temp = 
+
+Fit template for regression GP.
+
+              KernelFunction: 'ARDMatern52'
+            KernelParameters: [6×1 double]
+               BasisFunction: 'Constant'
+                        Beta: []
+                       Sigma: 7.6795e-04
+                   FitMethod: 'Exact'
+               PredictMethod: 'Exact'
+                   ActiveSet: []
+               ActiveSetSize: []
+             ActiveSetMethod: []
+                 Standardize: 0
+                     Verbose: []
+                   CacheSize: []
+                     Options: [1×1 struct]
+                   Optimizer: []
+            OptimizerOptions: []
+    ConstantKernelParameters: [6×1 logical]
+               ConstantSigma: 1
+             InitialStepSize: []
+                     Version: 1
+                      Method: 'GP'
+                        Type: 'regression'
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+W = dataPrepOut{1}
+
+W =
+
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+    0.0192
+
+fitArgs = dataPrepOut(2:end)
+
+fitArgs =
+
+  1×2 <a href="matlab:helpPopup cell" style="font-weight:bold">cell</a> array
+
+    {1×1 struct}    {@classreg.learning.transform.identity}
+
+fitArgs{:}
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+           PredictorNames: 5
+    CategoricalPredictors: []
+             ResponseName: 'Y'
+            VariableRange: {[]  []  []  []  []}
+               TableInput: 0
+                 RowsUsed: []
+       ObservationsInRows: 1
+                  BinnedX: []
+                 BinEdges: {}
+        OrdinalPredictors: [0 0 0 0 0]
+
+
+ans =
+
+  <a href="matlab:helpPopup function_handle" style="font-weight:bold">function_handle</a> with value:
+
+    @classreg.learning.transform.identity
+
+this.ModelParams
+
+ans = 
+
+
+              KernelFunction: 'ARDMatern52'
+            KernelParameters: [6×1 double]
+               BasisFunction: 'Constant'
+                        Beta: []
+                       Sigma: 7.6795e-04
+                   FitMethod: 'Exact'
+               PredictMethod: 'Exact'
+                   ActiveSet: []
+               ActiveSetSize: []
+             ActiveSetMethod: []
+                 Standardize: 0
+                     Verbose: []
+                   CacheSize: []
+                     Options: [1×1 struct]
+                   Optimizer: []
+            OptimizerOptions: []
+    ConstantKernelParameters: [6×1 logical]
+               ConstantSigma: 1
+             InitialStepSize: []
+                     Version: 1
+                      Method: 'GP'
+                        Type: 'regression'
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+X
+
+X =
+
+    0.3873    0.2900  128.7541  697.7598   12.5426
+    0.2755    0.2001  669.7519  186.7040   15.2778
+    0.2113    0.4402   28.7771  974.5384   48.9241
+    0.3617    0.3678   87.4623  322.5187   38.0001
+    0.3728    0.2688  865.6682  721.0002   33.5136
+    0.1551    0.4839  457.4832   18.4222   45.7702
+    0.2157    0.4966  641.9195  751.1039   19.7814
+    0.1905    0.1593  808.8473  332.9076   11.1149
+    0.3339    0.2394   46.8142  624.5744   21.1363
+    0.3945    0.4561  140.4040   19.1299   17.9895
+    0.3906    0.1262  518.1320  125.0671   45.4538
+    0.2556    0.1035  454.4678  715.8028   40.3410
+    0.2110    0.4613  582.8936  977.0080   42.5319
+    0.2188    0.2183  510.9644  399.4825   15.3299
+    0.1185    0.3573  702.7421  629.9892   38.3015
+    0.1012    0.2026  564.4850  195.3205   35.1634
+    0.2844    0.3899  304.1188  732.9117   48.0871
+    0.3751    0.4512  398.5122  915.0491   16.0127
+    0.2399    0.4061  442.9852  667.9618   11.9060
+    0.2727    0.2751   30.5205  916.2366   15.0097
+    0.1996    0.1241  268.3005  667.1935   47.0660
+    0.1799    0.2870   98.3337  221.5216   34.6865
+    0.2222    0.2689  745.6074  645.2500    9.9208
+    0.2417    0.1991  365.3686  113.2660   37.8647
+    0.3580    0.3018  438.5104  818.1053   22.3886
+    0.3036    0.3895  185.7376  753.1292   23.0459
+    0.2120    0.1815  537.9632  523.9098   33.2341
+    0.2963    0.4846  331.0362  869.2856   32.3543
+    0.3281    0.3557  604.9787  891.2923    8.1163
+    0.3564    0.1126  193.3158  975.8850   18.8274
+    0.3706    0.4575  911.2596  624.8458   48.6421
+    0.2927    0.4381  196.4029  234.8206   39.6047
+    0.1003    0.1089  153.3434   74.6245   48.2257
+    0.2097    0.2340  331.2162  326.1154   26.7443
+    0.1016    0.1184  536.9518  657.4251    8.9194
+    0.1262    0.1367    6.1995  393.3694   17.6461
+    0.2867    0.3353  407.0396  610.6370    7.2245
+    0.3177    0.4283  753.8116  399.0576   44.3092
+    0.3412    0.3852  902.0780  517.7509    6.1647
+    0.1329    0.2901  458.2268  144.2813    8.7006
+    0.3060    0.1724  525.1285  710.0465   37.8722
+    0.1484    0.3471  108.7827  569.1783   10.1311
+    0.1752    0.1474  845.3740  772.3574   33.9322
+    0.2615    0.1316  614.4514   35.6973   28.3286
+    0.1014    0.3290  241.6209  314.0344   28.4664
+    0.3861    0.2083   95.8153  506.0319   33.4124
+    0.2231    0.3684  828.5069  605.9792   21.3783
+    0.3677    0.4817   14.2840  703.8144   46.9332
+    0.1343    0.1570  392.8268  678.9347   37.4320
+    0.1477    0.4897  160.3798  619.4695   43.5751
+    0.1005    0.2014  154.6065    1.0906   26.0327
+    0.1027    0.1372  102.3897   15.8026   48.1353
+
+            this = this@classreg.learning.regr.FullRegressionModel(...
+                X,Y,W,modelParams,dataSummary,responseTransform)
+{'this' is not an accessible method of base class 'classreg.learning.regr.FullRegressionModel'.
+} 
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+this
+
+this = 
+
+  <a href="matlab: helpPopup RegressionGP">RegressionGP</a>
+{Dot indexing is not supported for variables of this type.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('classreg.learning.regr.CompactRegressionGP/get.KernelFunction', 'C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\+regr\CompactRegressionGP.m', 259)" style="font-weight:bold">classreg.learning.regr.CompactRegressionGP/get.KernelFunction</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\+regr\CompactRegressionGP.m',259,0)">line 259</a>)
+            a = this.Impl.KernelFunction;
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('classreg.learning.regr.CompactRegressionGP/propsForDisp', 'C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\+regr\CompactRegressionGP.m', 342)" style="font-weight:bold">classreg.learning.regr.CompactRegressionGP/propsForDisp</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\+regr\CompactRegressionGP.m',342,0)">line 342</a>)
+            s.KernelFunction    = this.KernelFunction;
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('RegressionGP/propsForDisp', 'C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\RegressionGP.m', 569)" style="font-weight:bold">RegressionGP/propsForDisp</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\RegressionGP.m',569,0)">line 569</a>)
+            s = propsForDisp@classreg.learning.regr.CompactRegressionGP(this,s);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('classreg.learning.Predictor/disp', 'C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\Predictor.m', 87)" style="font-weight:bold">classreg.learning.Predictor/disp</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\Predictor.m',87,0)">line 87</a>)
+            s = propsForDisp(this,[]);
+} 
+newN
+
+newN =
+
+    52
+
+this.ModelParams.ActiveSetSize
+
+ans =
+
+    52
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep out; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+[X,catcols] = classreg.learning.internal.expandCategorical(X,iscat,isord,vrange)
+
+X =
+
+    0.3873    0.2900  128.7541  697.7598   12.5426
+    0.2755    0.2001  669.7519  186.7040   15.2778
+    0.2113    0.4402   28.7771  974.5384   48.9241
+    0.3617    0.3678   87.4623  322.5187   38.0001
+    0.3728    0.2688  865.6682  721.0002   33.5136
+    0.1551    0.4839  457.4832   18.4222   45.7702
+    0.2157    0.4966  641.9195  751.1039   19.7814
+    0.1905    0.1593  808.8473  332.9076   11.1149
+    0.3339    0.2394   46.8142  624.5744   21.1363
+    0.3945    0.4561  140.4040   19.1299   17.9895
+    0.3906    0.1262  518.1320  125.0671   45.4538
+    0.2556    0.1035  454.4678  715.8028   40.3410
+    0.2110    0.4613  582.8936  977.0080   42.5319
+    0.2188    0.2183  510.9644  399.4825   15.3299
+    0.1185    0.3573  702.7421  629.9892   38.3015
+    0.1012    0.2026  564.4850  195.3205   35.1634
+    0.2844    0.3899  304.1188  732.9117   48.0871
+    0.3751    0.4512  398.5122  915.0491   16.0127
+    0.2399    0.4061  442.9852  667.9618   11.9060
+    0.2727    0.2751   30.5205  916.2366   15.0097
+    0.1996    0.1241  268.3005  667.1935   47.0660
+    0.1799    0.2870   98.3337  221.5216   34.6865
+    0.2222    0.2689  745.6074  645.2500    9.9208
+    0.2417    0.1991  365.3686  113.2660   37.8647
+    0.3580    0.3018  438.5104  818.1053   22.3886
+    0.3036    0.3895  185.7376  753.1292   23.0459
+    0.2120    0.1815  537.9632  523.9098   33.2341
+    0.2963    0.4846  331.0362  869.2856   32.3543
+    0.3281    0.3557  604.9787  891.2923    8.1163
+    0.3564    0.1126  193.3158  975.8850   18.8274
+    0.3706    0.4575  911.2596  624.8458   48.6421
+    0.2927    0.4381  196.4029  234.8206   39.6047
+    0.1003    0.1089  153.3434   74.6245   48.2257
+    0.2097    0.2340  331.2162  326.1154   26.7443
+    0.1016    0.1184  536.9518  657.4251    8.9194
+    0.1262    0.1367    6.1995  393.3694   17.6461
+    0.2867    0.3353  407.0396  610.6370    7.2245
+    0.3177    0.4283  753.8116  399.0576   44.3092
+    0.3412    0.3852  902.0780  517.7509    6.1647
+    0.1329    0.2901  458.2268  144.2813    8.7006
+    0.3060    0.1724  525.1285  710.0465   37.8722
+    0.1484    0.3471  108.7827  569.1783   10.1311
+    0.1752    0.1474  845.3740  772.3574   33.9322
+    0.2615    0.1316  614.4514   35.6973   28.3286
+    0.1014    0.3290  241.6209  314.0344   28.4664
+    0.3861    0.2083   95.8153  506.0319   33.4124
+    0.2231    0.3684  828.5069  605.9792   21.3783
+    0.3677    0.4817   14.2840  703.8144   46.9332
+    0.1343    0.1570  392.8268  678.9347   37.4320
+    0.1477    0.4897  160.3798  619.4695   43.5751
+    0.1005    0.2014  154.6065    1.0906   26.0327
+    0.1027    0.1372  102.3897   15.8026   48.1353
+
+
+catcols =
+
+  1×5 <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a> array
+
+   0   0   0   0   0
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+[X,catcols] = classreg.learning.internal.expandCategorical(X,iscat,isord,vrange)
+
+X =
+
+    0.3873    0.2900  128.7541  697.7598   12.5426
+    0.2755    0.2001  669.7519  186.7040   15.2778
+    0.2113    0.4402   28.7771  974.5384   48.9241
+    0.3617    0.3678   87.4623  322.5187   38.0001
+    0.3728    0.2688  865.6682  721.0002   33.5136
+    0.1551    0.4839  457.4832   18.4222   45.7702
+    0.2157    0.4966  641.9195  751.1039   19.7814
+    0.1905    0.1593  808.8473  332.9076   11.1149
+    0.3339    0.2394   46.8142  624.5744   21.1363
+    0.3945    0.4561  140.4040   19.1299   17.9895
+    0.3906    0.1262  518.1320  125.0671   45.4538
+    0.2556    0.1035  454.4678  715.8028   40.3410
+    0.2110    0.4613  582.8936  977.0080   42.5319
+    0.2188    0.2183  510.9644  399.4825   15.3299
+    0.1185    0.3573  702.7421  629.9892   38.3015
+    0.1012    0.2026  564.4850  195.3205   35.1634
+    0.2844    0.3899  304.1188  732.9117   48.0871
+    0.3751    0.4512  398.5122  915.0491   16.0127
+    0.2399    0.4061  442.9852  667.9618   11.9060
+    0.2727    0.2751   30.5205  916.2366   15.0097
+    0.1996    0.1241  268.3005  667.1935   47.0660
+    0.1799    0.2870   98.3337  221.5216   34.6865
+    0.2222    0.2689  745.6074  645.2500    9.9208
+    0.2417    0.1991  365.3686  113.2660   37.8647
+    0.3580    0.3018  438.5104  818.1053   22.3886
+    0.3036    0.3895  185.7376  753.1292   23.0459
+    0.2120    0.1815  537.9632  523.9098   33.2341
+    0.2963    0.4846  331.0362  869.2856   32.3543
+    0.3281    0.3557  604.9787  891.2923    8.1163
+    0.3564    0.1126  193.3158  975.8850   18.8274
+    0.3706    0.4575  911.2596  624.8458   48.6421
+    0.2927    0.4381  196.4029  234.8206   39.6047
+    0.1003    0.1089  153.3434   74.6245   48.2257
+    0.2097    0.2340  331.2162  326.1154   26.7443
+    0.1016    0.1184  536.9518  657.4251    8.9194
+    0.1262    0.1367    6.1995  393.3694   17.6461
+    0.2867    0.3353  407.0396  610.6370    7.2245
+    0.3177    0.4283  753.8116  399.0576   44.3092
+    0.3412    0.3852  902.0780  517.7509    6.1647
+    0.1329    0.2901  458.2268  144.2813    8.7006
+    0.3060    0.1724  525.1285  710.0465   37.8722
+    0.1484    0.3471  108.7827  569.1783   10.1311
+    0.1752    0.1474  845.3740  772.3574   33.9322
+    0.2615    0.1316  614.4514   35.6973   28.3286
+    0.1014    0.3290  241.6209  314.0344   28.4664
+    0.3861    0.2083   95.8153  506.0319   33.4124
+    0.2231    0.3684  828.5069  605.9792   21.3783
+    0.3677    0.4817   14.2840  703.8144   46.9332
+    0.1343    0.1570  392.8268  678.9347   37.4320
+    0.1477    0.4897  160.3798  619.4695   43.5751
+    0.1005    0.2014  154.6065    1.0906   26.0327
+    0.1027    0.1372  102.3897   15.8026   48.1353
+
+
+catcols =
+
+  1×5 <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a> array
+
+   0   0   0   0   0
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+constantSigma
+
+constantSigma =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+options.Regularization
+
+ans =
+
+     []
+
+options.SigmaLowerBound
+
+ans =
+
+   7.6795e-04
+
+sigma
+
+sigma =
+
+   7.6795e-04
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+beta
+
+beta =
+
+     0
+
+sigma
+
+sigma =
+
+   7.6795e-04
+
+fitMethod
+
+fitMethod =
+
+    'Exact'
+
+constantKernelParameters
+
+constantKernelParameters =
+
+  6×1 <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a> array
+
+   0
+   0
+   0
+   0
+   0
+   0
+
+constantSigma
+
+constantSigma =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+initialStepSize
+
+initialStepSize =
+
+     []
+
+optimizer
+
+optimizer =
+
+    'quasinewton'
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+this.FitMethod
+
+ans =
+
+    'Exact'
+
+GPParams.FitMethodSD
+
+ans =
+
+    'SD'
+
+GPParams.FitMethodExact
+
+ans =
+
+    'Exact'
+
+if system_dependent('IsDebugMode')==1, dbcont; end
+if system_dependent('IsDebugMode')==1, dbcont; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep in; end
+this.Theta0
+
+ans =
+
+   -1.8971
+   -1.6094
+    6.2146
+    6.2146
+    3.0910
+    4.0687
+
+this.Beta0
+
+ans =
+
+     0
+
+if system_dependent('IsDebugMode')==1, dbstep in; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+sigmaLB
+
+sigmaLB =
+
+    0.0177
+
+this.ConstantSigma
+
+ans =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   0
+
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+if system_dependent('IsDebugMode')==1, dbstep; end
+gamma0
+
+gamma0 =
+
+    0.2094
+
