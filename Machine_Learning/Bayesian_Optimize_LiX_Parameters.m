@@ -145,7 +145,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     %% Filenames
     FileBase = [Model.Salt '_' Model.Theory '_Model_' Model.Trial_ID];
     Results_filename = [FileBase '_bayesopt.mat'];
-    Final_point_filename = [Filebase '_final_point.mat'];
+    Final_point_filename = [FileBase '_final_point.mat'];
     Full_opt_filename = [FileBase '_fullopt.mat'];
     
     % Check for old results files
