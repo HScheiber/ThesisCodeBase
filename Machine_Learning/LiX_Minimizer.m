@@ -1172,6 +1172,8 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
+    elseif ~isempty(gcp('nocreate')) % close the current ppool, it will likely close on its own anyway, causing issues
+        delete(gcp);
     end
     
     Settings.BatchMode = false;
