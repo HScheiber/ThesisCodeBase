@@ -308,7 +308,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
             warnings.simplefilter('ignore')
             t = md.Universe(grofile, trajfile, in_memory=InMemory)
     except:
-        npz_file = os.path.join(WorkDir, '.' + SystemName + ".trr_offsets.npz"
+        npz_file = os.path.join(WorkDir, '.' + SystemName + ".trr_offsets.npz")
         os.remove(npz_file)
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
