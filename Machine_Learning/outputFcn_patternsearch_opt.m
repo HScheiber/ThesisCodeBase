@@ -1,7 +1,5 @@
 function [stop,options,optchanged] = outputFcn_patternsearch_opt(optimValues,options,flag)
 
-
-
 % outputFcn_global()
 %
 % OutputFun for optimizers (fminunc, fmincon etc),  saving intermediate results 
@@ -25,7 +23,7 @@ function [stop,options,optchanged] = outputFcn_patternsearch_opt(optimValues,opt
 %
 
 
-global intermediate_data
+global intermediate_data;
 stop = false;
 optchanged = false;
 switch flag
@@ -83,8 +81,8 @@ end
 
 % Backup and save to file
 if isfile('intermediate_secondary_opt.mat')
-    copyfile('intermediate_secondary_opt.mat','intermediate_secondary_opt.mat.PREV')
+    copyfile('intermediate_secondary_opt.mat','intermediate_secondary_opt.mat.PREV');
 end
 filename = 'intermediate_secondary_opt.mat';
-save(filename,'intermediate_data')
+save(filename,'intermediate_data');
 end

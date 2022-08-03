@@ -20,7 +20,7 @@ function stop = outputFcn_secondary_opt(x,optimValues,state)
 % Created
 %   Daniel Frisch, ISAS, 10.2019 
 %
-global intermediate_data
+global intermediate_data;
 stop = false;
 switch state
     case 'init'
@@ -72,13 +72,13 @@ switch state
     case 'done'
         % do nothing here
     otherwise
-        error(['wrong switch:' state])
+        error(['wrong switch:' state]);
 end
 
 % Backup and save to file
 if isfile('intermediate_secondary_opt.mat')
-    copyfile('intermediate_secondary_opt.mat','intermediate_secondary_opt.mat.PREV')
+    copyfile('intermediate_secondary_opt.mat','intermediate_secondary_opt.mat.PREV');
 end
 filename = 'intermediate_secondary_opt.mat';
-save(filename,'intermediate_data')
+save(filename,'intermediate_data');
 end

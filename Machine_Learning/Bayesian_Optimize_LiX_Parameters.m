@@ -22,7 +22,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     [Model.Metal,Model.Halide] = Separate_Metal_Halide(Model.Salt);
     Model.Longest_Cutoff = max([Model.MDP.RList_Cutoff Model.MDP.RCoulomb_Cutoff Model.MDP.RVDW_Cutoff]);
     [~,Model.gmx,Model.gmx_loc,Model.mdrun_opts] = MD_Batch_Template(Model.JobSettings);
-    if Model.Loss_Options.MP_Volume_Change > sqrt(eps)
+    if Model.Loss_Options.MP > sqrt(eps)
         Deterministic = false; % Melting points are not deterministic
     else
         Deterministic = true; % default is that the function is deterministic
@@ -473,7 +473,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     if ~isfile(Final_point_filename)
         switch Model.final_opt_type
             case 'fminsearch'
-
                 % First, reset the parallelization scheme for fminsearch as it has no parallel option
                 % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
                 if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
@@ -543,8 +542,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 Ranges = [params.Range];
                 lb = Ranges(1:2:end);
                 ub = Ranges(2:2:end);
-
-                % First, reset the parallelization scheme for fminsearch as it has no parallel option
+                
+                % First, reset the parallelization scheme for fminsearchbnd as it has no parallel option
                 % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
                 if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
                     Model.Parallel_Bayesopt = false;
