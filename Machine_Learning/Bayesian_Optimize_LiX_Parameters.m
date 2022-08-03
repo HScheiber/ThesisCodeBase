@@ -145,12 +145,17 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     %% Filenames
     FileBase = [Model.Salt '_' Model.Theory '_Model_' Model.Trial_ID];
     Results_filename = [FileBase '_bayesopt.mat'];
+    Final_point_filename = [Filebase '_final_point.mat'];
     Full_opt_filename = [FileBase '_fullopt.mat'];
     
     % Check for old results files
     obs = dir(['*Model_' Model.Trial_ID '*bayesopt.mat']);
     if ~isempty(obs)
         Results_filename = obs.name;
+    end
+    obs = dir(['*Model_' Model.Trial_ID '*final_point.mat']);
+    if ~isempty(obs)
+        Final_point_filename = obs.name;
     end
     obs = dir(['*Model_' Model.Trial_ID '*fullopt.mat']);
     if ~isempty(obs)
@@ -262,8 +267,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 obs = dir(['*Model_' Model.Trial_ID '*_bayesopt.mat']);         
                 res = load(obs.name); % Loads the results variable
                 results = res.results;
-            case 'surrogateopt'
-                %% TO DO %%
         end
 
     elseif Model.Restart_Calculation && continue_bayesopt
@@ -341,10 +344,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         'GPActiveSetSize',Model.Max_Bayesian_Iterations);
                 end
                 % Save results
-                save(Results_filename,'results')
-                
-            case 'surrogateopt'
-                %% TO DO %%
+                save(Results_filename,'results')                
         end
     else
         rng('shuffle'); % Reset the random seed to current time
@@ -470,49 +470,33 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
     
     %% Perform final local optimization %%
-    switch Model.final_opt_type
-        case 'fminsearch'
-            
-            % First, reset the parallelization scheme for fminsearch as it has no parallel option
-            % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
-            if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
-                Model.Parallel_Bayesopt = false;
-                Model.Parallel_Struct_Min = false;
-                Model.Parallel_LiX_Minimizer = true;
-                Model.MinMDP.Parallel_Min = false;
-            elseif Model.Parallel_Struct_Min
-                Model.Parallel_Bayesopt = false;
-                Model.Parallel_Struct_Min = true;
-                Model.Parallel_LiX_Minimizer = false;
-                Model.MinMDP.Parallel_Min = true;
-            end
-            fun = @(x)LiX_Minimizer(Model,x);
+    if ~isfile(Final_point_filename)
+        switch Model.final_opt_type
+            case 'fminsearch'
 
-            % Options for the Nelder–Mead search
-            optionsNM = optimset('Display','iter','MaxIter',Model.Max_Local_Iterations,...
-                'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence,...
-                'OutputFcn',@outputFcn_secondary_opt);
+                % First, reset the parallelization scheme for fminsearch as it has no parallel option
+                % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
+                if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
+                    Model.Parallel_Bayesopt = false;
+                    Model.Parallel_Struct_Min = false;
+                    Model.Parallel_LiX_Minimizer = true;
+                    Model.MinMDP.Parallel_Min = false;
+                elseif Model.Parallel_Struct_Min
+                    Model.Parallel_Bayesopt = false;
+                    Model.Parallel_Struct_Min = true;
+                    Model.Parallel_LiX_Minimizer = false;
+                    Model.MinMDP.Parallel_Min = true;
+                end
+                fun = @(x)LiX_Minimizer(Model,x);
 
-            if continue_fullopt
-                try
-                    dat = load(Intermediate_Secondary_file);
-                    intermediate_data = dat.intermediate_data;
-                    x0 = intermediate_data(end).x;
+                % Options for the Nelder–Mead search
+                optionsNM = optimset('Display','iter','MaxIter',Model.Max_Local_Iterations,...
+                    'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence,...
+                    'OutputFcn',@outputFcn_secondary_opt);
 
-                    remaining_evals = Model.Max_Local_Iterations - length(intermediate_data)+2;
-                    if remaining_evals <= 0
-                        remaining_evals = 1;
-                    end
-
-                    optionsNM.MaxIter = remaining_evals;
-                catch
-                    disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                    if isfile(Intermediate_Secondary_file)
-                        delete(Intermediate_Secondary_file);
-                    end
+                if continue_fullopt
                     try
-                        
-                        dat = load(Intermediate_Seconary_backup,'-mat');
+                        dat = load(Intermediate_Secondary_file);
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;
 
@@ -523,66 +507,66 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                         optionsNM.MaxIter = remaining_evals;
                     catch
-                        if isfile(Intermediate_Seconary_backup)
-                            delete(Intermediate_Seconary_backup);
+                        disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                        if isfile(Intermediate_Secondary_file)
+                            delete(Intermediate_Secondary_file);
                         end
-                        disp('Unable to load backup secondary optimization checkpoint file, restarting.')
-                        x0 = results.XAtMinObjective{:,:};
+                        try
+
+                            dat = load(Intermediate_Seconary_backup,'-mat');
+                            intermediate_data = dat.intermediate_data;
+                            x0 = intermediate_data(end).x;
+
+                            remaining_evals = Model.Max_Local_Iterations - length(intermediate_data)+2;
+                            if remaining_evals <= 0
+                                remaining_evals = 1;
+                            end
+
+                            optionsNM.MaxIter = remaining_evals;
+                        catch
+                            if isfile(Intermediate_Seconary_backup)
+                                delete(Intermediate_Seconary_backup);
+                            end
+                            disp('Unable to load backup secondary optimization checkpoint file, restarting.')
+                            x0 = results.XAtMinObjective{:,:};
+                        end
                     end
+                else
+                    x0 = results.XAtMinObjective{:,:};
                 end
-            else
-                x0 = results.XAtMinObjective{:,:};
-            end
 
-            [full_opt_point,~,~,full_opt_results] = fminsearch(fun,x0,optionsNM);
-        
-        case 'fminsearchbnd'
-            
-            % Constraints
-            Ranges = [params.Range];
-            lb = Ranges(1:2:end);
-            ub = Ranges(2:2:end);
+                [full_opt_point,~,~,full_opt_results] = fminsearch(fun,x0,optionsNM);
 
-            % First, reset the parallelization scheme for fminsearch as it has no parallel option
-            % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
-            if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
-                Model.Parallel_Bayesopt = false;
-                Model.Parallel_Struct_Min = false;
-                Model.Parallel_LiX_Minimizer = true;
-                Model.MinMDP.Parallel_Min = false;
-            elseif Model.Parallel_Struct_Min
-                Model.Parallel_Bayesopt = false;
-                Model.Parallel_Struct_Min = true;
-                Model.Parallel_LiX_Minimizer = false;
-                Model.MinMDP.Parallel_Min = true;
-            end
-            fun = @(x)LiX_Minimizer(Model,x);
+            case 'fminsearchbnd'
 
-            % Options for the Nelder–Mead search
-            optionsNM = optimset('Display','iter','MaxIter',Model.Max_Local_Iterations,...
-                'MaxFunEvals',Model.MaxFunEvals,'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence,...
-                'OutputFcn',@outputFcn_secondary_opt);
+                % Constraints
+                Ranges = [params.Range];
+                lb = Ranges(1:2:end);
+                ub = Ranges(2:2:end);
 
-            if continue_fullopt
-                try
-                    dat = load(Intermediate_Secondary_file);
-                    intermediate_data = dat.intermediate_data;
-                    x0 = intermediate_data(end).x;
+                % First, reset the parallelization scheme for fminsearch as it has no parallel option
+                % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
+                if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
+                    Model.Parallel_Bayesopt = false;
+                    Model.Parallel_Struct_Min = false;
+                    Model.Parallel_LiX_Minimizer = true;
+                    Model.MinMDP.Parallel_Min = false;
+                elseif Model.Parallel_Struct_Min
+                    Model.Parallel_Bayesopt = false;
+                    Model.Parallel_Struct_Min = true;
+                    Model.Parallel_LiX_Minimizer = false;
+                    Model.MinMDP.Parallel_Min = true;
+                end
+                fun = @(x)LiX_Minimizer(Model,x);
 
-                    remaining_evals = Model.Max_Local_Iterations - length(intermediate_data)+2;
+                % Options for the Nelder–Mead search
+                optionsNM = optimset('Display','iter','MaxIter',Model.Max_Local_Iterations,...
+                    'MaxFunEvals',Model.MaxFunEvals,'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence,...
+                    'OutputFcn',@outputFcn_secondary_opt);
 
-                    if remaining_evals <= 0
-                        remaining_evals = 1;
-                    end
-
-                    optionsNM.MaxIter = remaining_evals;
-                catch
-                    disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                    if isfile(Intermediate_Secondary_file)
-                        delete(Intermediate_Secondary_file);
-                    end
+                if continue_fullopt
                     try
-                        dat = load(Intermediate_Seconary_backup,'-mat');
+                        dat = load(Intermediate_Secondary_file);
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;
 
@@ -594,69 +578,66 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                         optionsNM.MaxIter = remaining_evals;
                     catch
-                        disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                        if isfile(Intermediate_Seconary_backup)
-                            delete(Intermediate_Seconary_backup);
+                        disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                        if isfile(Intermediate_Secondary_file)
+                            delete(Intermediate_Secondary_file);
                         end
-                        remaining_evals = Model.Max_Local_Iterations;
-                        x0 = results.XAtMinObjective{:,:};
+                        try
+                            dat = load(Intermediate_Seconary_backup,'-mat');
+                            intermediate_data = dat.intermediate_data;
+                            x0 = intermediate_data(end).x;
+
+                            remaining_evals = Model.Max_Local_Iterations - length(intermediate_data)+2;
+
+                            if remaining_evals <= 0
+                                remaining_evals = 1;
+                            end
+
+                            optionsNM.MaxIter = remaining_evals;
+                        catch
+                            disp('Unable to load backup secondary optimization checkpoint file, starting new.')
+                            if isfile(Intermediate_Seconary_backup)
+                                delete(Intermediate_Seconary_backup);
+                            end
+                            remaining_evals = Model.Max_Local_Iterations;
+                            x0 = results.XAtMinObjective{:,:};
+                        end
                     end
+                else
+                    remaining_evals = Model.Max_Local_Iterations;
+                    x0 = results.XAtMinObjective{:,:};
                 end
-            else
-                remaining_evals = Model.Max_Local_Iterations;
-                x0 = results.XAtMinObjective{:,:};
-            end
 
-            [full_opt_point,~,exitflag,full_opt_results] = fminsearchbnd(fun,x0,lb,ub,optionsNM);
+                [full_opt_point,~,exitflag,full_opt_results] = fminsearchbnd(fun,x0,lb,ub,optionsNM);
 
+                % Check to see if the max local iterations is exceeded
+                if exitflag == 0 && remaining_evals > 1 && Model.switch_final_opt % calculation exceeded number of allowed iterations
+                    % switch to nealder-mead simplex minimization
+                    disp('Swicthing local optimization to patternsearch')
+                    Model.final_opt_type = 'patternsearch';
 
-            % Check to see if the max local iterations is exceeded
-            if exitflag == 0 && remaining_evals > 1 && Model.switch_final_opt % calculation exceeded number of allowed iterations
-                % switch to nealder-mead simplex minimization
-                disp('Swicthing local optimization to patternsearch')
-                Model.final_opt_type = 'patternsearch';
+                    % Overwrite the input file if it exists
+                    if batch_subm
+                        save(Input_Model,'Model','-mat')
+                    end
 
-                % Overwrite the input file if it exists
-                if batch_subm
-                    save(Input_Model,'Model','-mat')
+                    Bayesian_Optimize_LiX_Parameters(Model)
+                    return
                 end
 
-                Bayesian_Optimize_LiX_Parameters(Model)
-                return
-            end
-        
-        case 'patternsearch'
-        
-            %% Options for Patternsearch
+            case 'patternsearch'
 
-            % Constraints
-            Ranges = [params.Range];
-            lb = Ranges(1:2:end);
-            ub = Ranges(2:2:end);
+                %% Options for Patternsearch
 
-            % Load previous data
-            if continue_fullopt
-                try
-                    dat = load(Intermediate_Secondary_file);
-                    intermediate_data = dat.intermediate_data;
-                    x0 = intermediate_data(end).x;    
-                    
-                    % Establish initial mesh size
-                    if isfield(intermediate_data(end).optimValues,'meshsize')
-                        init_meshsize = intermediate_data(end).optimValues.meshsize;
-                    else
-                        init_meshsize = 0.1;
-                    end
-                    
-                    current_iterations = length(intermediate_data);
-                    max_iter = Model.Max_Local_Iterations - current_iterations;
-                catch
-                    disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                    if isfile(Intermediate_Secondary_file)
-                        delete(Intermediate_Secondary_file);
-                    end
+                % Constraints
+                Ranges = [params.Range];
+                lb = Ranges(1:2:end);
+                ub = Ranges(2:2:end);
+
+                % Load previous data
+                if continue_fullopt
                     try
-                        dat = load(Intermediate_Seconary_backup,'-mat');
+                        dat = load(Intermediate_Secondary_file);
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;    
 
@@ -669,125 +650,169 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                         current_iterations = length(intermediate_data);
                         max_iter = Model.Max_Local_Iterations - current_iterations;
-                        
                     catch
-                        disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                        if isfile(Intermediate_Seconary_backup)
-                            delete(Intermediate_Seconary_backup);
+                        disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                        if isfile(Intermediate_Secondary_file)
+                            delete(Intermediate_Secondary_file);
                         end
-                        x0 = results.XAtMinObjective{:,:};
-                        init_meshsize = 0.1;
-                        max_iter = Model.Max_Local_Iterations;
+                        try
+                            dat = load(Intermediate_Seconary_backup,'-mat');
+                            intermediate_data = dat.intermediate_data;
+                            x0 = intermediate_data(end).x;    
+
+                            % Establish initial mesh size
+                            if isfield(intermediate_data(end).optimValues,'meshsize')
+                                init_meshsize = intermediate_data(end).optimValues.meshsize;
+                            else
+                                init_meshsize = 0.1;
+                            end
+
+                            current_iterations = length(intermediate_data);
+                            max_iter = Model.Max_Local_Iterations - current_iterations;
+
+                        catch
+                            disp('Unable to load backup secondary optimization checkpoint file, starting new.')
+                            if isfile(Intermediate_Seconary_backup)
+                                delete(Intermediate_Seconary_backup);
+                            end
+                            x0 = results.XAtMinObjective{:,:};
+                            init_meshsize = 0.1;
+                            max_iter = Model.Max_Local_Iterations;
+                        end
                     end
+                else
+                    x0 = results.XAtMinObjective{:,:};
+                    init_meshsize = 0.1;
+                    max_iter = Model.Max_Local_Iterations;
                 end
-            else
-                x0 = results.XAtMinObjective{:,:};
-                init_meshsize = 0.1;
-                max_iter = Model.Max_Local_Iterations;
-            end
 
-    %         optionsNM = optimset('Display','iter','MaxIter',50,'MaxFunEvals',Model.MaxFunEvals,...
-    %             'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence);
+        %         optionsNM = optimset('Display','iter','MaxIter',50,'MaxFunEvals',Model.MaxFunEvals,...
+        %             'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence);
 
-            if max_iter <= 0
-                max_iter = 1;
-            end
-            
-            if Model.ShowPlots
-                plotopt = 'psplotbestf';
-            else
-                plotopt = [];
-            end
+                if max_iter <= 0
+                    max_iter = 1;
+                end
 
-            options = optimoptions(@patternsearch,'Display','iter','MaxIterations',max_iter,...
-                'UseParallel',Model.Parallel_Bayesopt,'UseVectorized',false,'PlotFcn',plotopt,...
-                'InitialMeshSize',init_meshsize,'StepTolerance',Model.Param_Convergence,'FunctionTolerance',Model.Loss_Convergence,...
-                'PollOrderAlgorithm','Success','Cache','On','UseCompletePoll',true,...
-                'PollMethod','GPSPositiveBasis2N','MaxMeshSize',Inf,'MeshTolerance',1e-8,...
-                'OutputFcn',@outputFcn_patternsearch_opt);%,'MaxFunctionEvaluations',Model.MaxFunEvals);
-    %             'SearchFcn',{@searchneldermead,1,optionsNM});
+                if Model.ShowPlots
+                    plotopt = 'psplotbestf';
+                else
+                    plotopt = [];
+                end
 
-            [full_opt_point,~,~,full_opt_results] = patternsearch(fun,x0,[],[],[],[],lb,ub,[],options);
+                options = optimoptions(@patternsearch,'Display','iter','MaxIterations',max_iter,...
+                    'UseParallel',Model.Parallel_Bayesopt,'UseVectorized',false,'PlotFcn',plotopt,...
+                    'InitialMeshSize',init_meshsize,'StepTolerance',Model.Param_Convergence,'FunctionTolerance',Model.Loss_Convergence,...
+                    'PollOrderAlgorithm','Success','Cache','On','UseCompletePoll',true,...
+                    'PollMethod','GPSPositiveBasis2N','MaxMeshSize',Inf,'MeshTolerance',1e-8,...
+                    'OutputFcn',@outputFcn_patternsearch_opt);%,'MaxFunctionEvaluations',Model.MaxFunEvals);
+        %             'SearchFcn',{@searchneldermead,1,optionsNM});
 
-            % Check to see if the max local iterations is exceeded
-    %         if exitflag == 0  && max_iter > 1 && Model.switch_final_opt % calculation exceeded number of allowed iterations
-    %             disp('Swicthing local optimization to fminsearchbnd')
-    %             Model.final_opt_type = 'fminsearchbnd';
-    %             
-    %             % Overwrite the input file if it exists
-    %             if batch_subm
-    %                 save(Input_Model,'Model','-mat')
-    %             end
-    %             
-    %             Bayesian_Optimize_LiX_Parameters(Model)
-    %             return
-    %         end
-        case 'fmincon' % fmincon uses gradients!
-            
-            % Constraints
-            Ranges = [params.Range];
-            lb = Ranges(1:2:end);
-            ub = Ranges(2:2:end);
+                [full_opt_point,~,~,full_opt_results] = patternsearch(fun,x0,[],[],[],[],lb,ub,[],options);
 
-            % Load previous data
-            if continue_fullopt
-                try
-                    dat = load(Intermediate_Secondary_file);
-                    intermediate_data = dat.intermediate_data;
-                    x0 = intermediate_data(end).x;    
-                    
-                    current_iterations = length(intermediate_data);
-                    max_iter = Model.Max_Local_Iterations - current_iterations;
-                catch
-                    disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                    if isfile(Intermediate_Secondary_file)
-                        delete(Intermediate_Secondary_file);
-                    end
+                % Check to see if the max local iterations is exceeded
+        %         if exitflag == 0  && max_iter > 1 && Model.switch_final_opt % calculation exceeded number of allowed iterations
+        %             disp('Swicthing local optimization to fminsearchbnd')
+        %             Model.final_opt_type = 'fminsearchbnd';
+        %             
+        %             % Overwrite the input file if it exists
+        %             if batch_subm
+        %                 save(Input_Model,'Model','-mat')
+        %             end
+        %             
+        %             Bayesian_Optimize_LiX_Parameters(Model)
+        %             return
+        %         end
+            case 'fmincon' % fmincon uses gradients!
+
+                % Constraints
+                Ranges = [params.Range];
+                lb = Ranges(1:2:end);
+                ub = Ranges(2:2:end);
+
+                % Load previous data
+                if continue_fullopt
                     try
-                        dat = load(Intermediate_Seconary_backup,'-mat');
+                        dat = load(Intermediate_Secondary_file);
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;    
 
                         current_iterations = length(intermediate_data);
                         max_iter = Model.Max_Local_Iterations - current_iterations;
                     catch
-                        disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                        if isfile(Intermediate_Seconary_backup)
-                            delete(Intermediate_Seconary_backup);
+                        disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                        if isfile(Intermediate_Secondary_file)
+                            delete(Intermediate_Secondary_file);
                         end
-                        x0 = results.XAtMinObjective{:,:};
-                        max_iter = Model.Max_Local_Iterations;
-                    end
-                end
-            else
-                x0 = results.XAtMinObjective{:,:};
-                max_iter = Model.Max_Local_Iterations;
-            end
-            
-            if max_iter <= 0
-                max_iter = 1;
-            end
-            
-            % For unconstrained problem with fmincon, OptimalityTolerance is the max of the gradient
-            options = optimoptions(@fmincon,'Display','iter','Algorithm','active-set',...
-                'DiffMaxChange',1e-1,'OptimalityTolerance',1e-1,'UseParallel',Model.Parallel_Bayesopt,...
-                'MaxIterations',max_iter,'FiniteDifferenceStepSize',sqrt(eps),...
-                'StepTolerance',Model.Param_Convergence,'FunctionTolerance',Model.Loss_Convergence,...
-                'FiniteDifferenceType','forward','MaxFunctionEvaluations',Inf,...
-                'OutputFcn',@outputFcn_secondary_opt);
+                        try
+                            dat = load(Intermediate_Seconary_backup,'-mat');
+                            intermediate_data = dat.intermediate_data;
+                            x0 = intermediate_data(end).x;    
 
-            [full_opt_point,~,~,full_opt_results,~,~,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
-            
-        case 'none' % if no final optimization is selected, I still want to output the best bayesian optimization result
-            full_opt_results = struct;
-            full_opt_results.iterations = 0;
-            full_opt_results.funccount = 0;
-            full_opt_results.algorithm = 'none';
-            full_opt_results.message = 'Local optimization skipped. Results are for best global optimization point.';
-            full_opt_point = results.XAtMinObjective{:,:};
-            
-        otherwise
-            error('Unknown final optimization scheme. Choose one of "fminsearch", "patternsearch", "fminsearchbnd", or "none"')
+                            current_iterations = length(intermediate_data);
+                            max_iter = Model.Max_Local_Iterations - current_iterations;
+                        catch
+                            disp('Unable to load backup secondary optimization checkpoint file, starting new.')
+                            if isfile(Intermediate_Seconary_backup)
+                                delete(Intermediate_Seconary_backup);
+                            end
+                            x0 = results.XAtMinObjective{:,:};
+                            max_iter = Model.Max_Local_Iterations;
+                        end
+                    end
+                else
+                    x0 = results.XAtMinObjective{:,:};
+                    max_iter = Model.Max_Local_Iterations;
+                end
+
+                if max_iter <= 0
+                    max_iter = 1;
+                end
+
+                % For unconstrained problem with fmincon, OptimalityTolerance is the max of the gradient
+                options = optimoptions(@fmincon,'Display','iter','Algorithm','active-set',...
+                    'DiffMaxChange',1e-1,'OptimalityTolerance',1e-1,'UseParallel',Model.Parallel_Bayesopt,...
+                    'MaxIterations',max_iter,'FiniteDifferenceStepSize',sqrt(eps),...
+                    'StepTolerance',Model.Param_Convergence,'FunctionTolerance',Model.Loss_Convergence,...
+                    'FiniteDifferenceType','forward','MaxFunctionEvaluations',Inf,...
+                    'OutputFcn',@outputFcn_secondary_opt);
+
+                [full_opt_point,~,~,full_opt_results,~,~,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
+
+            case 'none' % if no final optimization is selected, I still want to output the best bayesian optimization result
+                full_opt_results = struct;
+                full_opt_results.iterations = 0;
+                full_opt_results.funccount = 0;
+                full_opt_results.algorithm = 'none';
+                full_opt_results.message = 'Local optimization skipped. Results are for best global optimization point.';
+                full_opt_point = results.XAtMinObjective{:,:};
+            otherwise
+                error('Unknown final optimization scheme. Choose one of "fminsearch", "patternsearch", "fminsearchbnd", or "none"')
+        end
+        
+        % Save a structure containing some calculation properties
+        Calculation_properties.Salt = Model.Salt;
+        Calculation_properties.Theory = Model.Theory;
+        Calculation_properties.Fix_Charge = Model.Fix_Charge;
+        Calculation_properties.Additivity = Model.Additivity;
+        Calculation_properties.Additional_MM_Disp = Model.Additional_MM_Disp;
+        Calculation_properties.Additional_GAdjust = Model.Additional_GAdjust;
+        Calculation_properties.SigmaEpsilon = Model.SigmaEpsilon;
+        save(Final_point_filename,'full_opt_results','full_opt_point',...
+            'Calculation_properties');
+    else
+        try
+            dat = load(Final_point_filename);
+        catch
+            disp('Unable to load final point data file, continuing final optimization.')
+            if isfile(Final_point_filename)
+                delete(Final_point_filename)
+            end
+            Bayesian_Optimize_LiX_Parameters(Input_Model)
+            return
+        end
+        Calculation_properties = dat.Calculation_properties;
+        full_opt_results = dat.Calculation_properties;
+        full_opt_point = dat.Calculation_properties;
     end
     
     %% Final test of parameters on all structures for output
@@ -1229,15 +1254,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         disp(['Parameters (Dispersion/Repulsion Scale): ' num2str(Pars,'\t%.15f')])
     end
     disp(['Energies (kJ/mol): ' num2str(En,'\t%.15f')])
-    
-    % Save a structure containing some calculation properties
-    Calculation_properties.Salt = Model.Salt;
-    Calculation_properties.Theory = Model.Theory;
-    Calculation_properties.Fix_Charge = Model.Fix_Charge;
-    Calculation_properties.Additivity = Model.Additivity;
-    Calculation_properties.Additional_MM_Disp = Model.Additional_MM_Disp;
-    Calculation_properties.Additional_GAdjust = Model.Additional_GAdjust;
-    Calculation_properties.SigmaEpsilon = Model.SigmaEpsilon;    
     
     % Save final results
     Minimization_Data = UserData.Minimization_Data;
