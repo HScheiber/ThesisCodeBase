@@ -190,7 +190,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JA' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
                     
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
