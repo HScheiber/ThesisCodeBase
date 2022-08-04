@@ -163,7 +163,9 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
-        Shared_Settings.final_opt_type = 'none'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
+        Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
+        Shared_Settings.switch_final_opt = false;
+        Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -189,7 +191,7 @@ switch lower(computer)
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JA' Rep];
                     Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
+                    
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -215,8 +217,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JB' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -244,8 +244,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JC' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -269,7 +267,6 @@ switch lower(computer)
                 end
             end
         end
-
         %% JC Models JA, JB, JC
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
@@ -278,7 +275,9 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
-        Shared_Settings.final_opt_type = 'none'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
+        Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
+        Shared_Settings.switch_final_opt = false;
+        Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'JC'};
         Replicates = 1:5;
@@ -303,8 +302,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JA' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -330,8 +327,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JB' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -359,8 +354,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JC' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -384,7 +377,6 @@ switch lower(computer)
                 end
             end
         end
-
     case 'narval'
         %% BH Models IA, IB, IC, ID
         Shared_Settings.Parallel_Bayesopt = true;
@@ -394,6 +386,8 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+        Shared_Settings.switch_final_opt = true;
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -419,8 +413,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IA' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -445,8 +437,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IB' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -472,8 +462,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IC' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -499,8 +487,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['ID' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -523,7 +509,6 @@ switch lower(computer)
                 end
             end
         end
-
         %% BH Models IE, IF, IG, IH, II
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
@@ -532,6 +517,8 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+        Shared_Settings.switch_final_opt = true;
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -556,8 +543,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IE' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -584,8 +569,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IF' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -613,8 +596,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IG' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -646,8 +627,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IH' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -679,8 +658,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['II' Rep];
-                    Models(idx).final_opt_type = 'patternsearch';
-                    Models(idx).switch_final_opt = false;
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
@@ -708,7 +685,6 @@ switch lower(computer)
                 end
             end
         end
-
     otherwise % Place jobs here for later assignment
         %% JC Models EV EW, EX
         Shared_Settings.Parallel_Bayesopt = true;

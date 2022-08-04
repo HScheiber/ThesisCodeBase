@@ -538,7 +538,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 end
 
                 [full_opt_point,~,~,full_opt_results] = fminsearch(fun,x0,optionsNM);
-
             case 'fminsearchbnd'
 
                 % Constraints
@@ -626,7 +625,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                     Bayesian_Optimize_LiX_Parameters(Model)
                     return
                 end
-
             case 'patternsearch'
 
                 %% Options for Patternsearch
@@ -779,7 +777,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                     'OutputFcn',@outputFcn_secondary_opt);
 
                 [full_opt_point,~,~,full_opt_results,~,~,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
-
             case 'none' % if no final optimization is selected, I still want to output the best bayesian optimization result
                 full_opt_results = struct;
                 full_opt_results.iterations = 0;
