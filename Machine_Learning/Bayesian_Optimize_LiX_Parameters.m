@@ -1230,33 +1230,38 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         Pars(L_pars+1:L_pars+Ex_fun) = full_opt_point(end+1-Ex_fun:end);
     end
     
+    Minimization_Data = UserData.Minimization_Data;
+    Finite_T_Data = UserData.Finite_T_Data;
     format long g
     En = zeros(size(Model.Structures));
     for idx = 1:length(Model.Structures)
-        En(idx) = UserData.Minimization_Data{idx}.E;
+        En(idx) = Minimization_Data{idx}.E;
         switch Model.Structures{idx}
             case {'Rocksalt' 'Sphalerite'}
-                En(end+1) = UserData.Minimization_Data{idx}.a;
+                En(end+1) = Minimization_Data{idx}.a; %#ok<AGROW>
             case {'Wurtzite' 'NiAs' 'FiveFive'}
-                En(end+1) = UserData.Minimization_Data{idx}.a;
-                En(end+1) = UserData.Minimization_Data{idx}.c;
+                En(end+1) = Minimization_Data{idx}.a; %#ok<AGROW>
+                En(end+1) = Minimization_Data{idx}.c; %#ok<AGROW>
         end
         disp(Model.Structures{idx})
-        disp(UserData.Minimization_Data{idx})
-        UserData.Minimization_Data{idx}.Structure = Model.Structures{idx};
+        disp(Minimization_Data{idx})
+        Minimization_Data{idx}.Structure = Model.Structures{idx};
     end
-
-    disp(['Final Optimized Loss: ' num2str(loss,'%.10f')])
+    disp(repmat('*',1,120))
+    disp('Finite Temperature Data (Enthalpy in kJ/mol, Entropy in J/(mol K), Volume in A^3/Forumla Unit, Temperature in K)')
+    disp(repmat('*',1,120))
+    disp(Finite_T_Data)
+    disp(repmat('*',1,120))
+    
+    disp(['Final Optimized Loss: ' num2str(loss,'%.10e')])
     if Model.SigmaEpsilon && strcmp(Model.Theory,'JC')
-        disp(['Parameters (Sigma/Epsilon): ' num2str(Pars,'\t%.15f')])
+        disp(['Parameters (Sigma/Epsilon): ' num2str(Pars,'\t%.15e')])
     else
-        disp(['Parameters (Dispersion/Repulsion Scale): ' num2str(Pars,'\t%.15f')])
+        disp(['Parameters (Dispersion/Repulsion Scale): ' num2str(Pars,'\t%.15e')])
     end
-    disp(['Energies (kJ/mol): ' num2str(En,'\t%.15f')])
+    disp(['0 K Lattice Energies (kJ/mol): ' num2str(En,'\t%.15e')])
     
     % Save final results
-    Minimization_Data = UserData.Minimization_Data;
-    Finite_T_Data = UserData.Finite_T_Data;
     save(Full_opt_filename,'full_opt_results','loss','full_opt_point',...
         'Minimization_Data','Finite_T_Data','Pars','Calculation_properties');
     

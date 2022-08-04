@@ -5,6 +5,9 @@ if ~isfield(Settings,'Q_value')
     Settings.Q_value = 1;
 end
 Settings.S = Init_Scaling_Object;
+if isfield(Settings,'Salt')
+    [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
+end
 
 % Potential Scaling
 if istable(Param) || isstruct(Param)

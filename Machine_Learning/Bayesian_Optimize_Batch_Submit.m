@@ -190,7 +190,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JA' Rep];
-                    
                     if Replicates(ridx) > 5
                         Models(idx).Loss_Convergence = 1e-8;
                         Models(idx).Param_Convergence = 1e-5;
