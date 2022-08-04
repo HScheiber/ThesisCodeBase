@@ -402,12 +402,12 @@ elseif contains(Settings.Theory,'BH')
     % For BH potentials, parameter are B*exp(-alpha*r) + C/r^6
     % Parameter order is B alpha C
     Settings.Topology_Template = strrep(Settings.Topology_Template,'ptype  C          A','ptype   a              b           c6');
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',[num2str(BH_MM.B,'%10.8f') ' ' num2str(BH_MM.alpha,'%10.8f')]);
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##',pad(num2str(BH_MM.C,'%10.8f'),10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',[num2str(BH_XX.B,'%10.8f') ' ' num2str(BH_XX.alpha,'%10.8f')]);
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##',pad(num2str(BH_XX.C,'%10.8f'),10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',[num2str(BH_MX.B,'%10.8f') ' ' num2str(BH_MX.alpha,'%10.8f')]);
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##',pad(num2str(BH_MX.C,'%10.8f'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',[num2str(BH_MM.B,'%10.8e') ' ' num2str(BH_MM.alpha,'%10.8e')]);
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##',pad(num2str(BH_MM.C,'%10.8e'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',[num2str(BH_XX.B,'%10.8e') ' ' num2str(BH_XX.alpha,'%10.8e')]);
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##',pad(num2str(BH_XX.C,'%10.8e'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',[num2str(BH_MX.B,'%10.8e') ' ' num2str(BH_MX.alpha,'%10.8e')]);
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##',pad(num2str(BH_MX.C,'%10.8e'),10));
     
     % Modify the MDP file (Buckingham potential requires group cutoff)
     Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWTYPE##',pad(Settings.MinMDP.VDWType,18));
@@ -442,12 +442,12 @@ elseif contains(Settings.Theory,'JC')
     [MX_JC_Param,MM_JC_Param,XX_JC_Param] = JC_Potential_Parameters(Settings);
     
     % Add parameters to topology text
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',pad(num2str(MM_JC_Param.sigma,'%10.8f'),10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',pad(num2str(XX_JC_Param.sigma,'%10.8f'),10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',pad(num2str(MX_JC_Param.sigma,'%10.8f'),10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##',num2str(MM_JC_Param.epsilon,'%10.8f'));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##',num2str(XX_JC_Param.epsilon,'%10.8f'));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##',num2str(MX_JC_Param.epsilon,'%10.8f'));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',pad(num2str(MM_JC_Param.sigma,'%10.8e'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',pad(num2str(XX_JC_Param.sigma,'%10.8e'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',pad(num2str(MX_JC_Param.sigma,'%10.8e'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##',num2str(MM_JC_Param.epsilon,'%10.8e'));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##',num2str(XX_JC_Param.epsilon,'%10.8e'));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##',num2str(MX_JC_Param.epsilon,'%10.8e'));
 
     % Modify the MDP file
     Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWTYPE##',pad(Settings.MinMDP.VDWType,18));

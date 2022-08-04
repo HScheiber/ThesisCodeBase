@@ -2106,3 +2106,118 @@ Breakpoint for MultiGP>MultiGP.iFitRobust is on line <a href="matlab: opentoline
 
 Breakpoint for MultiGPStrategy>MultiGPStrategy.iFitRobust is on line <a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\MultiGPStrategy.m',18,1)">18</a>.
 
+dbclear all
+dbstatus
+open Melting_Point_Batch_Submit_Cedar.m
+clear
+clc
+open Examine_Energies.m
+windows2unix('C:\Users\Hayden\Documents\Patey_Lab\Testing\Equil_Sol')
+
+ans =
+
+    '/mnt/c/Users/Hayden/Documents/Patey_Lab/Testing/Equil_Sol'
+
+clear
+clc
+load('Calc_Settings.mat')
+Settings.S.D
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    All: 1
+     MM: 2.2915e-05
+     XX: 9.2340e-04
+     MX: 6.6118e-05
+     AB: 1
+
+        JC_Potential_Parameters(Settings,'PlotType','full','Plotswitch',true,...
+            'Startpoint',0)
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+      sigma: 1.2070
+    epsilon: 1.7907e-09
+
+open JC_Potential_Parameters
+[OutputMX,OutputMM,OutputXX] = JC_Potential_Parameters(Settings)
+
+OutputMX = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+      sigma: 1.2070
+    epsilon: 1.7907e-09
+
+
+OutputMM = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+      sigma: 1.2266
+    epsilon: 7.4303e-11
+
+
+OutputXX = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+      sigma: 1.1874
+    epsilon: 4.3154e-08
+
+format long g
+OutputMM
+
+OutputMM = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+      sigma: 1.22659668571217
+    epsilon: 7.43030118887298e-11
+
+OutputXX
+
+OutputXX = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+      sigma: 1.18738723706466
+    epsilon: 4.31544601732744e-08
+
+OutputMX
+
+OutputMX = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+      sigma: 1.20699196138841
+    epsilon: 1.79067204348159e-09
+
+open Setup_LiX_Simulation.m
+pad(num2str(1.0,'%10.8f')
+ pad(num2str(1.0,'%10.8f')
+                          ↑
+{Invalid expression. When calling a function or indexing a variable, use parentheses. Otherwise, check for mismatched delimiters.
+} 
+pad(num2str(1.0,'%10.8f'))
+
+ans =
+
+    '1.00000000'
+
+pad(num2str(1.0,'%10.8e'))
+
+ans =
+
+    '1.00000000e+00'
+
+pad(num2str(1.2e-8,'%10.8e'))
+
+ans =
+
+    '1.20000000e-08'
+

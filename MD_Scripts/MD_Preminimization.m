@@ -225,14 +225,14 @@ if Run_Min
     
     if Settings.Expand_a_SC ~= 1 || Settings.Expand_b_SC ~= 1 || Settings.Expand_c_SC ~= 1
         % Geometry Editing: expand supercell by requested amount
-        a_sc = num2str(Settings.Expand_a_SC*Settings.Geometry.a*N_Supercell_a/10,'%10.8f'); % supercell a length in nm
-        b_sc = num2str(Settings.Expand_b_SC*Settings.Geometry.b*N_Supercell_b/10,'%10.8f'); % supercell b length in nm
-        c_sc = num2str(Settings.Expand_c_SC*Settings.Geometry.c*N_Supercell_c/10,'%10.8f'); % supercell c length in nm
+        a_sc = num2str(Settings.Expand_a_SC*Settings.Geometry.a*N_Supercell_a/10,'%10.8e'); % supercell a length in nm
+        b_sc = num2str(Settings.Expand_b_SC*Settings.Geometry.b*N_Supercell_b/10,'%10.8e'); % supercell b length in nm
+        c_sc = num2str(Settings.Expand_c_SC*Settings.Geometry.c*N_Supercell_c/10,'%10.8e'); % supercell c length in nm
 
         % Cell angles
-        bc = num2str(Settings.Geometry.alpha,'%10.4f');
-        ac = num2str(Settings.Geometry.beta,'%10.4f');
-        ab = num2str(Settings.Geometry.gamma,'%10.4f');
+        bc = num2str(Settings.Geometry.alpha,'%10.4e');
+        ac = num2str(Settings.Geometry.beta,'%10.4e');
+        ab = num2str(Settings.Geometry.gamma,'%10.4e');
 
         Expand_command = [Settings.gmx_loc ' editconf -f ' windows2unix(temp_SuperCellFile) ...
              ' -o ' windows2unix(temp_SuperCellFile) ' -box ' a_sc ' ' b_sc ' ' c_sc ' ' ...

@@ -1,4 +1,4 @@
-Energy_file = 'Equil_Liq.edr';
+Energy_file = 'Equil_Sol.edr';
 system(['wsl source ~/.bashrc; echo "5 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
 %     Data = import_xvg(En_xvg_file);

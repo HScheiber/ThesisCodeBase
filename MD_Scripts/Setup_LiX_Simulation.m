@@ -202,12 +202,12 @@ elseif contains(Settings.Theory,'JC')
     [MX_JC_Param,MM_JC_Param,XX_JC_Param] = JC_Potential_Parameters(Settings);
     
     % Add parameters to topology text
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad(num2str(MM_JC_Param.sigma,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad(num2str(XX_JC_Param.sigma,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad(num2str(MX_JC_Param.sigma,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',num2str(MM_JC_Param.epsilon,'%10.8f'));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(XX_JC_Param.epsilon,'%10.8f'));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(MX_JC_Param.epsilon,'%10.8f'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad(num2str(MM_JC_Param.sigma,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad(num2str(XX_JC_Param.sigma,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad(num2str(MX_JC_Param.sigma,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',num2str(MM_JC_Param.epsilon,'%10.8e'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(XX_JC_Param.epsilon,'%10.8e'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(MX_JC_Param.epsilon,'%10.8e'));
 
     % Modify the MDP file
     MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
@@ -243,12 +243,12 @@ elseif contains(Settings.Theory,'BH')
     % For BH potentials, parameter are B*exp(-alpha*r) + C/r^6
     % Parameter order is B alpha C
     Settings.Topology_Text = strrep(Settings.Topology_Text,'ptype  C          A','ptype   a              b           c6');
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',[num2str(U_MM.B,'%10.8f') ' ' num2str(U_MM.alpha,'%10.8f')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',pad(num2str(U_MM.C,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',[num2str(U_XX.B,'%10.8f') ' ' num2str(U_XX.alpha,'%10.8f')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',pad(num2str(U_XX.C,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',[num2str(U_MX.B,'%10.8f') ' ' num2str(U_MX.alpha,'%10.8f')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',pad(num2str(U_MX.C,'%10.8f'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',[num2str(U_MM.B,'%10.8e') ' ' num2str(U_MM.alpha,'%10.8e')]);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',pad(num2str(U_MM.C,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',[num2str(U_XX.B,'%10.8e') ' ' num2str(U_XX.alpha,'%10.8e')]);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',pad(num2str(U_XX.C,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',[num2str(U_MX.B,'%10.8e') ' ' num2str(U_MX.alpha,'%10.8e')]);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',pad(num2str(U_MX.C,'%10.8e'),10));
 
     % Modify the MDP file
     MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
@@ -738,13 +738,13 @@ if DoGeomEdit
 
         % Expand supercell by requested amount
         if Settings.Expand_a_SC ~= 1 || Settings.Expand_b_SC ~= 1 || Settings.Expand_c_SC ~= 1
-            a_sc = num2str(Settings.Expand_a_SC*Settings.Geometry.a*N_Supercell_a/10,'%10.8f'); % supercell a length in nm
-            b_sc = num2str(Settings.Expand_b_SC*Settings.Geometry.b*N_Supercell_b/10,'%10.8f'); % supercell b length in nm
-            c_sc = num2str(Settings.Expand_c_SC*Settings.Geometry.c*N_Supercell_c/10,'%10.8f'); % supercell c length in nm
+            a_sc = num2str(Settings.Expand_a_SC*Settings.Geometry.a*N_Supercell_a/10,'%10.8e'); % supercell a length in nm
+            b_sc = num2str(Settings.Expand_b_SC*Settings.Geometry.b*N_Supercell_b/10,'%10.8e'); % supercell b length in nm
+            c_sc = num2str(Settings.Expand_c_SC*Settings.Geometry.c*N_Supercell_c/10,'%10.8e'); % supercell c length in nm
 
-            bc = num2str(Settings.Geometry.alpha,'%10.4f');
-            ac = num2str(Settings.Geometry.beta,'%10.4f');
-            ab = num2str(Settings.Geometry.gamma,'%10.4f');
+            bc = num2str(Settings.Geometry.alpha,'%10.4e');
+            ac = num2str(Settings.Geometry.beta,'%10.4e');
+            ab = num2str(Settings.Geometry.gamma,'%10.4e');
             
             if isfile(Settings.SuperCellFile)
                 delete(Settings.SuperCellFile)
@@ -1050,5 +1050,3 @@ elseif Settings.BatchMode && ~isempty(Settings.qsub) % Running job in batch mode
 else
     disp('Unable to run job in batch mode: no batch program available')
 end
-
-    

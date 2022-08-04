@@ -74,12 +74,12 @@ elseif contains(Settings.Theory,'JC')
     [U_MX,U_MM,U_XX] = JC_Potential_Parameters(Settings);
     
     % Add parameters to topology text
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad(num2str(U_MM.sigma,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad(num2str(U_XX.sigma,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad(num2str(U_MX.sigma,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',num2str(U_MM.epsilon,'%10.8f'));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(U_XX.epsilon,'%10.8f'));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(U_MX.epsilon,'%10.8f'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad(num2str(U_MM.sigma,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad(num2str(U_XX.sigma,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad(num2str(U_MX.sigma,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',num2str(U_MM.epsilon,'%10.8e'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(U_XX.epsilon,'%10.8e'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(U_MX.epsilon,'%10.8e'));
 
 elseif contains(Settings.Theory,'BH')
     
@@ -96,12 +96,12 @@ elseif contains(Settings.Theory,'BH')
     % For BH potentials, parameter are B*exp(-alpha*r) + C/r^6
     % Parameter order is B alpha C
     Settings.Topology_Text = strrep(Settings.Topology_Text,'ptype  C          A','ptype   a              b           c6');
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',[num2str(U_MM.B,'%10.8f') ' ' num2str(U_MM.alpha,'%10.8f')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',pad(num2str(U_MM.C,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',[num2str(U_XX.B,'%10.8f') ' ' num2str(U_XX.alpha,'%10.8f')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',pad(num2str(U_XX.C,'%10.8f'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',[num2str(U_MX.B,'%10.8f') ' ' num2str(U_MX.alpha,'%10.8f')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',pad(num2str(U_MX.C,'%10.8f'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',[num2str(U_MM.B,'%10.8e') ' ' num2str(U_MM.alpha,'%10.8e')]);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',pad(num2str(U_MM.C,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',[num2str(U_XX.B,'%10.8e') ' ' num2str(U_XX.alpha,'%10.8e')]);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',pad(num2str(U_XX.C,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',[num2str(U_MX.B,'%10.8e') ' ' num2str(U_MX.alpha,'%10.8e')]);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',pad(num2str(U_MX.C,'%10.8e'),10));
     
 else
     rmdir(Settings.WorkDir)
