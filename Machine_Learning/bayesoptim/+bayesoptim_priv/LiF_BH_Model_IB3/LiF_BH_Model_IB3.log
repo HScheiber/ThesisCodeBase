@@ -2221,3 +2221,32 @@ ans =
 
     '1.20000000e-08'
 
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\MD_Scripts\MD_Preminimization.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Structure_Minimization.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Calc_Liquid_Properties_at_MP.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Calc_Solid_Properties_at_MP.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\MD_Scripts\MD_Preminimization.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Run_D4_Minimization.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Sample_Model_energy.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\MP_Analysis\UpdateTopology.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\energy_compare_app\Vibrational_Analysis.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\energy_compare_app\Vibrational_Analysis.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\energy_compare_app\myCellSelectionCB_Old.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\energy_compare_app\myCellSelectionCB.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\energy_compare_app\myCellSelectionCB.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\MP_Analysis\Equilibrate_Solid.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\MP_Analysis\Equilibrate_Liquid.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\MD_Scripts\Create_Liquid_Box.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\MP_Analysis\Minimize_Liquid_Interface.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\MP_Analysis\Minimize_Liquid_Cluster.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Sample_Model_energy.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Calc_Solid_Properties_at_MP.m',1)
+run('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Sample_Model_energy.m')
+{Not enough input arguments.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('Sample_Model_energy', 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Sample_Model_energy.m', 26)" style="font-weight:bold">Sample_Model_energy</a> (<a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiX_Minimization_scripts\job_submission\Sample_Model_energy.m',26,0)">line 26</a>)
+Settings.Longest_Cutoff = max([Settings.MinMDP.RList_Cutoff Settings.MinMDP.RCoulomb_Cutoff Settings.MinMDP.RVDW_Cutoff]);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('run', 'C:\Program Files\MATLAB\R2021a\toolbox\matlab\lang\run.m', 91)" style="font-weight:bold">run</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\matlab\lang\run.m',91,0)">line 91</a>)
+evalin('caller', strcat(script, ';'));
+} 
