@@ -2080,3 +2080,29 @@ gamma0 =
 
     0.2094
 
+if system_dependent('IsDebugMode')==1, dbquit; end
+warning('off','stats:classreg:learning:impl:GPImpl:GPImpl:SigmaMustBeGreaterThanSigmaLowerBound')
+open MD_Batch_Template
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_Batch_Submit_Cedar.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',1)
+open find_home
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\LiX_Minimizer.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\MultiSubmitBayesOpt.m',1)
+uiopen('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\Bayesian_Optimize_LiX_Parameters.m',1)
+open MD_Batch_Template
+open find_home
+open find_home
+open MultiSubmitBayesOpt
+open find_home
+dbstatus
+Breakpoint for BayesianOptimization_priv>BayesianOptimization_priv.runSerial is on line <a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\BayesianOptimization_priv.m',2042,1)">2042</a>.
+
+Breakpoints for GPImpl>GPImpl.doFit are on lines  <a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\+impl\GPImpl.m',359,1)">359</a>, <a href="matlab: opentoline('C:\Program Files\MATLAB\R2021a\toolbox\stats\classreg\+classreg\+learning\+impl\GPImpl.m',367,1)">367</a>.
+Breakpoint for GPStrategy>GPStrategy.fitConstraintModel is on line <a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\GPStrategy.m',45,1)">45</a>.
+
+Breakpoint for GPStrategy>GPStrategy.iFitRobust is on line <a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\GPStrategy.m',246,1)">246</a>.
+
+Breakpoint for MultiGP>MultiGP.iFitRobust is on line <a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\MultiGP.m',131,1)">131</a>.
+
+Breakpoint for MultiGPStrategy>MultiGPStrategy.iFitRobust is on line <a href="matlab: opentoline('C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\Machine_Learning\bayesoptim\+bayesoptim_priv\MultiGPStrategy.m',18,1)">18</a>.
+
