@@ -66,50 +66,13 @@ end
 
 
 % Determine scheduler type
-svr = strtrim(getenv('HOSTNAME'));
-if isempty(svr)
-    svr = 'HOSTNAME NOT FOUND';
-    Server = 'HOSTNAME NOT FOUND';
-else
-    Server = svr(1:3);
-end
-
-% SLURM Scheduler
-if strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') ...
-        || strcmpi(Server,'bel') || strcmpi(Server,'nar') || ~isempty(regexp(Server,'nc[0-9]','ONCE'))
-    Slurm = true;
-    disp('SLURM scheduler detected.')
-% PBS Scheduler
-elseif ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') ...
-        || strcmpi(Server,'sea') || strcmpi(Server,'pod')
-    Slurm = false;
-    disp('PBS scheduler detected.')
-else
-    disp(['This script does not know the scheduler type of the current host: ' svr])
-    disp('Please choose from the following options:')
-    prompt = ['Input 0 for PBS scheduler, or 1 for SLURM scheduler. [0]:' newline];
-    str = '';
-    while ~strcmpi(str,'0') && ~strcmpi(str,'1')
-        str = input(prompt,'s');
-        if isempty(str)
-            str = 0;
-            break
-        elseif ~strcmpi(str,'0') && ~strcmpi(str,'1')
-            disp('Invalid answer.')
-        end
-    end
-    Slurm = strcmpi(str,'1');
-    if Slurm
-        disp('SLURM scheduler selected.')
-    else
-        disp('PBS scheduler selected.')
-    end
-end
+[~,~,~,Slurm] = find_home;
 
 % Read submission script
 FileData = fileread(SubmFilename);
 
 if Slurm
+    disp('SLURM scheduler detected.')
     % Grab Job Name and put placeholder for job name
     JobMainName = regexp(FileData,'#SBATCH --job-name=(.+?)\n','tokens','ONCE');
     if isempty(JobMainName)
@@ -141,6 +104,7 @@ if Slurm
         [Stde_Dir,Stde_Name,Stde_Ext] = fileparts(Stde);
     end
 else
+    disp('PBS scheduler detected.')
     % Grab Job Name and put placeholder for job name
     JobMainName = regexp(FileData,'#PBS -N (.+?)\n','tokens','ONCE');
     if isempty(JobMainName)
