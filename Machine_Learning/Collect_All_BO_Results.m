@@ -1,6 +1,7 @@
 % Collect_All_BO_Results
 proj_dir = '/home/scheiber/project/Model_Building';
 destination_folder = '/home/scheiber/project/Model_Building/Completed';
+warning('off','MATLAB:class:InvalidSuperClass')
 
 if ~isfolder(destination_folder)
     mkdir(destination_folder);
@@ -23,7 +24,9 @@ for idx = 1:length(Salts)
         fullopt = dir([Current_Model_dir filesep Salt '_' Model_Name '_fullopt.mat']);
         fullopt_history = dir([Current_Model_dir filesep 'intermediate_secondary_opt.mat']);
         bayesopt = dir([Current_Model_dir filesep Salt '_' Model_Name '_bayesopt.mat']);
-        if ~isempty(fullopt)
+        destfile = fullfile(destination_folder,Salt,strrep(fullopt.name,'fullopt','data'));
+        
+        if ~isempty(fullopt) && ~isfile(destfile)
             try
                 fullopt_dat = load(fullfile(Current_Model_dir,fullopt.name));
                 fullopt_hist_dat = load(fullfile(Current_Model_dir,fullopt_history.name));
@@ -32,15 +35,12 @@ for idx = 1:length(Salts)
                 full_data = fullopt_dat;
                 full_data.secondary_result = fullopt_hist_dat.intermediate_data;
                 full_data.bayesopt_results = bayesopt_dat.results;
-
-                destfile = fullfile(destination_folder,Salt,strrep(fullopt.name,'fullopt','data'));
-                if ~isfile(destfile)
-                    if ~isfolder(fullfile(destination_folder,Salt))
-                        mkdir(fullfile(destination_folder,Salt))
-                    end
-                    save(destfile,'full_data');
-                    disp(['Copied: ' Salt ' ' Model_Name])
+                
+                if ~isfolder(fullfile(destination_folder,Salt))
+                    mkdir(fullfile(destination_folder,Salt))
                 end
+                save(destfile,'full_data');
+                disp(['Copied: ' Salt ' ' Model_Name])
 
                 % Clean up folder
                 del_cmd = ['find "' fullopt.folder  '" -type f \( -name *.stde -o -name *.stdo -o -name *.subm \) -delete'];
@@ -50,6 +50,8 @@ for idx = 1:length(Salts)
                 disp(me.message)
                 disp('Skipping model')
             end
+        elseif isfile(destfile)
+            disp([Salt ' ' Model_Name ': Job Already Copied.'])
         else
             disp([Salt ' ' Model_Name ': Job Not Complete!'])
         end
