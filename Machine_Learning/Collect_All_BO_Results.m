@@ -1,9 +1,7 @@
 % Collect_All_BO_Results
 proj_dir = '/home/scheiber/project/Model_Building';
 destination_folder = '/home/scheiber/project/Model_Building/Completed';
-warning('off','MATLAB:class:InvalidSuperClass')
-warning('off','MATLAB:load:classNotFound')
-warning('off','MATLAB:load:classError')
+
 
 if ~isfolder(destination_folder)
     mkdir(destination_folder);
@@ -20,6 +18,9 @@ for idx = 1:length(Salts)
     Models = files(~ismember({files.name},{'.','..'}));
     
     parfor jdx = 1:length(Models)
+        warning('off','MATLAB:class:InvalidSuperClass')
+        warning('off','MATLAB:load:classNotFound')
+        warning('off','MATLAB:load:classError')
         Model_Name = Models(jdx).name;
         Current_Model_dir = fullfile(Models(jdx).folder,Model_Name);
 
