@@ -32,28 +32,28 @@ end
 switch lower(Settings.Structure)
     case 'betabeo'
         Lattice_param_LBab = 4.0; % Angstroms, lower bound on the possible lattice parameter
-        Lattice_param_LBc = 2.0; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBc = 2.4; % Angstroms, lower bound on the possible lattice parameter
     case 'rocksalt'
         Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
         Lattice_param_LBc = 2.0; % Angstroms, lower bound on the possible lattice parameter
     case 'wurtzite'
-        Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
-        Lattice_param_LBc = 3.2; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBab = 2.2; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBc = 2.8; % Angstroms, lower bound on the possible lattice parameter
     case 'fivefive'
-        Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBab = 2.2; % Angstroms, lower bound on the possible lattice parameter
         Lattice_param_LBc = 2.8; % Angstroms, lower bound on the possible lattice parameter
     case 'sphalerite'
         Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
         Lattice_param_LBc = 2.0; % Angstroms, lower bound on the possible lattice parameter
     case 'cscl'
-        Lattice_param_LBab = 1.8; % Angstroms, lower bound on the possible lattice parameter
-        Lattice_param_LBc = 1.8; % Angstroms, lower bound on the possible lattice parameter
-    case {'nias' 'antinias'}
-        Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
-        Lattice_param_LBc = 3.2; % Angstroms, lower bound on the possible lattice parameter
-    otherwise
         Lattice_param_LBab = 2.0; % Angstroms, lower bound on the possible lattice parameter
         Lattice_param_LBc = 2.0; % Angstroms, lower bound on the possible lattice parameter
+    case {'nias' 'antinias'}
+        Lattice_param_LBab = 2.2; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBc = 2.8; % Angstroms, lower bound on the possible lattice parameter
+    otherwise
+        Lattice_param_LBab = 2.2; % Angstroms, lower bound on the possible lattice parameter
+        Lattice_param_LBc = 2.2; % Angstroms, lower bound on the possible lattice parameter
 end
 Lattice_param_UB = 15; % Angstroms, upper bound on the possible lattice parameter
 Settings.Longest_Cutoff = max([Settings.MinMDP.RList_Cutoff Settings.MinMDP.RCoulomb_Cutoff Settings.MinMDP.RVDW_Cutoff]);
