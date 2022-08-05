@@ -1,0 +1,266 @@
+    outp = regexp(fullopts(idx).name,'([a-zA-Z]{2,4})_([a-zA-Z]{2,4})_Model_([a-zA-Z0-9]{1,5})','tokens','once');
+    
+    Settings.Salt = outp{1};
+    Settings.Theory = outp{2};
+    Settings.Model = outp{3};
+    [Settings,ModelFound] = Load_Model_Params(Settings)
+
+Settings = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+          Salt: 'LiBr'
+        Theory: 'BH'
+         Model: 'FA10'
+             S: [1×1 struct]
+       C6_Damp: [1×1 struct]
+       CR_Damp: [1×1 struct]
+    GAdjust_MX: [0 0 1]
+    GAdjust_MM: [0 0 1]
+    GAdjust_XX: [0 0 1]
+
+
+ModelFound =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+Settings.CR_Damp
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    MX: [1×1 struct]
+    MM: [1×1 struct]
+    XX: [1×1 struct]
+
+Settings.CR_Damp.MM
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    r_d: -1
+      b: -1
+
+Settings.C6_Damp.MM
+
+ans =
+
+     0
+
+fullopts(idx).name
+
+ans =
+
+    'LiBr_BH_Model_FA10_fullopt.mat'
+
+fullopts(idx).name = 'LiBr_JC_Model_CS3_fullopt.mat'
+
+fullopts = 
+
+  3570×1 <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> array with fields:
+
+    name
+    folder
+    date
+    bytes
+    isdir
+    datenum
+
+    Settings.Salt = outp{1};
+    Settings.Theory = outp{2};
+    Settings.Model = outp{3};
+    [Settings,ModelFound] = Load_Model_Params(Settings)
+
+Settings = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+          Salt: 'LiBr'
+        Theory: 'BH'
+         Model: 'FA10'
+             S: [1×1 struct]
+       C6_Damp: [1×1 struct]
+       CR_Damp: [1×1 struct]
+    GAdjust_MX: [0 0 1]
+    GAdjust_MM: [0 0 1]
+    GAdjust_XX: [0 0 1]
+
+
+ModelFound =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+Settings.CR_Damp
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    MX: [1×1 struct]
+    MM: [1×1 struct]
+    XX: [1×1 struct]
+
+Settings.CR_Damp.MM
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    r_d: -1
+      b: -1
+
+Settings.C6_Damp.MM
+
+ans =
+
+     0
+
+Settings.CR_Damp
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    MX: [1×1 struct]
+    MM: [1×1 struct]
+    XX: [1×1 struct]
+
+Settings.CR_Damp.MM
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    r_d: -1
+      b: -1
+
+fullopts(idx).name
+
+ans =
+
+    'LiBr_JC_Model_CS3_fullopt.mat'
+
+Settings.Model
+
+ans =
+
+    'FA10'
+
+outp
+
+outp =
+
+  1×3 <a href="matlab:helpPopup cell" style="font-weight:bold">cell</a> array
+
+    {'LiBr'}    {'BH'}    {'FA10'}
+
+fullopts(idx).name
+
+ans =
+
+    'LiBr_JC_Model_CS3_fullopt.mat'
+
+    outp = regexp(fullopts(idx).name,'([a-zA-Z]{2,4})_([a-zA-Z]{2,4})_Model_([a-zA-Z0-9]{1,5})','tokens','once');
+    
+    Settings.Salt = outp{1};
+    Settings.Theory = outp{2};
+    Settings.Model = outp{3}
+
+Settings = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+          Salt: 'LiBr'
+        Theory: 'JC'
+         Model: 'CS3'
+             S: [1×1 struct]
+       C6_Damp: [1×1 struct]
+       CR_Damp: [1×1 struct]
+    GAdjust_MX: [0 0 1]
+    GAdjust_MM: [0 0 1]
+    GAdjust_XX: [0 0 1]
+
+[Settings,ModelFound] = Load_Model_Params(Settings)
+
+Settings = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+          Salt: 'LiBr'
+        Theory: 'JC'
+         Model: 'CS3'
+             S: [1×1 struct]
+       C6_Damp: [1×1 struct]
+       CR_Damp: [1×1 struct]
+    GAdjust_MX: [0 0 1]
+    GAdjust_MM: [0 0 1]
+    GAdjust_XX: [0 0 1]
+
+
+ModelFound =
+
+  <a href="matlab:helpPopup logical" style="font-weight:bold">logical</a>
+
+   1
+
+Settings.CR_Damp
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    MX: [1×1 struct]
+    MM: [1×1 struct]
+    XX: [1×1 struct]
+
+Settings.CR_Damp.MM
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    r_d: 0.3
+      b: 75
+
+Settings.S.D
+
+ans = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+    All: 1
+     MM: 74.5640192478734
+     XX: 0.0382285010020045
+     MX: 0.0225961403312791
+     AB: 1
+
+Settings
+
+Settings = 
+
+  <a href="matlab:helpPopup struct" style="font-weight:bold">struct</a> with fields:
+
+          Salt: 'LiBr'
+        Theory: 'JC'
+         Model: 'CS3'
+             S: [1×1 struct]
+       C6_Damp: [1×1 struct]
+       CR_Damp: [1×1 struct]
+    GAdjust_MX: [0 0 1]
+    GAdjust_MM: [0 0 1]
+    GAdjust_XX: [0 0 1]
+
+Settings.TF_Paramset
+{Unrecognized field name "TF_Paramset".
+} 
+open TF_Potential_Generator
+if system_dependent('IsDebugMode')==1, dbquit all; end
+clear
+clc
+Check_all_Models

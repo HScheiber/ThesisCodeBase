@@ -4,53 +4,19 @@ model_loc = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 fullopts = dir(fullfile(model_loc,'*fullopt.mat'));
 
 for idx = 1:length(fullopts)
-    bayeopt_file = strrep(fullopts(idx).name,'fullopt','bayesopt');
-    OptParamdat = load(fullfile(model_loc,fullopts(idx).name));
+    %bayeopt_file = strrep(fullopts(idx).name,'fullopt','bayesopt');
+    %OptParamdat = load(fullfile(model_loc,fullopts(idx).name));
     outp = regexp(fullopts(idx).name,'([a-zA-Z]{2,4})_([a-zA-Z]{2,4})_Model_([a-zA-Z0-9]{1,5})','tokens','once');
-    if isfield(OptParamdat,'full_opt_point')
-        OptParam = OptParamdat.full_opt_point;
-    else
-        continue
-    end
-    bayesopt_data = load(fullfile(model_loc,bayeopt_file)).results;
-    if isfield(functions(bayesopt_data.ObjectiveFcn).workspace{1},'Loss_Options')
-        BO_Settings = functions(bayesopt_data.ObjectiveFcn).workspace{1};
-    elseif isfield(functions(bayesopt_data.ObjectiveFcn).workspace{1},'Model')
-        BO_Settings = functions(bayesopt_data.ObjectiveFcn).workspace{1}.Model;
-    else
-        BO_Settings = functions(bayesopt_data.ObjectiveFcn).workspace{1};
-    end
-    
-    if ~isfield(BO_Settings,'Additional_Function')
-        BO_Settings.Additional_Function = Init_Additional_Function;
-    end
-    if ~isfield(BO_Settings,'Fix_Charge')
-        BO_Settings.Fix_Charge = true;
-    end
-    if ~isfield(BO_Settings,'Additivity')
-        BO_Settings.Additivity = true;
-    end
-    if ~isfield(BO_Settings,'Additional_MM_Disp')
-        BO_Settings.Additional_MM_Disp = false;
-    end
-    if ~isfield(BO_Settings,'SigmaEpsilon')
-        BO_Settings.SigmaEpsilon = false;
-    end
-    if ~isfield(BO_Settings,'Fix_Alpha')
-        BO_Settings.Fix_Alpha = false;
-    end
-    if ~isfield(BO_Settings,'Fix_C8')
-        BO_Settings.Fix_C8 = false;
-    end
-    if ~isfield(BO_Settings,'Theory')
-        BO_Settings.Theory = outp{2};
-    end
-    if ~isfield(BO_Settings,'Additional_GAdjust')
-        BO_Settings.Additional_GAdjust = {};
-    end
     
     Settings.Salt = outp{1};
-    Settings = Potential_Scaling(BO_Settings,OptParam);
+    Settings.Theory = outp{2};
+    Settings.Model = outp{3};
+    [Settings,ModelFound] = Load_Model_Params(Settings);
+    
+    if ~ModelFound
+        continue
+    end
+    
     Settings.Table_Length = 10; % nm
     Settings.Table_StepSize = 0.002;
     Settings.MaxRepWellDepth = 0; % kJ/mol
@@ -58,7 +24,6 @@ for idx = 1:length(fullopts)
     Settings.BadFcnLossPenalty = 1000;
     Settings.MDP.RVDW_Cutoff = 2;
     Settings.MDP.vdw_modifier = 'potential-shift';
-    
     
     if ~isfield(Settings,'CR_Damp')
         Settings.CR_Damp = Init_CRDamping_Object;

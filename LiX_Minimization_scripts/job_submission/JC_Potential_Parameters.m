@@ -153,7 +153,6 @@ Param.(Halide).epsilon = Gamma_XX*Param.(Halide).epsilon;
 Param.(Settings.Salt).sigma = Beta_MX*Param.(Settings.Salt).sigma;
 Param.(Settings.Salt).epsilon = Gamma_MX*Param.(Settings.Salt).epsilon;
 
-
 OutputMM = Param.(Metal);
 OutputXX = Param.(Halide);
 OutputMX = Param.(Settings.Salt);

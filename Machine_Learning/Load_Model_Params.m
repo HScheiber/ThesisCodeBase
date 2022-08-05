@@ -49,8 +49,16 @@ if isfile(Model_Filename) && isfile(BO_Filename)
         BO_WS = s.workspace{1}.Model;
     end
     
-    Fix_Charge = BO_WS.Fix_Charge;
-    Additivity = BO_WS.Additivity;
+    if isfield(BO_WS,'Fix_Charge')
+        Fix_Charge = BO_WS.Fix_Charge;
+    else
+        Fix_Charge = true;
+    end
+    if isfield(BO_WS,'Additivity')
+        Additivity = BO_WS.Additivity;
+    else
+        Additivity = true;
+    end
     if isfield(BO_WS,'Additional_MM_Disp')
         Additional_MM_Disp = BO_WS.Additional_MM_Disp;
     elseif isfield(BO_WS,'Additional_MM_Force')
@@ -70,7 +78,20 @@ if isfile(Model_Filename) && isfile(BO_Filename)
     end
     if isfield(BO_WS,'C6Damp')
         Settings.C6_Damp = BO_WS.C6Damp;
-
+        
+        def_C6Damp = Init_C6Damping_Object;
+        if ~isfield(Settings.C6_Damp,'input_rvdw')
+            Settings.C6_Damp.input_rvdw = def_C6Damp.input_rvdw;
+        end
+        if ~isfield(Settings.C6_Damp,'rvdw')
+            Settings.C6_Damp.rvdw = def_C6Damp.rvdw;
+        end
+        if ~isfield(Settings.C6_Damp,'N')
+            Settings.C6_Damp.N = def_C6Damp.N;
+        end
+    elseif isfield(BO_WS,'C6_Damp')
+        Settings.C6_Damp = BO_WS.C6_Damp;
+        
         def_C6Damp = Init_C6Damping_Object;
         if ~isfield(Settings.C6_Damp,'input_rvdw')
             Settings.C6_Damp.input_rvdw = def_C6Damp.input_rvdw;
@@ -88,6 +109,8 @@ if isfile(Model_Filename) && isfile(BO_Filename)
     
     if isfield(BO_WS,'CRDamp')
         Settings.CR_Damp = BO_WS.CRDamp;
+    elseif isfield(BO_WS,'CR_Damp')
+        Settings.CR_Damp = BO_WS.CR_Damp;
     else
         % Used as the default in older models
         Settings.CR_Damp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
@@ -131,7 +154,13 @@ if damp_MM
     Settings.C6_Damp.MM = true;
 end
 
-Param = pdat.full_opt_point;
+if isfield(pdat,'full_opt_point')
+    Param = pdat.full_opt_point;
+else
+    warning('Model not found.')
+    ModelFound = false;
+    return
+end
 
 if strcmp(Settings.Theory,'TF')
 
