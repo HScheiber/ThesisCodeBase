@@ -61,6 +61,6 @@ for idx = 1:length(Salts)
     end
 end
 
-function mySave(filenm, WT1)
-    save(filenm, 'WT1');
+function mySave(filenm, full_data)
+    save(filenm, 'full_data');
 end
