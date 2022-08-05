@@ -87,6 +87,10 @@ Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (defau
 Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
 Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
 Shared_Settings.MaxWarn = 2;
+Shared_Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
+Shared_Settings.Loss_Convergence = 1e-6;
+Shared_Settings.Param_Convergence = 1e-3;
 
 % MP / Finite T Settings
 Shared_Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
@@ -165,7 +169,6 @@ switch lower(computer)
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
         Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
         Shared_Settings.switch_final_opt = false;
-        Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -190,13 +193,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JA' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -207,21 +203,13 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
+                    
                     %% Model BH: JB
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JB' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -233,8 +221,6 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
 
                     %% Model BH: JC
                     idx = idx+1;
@@ -242,13 +228,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JC' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -260,8 +239,7 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
+                    
                 end
             end
         end
@@ -300,13 +278,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JA' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -317,22 +288,14 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
+                    
                     %% Model BH: JB
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JB' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
-
+                    
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
                     Models(idx).Loss_Options.Rocksalt.a = 1;
@@ -343,8 +306,6 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
 
                     %% Model BH: JC
                     idx = idx+1;
@@ -352,13 +313,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['JC' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -370,8 +324,7 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
+                    
                 end
             end
         end
@@ -386,6 +339,7 @@ switch lower(computer)
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
         Shared_Settings.switch_final_opt = true;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
+        
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -411,14 +365,7 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IA' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
-
+                    
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
                     Models(idx).Loss_Options.Rocksalt.a = 1;
@@ -427,7 +374,6 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
 
                     %% Model BH: IB
                     idx = idx+1;
@@ -435,14 +381,7 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IB' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
-
+                    
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
                     Models(idx).Loss_Options.Rocksalt.a = 1;
@@ -452,7 +391,7 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
+                    
 
                     %% Model BH: IC
                     idx = idx+1;
@@ -460,13 +399,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IC' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -477,7 +409,6 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = false;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
 
                     %% Model BH: ID
                     idx = idx+1;
@@ -485,13 +416,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['ID' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -502,7 +426,6 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
 
                 end
             end
@@ -541,13 +464,6 @@ switch lower(computer)
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IE' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -559,21 +475,13 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
+                    
                     %% Model BH: IF
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IF' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -586,21 +494,13 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
+                    
                     %% Model BH: IG
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IG' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -617,21 +517,13 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
+                    
                     %% Model BH: IH
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['IH' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -648,21 +540,13 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = false;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
-
+                    
                     %% Model BH: II
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
                     Models(idx).Trial_ID = ['II' Rep];
-                    if Replicates(ridx) > 5
-                        Models(idx).Loss_Convergence = 1e-8;
-                        Models(idx).Param_Convergence = 1e-5;
-                    else
-                        Models(idx).Loss_Convergence = 1e-6;
-                        Models(idx).Param_Convergence = 1e-3;
-                    end
 
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -679,12 +563,11 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
-                    Models(idx).MinExpWallHeight = 100; % kJ/mol
                 end
             end
         end
     case 'graham'
-        
+        Shared_Settings.JobSettings.N_Calc = 2;
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
@@ -697,7 +580,6 @@ switch lower(computer)
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Shared_Settings.Max_Bayesian_Iterations = 800;
         Shared_Settings.Max_Secondary_Iterations = 200;
-        
         %% JC Models EA, EB, ED, EE
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
@@ -776,7 +658,6 @@ switch lower(computer)
                 Models(idx).SDMM_Range = [0 50];
             end
         end
-
         %% JC Models EH, EJ, EK, EM
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
@@ -880,7 +761,6 @@ switch lower(computer)
 
             end
         end
-
         %% JC Models EN, EP
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
@@ -962,7 +842,6 @@ switch lower(computer)
 
             end
         end
-
         %% JC Models EQ, ER, ES, ET
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
@@ -1049,7 +928,6 @@ switch lower(computer)
                 Models(idx).SDMM_Range = [0 50];
             end
         end
-        
         %% JC Models EV, EW, EX
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
@@ -1121,7 +999,6 @@ switch lower(computer)
 
             end
         end
-
     otherwise % Place jobs here for later assignment
 end
 
