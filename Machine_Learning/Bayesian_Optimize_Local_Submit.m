@@ -50,7 +50,7 @@ clear;
 idx = 0;
 
 %% BH Model (MP Test) XY
-Salts = {'LiI'};
+Salts = {'LiF'};
 Theories = {'BH'};
 Replicates = 1;
 
@@ -70,13 +70,8 @@ for tidx = 1:length(Theories)
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['XY' Rep];
             Models(idx).final_opt_type = 'fminsearchbnd';
-            if Replicates(ridx) > 5
-                Models(idx).Loss_Convergence = 1e-8;
-                Models(idx).Param_Convergence = 1e-5;
-            else
-                Models(idx).Loss_Convergence = 1e-6;
-                Models(idx).Param_Convergence = 1e-3;
-            end
+            Models(idx).Loss_Convergence = 1e-6;
+            Models(idx).Param_Convergence = 1e-3;
             
             % Some Job settings
             Models(idx).JobSettings.OMP_Threads = 1;
@@ -88,12 +83,13 @@ for tidx = 1:length(Theories)
             % T=0 Loss
             Models(idx).Loss_Options.Rocksalt.LE = 1;
             Models(idx).Loss_Options.Rocksalt.a = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
             
             % Finite T loss
             Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
-            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
-            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 0; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 0; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 0; % Fitting the experimental volume of the experimental solid structure at the experimental MP
             Models(idx).Loss_Options.MP  = 0; % Fitting the experimental MP, using the experimental structure as the solid
             
             % Finite T options (including MP options)
@@ -115,7 +111,7 @@ for tidx = 1:length(Theories)
             Models(idx).MeshSizeMultiplier = 5;
             Models(idx).QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
             Models(idx).ScaleInitialLiqDensity = 0.8;
-            Models(idx).Delete_Equil = false; % switch to delete temporary calculation folders for finite T calcs
+            Models(idx).Delete_Equil = true; % switch to delete temporary calculation folders for finite T calcs
             
             % Barostat Options
             Models(idx).Isotropy = 'semiisotropic';
