@@ -810,8 +810,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
             return
         end
         Calculation_properties = dat.Calculation_properties;
-        full_opt_results = dat.Calculation_properties;
-        full_opt_point = dat.Calculation_properties;
+        full_opt_results = dat.full_opt_results;
+        full_opt_point = dat.full_opt_point;
     end
     
     %% Final test of parameters on all structures for output
