@@ -159,16 +159,20 @@ idx=0;
 
 switch lower(computer)
     case 'cedar'
-        %% BH Models JA, JB, JC
+        Shared_Settings.Max_Bayesian_Iterations = 400;
+        Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
+        Shared_Settings.switch_final_opt = false;
+        Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
+        
+        %% BH Models JA, JB, JC
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
-        Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
-        Shared_Settings.switch_final_opt = false;
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -244,16 +248,10 @@ switch lower(computer)
             end
         end
         %% JC Models JA, JB, JC
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
         Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
-        Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
-        Shared_Settings.switch_final_opt = false;
-        Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'JC'};
         Replicates = 1:5;
@@ -329,7 +327,8 @@ switch lower(computer)
             end
         end
     case 'narval'
-        %% BH Models IA, IB, IC, ID
+        Shared_Settings.Max_Bayesian_Iterations = 800;
+        Shared_Settings.Max_Secondary_Iterations = 200;
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
@@ -339,7 +338,9 @@ switch lower(computer)
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
         Shared_Settings.switch_final_opt = true;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
+        Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         
+        %% BH Models IA, IB, IC, ID
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -431,15 +432,6 @@ switch lower(computer)
             end
         end
         %% BH Models IE, IF, IG, IH, II
-        Shared_Settings.Parallel_Bayesopt = true;
-        Shared_Settings.Parallel_Struct_Min = false;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-        Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
-        Shared_Settings.switch_final_opt = true;
-        Shared_Settings.final_opt_type = 'fminsearchbnd';
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -567,6 +559,8 @@ switch lower(computer)
             end
         end
     case 'graham'
+        Shared_Settings.Max_Bayesian_Iterations = 800;
+        Shared_Settings.Max_Secondary_Iterations = 200;
         Shared_Settings.JobSettings.N_Calc = 2;
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
@@ -578,8 +572,6 @@ switch lower(computer)
         Shared_Settings.switch_final_opt = true;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
-        Shared_Settings.Max_Bayesian_Iterations = 800;
-        Shared_Settings.Max_Secondary_Iterations = 200;
         %% JC Models EA, EB, ED, EE
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
