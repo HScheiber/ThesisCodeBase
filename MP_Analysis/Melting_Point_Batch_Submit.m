@@ -116,6 +116,11 @@ switch lower(computer)
         end
     otherwise
         %% TF Models HA, HB, ...
+        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 0; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+        
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theory = 'TF';
         Models = {'HA' 'HB' 'HC' 'HD' 'HE' 'HF' 'HG' 'HH' 'HI'};
