@@ -41,7 +41,7 @@ for idx = 1:length(Salts)
                 if ~isfolder(fullfile(destination_folder,Salt))
                     mkdir(fullfile(destination_folder,Salt))
                 end
-                save(destfile,'full_data');
+                mySave(destfile,'full_data');
                 disp(['Copied: ' Salt ' ' Model_Name])
 
                 % Clean up folder
@@ -58,4 +58,8 @@ for idx = 1:length(Salts)
             disp([Salt ' ' Model_Name ': Job Not Complete!'])
         end
     end
+end
+
+function mySave(filenm, WT1)
+    save(filenm, 'WT1');
 end
