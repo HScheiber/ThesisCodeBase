@@ -42,7 +42,7 @@ for idx = 1:length(Salts)
                 if ~isfolder(fullfile(destination_folder,Salt))
                     mkdir(fullfile(destination_folder,Salt))
                 end
-                mySave(destfile,'full_data');
+                mySave(destfile,full_data);
                 disp(['Copied: ' Salt ' ' Model_Name])
 
                 % Clean up folder
