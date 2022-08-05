@@ -38,6 +38,10 @@ for idx = 1:length(Salts)
                 full_data = fullopt_dat;
                 full_data.secondary_result = fullopt_hist_dat.intermediate_data;
                 full_data.bayesopt_results = bayesopt_dat.results;
+                if ~isfield(full_data,'Finite_T_Data')
+                    Settings.Salt = Salt;
+                    full_data.Finite_T_Data = Initialize_Finite_T_Data(Settings);
+                end
                 
                 if ~isfolder(fullfile(destination_folder,Salt))
                     mkdir(fullfile(destination_folder,Salt))
