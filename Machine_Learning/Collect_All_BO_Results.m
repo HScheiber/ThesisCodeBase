@@ -27,7 +27,7 @@ for idx = 1:length(Salts)
         fullopt = dir([Current_Model_dir filesep Salt '_' Model_Name '_fullopt.mat']);
         fullopt_history = dir([Current_Model_dir filesep 'intermediate_secondary_opt.mat']);
         bayesopt = dir([Current_Model_dir filesep Salt '_' Model_Name '_bayesopt.mat']);
-        destfile = fullfile(destination_folder,Salt,[Salt '_' Model_Name '_data']);
+        destfile = fullfile(destination_folder,Salt,[Salt '_' Model_Name '_data.mat']);
         
         if ~isempty(fullopt) && ~isfile(destfile)
             try
