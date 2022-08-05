@@ -9,8 +9,8 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
 Theory = 'JC';
 Basenum = 'E';
-Midnum = 'D';
-savefile = true; % switch to save the final plots to file
+Midnum = 'C';
+savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
 
 % Plot options
@@ -22,7 +22,8 @@ plot_c = true;
 plot_ac = false;
 plot_volume = false;
 plot_density = false;
-plot_loss = true;
+plot_loss = false;
+plot_finite_T_data = true;
 show_targets = true;
 fs = 22; % font size
 
@@ -38,7 +39,7 @@ volume_ylim = [-8 20];
 loss_ylog = true;
 
 % Other parameters
-show_as_percent_error = true; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
+show_as_percent_error = false; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
 % Calculates error in lattice energy with respect to experimental lattice energies when available
 Target_Experimental_Energies = true; 
 % Calculates error in lattice parameters, volumes, and densities with respect to experimental lattice parameters when available
@@ -55,17 +56,22 @@ shift_CsCl_RLE = false;
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 
 % Find reps of models
-files = {dir(fullfile(ML_results_dir,['*' Theory '_Model_' Basenum Midnum '*'])).name};
-Models = unique(regexp(files,[Basenum Midnum '([0-9])+'],'match','once'));
-nonempty_idx = ~cellfun(@isempty,Models);
-Models = Models(nonempty_idx);
+Models = cell(1,length(Salts));
+for idx = 1:length(Salts)
+    Salt = Salts{idx};
+    files = {dir(fullfile(ML_results_dir,Salt,[Salt '_' Theory '_Model_' Basenum Midnum '*_data.mat'])).name};
+    Models{idx} = unique(regexp(files,[Basenum Midnum '([0-9])+'],'match','once'));
+    nonempty_idx = ~cellfun(@isempty,Models{idx});
+    Models{idx} = Models{idx}(nonempty_idx);
+end
+Models = unique(cat(2, Models{:}));
+
 
 % Make sure the models are sorted
 if ~isempty(Models)
     [~,idx] = sort(cellfun(@str2double,regexp(Models,'[0-9]+','match','once')));
     Models = Models(idx);
 end
-
 
 % Assign a marker to each rep
 markers = {'o' 's' '^' 'v' 'd' '>' '<' 'p' 'h' 'x'};
@@ -125,6 +131,16 @@ LatPars_ca = nan(N_Salts,N_Models,N_Structures);
 Densities = nan(N_Salts,N_Models,N_Structures);
 Volumes = nan(N_Salts,N_Models,N_Structures);
 Total_loss = nan(N_Salts,N_Models);
+Fusion_dH = nan(N_Salts,N_Models);
+Fusion_dV = nan(N_Salts,N_Models);
+Liquid_V_MP = nan(N_Salts,N_Models);
+Solid_V_MP = nan(N_Salts,N_Models);
+MP = nan(N_Salts,N_Models);
+Exp_Fusion_dH = nan(N_Salts,N_Models);
+Exp_Fusion_dV = nan(N_Salts,N_Models);
+Exp_Liquid_V_MP = nan(N_Salts,N_Models);
+Exp_Solid_V_MP = nan(N_Salts,N_Models);
+Exp_MP = nan(N_Salts,N_Models);
 
 % Plot color scheme
 Colours = cbrewer('qual','Set3',N_Salts);
@@ -186,7 +202,6 @@ if Target_Experimental_Energies || Target_Experimental_latpar
     clear('EXP')
 end
 
-
 % Calculate target relative lattice energies
 if plot_RLE
     for idx = 1:N_Salts
@@ -215,17 +230,15 @@ if show_targets
     data_found = false;
     for idx = 1:N_Salts
         for jdx = 1:N_Models
-            sres = dir([ML_results_dir filesep  Salts{idx} '_' Theory '_Model_' Models{jdx} '_bayesopt.mat']);
+            dat_file = fullfile(ML_results_dir,Salts{idx},[Salts{idx} '_' Theory '_Model_' Models{jdx} '_data.mat']);
 
-            if isempty(sres)
+            if ~isfile(dat_file)
                 continue
             else
-                model_filename = fullfile(sres.folder,sres.name);
-
                 % Load data
                 try
-                    data = load(model_filename);
-                    Bayesopt_Loss_Options = functions(data.results.ObjectiveFcn).workspace{1}.Model.Loss_Options;
+                    data = load(dat_file).full_data;
+                    Bayesopt_Loss_Options = functions(data.bayesopt_results.ObjectiveFcn).workspace{1}.Model.Loss_Options;
                     data_found = true;
                     break
                 catch
@@ -245,7 +258,6 @@ else
     Bayesopt_Loss_Options = init_loss_options;
 end
 
-
 % Loop over chosen models
 for idx = 1:N_Salts
     Salt = Salts{idx};
@@ -254,27 +266,28 @@ for idx = 1:N_Salts
         Model = Models{iidx};
 
         % Find the fully optimized model
-        sres = dir([ML_results_dir filesep '*' Salt '*' Theory '*' 'Model_' Model '_*fullopt.mat']);
-
-        if length(sres) > 1
-            warning(['Multiple results found for: ' Salt ', ' Theory ', Model ' Model '. Using first result.']);
-            sres = sres(1);
-        elseif isempty(sres)
+        dat_file = fullfile(ML_results_dir,Salt,[Salt '_' Theory '_Model_' Model '_data.mat']);
+        
+        if ~isfile(dat_file)
             warning(['No results found for: ' Salt ', ' Theory ', Model ' Model '.']);
             continue
         end
-
-        model_filename = fullfile(sres.folder,sres.name);
-
+        
         % Load data
-        data = load(model_filename);
+        data = load(dat_file).full_data;
         try
             Minimization_Data = data.Minimization_Data;
             Loss = data.loss;
-            clear('data')
         catch
             warning(['No saved crystal data for ' Salt ' ' Theory ' Model ' Model])
             continue
+        end
+        try
+            Finite_T_Data = data.Finite_T_Data;
+        catch
+            Settings.Salt = Salt;
+            Finite_T_Data = Initialize_Finite_T_Data(Settings);
+            warning(['No finite T data for ' Salt ' ' Theory ' Model ' Model])
         end
         
         % Grab available structures from data
@@ -405,7 +418,35 @@ for idx = 1:N_Salts
         if plot_loss || BestOnly
             Total_loss(idx,iidx) = Loss;
         end
+        
+        if plot_finite_T_data
+            Fusion_dH(idx,iidx) = Finite_T_Data.Fusion_dH;
+            Fusion_dV(idx,iidx) = Finite_T_Data.Fusion_dV;
+            Liquid_V_MP(idx,iidx) = Finite_T_Data.Liquid_V_MP;
+            Solid_V_MP(idx,iidx) = Finite_T_Data.Solid_V_MP;
+            MP(idx,iidx) = Finite_T_Data.MP;
+            Exp_Fusion_dH(idx,iidx) = Finite_T_Data.Exp_Fusion_dH;
+            Exp_Fusion_dV(idx,iidx) = Finite_T_Data.Exp_Fusion_dV;
+            Exp_Liquid_V_MP(idx,iidx) = Finite_T_Data.Exp_Liquid_V_MP;
+            Exp_Solid_V_MP(idx,iidx) = Finite_T_Data.Exp_Solid_V_MP;
+            Exp_MP(idx,iidx) = Finite_T_Data.Exp_MP;
+        end
     end
+end
+
+
+if show_as_percent_error && plot_finite_T_data
+    Fusion_dH = (Fusion_dH - Exp_Fusion_dH)*100./abs(Exp_Fusion_dH);
+    Fusion_dV = (Fusion_dV - Exp_Fusion_dV)*100./abs(Exp_Fusion_dV);
+    Liquid_V_MP = (Liquid_V_MP - Exp_Liquid_V_MP)*100./abs(Exp_Liquid_V_MP);
+    Solid_V_MP = (Solid_V_MP - Exp_Solid_V_MP)*100./abs(Exp_Solid_V_MP);
+    MP = (MP - Exp_MP)*100./abs(Exp_MP);
+elseif plot_finite_T_data
+    Fusion_dH = Fusion_dH - Exp_Fusion_dH;
+    Fusion_dV = Fusion_dV - Exp_Fusion_dV;
+    Liquid_V_MP = Liquid_V_MP - Exp_Liquid_V_MP;
+    Solid_V_MP = Solid_V_MP - Exp_Solid_V_MP;
+    MP = MP - Exp_MP;
 end
 
 if BestOnly
@@ -418,6 +459,11 @@ if BestOnly
     LatPars_ca_base = zeros(size(LatPars_ca,1),1,size(LatPars_ca,3));
     Densities_base = zeros(size(Densities,1),1,size(Densities,3));
     Volumes_base = zeros(size(Volumes,1),1,size(Volumes,3));
+    Fusion_dH_base = zeros(size(Fusion_dH,1),1);
+    Fusion_dV_base = zeros(size(Fusion_dV,1),1);
+    Liquid_V_MP_base = zeros(size(Liquid_V_MP,1),1);
+    Solid_V_MP_base = zeros(size(Solid_V_MP,1),1);
+    MP_base = zeros(size(MP,1),1);
     
     for idx = 1:N_Salts
         Energies_base(idx,:,:) = Energies(idx,min_idx(idx),:);
@@ -427,6 +473,11 @@ if BestOnly
         LatPars_ca_base(idx,:,:) = LatPars_ca(idx,min_idx(idx),:);
         Densities_base(idx,:,:) = Densities(idx,min_idx(idx),:);
         Volumes_base(idx,:,:) = Volumes(idx,min_idx(idx),:);
+        Fusion_dH_base(idx,:) = Fusion_dH(idx,min_idx(idx))
+        Fusion_dV_base(idx,:) = Fusion_dV(idx,min_idx(idx))
+        Liquid_V_MP_base(idx,:) = Liquid_V_MP(idx,min_idx(idx))
+        Solid_V_MP_base(idx,:) = Solid_V_MP(idx,min_idx(idx))
+        MP_base(idx,:) = MP(idx,min_idx(idx))
     end
     
     Energies = Energies_base;
@@ -436,15 +487,22 @@ if BestOnly
     LatPars_ca = LatPars_ca_base;
     Densities = Densities_base;
     Volumes = Volumes_base;
+    Fusion_dH = Fusion_dH_base;
+    Fusion_dV = Fusion_dV_base;
+    Liquid_V_MP = Liquid_V_MP_base;
+    Solid_V_MP = Solid_V_MP_base;
+    MP = MP_base;
     
     N_Models = 1;
 end
+Finite_T_Data = cat(3,MP,Fusion_dH,Fusion_dV,Liquid_V_MP,Solid_V_MP);
 
-plot_switches = [plot_loss plot_LE plot_RLE plot_a plot_c plot_ac plot_density plot_volume];
+plot_switches = [plot_loss plot_finite_T_data plot_LE plot_RLE plot_a plot_c plot_ac plot_density plot_volume];
 N_compares = sum(plot_switches);
-all_y = {Total_loss, Energies, Rel_Energies, LatPars_a, LatPars_c, LatPars_ca Densities Volumes};
-all_ylim = {[],LE_ylim, RLE_ylim, a_ylim, c_ylim, ca_ylim density_ylim volume_ylim};
-plot_types = {'loss' 'LE' 'RLE' 'a' 'c' 'ca' 'density' 'V'};
+all_y = {Total_loss, Finite_T_Data, Energies, Rel_Energies, LatPars_a, LatPars_c, LatPars_ca Densities Volumes};
+all_ylim = {[],[],LE_ylim, RLE_ylim, a_ylim, c_ylim, ca_ylim density_ylim volume_ylim};
+plot_types = {'loss' 'finite T' 'LE' 'RLE' 'a' 'c' 'ca' 'density' 'V'};
+finite_T_types = {'MP' 'Fusion_Enthalpy' 'MP_Volume_Change' 'Liquid_MP_Volume' 'Solid_MP_Volume'};
 
 bar_x = 1:N_Structures;
 
@@ -455,6 +513,7 @@ else
 end
 
 Titles = {['Minimized Objective Function' spec_ther] ...
+    'Melting Point Properties' ...
     'Error in $E_L$: $\left( E_{L} - E_{L}^{*} \right) / \left| E_{L}^{*} \right|$' ...
     '$E_{L}$[Structure] - $E_{L}$[Rocksalt]' ...
     'Error in $a$: $\left( a - a^{*} \right) / \left| a^{*} \right|$' ...
@@ -462,8 +521,10 @@ Titles = {['Minimized Objective Function' spec_ther] ...
     'Error in $c/a$: $\left( c/a - c^{*}/a^{*} \right) / \left| c^{*}/a^{*} \right|$' ...
     'Error in $\rho$: $\left( \rho - \rho^{*} \right) / \left| \rho^{*} \right|$' ...
     'Error in $V$: $\left( V - V^{*} \right) / \left| V^{*} \right|$'};
+MP_Titles = {'Melting Point Er.' '$\Delta H_{\mathrm{Fus.}}$ Er.' '$\Delta V_{\mathrm{Fus.}}$ Er.' '$V_{\mathrm{Liq.}}$ at MP Er.' '$V_{\mathrm{Sol.}}$ at MP Er.'};
 if show_as_percent_error
     ylabs = {'Loss' ...
+        '' ...
         '[\%]' ...
         '[kJ mol$^{-1}$]' ...
         '[\%]' ...
@@ -471,15 +532,18 @@ if show_as_percent_error
         '[\%]' ...
         '[\%]' ...
         '[\%]'};
+    MP_ylabs = {'[\%]' '[\%]' '[\%]' '[\%]' '[\%]'};
 else
     ylabs = {'Loss' ...
+        '[kJ mol$^{-1}$], [$\AA^{3}$/MX], [K]' ...
         '[kJ mol$^{-1}$]' ...
         '[kJ mol$^{-1}$]' ...
         '[\AA]' ...
         '[\AA]' ...
-        '$(c/a)$' ...
-        'g cm$^{-3}$' ...
-        '$\AA^{3}$ / formula unit'};
+        '[$(c/a)$]' ...
+        '[g cm$^{-3}$]' ...
+        '[$\AA^{3}$ / formula unit]'};
+    MP_ylabs = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$/MX]' '[$\AA^{3}$/MX]' '[$\AA^{3}$/MX]'};
 end
 
 % Create figure and axis
@@ -531,6 +595,76 @@ for idx = 1:length(all_y)
         end
         
         %ylim(axobj,[round(min(bar_y,[],'all')*0.1,1,'significant') round(max(bar_y,[],'all')*10, 1,'significant')])
+    elseif strcmp(plot_type,'finite T')
+        
+        axobj.Visible = 'Off';
+        drawnow;
+        
+        % Make model-averaged data for the line plot
+        N_FTprop = size(bar_y,3);
+        bar_av = reshape(mean(bar_y,2,'omitnan'),[],N_FTprop);
+        
+        bb = axobj.Position(2);
+        ww = axobj.Position(3);
+        ww_d = ww/N_FTprop - ww/(N_FTprop+1);
+        dd = ww_d/(N_FTprop-1);
+        hh = axobj.Position(4);
+        for jdx = 1:N_FTprop
+            finite_T_type = finite_T_types{jdx};
+            cur_ax = axes(figh,'YAxisLocation','left','box','on',...
+                'Position',[axobj.Position(1)+(ww/N_FTprop+dd)*(jdx-1) ....
+                bb+(hh*0.15) ww/(N_FTprop+1) hh*0.7]); % [left bottom width height]
+            
+
+            dat_y = bar_y(:,:,jdx);
+            dat_y_av = bar_av(:,jdx);
+            dat_x = repmat(linspace(1/N_FTprop,(N_FTprop-1)/N_FTprop,N_Salts)',1,N_Models);
+            dat_x_av = linspace(1/N_FTprop,(N_FTprop-1)/N_FTprop,N_Salts);
+            
+            hold on
+            plot(cur_ax,dat_x_av,dat_y_av,'--k','linewidth',2);
+            for kdx = 1:N_Salts
+                xx = dat_x(kdx,:);
+                yy = dat_y(kdx,:);
+                for mdx = 1:N_Models
+                    scatter(cur_ax,xx(mdx),yy(mdx),100,'MarkerEdgeColor','k',...
+                        'MarkerFaceColor',Colours(kdx,:),'linewidth',1,'marker',markers{mdx});
+                end
+            end
+            title(cur_ax, MP_Titles{jdx},'Fontsize',fs+5,'Interpreter','latex')
+            yline(cur_ax,0,':k','linewidth',1)
+            cur_ax.XAxis.TickLength = [0,0];
+            set(cur_ax,'box','on','TickLabelInterpreter','latex');
+            
+            set(cur_ax,'XLim',[0 1])
+            xticklabels(cur_ax,[])
+            ylim(cur_ax,'padded');   
+            grid(cur_ax,'minor');
+            yticks(cur_ax,'auto')
+            cur_ax.YGrid = 'on';
+            cur_ax.XGrid = 'off';
+            if show_as_percent_error
+                set(cur_ax,'YMinorTick','on','FontSize',fs-1);
+                if jdx == 1
+                    ylabel(cur_ax, MP_ylabs{jdx},'Fontsize',fs-1,'Interpreter','latex')
+                end
+            else
+                set(cur_ax,'YMinorTick','on','FontSize',fs-2);
+                ylabel(cur_ax, MP_ylabs{jdx},'Fontsize',fs-2,'Interpreter','latex')
+            end
+            
+            cylim = ylim(cur_ax);
+            % Add boxes for targets
+            if isfield(Bayesopt_Loss_Options,finite_T_type) && Bayesopt_Loss_Options.(finite_T_type) > sqrt(eps)
+
+                % [x y w h]. The x and y elements define the coordinate for the lower left corner of the rectangle. 
+                % The w and h elements define the dimensions of the rectangle.
+                rech = rectangle(cur_ax,'Position',[jdx-0.4 cylim(1) 0.8 (cylim(2) - cylim(1))],...
+                    'Curvature',0,'LineWidth',min(3*Bayesopt_Loss_Options.(finite_T_type),4),'EdgeColor','r');
+            end
+            ylim(axobj, cylim);
+        end
+        
     elseif strcmp(plot_type,'RLE')
         
         % Make model-averaged data for the line plot

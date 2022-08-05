@@ -49,7 +49,7 @@ idx=0;
 
 switch lower(computer)
     case 'cedar'
-        %% JC Models EB, EC, ...
+        %% JC Models EC, ...
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theory = 'JC';
         Models = {'EC' 'EF' 'EG' 'EI' 'EL' 'EO' 'EU'};
