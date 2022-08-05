@@ -698,9 +698,9 @@ switch lower(computer)
         Shared_Settings.Max_Bayesian_Iterations = 800;
         Shared_Settings.Max_Secondary_Iterations = 200;
         
-        %% JC Models EA, EB, EC, ED, EE
+        %% JC Models EA, EB, ED, EE
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-        Replicates = 1:10;
+        Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
 
@@ -737,23 +737,6 @@ switch lower(computer)
 
                 Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
                 Models(idx).Fix_Charge = true;
-                Models(idx).Additivity = true;
-                Models(idx).SDMM_Range = [0 50];
-
-                %% Model JC: EC
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['EC' Rep];
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.RLE = 1;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = false;
                 Models(idx).Additivity = true;
                 Models(idx).SDMM_Range = [0 50];
 
@@ -803,24 +786,6 @@ switch lower(computer)
             for ridx = 1:length(Replicates)
                 Rep = num2str(Replicates(ridx));
 
-                %% Model JC: EF
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['EF' Rep];
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                Models(idx).Loss_Options.FiveFive.RLE = 1;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = false;
-                Models(idx).Additivity = true;
-                Models(idx).SDMM_Range = [0 50];
-
                 %% Model JC: EG
                 idx = idx+1;
                 Models(idx) = Shared_Settings;
@@ -855,25 +820,6 @@ switch lower(computer)
 
                 Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
                 Models(idx).Fix_Charge = true;
-                Models(idx).Additivity = true;
-                Models(idx).SDMM_Range = [0 50];
-
-                %% Model JC: EI
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['EI' Rep];
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                Models(idx).Loss_Options.Wurtzite.a = 2/3;
-                Models(idx).Loss_Options.Wurtzite.c = 1/3;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = false;
                 Models(idx).Additivity = true;
                 Models(idx).SDMM_Range = [0 50];
 
@@ -914,24 +860,6 @@ switch lower(computer)
                 Models(idx).Additivity = true;
                 Models(idx).SDMM_Range = [0 50];
 
-                %% Model JC: EL
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['EL' Rep];
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                Models(idx).Loss_Options.CsCl.RLE = 1;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = false;
-                Models(idx).Additivity = true;
-                Models(idx).SDMM_Range = [0 50];
-
                 %% Model JC: EM
                 idx = idx+1;
                 Models(idx) = Shared_Settings;
@@ -955,7 +883,7 @@ switch lower(computer)
 
         %% JC Models EN, EO, EP
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-        Replicates = 1:10;
+        Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
 
@@ -968,14 +896,6 @@ switch lower(computer)
                 Models(idx).Salt = Salt;
                 Models(idx).Theory = 'JC';
                 Models(idx).Trial_ID = ['EN' Rep];
-
-                if Replicates(ridx) > 5
-                    Models(idx).Max_Bayesian_Iterations = 1000;
-                    Models(idx).Max_Secondary_Iterations = 1000;
-                else
-                    Models(idx).Max_Bayesian_Iterations = 800;
-                    Models(idx).Max_Secondary_Iterations = 200;
-                end
 
                 % Loss
                 Models(idx).Loss_Options.Rocksalt.LE = 1;
@@ -1002,41 +922,6 @@ switch lower(computer)
 
                 Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
                 Models(idx).Fix_Charge = true;
-                Models(idx).Additivity = true;
-                Models(idx).SDMM_Range = [0 50];
-
-                %% Model JC: EO
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['EO' Rep];
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.LE = 1;
-                Models(idx).Loss_Options.Wurtzite.a = 2/3;
-                Models(idx).Loss_Options.Wurtzite.c = 1/3;
-                Models(idx).Loss_Options.NiAs.LE = 1;
-                Models(idx).Loss_Options.NiAs.a = 2/3;
-                Models(idx).Loss_Options.NiAs.c = 1/3;
-                Models(idx).Loss_Options.Sphalerite.LE = 1;
-                Models(idx).Loss_Options.Sphalerite.a = 1;
-                Models(idx).Loss_Options.FiveFive.LE = 1;
-                Models(idx).Loss_Options.FiveFive.a = 2/3;
-                Models(idx).Loss_Options.FiveFive.c = 1/3;
-                Models(idx).Loss_Options.AntiNiAs.LE = 1;
-                Models(idx).Loss_Options.AntiNiAs.a = 2/3;
-                Models(idx).Loss_Options.AntiNiAs.c = 1/3;
-                Models(idx).Loss_Options.BetaBeO.LE = 1;
-                Models(idx).Loss_Options.BetaBeO.a = 2/3;
-                Models(idx).Loss_Options.BetaBeO.c = 1/3;
-                Models(idx).Loss_Options.CsCl.LE = 1;
-                Models(idx).Loss_Options.CsCl.a = 1;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = false;
                 Models(idx).Additivity = true;
                 Models(idx).SDMM_Range = [0 50];
 
@@ -1144,7 +1029,6 @@ switch lower(computer)
                 Models(idx).Additivity = false;
                 Models(idx).SDMM_Range = [0 300];
 
-
                 %% Model JC: ET
                 idx = idx+1;
                 Models(idx) = Shared_Settings;
@@ -1163,82 +1047,10 @@ switch lower(computer)
                 Models(idx).Fix_Charge = true;
                 Models(idx).Additivity = true;
                 Models(idx).SDMM_Range = [0 50];
-
-                %% Model JC: EU
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['EU' Rep];
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                Models(idx).Loss_Options.FiveFive.RLE = 1;
-                Models(idx).Loss_Options.AntiNiAs.RLE = 1;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = false;
-                Models(idx).Additivity = true;
-                Models(idx).SDMM_Range = [0 50];
-
-
             end
         end
-
-        %% JC Models EQ, ER, ES, ET, EU
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-        Replicates = 1:5;
-        for sidx = 1:length(Salts)
-            Salt = Salts{sidx};
-
-            for ridx = 1:length(Replicates)
-                Rep = num2str(Replicates(ridx));
-
-                %% Model JC: ET
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['ET' Rep];
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                Models(idx).Loss_Options.FiveFive.RLE = 1;
-                Models(idx).Loss_Options.AntiNiAs.RLE = 1;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = true;
-                Models(idx).Additivity = true;
-                Models(idx).SDMM_Range = [0 50];
-
-                %% Model JC: EU
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['EU' Rep];
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                Models(idx).Loss_Options.FiveFive.RLE = 1;
-                Models(idx).Loss_Options.AntiNiAs.RLE = 1;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = false;
-                Models(idx).Additivity = true;
-                Models(idx).SDMM_Range = [0 50];
-
-
-            end
-        end
-
-        %% JC Models EV EW, EX
+        
+        %% JC Models EV, EW, EX
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
         for sidx = 1:length(Salts)
