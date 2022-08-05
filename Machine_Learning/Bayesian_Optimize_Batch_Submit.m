@@ -777,7 +777,7 @@ switch lower(computer)
             end
         end
 
-        %% JC Models EF, EG, EH, EI, EJ, EK, EL, EM
+        %% JC Models EH, EJ, EK, EM
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
         for sidx = 1:length(Salts)
@@ -881,7 +881,7 @@ switch lower(computer)
             end
         end
 
-        %% JC Models EN, EO, EP
+        %% JC Models EN, EP
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
         for sidx = 1:length(Salts)
@@ -963,7 +963,7 @@ switch lower(computer)
             end
         end
 
-        %% JC Models EQ, ER, ES, ET, EU
+        %% JC Models EQ, ER, ES, ET
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
         for sidx = 1:length(Salts)
