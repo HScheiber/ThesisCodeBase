@@ -24,43 +24,34 @@ for idx = 1:length(Salts)
         fullopt_history = dir([Current_Model_dir filesep 'intermediate_secondary_opt.mat']);
         bayesopt = dir([Current_Model_dir filesep Salt '_' Model_Name '_bayesopt.mat']);
         if ~isempty(fullopt)
-            fullopt_history_name = strrep(fullopt.name,'fullopt','fullopt_history');
-            
-            destfile = fullfile(destination_folder,fullopt.name);
-            destdir = dir(destfile);
-            sourcefile = fullfile(fullopt.folder,fullopt.name);
-            if ~isfile(destfile) || ( datenum(fullopt.date) > datenum(destdir.date) )
-                copyfile(sourcefile,destfile);
-                disp(['Copied: ' fullopt.name])
+            try
+                fullopt_dat = load(fullfile(Current_Model_dir,fullopt.name));
+                fullopt_hist_dat = load(fullfile(Current_Model_dir,fullopt_history.name));
+                bayesopt_dat = load(fullfile(Current_Model_dir,bayesopt.name));
+
+                full_data = fullopt_dat;
+                full_data.secondary_result = fullopt_hist_dat.intermediate_data;
+                full_data.bayesopt_results = bayesopt_dat.results;
+
+                destfile = fullfile(destination_folder,Salt,strrep(fullopt.name,'fullopt','data'));
+                if ~isfile(destfile)
+                    if ~isfolder(fullfile(destination_folder,Salt))
+                        mkdir(fullfile(destination_folder,Salt))
+                    end
+                    save(destfile,'full_data');
+                    disp(['Copied: ' Salt ' ' Model_Name])
+                end
+
+                % Clean up folder
+                del_cmd = ['find "' fullopt.folder  '" -type f \( -name *.stde -o -name *.stdo -o -name *.subm \) -delete'];
+                system(del_cmd);
+            catch me
+                disp(['Error extracting data for model: ' Salt ' ' Model_Name])
+                disp(me.message)
+                disp('Skipping model')
             end
-            
-            destfile = fullfile(destination_folder,fullopt_history_name);
-            destdir = dir(destfile);
-            if isempty(fullopt_history)
-                disp([Salt '_' Model_Name ': No fullopt history found!'])
-            elseif ~isfile(destfile)
-                sourcefile = fullfile(fullopt_history.folder,fullopt_history.name);
-                copyfile(sourcefile,destfile);
-                disp(['Copied: ' fullopt_history_name])
-            elseif datenum(fullopt_history.date) > datenum(destdir.date)
-                sourcefile = fullfile(fullopt_history.folder,fullopt_history.name);
-                copyfile(sourcefile,destfile);
-                disp(['Copied: ' fullopt_history_name])
-            end
-            
-            destfile = fullfile(destination_folder,bayesopt.name);
-            destdir = dir(destfile);
-            sourcefile = fullfile(bayesopt.folder,bayesopt.name);
-            if ~isfile(destfile) || ( datenum(bayesopt.date) > datenum(destdir.date) )
-                copyfile(sourcefile,destfile);
-                disp(['Copied: ' bayesopt.name])
-            end
-            
-            % Clean up folder
-            del_cmd = ['find "' fullopt.folder  '" -type f \( -name *.stde -o -name *.stdo -o -name *.subm \) -delete'];
-            system(del_cmd);
         else
-            disp([Salt '_' Model_Name ': Job Not Complete!'])
+            disp([Salt ' ' Model_Name ': Job Not Complete!'])
         end
     end
 end
