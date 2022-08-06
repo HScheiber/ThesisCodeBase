@@ -340,6 +340,7 @@ switch lower(computer)
         Shared_Settings.switch_final_opt = true;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
+        Shared_Settings.Max_Local_Iterations = 1000;
         
         %% BH Models IA, IB, IC, ID
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
@@ -573,6 +574,7 @@ switch lower(computer)
         Shared_Settings.switch_final_opt = true;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
+        Shared_Settings.Max_Local_Iterations = 1000;
         %% JC Models EA, EB, ED, EE, EG
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
