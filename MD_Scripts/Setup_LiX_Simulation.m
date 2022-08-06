@@ -54,9 +54,9 @@ if ~exist(Settings.WorkDir,'dir')
 end
 
 % Load Model parameters
-if ~isempty(Settings.Model)
-    [Settings,~] = Load_Model_Params(Settings);
-end
+% if ~isempty(Settings.Model)
+%     [Settings,~] = Load_Model_Params(Settings);
+% end
 
 % Load Batch script (if applicable) settings and gromacs stuff
 [Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.postprocess] = MD_Batch_Template(Settings.JobSettings);
