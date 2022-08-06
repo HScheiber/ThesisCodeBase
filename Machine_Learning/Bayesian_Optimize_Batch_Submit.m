@@ -87,7 +87,7 @@ Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (defau
 Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
 Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
 Shared_Settings.MaxWarn = 2;
-Shared_Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
 Shared_Settings.Loss_Convergence = 1e-6;
 Shared_Settings.Param_Convergence = 1e-3;
@@ -341,6 +341,7 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Shared_Settings.Max_Local_Iterations = 1000;
+        Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
         
         %% BH Models IA, IB, IC, ID
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};

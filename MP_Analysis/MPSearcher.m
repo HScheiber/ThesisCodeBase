@@ -84,7 +84,6 @@ while TBracket > Settings.BracketThreshold
     disp(['Current melting point bracket: ' num2str(TBracket,'%.4f') ...
         ' K, between T[Freeze] = ' num2str(T_dat.dT(1),'%.4f') ' K and T[Melt] = ' ...
         num2str(T_dat.dT(2),'%.4f') ' K.'])
-    
     % Info
     disp(['Checked temperatures that melted: ' num2str(sort(T_dat.T_Melt_Trace),'%.4f K    ')])
     disp(['Checked temperatures that froze:  ' num2str(sort(T_dat.T_Freeze_Trace,'descend'),'%.4f K    ')])

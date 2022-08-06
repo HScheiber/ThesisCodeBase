@@ -262,7 +262,26 @@ function varargout = Melting_Point_Check(T,Settings)
             [errcode,outp] = system(mdrun_command);
             if errcode ~= 0
                 disp(outp);
-                error(['Error running mdrun. Problem command: ' newline mdrun_command]);
+                if T > 1700
+                    T_dat.Alt_Structure = true;
+                    T_dat.T = T;
+                    T_dat.T_Trace = [T_dat.T_Trace T];
+                    T_dat.f_Trace = [T_dat.f_Trace f];
+                    T_dat.df_Trace = [T_dat.df_Trace df];
+                    T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                    T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                    copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                    save(Settings.CurrentTFile,'T_dat')
+                    varargout = cell(1,3); % Outputs function, coupled constraints, and user data
+                    varargout{1} = -1; % function evaluation
+                    varargout{2} = 0; % function derivative
+                    varargout{3} = T_dat; % user data 
+                    disp('Detected system blow up! This potential may be unusable')
+                    disp('Aborting Melting Point calculation.')
+                    return
+                else
+                    error(['Error running mdrun. Problem command: ' newline mdrun_command]);
+                end
             elseif ~isfile(windows2unix(Structure_Out_File))
                 disp('Calculation time is almost up, ending MATLAB session now.')
                 exit
@@ -359,7 +378,26 @@ function varargout = Melting_Point_Check(T,Settings)
         [errcode,outp] = system(mdrun_command);
         if errcode ~= 0
             disp(outp);
-            error(['Error running mdrun. Problem command: ' newline mdrun_command]);
+            if T > 1700
+                T_dat.Alt_Structure = true;
+                T_dat.T = T;
+                T_dat.T_Trace = [T_dat.T_Trace T];
+                T_dat.f_Trace = [T_dat.f_Trace f];
+                T_dat.df_Trace = [T_dat.df_Trace df];
+                T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                save(Settings.CurrentTFile,'T_dat')
+                varargout = cell(1,3); % Outputs function, coupled constraints, and user data
+                varargout{1} = -1; % function evaluation
+                varargout{2} = 0; % function derivative
+                varargout{3} = T_dat; % user data
+                disp('Possible system blow up! This potential may be unusable!')
+                disp('Aborting Melting Point calculation.')
+                return
+            else
+                error(['Error running mdrun. Problem command: ' newline mdrun_command]);
+            end
         elseif ~isfile(windows2unix(Structure_Out_File))
             disp('Calculation time is almost up, ending MATLAB session now.')
             exit
@@ -586,23 +624,8 @@ function varargout = Melting_Point_Check(T,Settings)
         system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" -delete']);
     end
     
-    switch lower(Settings.Optimizer)
-    case 'fmincon'
-        varargout = cell(1,2); % Outputs function and derivative
-        varargout{1} = f;
-        varargout{2} = df;
-    case 'bayesopt'
-        varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-        varargout{1} = f; % function evaluation
-        varargout{2} = []; % coupled constraints
-        varargout{3} = T_dat; % user data
-    case 'patternsearch'
-        varargout = cell(1,1); % Outputs function only
-        varargout{1} = f; % function evaluation
-    case 'mpsearcher'
-        varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-        varargout{1} = f; % function evaluation
-        varargout{2} = df; % function derivative
-        varargout{3} = T_dat; % user data 
-    end
+    varargout = cell(1,3); % Outputs function, coupled constraints, and user data
+    varargout{1} = f; % function evaluation
+    varargout{2} = df; % function derivative
+    varargout{3} = T_dat; % user data 
 end

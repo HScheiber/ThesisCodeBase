@@ -43,7 +43,7 @@ if isfile(ResultsFile) && ~Settings.Continue
         
         disp(repmat('*',1,40));
         if T_dat.Alt_Structure
-            disp(['Calculation previously aborted due to incorrect structure freezing out at T = ' num2str(T_dat.T,'%.4f') ' K.']);
+            disp(['Calculation previously aborted at T = ' num2str(T_dat.T,'%.4f') ' K.']);
             Aborted = true;
         else
             disp(['Calculation previously completed. Melting Point estimated at Tm = ' num2str(Tm_estimate,'%.4f') ' K. Error bounds: Tm = ' ...
@@ -248,6 +248,7 @@ end
 
 Tm_estimate = mean(T_dat.dT);
 if T_dat.Alt_Structure
+    Tm_estimate = nan;
     Aborted = true;
 end
 disp(['Calculation complete. Epalsed Time: ' datestr(seconds(toc(total_timer)),'HH:MM:SS')])

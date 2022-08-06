@@ -189,9 +189,9 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\Equil_Sol'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\T_2200.0000'
 Salt = 'LiF'
-SystemName = 'Equil_Sol'
+SystemName = 'Test_MP'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
@@ -215,8 +215,8 @@ Spatial_Reassignment = False
 Spatial_Interfacial = None
 SaveTrajectoryAux = 2
 LoadFeatures = True
-T = None
-T_Ref = None
+T = 2200
+T_Ref = 2200
 RefChangeThreshold = 0.25
 CheckFullTrajectory = True
 
