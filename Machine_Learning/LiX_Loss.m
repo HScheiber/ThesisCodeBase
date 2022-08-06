@@ -179,7 +179,7 @@ function Loss = LiX_Loss(Settings)
                 reg((Settings.Finite_T_Data.Fusion_dH - Settings.Finite_T_Data.Exp_Fusion_dH)/...
                 Settings.Finite_T_Data.Exp_Fusion_dH);
             if isnan(rel_er)
-                rel_er = Settings.Loss_Options.Fusion_Enthalpy;
+                rel_er = Settings.Loss_Options.Fusion_Enthalpy*Settings.BadFcnLossPenalty;
             end
             Loss = Loss + rel_er;
         end
@@ -190,7 +190,7 @@ function Loss = LiX_Loss(Settings)
                 reg((Settings.Finite_T_Data.Fusion_dV - Settings.Finite_T_Data.Exp_Fusion_dV)/...
                 Settings.Finite_T_Data.Exp_Fusion_dV);
             if isnan(rel_er)
-                rel_er = Settings.Loss_Options.MP_Volume_Change;
+                rel_er = Settings.Loss_Options.MP_Volume_Change*Settings.BadFcnLossPenalty;
             end
             Loss = Loss + rel_er;
         end
@@ -201,7 +201,7 @@ function Loss = LiX_Loss(Settings)
                 reg((Settings.Finite_T_Data.Liquid_V_MP - Settings.Finite_T_Data.Exp_Liquid_V_MP)/...
                 Settings.Finite_T_Data.Exp_Liquid_V_MP);
             if isnan(rel_er)
-                rel_er = Settings.Loss_Options.Liquid_MP_Volume;
+                rel_er = Settings.Loss_Options.Liquid_MP_Volume*Settings.BadFcnLossPenalty;
             end
             Loss = Loss + rel_er;
         end
@@ -212,7 +212,7 @@ function Loss = LiX_Loss(Settings)
                 reg((Settings.Finite_T_Data.Solid_V_MP - Settings.Finite_T_Data.Exp_Solid_V_MP)/...
                 Settings.Finite_T_Data.Exp_Solid_V_MP);
             if isnan(rel_er)
-                rel_er = Settings.Loss_Options.Solid_MP_Volume;
+                rel_er = Settings.Loss_Options.Solid_MP_Volume*Settings.BadFcnLossPenalty;
             end
             Loss = Loss + rel_er;
         end
@@ -223,7 +223,7 @@ function Loss = LiX_Loss(Settings)
                 reg((Settings.Finite_T_Data.MP - Settings.Finite_T_Data.Exp_MP)/...
                 Settings.Finite_T_Data.Exp_MP);
             if isnan(rel_er)
-                rel_er = Settings.Loss_Options.MP;
+                rel_er = Settings.Loss_Options.MP*Settings.BadFcnLossPenalty;
             end
             Loss = Loss + rel_er;
         end

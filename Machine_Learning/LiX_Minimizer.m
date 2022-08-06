@@ -1191,8 +1191,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
     end
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted && ~Therm_Prop_Override
-        Loss_add = Loss_add + log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
-        Settings.Finite_T_Data.MP = 0;
+        Settings.Finite_T_Data.MP = nan;
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
     end

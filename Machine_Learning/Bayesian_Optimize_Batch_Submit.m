@@ -168,12 +168,16 @@ switch lower(computer)
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Shared_Settings.Max_Local_Iterations = 100;
+        Shared_Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+        Shared_Settings.ub = 1800; % K, upper bound on MP search
         
         %% BH Models JA, JB, JC
+        Shared_Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+        Shared_Settings.ub = 1800; % K, upper bound on MP search
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
@@ -249,10 +253,12 @@ switch lower(computer)
             end
         end
         %% JC Models JA, JB, JC
+        Shared_Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
         Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+        Shared_Settings.ub = 2200; % K, upper bound on MP search
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'JC'};
         Replicates = 1:5;
@@ -342,6 +348,7 @@ switch lower(computer)
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Shared_Settings.Max_Local_Iterations = 1000;
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+        Shared_Settings.ub = 1800; % K, upper bound on MP search
         
         %% BH Models IA, IB, IC, ID
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
@@ -576,6 +583,8 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Shared_Settings.Max_Local_Iterations = 1000;
+        Shared_Settings.ub = 2200; % K, upper bound on MP search
+        
         %% JC Models EA, EB, ED, EE, EG
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
