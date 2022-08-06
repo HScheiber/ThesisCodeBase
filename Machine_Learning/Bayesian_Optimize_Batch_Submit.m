@@ -167,6 +167,7 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
+        Shared_Settings.Max_Local_Iterations = 100;
         
         %% BH Models JA, JB, JC
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
@@ -572,7 +573,7 @@ switch lower(computer)
         Shared_Settings.switch_final_opt = true;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
-        %% JC Models EA, EB, ED, EE
+        %% JC Models EA, EB, ED, EE, EG
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
         for sidx = 1:length(Salts)
@@ -649,28 +650,9 @@ switch lower(computer)
                 Models(idx).Additivity = true;
                 Models(idx).SDMM_Range = [0 50];
                 
-                %% Model JC: EG
-                idx = idx+1;
-                Models(idx) = Shared_Settings;
-                Models(idx).Salt = Salt;
-                Models(idx).Theory = 'JC';
-                Models(idx).Trial_ID = ['EG' Rep];
-                Models(idx).final_opt_type = 'fminsearchbnd';
-
-                % Loss
-                Models(idx).Loss_Options.Rocksalt.LE = 1;
-                Models(idx).Loss_Options.Rocksalt.a = 1;
-                Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                Models(idx).Loss_Options.FiveFive.RLE = 1;
-
-                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                Models(idx).Fix_Charge = true;
-                Models(idx).Additivity = false;
-                Models(idx).SDMM_Range = [0 1000];
-                
             end
         end
-        %% JC Models EH, EJ, EK, EM
+        %% JC Models EG, EH, EJ, EK, EM
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
         for sidx = 1:length(Salts)
