@@ -648,6 +648,26 @@ switch lower(computer)
                 Models(idx).Fix_Charge = true;
                 Models(idx).Additivity = true;
                 Models(idx).SDMM_Range = [0 50];
+                
+                %% Model JC: EG
+                idx = idx+1;
+                Models(idx) = Shared_Settings;
+                Models(idx).Salt = Salt;
+                Models(idx).Theory = 'JC';
+                Models(idx).Trial_ID = ['EG' Rep];
+                Models(idx).final_opt_type = 'fminsearchbnd';
+
+                % Loss
+                Models(idx).Loss_Options.Rocksalt.LE = 1;
+                Models(idx).Loss_Options.Rocksalt.a = 1;
+                Models(idx).Loss_Options.Wurtzite.RLE = 1;
+                Models(idx).Loss_Options.FiveFive.RLE = 1;
+
+                Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                Models(idx).Fix_Charge = true;
+                Models(idx).Additivity = false;
+                Models(idx).SDMM_Range = [0 1000];
+                
             end
         end
         %% JC Models EH, EJ, EK, EM

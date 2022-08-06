@@ -52,7 +52,7 @@ switch lower(computer)
         %% JC Models EC, ...
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theory = 'JC';
-        Models = {'EC' 'EF' 'EG' 'EI' 'EL' 'EO' 'EU'};
+        Models = {'EC' 'EF' 'EI' 'EL' 'EO' 'EU'};
         Reps = 1:10;
         for jdx = 1:length(Salts)
             Salt = Salts{jdx};
