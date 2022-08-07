@@ -237,7 +237,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
             parpool(local_cluster,PrefCores); 
         end
     end
-
+    
     %% Global optimization with bayesian optimization
     % Deal with restart requests
     if Model.Restart_Calculation && (isfile(Intermediate_Secondary_file) || isfile(Intermediate_Seconary_backup))

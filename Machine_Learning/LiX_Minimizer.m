@@ -1055,7 +1055,7 @@ if Settings.Parallel_LiX_Minimizer
         Cur_Workers = Cur_Pool.NumWorkers;
 
         % Start the parallel pool
-        if Cur_Workers ~= PrefCores
+        if Cur_Workers < PrefCores
             delete(Cur_Pool);
             % Create a "local" cluster object
             local_cluster = parcluster('local');
