@@ -826,6 +826,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         Model.Parallel_LiX_Minimizer = false;
         Model.MinMDP.Parallel_Min = true;
     end
+    Model.MinMDP.Verbose = true;
     Model.Delete_Equil = false; % save the final MP calculation directories
     Model.Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
     [loss,~,UserData] = LiX_Minimizer(Model,full_opt_point,...
