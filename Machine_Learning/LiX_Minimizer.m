@@ -36,7 +36,7 @@ parse(p,varargin{:});
 Settings.MinMDP.Verbose = p.Results.Verbose;
 Verbose = p.Results.Verbose;
 Extra_Properties = p.Results.Extra_Properties;
-Therm_Prop_Override = p.Results.Therm_Prop_Override;
+Settings.Therm_Prop_Override = p.Results.Therm_Prop_Override;
 
 if Settings.Parallel_LiX_Minimizer && Settings.Parallel_Struct_Min
     Settings.Parallel_Struct_Min = false;
@@ -1113,7 +1113,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume ...
         Settings.Loss_Options.Solid_MP_Volume ...
-        Settings.Loss_Options.MP] > tol) || Therm_Prop_Override
+        Settings.Loss_Options.MP] > tol) || Settings.Therm_Prop_Override
     
     Settings.T0 = Settings.Finite_T_Data.Exp_MP; % K, Initial temperature
     Settings.Target_T = Settings.Finite_T_Data.Exp_MP; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
@@ -1141,7 +1141,7 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         
         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
         
-        if ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Therm_Prop_Override
+        if ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Settings.Therm_Prop_Override
             Loss_add = Loss_add + log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
             Settings.skip_finite_T = true;
         else
@@ -1157,7 +1157,8 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 end
 
 % Melting point
-if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_Override
+CalcDir = pwd;
+if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
     
     if Settings.Parallel_Bayesopt % Run serially
         env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
@@ -1175,22 +1176,28 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Therm_Prop_O
     elseif ~isempty(gcp('nocreate')) % close the current ppool, it will likely close on its own anyway, causing issues
         delete(gcp);
     end
+    if Settings.Therm_Prop_Override
+        Settings.WorkDir = fullfile(CalcDir,'BestPoint_Thermal','Melting_Point');
+    else
+        WorkDir = GetMDWorkdir(Settings);
+        Settings.WorkDir = [WorkDir '_MP'];
+    end
     
     Settings.BatchMode = false;
     Settings.Submit_Jobs = false;
     Settings.Skip_Minimization = true; % Skip the automatic geometry minimization
     Settings.RefStructure = Settings.Finite_T_Data.Structure;
-    [Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings);
+    [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
     
-    if Settings.Delete_Equil
+    if Settings.Delete_Equil && ~Settings.Therm_Prop_Override
         try
-            rmdir(WorkDir,'s')
+            rmdir(Settings.WorkDir,'s')
         catch
-            disp(['Unable to remove directory: ' WorkDir])
+            disp(['Unable to remove directory: ' Settings.WorkDir])
         end
     end
     Settings.Finite_T_Data.T_dat = T_dat;
-    if Aborted && ~Therm_Prop_Override
+    if Aborted
         Settings.Finite_T_Data.MP = nan;
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
@@ -1208,7 +1215,11 @@ end
 if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Liquid_MP_Volume] > tol) ...
-        && ~Settings.skip_finite_T ) || Therm_Prop_Override
+        && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
+    
+    if Settings.Therm_Prop_Override
+        Settings.WorkDir = fullfile(CalcDir,'BestPoint_Thermal','Liq_Properties_at_MP');
+    end
     
     if Settings.Parallel_Bayesopt % Run serially
         env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
@@ -1251,7 +1262,11 @@ end
 if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.MP_Volume_Change ...
         Settings.Loss_Options.Solid_MP_Volume] > tol) ...
-        && ~Settings.skip_finite_T ) || Therm_Prop_Override
+        && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
+    
+    if Settings.Therm_Prop_Override
+        Settings.WorkDir = fullfile(CalcDir,'BestPoint_Thermal','Sol_Properties_at_MP');
+    end
     
     if Settings.Parallel_Bayesopt % Run serially
         env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
@@ -1293,6 +1308,22 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
         setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
         setenv('KMP_AFFINITY',env.KMP_AFFINITY);
+    end
+end
+
+% Delete previous calculations that did not complete
+if Settings.Delete_Equil
+    files = dir(CalcDir);
+    dirFlags = [files.isdir];
+    subFolders = files(dirFlags);
+    subFolderNames = {subFolders(3:end).name};
+    prev_calcs = subFolderNames(cellfun(@(x) ~isempty(x),regexp(subFolderNames,'.+?_[S|M|L]P','once')));
+    for idx = 1:length(prev_calcs)
+        try
+            rmdir(fullfile(CalcDir,prev_calcs{idx}),'s')
+        catch
+            disp(['Unable to remove directory: ' fullfile(CalcDir,prev_calcs{idx})])
+        end
     end
 end
 

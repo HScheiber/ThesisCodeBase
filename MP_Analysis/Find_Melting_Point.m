@@ -11,6 +11,9 @@ if ~isfield(Settings,'WorkDir')
     [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
 end
 WorkDir = Settings.WorkDir;
+if ~isfolder(WorkDir)
+    mkdir(WorkDir)
+end
 if ~isfield(Settings,'gmx')
     [Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
 end
