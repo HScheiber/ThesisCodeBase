@@ -571,7 +571,7 @@ switch lower(computer)
     case 'graham'
         Shared_Settings.Max_Bayesian_Iterations = 800;
         Shared_Settings.Max_Secondary_Iterations = 200;
-        Shared_Settings.JobSettings.N_Calc = 2;
+        Shared_Settings.JobSettings.N_Calc = 4;
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
