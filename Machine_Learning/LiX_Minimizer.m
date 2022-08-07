@@ -1177,9 +1177,10 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
         delete(gcp);
     end
     if Settings.Therm_Prop_Override
+        [~,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
         Settings.WorkDir = fullfile(CalcDir,'BestPoint_Thermal','Melting_Point');
     else
-        WorkDir = GetMDWorkdir(Settings);
+        [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
         Settings.WorkDir = [WorkDir '_MP'];
     end
     
