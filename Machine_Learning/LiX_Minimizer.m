@@ -1313,7 +1313,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
 end
 
 % Delete previous calculations that did not complete
-if Settings.Delete_Equil
+if Settings.Delete_Equil || Settings.Therm_Prop_Override
     files = dir(CalcDir);
     dirFlags = [files.isdir];
     subFolders = files(dirFlags);
@@ -1323,7 +1323,7 @@ if Settings.Delete_Equil
         try
             rmdir(fullfile(CalcDir,prev_calcs{idx}),'s')
         catch
-            disp(['Unable to remove directory: ' fullfile(CalcDir,prev_calcs{idx})])
+            disp(['Unable to remove failed calculation directory: ' fullfile(CalcDir,prev_calcs{idx})])
         end
     end
 end
