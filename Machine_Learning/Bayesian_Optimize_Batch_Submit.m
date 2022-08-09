@@ -571,7 +571,6 @@ switch lower(computer)
     case 'graham'
         Shared_Settings.Max_Bayesian_Iterations = 800;
         Shared_Settings.Max_Secondary_Iterations = 200;
-        Shared_Settings.JobSettings.N_Calc = 4;
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
@@ -585,7 +584,7 @@ switch lower(computer)
         Shared_Settings.Max_Local_Iterations = 1000;
         Shared_Settings.ub = 2200; % K, upper bound on MP search
         
-        %% JC Models EA, EB, ED, EE, EG
+        %% JC Models EA, EB, ED, EE
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Replicates = 1:5;
         for sidx = 1:length(Salts)
