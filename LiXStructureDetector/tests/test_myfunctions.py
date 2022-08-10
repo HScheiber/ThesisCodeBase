@@ -189,9 +189,9 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\86ebafe4b9f8969f4cb9f7d35afa531b_SP'
-Salt = 'LiCl'
-SystemName = 'Equil_Sol_min'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\cf928e9ec9590f1e0906a3eead216528_LP'
+Salt = 'LiBr'
+SystemName = 'Equil_Liq'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
@@ -199,7 +199,7 @@ SavePredictions=False
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=1.2719186785260483
+TimePerFrame=0.001
 FileType='gro'
 Verbose=True
 StartPoint = None

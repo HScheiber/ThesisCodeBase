@@ -397,13 +397,13 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         disp(['Beginning Solid Equilibration for ' num2str(Settings.Solid_Test_Time) ' ps...'] )
     end
     mintimer = tic;
-    [state,mdrun_output] = system(mdrun_command);
+    [state,~] = system(mdrun_command);
     if state == 0
         if Verbose
             disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        disp('Equilibration failed. Retrying with stiffer compressibility.')
+        disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
         Settings = Inp_Settings;
         if ~isfield(Settings,'QECompressibility_init')
             Settings.QECompressibility_init = Settings.QECompressibility;
@@ -416,8 +416,8 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
         elseif ~Settings.MinComplete
-            disp('Equilibration failed. Stiffer compressibility did not resolve.')
-            disp('Running Pre-Minimization of System.')
+            disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
+            disp('Running Pre-Minimization of Solid.')
             Settings.Verbose = Verbose;
             Minimize_Solid(Settings);
             Inp_Settings.QECompressibility = Settings.QECompressibility_init;
@@ -427,8 +427,11 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Calc_Solid_Properties_at_MP(Inp_Settings,'Verbose',Verbose,'Skip_Cell_Construction',true)
             return
         else
-            disp(mdrun_output)
-            error('Equilibration completely failed!')
+            disp('Solid equilibration failed.')
+            disp('Solid may be completely unstable!')
+            Output.Solid_V_MP = nan;
+            Output.Solid_H_MP = nan;
+            return
         end
     end
     

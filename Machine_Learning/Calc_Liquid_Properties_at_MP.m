@@ -621,22 +621,31 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         disp(['Begining Liquid Equilibration for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
     end
     mintimer = tic;
-    [state,mdrun_output] = system(mdrun_command);
+    [state,~] = system(mdrun_command);
     if state == 0
         if Verbose
             disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        disp('Equilibration failed. Retrying with stiffer compressibility.')
         Settings = Inp_Settings;
         Settings.QECompressibility = Settings.QECompressibility/2;
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+            disp('Equilibration failed. Retrying with stiffer compressibility.')
+            Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
+            return
+        elseif Settings.ScaleInitialLiqDensity > 0.5 % Retry until density is half of the solid
+            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp('Retrying with lower density and stiff compressibility.')
+            Settings.QECompressibility = 1e-8;
+            Settings.ScaleInitialLiqDensity = Settings.ScaleInitialLiqDensity*0.9;
             Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
         else
-            disp('Equilibration failed. Stiffer compressibility did not resolve.')
-            disp(mdrun_output);
-            error(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
+            disp('Equilibration failed. Lower density did not resolve.')
+            disp('Liquid is likely to be totally unstable!')
+            Output.Liquid_V_MP = nan;
+            Output.Liquid_H_MP = nan;
+            return
         end
     end
     
@@ -699,8 +708,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     
     [err,~] = system(gmx_command);
     if err ~= 0
-        warndlg('Failed to collect data.')
-        return
+        error('Failed to collect data.')
     end
     
     Data = import_xvg(En_xvg_file); % Gather X,Y,Z lengths
