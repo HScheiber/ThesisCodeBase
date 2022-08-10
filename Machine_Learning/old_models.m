@@ -5520,3 +5520,423 @@ for tidx = 1:length(Theories)
         end
     end
 end
+%% JC Models EA, EB, ED, EE
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+
+        %% Model JC: EA
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EA' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: EB
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EB' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: ED
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ED' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+
+        %% Model JC: EE
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EE' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+    end
+end
+%% JC Models EG, EH, EJ, EK, EM
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+
+        %% Model JC: EG
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EG' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+
+        %% Model JC: EH
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EH' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: EJ
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EJ' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+
+        %% Model JC: EK
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EK' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: EM
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EM' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+
+    end
+end
+%% JC Models EN, EP
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+
+        %% Model JC: EN
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EN' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: EP
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EP' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.LE = 1;
+        Models(idx).Loss_Options.Wurtzite.a = 2/3;
+        Models(idx).Loss_Options.Wurtzite.c = 1/3;
+        Models(idx).Loss_Options.NiAs.LE = 1;
+        Models(idx).Loss_Options.NiAs.a = 2/3;
+        Models(idx).Loss_Options.NiAs.c = 1/3;
+        Models(idx).Loss_Options.Sphalerite.LE = 1;
+        Models(idx).Loss_Options.Sphalerite.a = 1;
+        Models(idx).Loss_Options.FiveFive.LE = 1;
+        Models(idx).Loss_Options.FiveFive.a = 2/3;
+        Models(idx).Loss_Options.FiveFive.c = 1/3;
+        Models(idx).Loss_Options.AntiNiAs.LE = 1;
+        Models(idx).Loss_Options.AntiNiAs.a = 2/3;
+        Models(idx).Loss_Options.AntiNiAs.c = 1/3;
+        Models(idx).Loss_Options.BetaBeO.LE = 1;
+        Models(idx).Loss_Options.BetaBeO.a = 2/3;
+        Models(idx).Loss_Options.BetaBeO.c = 1/3;
+        Models(idx).Loss_Options.CsCl.LE = 1;
+        Models(idx).Loss_Options.CsCl.a = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 1000];
+
+    end
+end
+%% JC Models EQ, ER, ES, ET
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+
+        %% Model JC: EQ
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EQ' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: ER
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ER' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: ES
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ES' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = false;
+        Models(idx).Additivity = false;
+        Models(idx).SDMM_Range = [0 300];
+
+        %% Model JC: ET
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['ET' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.AntiNiAs.RLE = 1;
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+    end
+end
+%% JC Models EV, EW, EX
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Replicates = 1:5;
+for sidx = 1:length(Salts)
+    Salt = Salts{sidx};
+
+    for ridx = 1:length(Replicates)
+        Rep = num2str(Replicates(ridx));
+
+        %% Model JC: EV
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EV' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Q_value = 0.97; % Value for the charge scale. Only meaningful when Fix_Charge = true
+
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: EW
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EW' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Q_value = 0.97; % Value for the charge scale. Only meaningful when Fix_Charge = true
+
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+        %% Model JC: EX
+        idx = idx+1;
+        Models(idx) = Shared_Settings;
+        Models(idx).Salt = Salt;
+        Models(idx).Theory = 'JC';
+        Models(idx).Trial_ID = ['EX' Rep];
+
+        % Loss
+        Models(idx).Loss_Options.Rocksalt.LE = 1;
+        Models(idx).Loss_Options.Rocksalt.a = 1;
+        Models(idx).Loss_Options.Wurtzite.RLE = 1;
+        Models(idx).Loss_Options.FiveFive.RLE = 1;
+        Models(idx).Loss_Options.CsCl.RLE = 1/3;
+        Models(idx).Q_value = 0.97; % Value for the charge scale. Only meaningful when Fix_Charge = true
+
+
+        Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+        Models(idx).Fix_Charge = true;
+        Models(idx).Additivity = true;
+        Models(idx).SDMM_Range = [0 50];
+
+    end
+end
