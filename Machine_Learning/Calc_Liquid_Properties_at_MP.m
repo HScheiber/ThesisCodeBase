@@ -627,22 +627,29 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
             disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
+        WorkDir = Settings.WorkDir;
         Settings = Inp_Settings;
+        Settings.WorkDir = WorkDir;
         Settings.QECompressibility = Settings.QECompressibility/2;
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-            disp('Equilibration failed. Retrying with stiffer compressibility.')
+            if Verbose
+                disp('Liquid Equilibration failed. Retrying with stiffer compressibility.')
+            end
             Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
         elseif Settings.ScaleInitialLiqDensity > 0.5 % Retry until density is half of the solid
-            disp('Equilibration failed. Stiffer compressibility did not resolve.')
-            disp('Retrying with lower density and stiff compressibility.')
+            if Verbose
+                disp('Liquid Equilibration failed. Stiffer compressibility did not resolve.')
+                disp('Retrying with lower density and stiff compressibility.')
+            end
             Settings.QECompressibility = 1e-8;
             Settings.ScaleInitialLiqDensity = Settings.ScaleInitialLiqDensity*0.9;
             Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
         else
-            disp('Equilibration failed. Lower density did not resolve.')
+            disp('Liquid Equilibration failed. Lower density did not resolve.')
             disp('Liquid is likely to be totally unstable!')
+            disp(['WorkDir: ' WorkDir])
             Output.Liquid_V_MP = nan;
             Output.Liquid_H_MP = nan;
             return

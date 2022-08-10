@@ -403,7 +403,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
+        if Verbose
+            disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
+        end
         SuperCellFile = Settings.SuperCellFile;
         WorkDir = Settings.WorkDir;
         Settings = Inp_Settings;
@@ -419,8 +421,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
         elseif ~Settings.MinComplete
-            disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
-            disp('Running Pre-Minimization of Solid.')
+            if Verbose
+                disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
+                disp('Running Pre-Minimization of Solid.')
+            end
             Settings.Verbose = Verbose;
             Settings.WorkDir = WorkDir;
             Minimize_Solid(Settings);
@@ -431,8 +435,11 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Calc_Solid_Properties_at_MP(Inp_Settings,'Verbose',Verbose,'Skip_Cell_Construction',true)
             return
         else
-            disp('Solid equilibration failed.')
-            disp('Solid may be completely unstable!')
+            if Verbose
+                disp('Solid equilibration failed.')
+                disp('Solid may be completely unstable!')
+                disp(['WorkDir: ' WorkDir])
+            end
             Output.Solid_V_MP = nan;
             Output.Solid_H_MP = nan;
             return
