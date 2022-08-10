@@ -340,7 +340,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         outfile = os.path.join(SaveDir, ML_Name + '_' + Salt + '_' + SystemName + '.xyz')
     
     # List of index points to examine
-    steps_per_init_frame = int(TimePerFrame/traj_timestep)
+    steps_per_init_frame = int(round(TimePerFrame/traj_timestep))
     Traj_starts = list(range(min_step, max_step+1, steps_per_init_frame)) # Steps
     ML_TimeLength_in_steps = int(np.ceil((ML_TimeLength)/traj_timestep)) # number of trajectory steps required to traverse the CNN time slice
     Half_ML_TimeLength_in_steps = int(np.floor(ML_TimeLength_in_steps/2))

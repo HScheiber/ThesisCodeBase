@@ -2,9 +2,11 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     p = inputParser;
     p.FunctionName = 'Calc_Solid_Properties_at_MP';
     addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
+    addOptional(p,'Skip_Cell_Construction',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 
     parse(p,varargin{:});
     Verbose = p.Results.Verbose;
+    Settings.Skip_Cell_Construction =  p.Results.Skip_Cell_Construction;
 	Inp_Settings = Settings;
     
     if ~isfield(Settings,'WorkDir')
@@ -23,57 +25,62 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     % Generate unit cell: Unit Cell Filename
     Settings.JobName = 'Equil_Sol';
     
-    Settings.UnitCellFile = fullfile(Settings.WorkDir,[Settings.JobName '_UnitCell.' Settings.CoordType]);
-    Settings.Geometry = Convert_to_Primitive(Settings.Geometry);
-    if contained_in_cell(Settings.Structure,{'Rocksalt' 'Sphalerite' 'FiveFive'})
-        Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
-            [Settings.Structure '_Primitive.' Settings.CoordType]);
-    else
-        Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
-            [Settings.Structure '.' Settings.CoordType]);
-    end
-    
-    % Generate unit cell coord file text
-    Coordinate_Text = fileread(Settings.Coordinate_File);
+    if ~Settings.Skip_Cell_Construction
+        Settings.UnitCellFile = fullfile(Settings.WorkDir,[Settings.JobName '_UnitCell.' Settings.CoordType]);
+        Settings.Geometry = Convert_to_Primitive(Settings.Geometry);
+        if contained_in_cell(Settings.Structure,{'Rocksalt' 'Sphalerite' 'FiveFive'})
+            Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
+                [Settings.Structure '_Primitive.' Settings.CoordType]);
+        else
+            Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
+                [Settings.Structure '.' Settings.CoordType]);
+        end
 
-    % Add Metal and Halide symbols
-    if strcmp(Settings.CoordType,'gro')
-        Met = pad(Settings.Metal,2,'left');
-        Hal = pad(Settings.Halide,2,'left');
-    elseif strcmp(Settings.CoordType,'g96')
-        Met = pad(Settings.Metal,2,'right');
-        Hal = pad(Settings.Halide,2,'right');
-    end
-    Coordinate_Text = strrep(Coordinate_Text,'##MET##',Met);
-    Coordinate_Text = strrep(Coordinate_Text,'##HAL##',Hal);
-    Coordinate_Text = AddCartesianCoord(Coordinate_Text,Settings.Geometry,1,false,Settings.CoordType); %input coordinates
-    
-    % Save unit cell .gro file
-    fid = fopen(Settings.UnitCellFile,'wt');
-    fwrite(fid,regexprep(Coordinate_Text,'\r',''));
-    fclose(fid);
-            
-    % Generate a box with the structure of interest containing the smallest
-    % possible number of atoms for the given cutoff, plus a buffer in case of contraction
-    La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
-    Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_b; % nm, the minimum box dimension
-    Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_c; % nm, the minimum box dimension
-    
-    Na = ceil(La/(Settings.Geometry.a/10));
-    Nb = ceil(Lb/(Settings.Geometry.b/10));
-    Nc = ceil(Lc/(Settings.Geometry.c/10));
-    
-    % Calculate number of formula units
-    nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
-    
-    SuperCellFile = fullfile(Settings.WorkDir,['Equil_Sol.' Settings.CoordType]);
-    Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
-         ' -o ' windows2unix(SuperCellFile) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
-    [errcode,output] = system(Supercell_command);
-    
-    if errcode ~= 0
-        disp(output);
-        error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
+        % Generate unit cell coord file text
+        Coordinate_Text = fileread(Settings.Coordinate_File);
+
+        % Add Metal and Halide symbols
+        if strcmp(Settings.CoordType,'gro')
+            Met = pad(Settings.Metal,2,'left');
+            Hal = pad(Settings.Halide,2,'left');
+        elseif strcmp(Settings.CoordType,'g96')
+            Met = pad(Settings.Metal,2,'right');
+            Hal = pad(Settings.Halide,2,'right');
+        end
+        Coordinate_Text = strrep(Coordinate_Text,'##MET##',Met);
+        Coordinate_Text = strrep(Coordinate_Text,'##HAL##',Hal);
+        Coordinate_Text = AddCartesianCoord(Coordinate_Text,Settings.Geometry,1,false,Settings.CoordType); %input coordinates
+
+        % Save unit cell .gro file
+        fid = fopen(Settings.UnitCellFile,'wt');
+        fwrite(fid,regexprep(Coordinate_Text,'\r',''));
+        fclose(fid);
+
+        % Generate a box with the structure of interest containing the smallest
+        % possible number of atoms for the given cutoff, plus a buffer in case of contraction
+        La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
+        Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_b; % nm, the minimum box dimension
+        Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_c; % nm, the minimum box dimension
+
+        Na = ceil(La/(Settings.Geometry.a/10));
+        Nb = ceil(Lb/(Settings.Geometry.b/10));
+        Nc = ceil(Lc/(Settings.Geometry.c/10));
+
+        % Calculate number of formula units
+        nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
+
+        Settings.SuperCellFile = fullfile(Settings.WorkDir,['Equil_Sol.' Settings.CoordType]);
+        Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
+             ' -o ' windows2unix(Settings.SuperCellFile) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
+        [errcode,output] = system(Supercell_command);
+
+        if errcode ~= 0
+            disp(output);
+            error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
+        end
+    else
+        Supercell_file_data = load_gro_file(Settings.SuperCellFile);
+        nmol_solid = Supercell_file_data.N_atoms/2;
     end
     
     % Set the number of steps
@@ -343,7 +350,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     % Finish the topology file: add in title and the atom list
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##',num2str(nmol_solid));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##GEOM##',['molecule ' Settings.Structure]);
-    Atomlist = copy_atom_order(SuperCellFile);
+    Atomlist = copy_atom_order(Settings.SuperCellFile);
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
     Top_Filename = fullfile(Settings.WorkDir,'Equil_Sol.top');
     
@@ -356,7 +363,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     MDPout_File = fullfile(Settings.WorkDir,'Equil_Sol_out.mdp');
     GrompLog_File = fullfile(Settings.WorkDir,'Equil_Sol_Grompplog.log');
     
-    FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(SuperCellFile) ...
+    FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
         ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
         ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
         ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
@@ -398,14 +405,30 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     else
         disp('Equilibration failed. Retrying with stiffer compressibility.')
         Settings = Inp_Settings;
+        if ~isfield(Settings,'QECompressibility_init')
+            Settings.QECompressibility_init = Settings.QECompressibility;
+        end
+        if ~isfield(Settings,'MinComplete')
+            Settings.MinComplete = false;
+        end
         Settings.QECompressibility = Settings.QECompressibility/2;
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
-        else
+        elseif ~Settings.MinComplete
             disp('Equilibration failed. Stiffer compressibility did not resolve.')
-            disp(mdrun_output);
-            error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+            disp('Running Pre-Minimization of System.')
+            Settings.Verbose = Verbose;
+            Minimize_Solid(Settings);
+            Inp_Settings.QECompressibility = Settings.QECompressibility_init;
+            Inp_Settings.Verbose = Verbose;
+            Inp_Settings.SuperCellFile = Inp_Settings.SuperCellFile;
+            Inp_Settings.MinComplete = true;
+            Calc_Solid_Properties_at_MP(Inp_Settings,'Verbose',Verbose,'Skip_Cell_Construction',true)
+            return
+        else
+            disp(mdrun_output)
+            error('Equilibration completely failed!')
         end
     end
     
