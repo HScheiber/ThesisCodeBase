@@ -2,16 +2,16 @@
 
 %% Analysis Parameters
 fs = 24;
-Salt = 'LiI';
+Salt = 'LiBr';
 Theory = 'BH';
-Basenum = 'G';
-Midnum = 'A';
+Basenum = 'F';
+Midnum = 'B';
 min_iter = 900; % Set the first iterations to show, set to 1 for all numbers
 max_iter = Inf; % Set the max to show, set to Inf for all numbers
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 
 % Find reps of models
-files = {dir(fullfile(ML_results_dir,['*' Salt '_' Theory '_Model_' Basenum Midnum '*'])).name};
+files = {dir(fullfile(ML_results_dir,Salt,[Salt '_' Theory '_Model_' Basenum Midnum '*'])).name};
 Models = unique(regexp(files,[Basenum Midnum '([0-9])+'],'match','once'));
 nonempty_idx = ~cellfun(@isempty,Models);
 Models = Models(nonempty_idx);
@@ -24,7 +24,7 @@ Model_Labels = Models;
 filename = [Salt '_' Theory '_' Models{1} '-' Models{end} '_Traces.png'];
 
 N_Models = length(Models);
-Colours = cbrewer('qual','Set1',N_Models);
+Colours = cbrewer('qual','Set1',N_Models,'spline');
 
 plot_min = true; % If true plots the minimum loss vs step
 plot_iter = true; % If true, plots the current loss value vs step
@@ -32,9 +32,9 @@ plot_params = true; % If true, plots the values of each parameter vs step. Note,
 
 %% Other parameters
 savefile = false; % switch to save the final plots to file
-
+fullopt_dat = true;
 % Find model in results
-
+warning('off','MATLAB:cellfun:NotACell')
 
 % Preallocate data arrays
 p = gobjects(N_Models,1);
@@ -44,41 +44,27 @@ for idx = 1:N_Models
     Model = Models{idx};
     
     % Find the bayesian optimized model and full opt history
-    sres = dir([ML_results_dir filesep '*' Salt '*' Theory '*' 'Model_' Model '_*bayesopt.mat']);
-    rres = dir([ML_results_dir filesep '*' Salt '*' Theory '*' 'Model_' Model '_*fullopt_history.mat']);
+    data_file = fullfile(ML_results_dir,Salt,[Salt '_' Theory '_Model_' Model '_data.mat']);
 
-    if length(sres) > 1
-        warning(['Multiple results found for: ' Salt ', ' Theory ', Model ' Model '. Using first result.']);
-        sres = sres(1);
-    elseif isempty(sres)
+	if ~isfile(data_file)
         %error(['No results found for: ' Salt ', ' Theory ', Model ' Model '.']);
         continue
-    end
-    
-    fullopt_dat = true;
-    if length(rres) > 1
-        warning(['Multiple results found for: ' Salt ', ' Theory ', Model ' Model '. Using first result.']);
-        rres = rres(1);
-    elseif isempty(rres)
-        warning(['No full opt history results found for: ' Salt ', ' Theory ', Model ' Model '.']);
-        fullopt_dat = false;
-    end
-    
+	end
+
     % Load bayesopt data
-    model_bayesopt_filename = fullfile(sres.folder,sres.name);
-    data_bayes = load(model_bayesopt_filename);
+    data = load(data_file).full_data;
+    data_bayes = data.bayesopt_results;
     
     % Load fullopt data
     if fullopt_dat
-        model_fullopt_filename = fullfile(rres.folder,rres.name);
-        data_full  = load(model_fullopt_filename);
+        data_full  = data.secondary_result;
     end
     
     % Check how many parameters exist
     if idx == 1
         if plot_params
-            N_Pars = size(data_bayes.results.XTrace,2);
-            ParNames = data_bayes.results.XTrace.Properties.VariableNames;
+            N_Pars = size(data_bayes.XTrace,2);
+            ParNames = data_bayes.XTrace.Properties.VariableNames;
         else
             N_Pars = 0;
         end
@@ -92,18 +78,18 @@ for idx = 1:N_Models
     end
     
     if fullopt_dat
-        xdat{idx} = 1:(length(data_bayes.results.ObjectiveTrace) + length(data_full.intermediate_data));
+        xdat{idx} = 1:(length(data_bayes.ObjectiveTrace) + length(data_full));
     else
-        xdat{idx} = 1:length(data_bayes.results.ObjectiveTrace);
+        xdat{idx} = 1:length(data_bayes.ObjectiveTrace);
     end
     pdx = 1;
     
     if plot_min
         if fullopt_dat
-            ydat{idx,pdx} = [data_bayes.results.ObjectiveMinimumTrace; ...
-                extract_fullopt_hist(data_full.intermediate_data,'optimValues','fval')];
+            ydat{idx,pdx} = [data_bayes.ObjectiveMinimumTrace; ...
+                extract_fullopt_hist(data_full,'optimValues','fval')];
         else
-            ydat{idx,pdx} = data_bayes.results.ObjectiveMinimumTrace;
+            ydat{idx,pdx} = data_bayes.ObjectiveMinimumTrace;
         end
         
         if idx == 1
@@ -115,10 +101,10 @@ for idx = 1:N_Models
     end
     if plot_iter
         if fullopt_dat
-            ydat{idx,pdx} = [data_bayes.results.ObjectiveTrace; ...
-                extract_fullopt_hist(data_full.intermediate_data,'optimValues','fval')];
+            ydat{idx,pdx} = [data_bayes.ObjectiveTrace; ...
+                extract_fullopt_hist(data_full,'optimValues','fval')];
         else
-            ydat{idx,pdx} = data_bayes.results.ObjectiveTrace;
+            ydat{idx,pdx} = data_bayes.ObjectiveTrace;
         end
         
         if idx == 1
@@ -130,15 +116,15 @@ for idx = 1:N_Models
     end
     if plot_params
         if fullopt_dat
-            fulldat = extract_fullopt_hist(data_full.intermediate_data,'optimValues','x');
+            fulldat = extract_fullopt_hist(data_full,'optimValues','x');
         end
         
         for qq = 1:N_Pars
             if fullopt_dat
-                ydat{idx,pdx} = [data_bayes.results.XTrace{:,qq}; ...
+                ydat{idx,pdx} = [data_bayes.XTrace{:,qq}; ...
                     fulldat(:,qq)];
             else
-                ydat{idx,pdx} = data_bayes.results.XTrace{:,qq};
+                ydat{idx,pdx} = data_bayes.XTrace{:,qq};
             end
             titles{pdx} = param_name_map(ParNames{qq},Salt);
             yaxislabel{pdx} = param_name_map(ParNames{qq},Salt);

@@ -7,8 +7,8 @@
 % Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
-Theory = 'JC';
-Basenum = 'E';
+Theory = 'BH';
+Basenum = 'J';
 Midnum = 'C';
 savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
@@ -22,7 +22,7 @@ plot_c = true;
 plot_ac = false;
 plot_volume = false;
 plot_density = false;
-plot_loss = false;
+plot_loss = true;
 plot_finite_T_data = true;
 show_targets = true;
 fs = 22; % font size
@@ -64,7 +64,7 @@ for idx = 1:length(Salts)
     nonempty_idx = ~cellfun(@isempty,Models{idx});
     Models{idx} = Models{idx}(nonempty_idx);
 end
-Models = unique(cat(2, Models{:}));
+Models = unique(horzcat(Models{:}));
 
 
 % Make sure the models are sorted

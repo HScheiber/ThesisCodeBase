@@ -13,7 +13,7 @@ Custom_Legend = true;
 Sets = {'Set60' 'Set61'}; % 'Set62' 'Set63'
 Legend_Params = {'N'};
 Show_Fit_dist = true;
-Include_Delta_T_prime = false; % When false, exclude any calculation where Delta_T' was used as the stopping condition
+Include_Delta_T_prime = true; % When false, exclude any calculation where Delta_T' was used as the stopping condition
 % Sets = {'Set27' 'Set28' 'Set29' 'Set30' 'Set31'};
 % Legend_Params = {'N' 'R_C' 'Thermostat' 'Tau_T' 'Barostat' 'Tau_P'};
 
@@ -217,6 +217,12 @@ ylabel(axh,'$\rho(T_{m})$','Interpreter','latex')
 grid(axh,'on')
 drawnow
 
-exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Sys_Size_Comp.pdf',...
-    'ContentType','vector','BackgroundColor','none')
+if Include_Delta_T_prime
+    exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\SI_Figures\MP_Sys_Size_Comp_full.pdf',...
+        'ContentType','vector','BackgroundColor','none')
+else
+    exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Sys_Size_Comp.pdf',...
+        'ContentType','vector','BackgroundColor','none')
+end
+
 

@@ -1,8 +1,8 @@
 % Script for plotting bayesian optimization results: model parameters correlated
 % with various target properties
-Salt = 'LiI';
-Model = 'BH';
-Trial = 'GA1';
+Salt = 'LiBr';
+Theory = 'BH';
+Model = 'FB1';
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = 100;
 fs = 10; % fontsize
@@ -21,24 +21,19 @@ Property = 'Loss';
 
 %% Find model in results
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
-sres = dir([ML_results_dir filesep '*' Salt '*' Model '*' 'Model_' Trial '*bayesopt.mat']);
+model_filename = fullfile(ML_results_dir,Salt,[Salt '_' Theory '_Model_' Model '_data.mat']);
 
-if length(sres) > 1
-    warning(['Multiple results found for: ' Salt ', ' Model ', Model ' Trial '. Using first result.']);
-    sres = sres(1);
-elseif isempty(sres)
-    error(['No results found for: ' Salt ', ' Model ', Model ' Trial '.']);
+if ~isfile(model_filename)
+    error(['No results found for: ' Salt ', ' Theory ', Model ' Model '.']);
 end
 
-model_filename = fullfile(sres.folder,sres.name);
-
-if strcmp(Model,'TF') % Cannot show additivity for TF model
+if strcmp(Theory,'TF') % Cannot show additivity for TF model
     show_additivity = false;
 end
 
 % Load data
-data = load(model_filename);
-results = data.results;
+data = load(model_filename).full_data;
+results = data.bayesopt_results;
 clear('data')
 
 if isempty(Show_init)
@@ -170,7 +165,7 @@ if contained_in_cell('SDMM2',search_pnts_cut.Properties.VariableNames)
     search_pnts_cut.SDMM2 = [];
 end
 
-if ~show_as_scale && strcmp(Model,'JC')
+if ~show_as_scale && strcmp(Theory,'JC')
     
     PotSettings = Initialize_MD_Settings;
     PotSettings.Salt = Salt;
@@ -200,7 +195,7 @@ if ~show_as_scale && strcmp(Model,'JC')
         search_pnts_cut.RMX = MX_R.*search_pnts_cut.SRMX;
     end
     
-elseif ~show_as_scale && strcmp(Model,'TF')
+elseif ~show_as_scale && strcmp(Theory,'TF')
     PotSettings = Initialize_MD_Settings;
     PotSettings.Salt = Salt;
     PotSettings.S = Init_Scaling_Object;
@@ -223,7 +218,7 @@ elseif ~show_as_scale && strcmp(Model,'TF')
     search_pnts_cut.RMX = search_pnts_cut.SRMX*OutputMX.B;
 end
 
-if show_as_sigma_epsilon && strcmp(Model,'JC')
+if show_as_sigma_epsilon && strcmp(Theory,'JC')
     
     PotSettings = Initialize_MD_Settings;
     PotSettings.Salt = Salt;
@@ -274,7 +269,7 @@ if show_as_sigma_epsilon && strcmp(Model,'JC')
             search_pnts_cut.epsilon_MX = MX_Epsilon_scaled;
         end
     end
-elseif show_as_sigma_epsilon && strcmp(Model,'TF')
+elseif show_as_sigma_epsilon && strcmp(Theory,'TF')
     error('Cannot show TF model in Sigma-Epsilon form.')
 end
 
@@ -303,7 +298,7 @@ if show_as_sigma_epsilon
         search_pnts_cut.RMX = [];
     end
     
-elseif ~show_as_scale && strcmp(Model,'JC')
+elseif ~show_as_scale && strcmp(Theory,'JC')
     search_pnts_cut.SDMM = [];
     search_pnts_cut.SDXX = [];
     search_pnts_cut.SRMM = [];
@@ -313,7 +308,7 @@ elseif ~show_as_scale && strcmp(Model,'JC')
         search_pnts_cut.SRMX = [];
     end
     
-elseif ~show_as_scale && strcmp(Model,'TF')
+elseif ~show_as_scale && strcmp(Theory,'TF')
     search_pnts_cut.SD6MM = [];
     search_pnts_cut.SD6XX = [];
     search_pnts_cut.SD6MX = [];
@@ -609,7 +604,7 @@ cb.Title.Interpreter = 'latex';
 cb.Title.FontSize = fs+5;
 
 % Add title
-title(T,[Salt ' ' Model ' Model ' Trial ': Parameter Correlation Matrix'],...
+title(T,[Salt ' ' Theory ' Model ' Model ': Parameter Correlation Matrix'],...
     'Interpreter','Latex','FontSize',fs+16);
 xlabel(T,'Parameter 1','Interpreter','Latex','FontSize',fs+5)
 ylabel(T,'Parameter 2','Interpreter','Latex','FontSize',fs+5)
