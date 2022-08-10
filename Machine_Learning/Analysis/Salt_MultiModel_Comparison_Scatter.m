@@ -9,7 +9,7 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
 Theory = 'BH';
 Basenum = 'J';
-Midnum = 'C';
+Midnum = 'A';
 savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
 
@@ -536,7 +536,7 @@ if show_as_percent_error
     MP_ylabs = {'[\%]' '[\%]' '[\%]' '[\%]' '[\%]'};
 else
     ylabs = {'Loss' ...
-        '[kJ mol$^{-1}$], [$\AA^{3}$/MX], [K]' ...
+        '[kJ mol$^{-1}$], [$\AA^{3}$], [K]' ...
         '[kJ mol$^{-1}$]' ...
         '[kJ mol$^{-1}$]' ...
         '[\AA]' ...
@@ -544,7 +544,7 @@ else
         '[$(c/a)$]' ...
         '[g cm$^{-3}$]' ...
         '[$\AA^{3}$ / formula unit]'};
-    MP_ylabs = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$/MX]' '[$\AA^{3}$/MX]' '[$\AA^{3}$/MX]'};
+    MP_ylabs = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$\AA^{3}$]'};
 end
 
 % Create figure and axis
@@ -607,14 +607,14 @@ for idx = 1:length(all_y)
         
         bb = axobj.Position(2);
         ww = axobj.Position(3);
-        ww_d = ww/N_FTprop - ww/(N_FTprop+1);
+        ww_d = ww/N_FTprop - ww/(N_FTprop+2);
         dd = ww_d/(N_FTprop-1);
         hh = axobj.Position(4);
         for jdx = 1:N_FTprop
             finite_T_type = finite_T_types{jdx};
             cur_ax = axes(figh,'YAxisLocation','left','box','on',...
                 'Position',[axobj.Position(1)+(ww/N_FTprop+dd)*(jdx-1) ....
-                bb+(hh*0.15) ww/(N_FTprop+1) hh*0.7]); % [left bottom width height]
+                bb+(hh*0.15) ww/(N_FTprop+2) hh*0.7]); % [left bottom width height]
             
 
             dat_y = bar_y(:,:,jdx);
@@ -639,7 +639,7 @@ for idx = 1:length(all_y)
             
             set(cur_ax,'XLim',[0 1])
             xticklabels(cur_ax,[])
-            ylim(cur_ax,'padded');   
+            ylim(cur_ax,'padded');
             grid(cur_ax,'minor');
             yticks(cur_ax,'auto')
             cur_ax.YGrid = 'on';
@@ -650,18 +650,22 @@ for idx = 1:length(all_y)
                     ylabel(cur_ax, MP_ylabs{jdx},'Fontsize',fs-1,'Interpreter','latex')
                 end
             else
-                set(cur_ax,'YMinorTick','on','FontSize',fs-2);
-                ylabel(cur_ax, MP_ylabs{jdx},'Fontsize',fs-2,'Interpreter','latex')
+                set(cur_ax,'YMinorTick','on','FontSize',fs-1);
+                ylabel(cur_ax, MP_ylabs{jdx},'Fontsize',fs-1,'Interpreter','latex')
             end
             
             cylim = ylim(cur_ax);
+            cxlim = xlim(cur_ax);
+            ydiff = cylim(2) - cylim(1);
+            xdiff = cxlim(2) - cxlim(1);
             % Add boxes for targets
             if isfield(Bayesopt_Loss_Options,finite_T_type) && Bayesopt_Loss_Options.(finite_T_type) > sqrt(eps)
 
                 % [x y w h]. The x and y elements define the coordinate for the lower left corner of the rectangle. 
                 % The w and h elements define the dimensions of the rectangle.
-                rech = rectangle(cur_ax,'Position',[jdx-0.4 cylim(1) 0.8 (cylim(2) - cylim(1))],...
-                    'Curvature',0,'LineWidth',min(3*Bayesopt_Loss_Options.(finite_T_type),4),'EdgeColor','r');
+                rech = rectangle(cur_ax,'Position',[cxlim(1) cylim(1) xdiff ydiff],...
+                    'Curvature',0,'LineWidth',min(3*Bayesopt_Loss_Options.(finite_T_type),4),'EdgeColor','r'); % [left bottom width height]
+                ylim(cur_ax,'tight');
             end
             ylim(axobj, cylim);
         end
