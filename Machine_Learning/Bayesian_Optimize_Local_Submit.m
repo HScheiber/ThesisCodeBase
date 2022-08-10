@@ -55,8 +55,8 @@ Shared_Settings.Max_Secondary_Iterations = 100;
 Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
 Shared_Settings.Loss_Convergence = 1e-6;
 Shared_Settings.Param_Convergence = 1e-3;
-Shared_Settings.Parallel_Bayesopt = true;
-Shared_Settings.Parallel_Struct_Min = false;
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
 Shared_Settings.switch_final_opt = false;
@@ -67,7 +67,7 @@ Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
 Shared_Settings.JobSettings.dd = [1 2 4]; % Domain decomposition
 Shared_Settings.Cutoff_Buffer = 1.2; % This affects Structure_Minimization as well as other aspects of code
 Shared_Settings.MaxWarn = 2;
-Shared_Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
 
 
@@ -129,7 +129,7 @@ Shared_Settings.MDP.VerletBT = -1;
 idx = 0;
 
 %% BH Model (MP Test) XZ
-Salts = {'LiI'};
+Salts = {'LiBr'};
 Theories = {'BH'};
 Replicates = 1;
 
