@@ -405,6 +405,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     else
         disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
         SuperCellFile = Settings.SuperCellFile;
+        WorkDir = Settings.WorkDir;
         Settings = Inp_Settings;
         Settings.SuperCellFile = SuperCellFile;
         if ~isfield(Settings,'QECompressibility_init')
@@ -421,6 +422,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
             disp('Running Pre-Minimization of Solid.')
             Settings.Verbose = Verbose;
+            Settings.WorkDir = WorkDir;
             Minimize_Solid(Settings);
             Inp_Settings.QECompressibility = Settings.QECompressibility_init;
             Inp_Settings.Verbose = Verbose;
