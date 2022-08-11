@@ -491,7 +491,7 @@ else
     %pltfcn = [];
 end
 
-rm_command = [Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm -f'];
+rm_command = [Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ' Settings.pipe ' xargs rm -f'];
 
 %% Begin Optimization
 % Loop broken when convergence criteria is met or max cycles reached

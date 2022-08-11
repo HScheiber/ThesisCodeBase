@@ -32,6 +32,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer; % nm, the box dimension
     Volume = L^3; % Volume in nm^3
     nmol_liquid = round(Volume*Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
+    
+    if nmol_liquid < 500 % Enforce a minimum of 1000 atoms
+        nmol_liquid = 500;
+        Volume = nmol_liquid/(Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
+        L = Volume^(1/3);
+    end
+    
     R0 = num2str(min(0.5*((3/(4*pi))*(Volume/nmol_liquid))^(1/3),0.57),'%0.3f');
     
     % Initialize empty cubic box
@@ -627,29 +634,41 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
             disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
+        try % Clean up
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ' Settings.pipe ' xargs rm']);
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
+        catch
+        end
         WorkDir = Settings.WorkDir;
         Settings = Inp_Settings;
         Settings.WorkDir = WorkDir;
-        Settings.QECompressibility = Settings.QECompressibility/2;
+        Settings.Verbose = Verbose;
+        if ~isfield(Settings,'QECompressibility_init')
+            Settings.QECompressibility_init = Settings.QECompressibility;
+        end
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
             if Verbose
                 disp('Liquid Equilibration failed. Retrying with stiffer compressibility.')
             end
+            Settings.QECompressibility = Settings.QECompressibility/2;
             Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
-        elseif Settings.ScaleInitialLiqDensity > 0.5 % Retry until density is half of the solid
+        elseif Settings.MDP.dt > 1e-4
             if Verbose
                 disp('Liquid Equilibration failed. Stiffer compressibility did not resolve.')
-                disp('Retrying with lower density and stiff compressibility.')
+                disp('Reducing time step.')
             end
-            Settings.QECompressibility = 1e-8;
-            Settings.ScaleInitialLiqDensity = Settings.ScaleInitialLiqDensity*0.9;
+            Settings.QECompressibility = Settings.QECompressibility_init;
+            Settings.MDP.dt = Settings.MDP.dt/2;
+            Settings.Output_Coords = Settings.Output_Coords*2;
             Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
             return
         else
-            disp('Liquid Equilibration failed. Lower density did not resolve.')
-            disp('Liquid is likely to be totally unstable!')
-            disp(['WorkDir: ' WorkDir])
+            if Verbose
+                disp('Liquid equilibration failed.')
+                disp('Liquid may be completely unstable!')
+                disp(['WorkDir: ' WorkDir])
+            end
             Output.Liquid_V_MP = nan;
             Output.Liquid_H_MP = nan;
             return
@@ -731,7 +750,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     end
     if Settings.Delete_Equil
         try
-            cd(Settings.OuterDir)
             rmdir(Settings.WorkDir,'s')
         catch
             disp(['Unable to remove directory: ' Settings.WorkDir])

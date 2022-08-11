@@ -68,6 +68,16 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
 
         % Calculate number of formula units
         nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
+        
+        while nmol_solid < 500 % Enforce a minimum of 1000 atoms
+            La = La*1.1;
+            Lb = Lb*1.1;
+            Lc = Lc*1.1;
+            Na = ceil(La/(Settings.Geometry.a/10));
+            Nb = ceil(Lb/(Settings.Geometry.b/10));
+            Nc = ceil(Lc/(Settings.Geometry.c/10));
+            nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
+        end
 
         Settings.SuperCellFile = fullfile(Settings.WorkDir,['Equil_Sol.' Settings.CoordType]);
         Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
@@ -403,38 +413,50 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        if Verbose
-            disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
+        try % Clean up
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ^| xargs rm']);
+        catch
         end
         SuperCellFile = Settings.SuperCellFile;
         WorkDir = Settings.WorkDir;
         Settings = Inp_Settings;
         Settings.SuperCellFile = SuperCellFile;
+        Settings.WorkDir = WorkDir;
+        Settings.Verbose = Verbose;
         if ~isfield(Settings,'QECompressibility_init')
             Settings.QECompressibility_init = Settings.QECompressibility;
         end
-        if ~isfield(Settings,'MinComplete')
-            Settings.MinComplete = false;
-        end
-        Settings.QECompressibility = Settings.QECompressibility/2;
+%         if ~isfield(Settings,'MinComplete')
+%             Settings.MinComplete = false;
+%         end
+        
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-            Settings.Verbose = Verbose;
-            Settings.SuperCellFile = SuperCellFile;
+            if Verbose
+                disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
+            end
+            Settings.QECompressibility = Settings.QECompressibility/2;
             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
             return
-        elseif ~Settings.MinComplete
+%         elseif ~Settings.MinComplete
+%             if Verbose
+%                 disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
+%                 disp('Running Pre-Minimization of Solid.')
+%             end
+%             Minimize_Solid(Settings);
+%             Settings.QECompressibility = Settings.QECompressibility_init;
+%             Settings.MinComplete = true;
+%             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
+%             return
+        elseif Settings.MDP.dt > 1e-4
             if Verbose
-                disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
-                disp('Running Pre-Minimization of Solid.')
+                disp('Solid Equilibration failed. Pre-Minimization did not resolve.')
+                disp('Reducing time step.')
             end
-            Settings.Verbose = Verbose;
-            Settings.WorkDir = WorkDir;
-            Minimize_Solid(Settings);
-            Inp_Settings.QECompressibility = Settings.QECompressibility_init;
-            Inp_Settings.Verbose = Verbose;
-            Inp_Settings.SuperCellFile = SuperCellFile;
-            Inp_Settings.MinComplete = true;
-            Output = Calc_Solid_Properties_at_MP(Inp_Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
+            Settings.QECompressibility = Settings.QECompressibility_init;
+            Settings.MDP.dt = Settings.MDP.dt/2;
+            Settings.Output_Coords = Settings.Output_Coords*2;
+            Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
             return
         else
             if Verbose

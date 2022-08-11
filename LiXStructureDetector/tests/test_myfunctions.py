@@ -189,8 +189,8 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\cf928e9ec9590f1e0906a3eead216528_LP'
-Salt = 'LiBr'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\008fc299222e31674bbce670b06bc975_LP'
+Salt = 'LiCl'
 SystemName = 'Equil_Liq'
 RefStructure='Rocksalt'
 SaveTrajectory=True
