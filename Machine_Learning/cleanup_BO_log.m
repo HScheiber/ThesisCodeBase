@@ -14,6 +14,7 @@ logtxt = regexprep(logtxt,'MATLAB is selecting.+?\n','');
 logtxt = regexprep(logtxt,'connected to [0-9]+ workers.+?\n','');
 logtxt = regexprep(logtxt,'Your MATLAB session has timed out.+?\n','');
 logtxt = regexprep(logtxt,'Parallel pool using the.+?\n','');
+logtxt = regexprep(logtxt,'mpiexec -np.+?\n','');
 paramsummary = regexp(logtxt,'\*+\nModel Input Parameters.+?\*+\n\*+\n','match');
 logtxt = regexprep(logtxt,'\*+\nModel Input Parameters.+?\*+\n\*+\n','');
 
