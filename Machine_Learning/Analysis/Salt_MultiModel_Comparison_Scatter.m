@@ -7,10 +7,10 @@
 % Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
-Theory = 'BH';
+Theory = 'JC';
 Basenum = 'J';
-Midnum = 'A';
-savefile = false; % switch to save the final plots to file
+Midnum = 'C';
+savefile = true; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
 
 % Plot options
@@ -506,11 +506,11 @@ finite_T_types = {'MP' 'Fusion_Enthalpy' 'MP_Volume_Change' 'Liquid_MP_Volume' '
 
 bar_x = 1:N_Structures;
 
-if savefile
-    spec_ther = '';
-else
-    spec_ther = [': ' Theory ' Model ' Basenum Midnum];
-end
+% if savefile
+%     spec_ther = '';
+% else
+spec_ther = [': ' Theory ' Model ' Basenum Midnum];
+% end
 
 Titles = {['Minimized Objective Function' spec_ther] ...
     'Melting Point Properties' ...
