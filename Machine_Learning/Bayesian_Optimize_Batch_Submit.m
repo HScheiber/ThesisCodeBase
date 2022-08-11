@@ -159,6 +159,18 @@ idx=0;
 
 switch lower(computer)
     case 'cedar'
+        
+        Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+        Shared_Settings.Max_Bayesian_Iterations = 400;
+        Shared_Settings.Max_Secondary_Iterations = 100;
+        Shared_Settings.Parallel_Bayesopt = false;
+        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.switch_final_opt = false;
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
+        Shared_Settings.ub = 2200; % K, upper bound on MP search
+        Shared_Settings.Max_Local_Iterations = 100;
+        
         %% BH Models JD, JE, JF, JG
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
         Shared_Settings.ub = 2200; % K, upper bound on MP search
@@ -606,11 +618,9 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
-        Shared_Settings.switch_final_opt = true;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.ub = 2200; % K, upper bound on MP search
-        Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Shared_Settings.Max_Local_Iterations = 100;
         
         %% BH Models JA, JB, JC
