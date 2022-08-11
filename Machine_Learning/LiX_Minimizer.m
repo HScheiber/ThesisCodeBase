@@ -1188,7 +1188,15 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Submit_Jobs = false;
     Settings.Skip_Minimization = true; % Skip the automatic geometry minimization
     Settings.RefStructure = Settings.Finite_T_Data.Structure;
-    [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
+    try
+        [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
+    catch me
+        disp(['Problem with MP calculation: ' Settings.WorkDir])
+        disp(me.message)
+        disp(me.stack)
+        Aborted = true;
+        T_dat = struct();
+    end
     
     if Settings.Delete_Equil && ~Settings.Therm_Prop_Override
         try
