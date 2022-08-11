@@ -417,6 +417,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
             [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ^| xargs rm']);
         catch
+            disp(me.message)
         end
         SuperCellFile = Settings.SuperCellFile;
         WorkDir = Settings.WorkDir;

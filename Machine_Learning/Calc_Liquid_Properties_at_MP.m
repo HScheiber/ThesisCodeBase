@@ -637,7 +637,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         try % Clean up
             [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ' Settings.pipe ' xargs rm']);
             [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
-        catch
+        catch me
+            disp(me.message)
         end
         WorkDir = Settings.WorkDir;
         Settings = Inp_Settings;
