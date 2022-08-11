@@ -1198,13 +1198,6 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
         T_dat = struct();
     end
     
-    if Settings.Delete_Equil && ~Settings.Therm_Prop_Override
-        try
-            rmdir(Settings.WorkDir,'s')
-        catch
-            disp(['Unable to remove directory: ' Settings.WorkDir])
-        end
-    end
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
         Settings.Finite_T_Data.MP = nan;
