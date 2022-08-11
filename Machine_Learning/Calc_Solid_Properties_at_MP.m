@@ -418,7 +418,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         end
         Settings.QECompressibility = Settings.QECompressibility/2;
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-            Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
+            Settings.Verbose = Verbose;
+            Settings.SuperCellFile = SuperCellFile;
+            Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
             return
         elseif ~Settings.MinComplete
             if Verbose
