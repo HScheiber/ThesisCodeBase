@@ -432,7 +432,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Inp_Settings.Verbose = Verbose;
             Inp_Settings.SuperCellFile = SuperCellFile;
             Inp_Settings.MinComplete = true;
-            Calc_Solid_Properties_at_MP(Inp_Settings,'Verbose',Verbose,'Skip_Cell_Construction',true)
+            Output = Calc_Solid_Properties_at_MP(Inp_Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
             return
         else
             if Verbose
