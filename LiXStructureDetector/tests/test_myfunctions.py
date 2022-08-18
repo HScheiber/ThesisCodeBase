@@ -1,6 +1,6 @@
 import sys
-#sys.path.append(r"C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiXStructureDetector")
-sys.path.append(r"/home/user/ThesisCodeBase/LiXStructureDetector")
+sys.path.append(r"C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase\LiXStructureDetector")
+#sys.path.append(r"/home/user/ThesisCodeBase/LiXStructureDetector")
 import LiXStructureDetector
 
 
