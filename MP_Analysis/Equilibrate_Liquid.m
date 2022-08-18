@@ -387,23 +387,22 @@ function Output = Equilibrate_Liquid(Settings)
         end
 
         Settings = Inp_Settings;
-        if ~isfield(Settings,'QECompressibility_init')
-            Settings.QECompressibility_init = Settings.QECompressibility;
-        end
-        
-        if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+%         if ~isfield(Settings,'QECompressibility_init')
+%             Settings.QECompressibility_init = Settings.QECompressibility;
+%         end
+%         
+%         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+%             if Settings.Verbose
+%                 disp('Equilibration failed. Retrying with stiffer compressibility.')
+%             end
+%             Settings.QECompressibility = Settings.QECompressibility/2;
+%             Output = Equilibrate_Liquid(Settings);
+%             return
+        if Settings.MDP.dt > 1e-4
             if Settings.Verbose
-                disp('Equilibration failed. Retrying with stiffer compressibility.')
+                disp('Equilibration failed. Reducing time step.')
             end
-            Settings.QECompressibility = Settings.QECompressibility/2;
-            Output = Equilibrate_Liquid(Settings);
-            return
-        elseif Settings.MDP.dt > 1e-4
-            if Settings.Verbose
-                disp('Equilibration failed. Stiffer compressibility did not resolve.')
-                disp('Reducing time step.')
-            end
-            Settings.QECompressibility = Settings.QECompressibility_init;
+            %Settings.QECompressibility = Settings.QECompressibility_init;
             Settings.MDP.dt = Settings.MDP.dt/2;
             Settings.Output_Coords = Settings.Output_Coords*2;
             Output = Equilibrate_Liquid(Settings);
