@@ -426,6 +426,9 @@ function varargout = Melting_Point_Check(T,Settings)
         MDP_txt = regexprep(MDP_txt,'(ref-t *= *).+?;',['$1' pad(num2str(T),18) ';']);
         MDP_txt = regexprep(MDP_txt,'(gen-temp *= *).+?;',['$1' pad(num2str(T),18) ';']);
         MDP_txt = regexprep(MDP_txt,'(nsteps *= *).+?;',['$1' pad(num2str(MD_nsteps),18) ';']);
+        MDP_txt = regexprep(MDP_txt,'(nstxout += *)(.+?)( *);',['$1' num2str(round(Settings.Output_Coords)) '$3;']);
+        MDP_txt = regexprep(MDP_txt,'(dt += *)(.+?)( *);',['$1' num2str(Settings.MDP.dt) '$3;']);
+        
         fidMDP = fopen(MDP_in_File,'wt');
         fwrite(fidMDP,regexprep(MDP_txt,'\r',''));
         fclose(fidMDP);
@@ -476,7 +479,24 @@ function varargout = Melting_Point_Check(T,Settings)
             if Settings.Verbose
                 disp(outp);
             end
-            if T > 1700
+            try % Clean up
+                [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+            catch me
+                disp(me.message)
+            end
+            
+            if Settings.MDP.dt > 1e-4
+                if Settings.Verbose
+                    disp('Simulation failed. Restarting with reduced time step.')
+                end
+                if isfile(CheckPoint_File)
+                    delete(CheckPoint_File)
+                end
+                Settings.MDP.dt = Settings.MDP.dt/2;
+                Settings.Output_Coords = Settings.Output_Coords*2;
+                varargout = Melting_Point_Check(T,Settings);
+                return
+            else
                 f = -1;
                 df = 0;
                 T_dat.Alt_Structure = true;
@@ -493,12 +513,10 @@ function varargout = Melting_Point_Check(T,Settings)
                 varargout{2} = 0; % function derivative
                 varargout{3} = T_dat; % user data
                 if Settings.Verbose
-                    disp('Possible system blow up! This potential may be unusable!')
+                    disp('Possible system blow up. This potential may be unusable!')
                     disp('Aborting Melting Point calculation.')
                 end
                 return
-            else
-                error(['Error running mdrun. Problem command: ' newline mdrun_command]);
             end
         elseif ~isfile(windows2unix(Structure_Out_File))
             if Settings.Verbose

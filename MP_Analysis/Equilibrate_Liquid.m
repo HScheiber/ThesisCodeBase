@@ -322,6 +322,7 @@ function Output = Equilibrate_Liquid(Settings)
     MDP_Template = regexprep(MDP_Template,'(nstpcouple += *)(.+?)( *);',['$1 ' num2str(nstpcouple) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(compressibility += *)(.+?)( *);',['$1 ' num2str(Compressibility) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(ref-p += *)(.+?)( *);',['$1 ' num2str(Settings.Target_P(1)) '$3;']);
+    MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);',['$1' num2str(round(0.1/Settings.MDP.dt)) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(dt += *)(.+?)( *);',['$1' num2str(Settings.MDP.dt) '$3;']);
 
     % Pair it with velocity rescale thermostat + small time constant
