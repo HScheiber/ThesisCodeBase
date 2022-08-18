@@ -147,7 +147,7 @@ for tidx = 1:length(Theories)
             Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
-            Models(idx).Trial_ID = ['XZ' Rep];
+            Models(idx).Trial_ID = ['JG3' Rep];
             
             % T=0 Loss
             Models(idx).Loss_Options.Rocksalt.LE = 1;
