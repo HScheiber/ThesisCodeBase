@@ -125,6 +125,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     import warnings
     import logging
     import collections
+    from itertools import groupby
 
     if CheckFullTrajectory:
         from scipy.stats import linregress

@@ -89,6 +89,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     import warnings
     import logging
     import collections
+    from itertools import groupby
     
     if SavePredictionsImage:
         #from scipy.ndimage.filters import uniform_filter1d
