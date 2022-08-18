@@ -12,9 +12,13 @@ Settings.ScaleInitialLiqDensity = 0.8;
 Settings.MDP.dt = 0.001;
 Settings.Output_Coords = 1000;
 Settings.Delete_Equil = false;
-Calc_Liquid_Properties_at_MP(Settings,'Verbose',true)
-Calc_Solid_Properties_at_MP(Settings,'Verbose',true)
-
+Settings.Verbose = true;
+% Calc_Liquid_Properties_at_MP(Settings,'Verbose',true)
+% Calc_Solid_Properties_at_MP(Settings,'Verbose',true)
+Settings.Equilibrate_Liquid = 20;
+Settings.CheckAmorphousLiquid = true;
+Settings.AmorphousDiffThreshold = 1e-6;
+[Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings);
 
 
 [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...

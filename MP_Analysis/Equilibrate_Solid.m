@@ -1,6 +1,20 @@
-function Equilibrate_Solid(Settings)
+function Output = Equilibrate_Solid(Settings,varargin)
+    p = inputParser;
+    p.FunctionName = 'Equilibrate_Solid';
+    addOptional(p,'Skip_Cell_Construction',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
     
-    disp('*** Separate Equilibration of Solid Selected ***')
+    parse(p,varargin{:});
+    Settings.Skip_Cell_Construction =  p.Results.Skip_Cell_Construction;
+    
+    Output.StructureChange = false;
+    Output.SolidMelted = false;
+    Output.LiquidFroze = false;
+    Output.LiquidAmorphous = false;
+    Output.Aborted = false;
+    
+	if Settings.Verbose
+    	disp('*** Separate Equilibration of Solid Selected ***')
+	end
     
     Inp_Settings = Settings;
     WorkDir = fullfile(Settings.WorkDir,'Equil_Sol');
@@ -13,19 +27,24 @@ function Equilibrate_Solid(Settings)
     La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
     Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_b; % nm, the minimum box dimension
     Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_c; % nm, the minimum box dimension
-    
+
     Na = ceil(La/(Settings.Geometry.a/10));
     Nb = ceil(Lb/(Settings.Geometry.b/10));
     Nc = ceil(Lc/(Settings.Geometry.c/10));
-    
+        
     SuperCell_File = fullfile(WorkDir,['Equil_Sol.' Settings.CoordType]);
-    Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
-         ' -o ' windows2unix(SuperCell_File) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
-    [errcode,output] = system(Supercell_command);
     
-    if errcode ~= 0
-        disp(output);
-        error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
+    if ~Settings.Skip_Cell_Construction
+        Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
+             ' -o ' windows2unix(SuperCell_File) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
+        [errcode,output] = system(Supercell_command);
+
+        if errcode ~= 0
+            if Settings.Verbose
+                disp(output);
+            end
+            error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
+        end
     end
     
     % Set the number of steps
@@ -63,6 +82,7 @@ function Equilibrate_Solid(Settings)
     MDP_Template = regexprep(MDP_Template,'(nstpcouple += *)(.+?)( *);',['$1 ' num2str(nstpcouple) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(compressibility += *)(.+?)( *);',['$1 ' Compresstxt '$3;']);
     MDP_Template = regexprep(MDP_Template,'(ref-p += *)(.+?)( *);',['$1 ' ref_p '$3;']);
+    MDP_Template = regexprep(MDP_Template,'(dt += *)(.+?)( *);',['$1' num2str(Settings.MDP.dt) '$3;']);
     
     % Pair it with velocity rescale thermostat + small time constant
     MDP_Template = regexprep(MDP_Template,'(tcoupl += *)(.+?)( +);','$1v-rescale$3;');
@@ -119,23 +139,98 @@ function Equilibrate_Solid(Settings)
     end
 
     % Final Equilibration
-    disp(['Beginning Solid Equilibration for ' num2str(Settings.Equilibrate_Solid) ' ps...'] )
+    if Settings.Verbose
+        disp(['Beginning Solid Equilibration for ' num2str(Settings.Equilibrate_Solid) ' ps...'] )
+    end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
-        disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        if Settings.Verbose
+            disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
     else
-        disp('Equilibration failed. Retrying with stiffer compressibility.')
+        try % Clean up
+            [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+        catch me
+            disp(me.message)
+        end
         Settings = Inp_Settings;
-        Settings.QECompressibility = Settings.QECompressibility/2;
+        if ~isfield(Settings,'QECompressibility_init')
+            Settings.QECompressibility_init = Settings.QECompressibility;
+        end
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-            Equilibrate_Solid(Settings);
+            if Settings.Verbose
+                disp('Equilibration failed. Retrying with stiffer compressibility.')
+            end
+            Settings.QECompressibility = Settings.QECompressibility/2;
+            Output = Equilibrate_Solid(Settings,'Skip_Cell_Construction',true);
+            return
+        elseif Settings.MDP.dt > 1e-4
+            if Settings.Verbose
+                disp('Equilibration failed. Stiffer compressibility did not resolve.')
+                disp('Reducing time step.')
+            end
+            Settings.QECompressibility = Settings.QECompressibility_init;
+            Settings.MDP.dt = Settings.MDP.dt/2;
+            Settings.Output_Coords = Settings.Output_Coords*2;
+            Output = Equilibrate_Solid(Settings,'Skip_Cell_Construction',true);
             return
         else
-            disp('Equilibration failed. Stiffer compressibility did not resolve.')
-            disp(mdrun_output);
-            error(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+            if Settings.Verbose
+                disp('Equilibration failed. Stiffer compressibility and shorter time steps did not resolve.')
+                disp(mdrun_output);
+                disp(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
+            end
+            Output.Aborted = true;
+            TDir = fullfile(strrep(Settings.WorkDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
+            [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+            copyfile(WorkDir,TDir)
+            try
+                if Settings.Delete_Equil
+                    rmdir(WorkDir,'s')
+                end
+            catch
+                disp(['Unable to remove directory: ' WorkDir])
+            end
+            return
         end
+    end
+    
+    % Check to ensure system remained in the correct solid structure
+    PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
+        pyargs('SystemName','Equil_Sol',...
+        'RefStructure',Settings.Structure,...
+        'CheckFullTrajectory',false,...
+        'FileType',Settings.CoordType,...
+        'ML_TimeLength',0,...
+        'ML_TimeStep',0,...
+        'SaveTrajectory',false,...
+        'SavePredictionsImage',false,...
+        'Verbose',Settings.Verbose));
+    Sol_Fraction = PyOut{4};
+    Liq_Fraction = PyOut{5};
+    
+    if Sol_Fraction < (1 - Settings.MeltFreezeThreshold)
+        if Settings.Verbose
+            disp('Detected Solid Phase change.')
+        end
+        if Liq_Fraction > 0.5*Settings.MeltFreezeThreshold
+            Output.SolidMelted = true;
+        else
+            Output.StructureChange = true;
+        end
+        Output.Aborted = true;
+        TDir = fullfile(strrep(Settings.WorkDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
+        [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+        copyfile(WorkDir,TDir)
+        try
+            if Settings.Delete_Equil
+                rmdir(WorkDir,'s')
+            end
+        catch
+            disp(['Unable to remove directory: ' WorkDir])
+        end
+        return
     end
     
     Box_xvg_file = fullfile(WorkDir,'Equil_Sol_Box.xvg');
@@ -219,7 +314,9 @@ function Equilibrate_Solid(Settings)
         [errcode,output] = system(Supercell_command);
         
         if errcode ~= 0
-            disp(output);
+            if Settings.Verbose
+                disp(output);
+            end
             error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
         end
     else
@@ -228,13 +325,21 @@ function Equilibrate_Solid(Settings)
         fclose(fid);
     end
     
-    if Settings.Delete_Equil
-        rmdir(WorkDir,'s')
+    try
+        if Settings.Delete_Equil
+            rmdir(WorkDir,'s')
+        end
+    catch
+        if Settings.Verbose
+            disp(['Unable to remove directory: ' WorkDir])
+        end
     end
     
     if Settings.GenCluster
         Build_Cluster(Settings)
     end
     
-    disp('*** Separate Equilibration of Solid Complete ***')
+    if Settings.Verbose
+        disp('*** Separate Equilibration of Solid Complete ***')
+    end
 end

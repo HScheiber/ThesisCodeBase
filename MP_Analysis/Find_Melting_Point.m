@@ -17,6 +17,7 @@ end
 if ~isfield(Settings,'gmx')
     [Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
 end
+
 Settings.mdrun_opts = regexprep(Settings.mdrun_opts,' -maxh [0-9]+','','once');
 Settings.CurrentTFile = fullfile(Settings.WorkDir,[Settings.JobName '_MP.mat']);
 Settings.PrevTFile = fullfile(Settings.WorkDir,[Settings.JobName '_MP.mat.PREV']);
@@ -44,15 +45,23 @@ if isfile(ResultsFile) && ~Settings.Continue
             T_dat.Alt_Structure = false;
         end
         
-        disp(repmat('*',1,40));
+        if Settings.Verbose
+            disp(repmat('*',1,40));
+        end
         if T_dat.Alt_Structure
-            disp(['Calculation previously aborted at T = ' num2str(T_dat.T,'%.4f') ' K.']);
+            if Settings.Verbose
+                disp(['Calculation previously aborted at T = ' num2str(T_dat.T,'%.4f') ' K.']);
+            end
             Aborted = true;
         else
-            disp(['Calculation previously completed. Melting Point estimated at Tm = ' num2str(Tm_estimate,'%.4f') ' K. Error bounds: Tm = ' ...
-                num2str(Max_T_freeze,'%.4f') ' - ' num2str(Min_T_Melt,'%.4f') ' K.']);
+            if Settings.Verbose
+                disp(['Calculation previously completed. Melting Point estimated at Tm = ' num2str(Tm_estimate,'%.4f') ' K. Error bounds: Tm = ' ...
+                    num2str(Max_T_freeze,'%.4f') ' - ' num2str(Min_T_Melt,'%.4f') ' K.']);
+            end
         end
-        disp(repmat('*',1,40));
+        if Settings.Verbose
+            disp(repmat('*',1,40));
+        end
         return
     catch
     end
@@ -86,36 +95,108 @@ end
 
 if ~Loaded_Prev_Data
     % Create suitable initial conditions (may be re-used for other steps)
-    Setup_LiX_Simulation(Settings);
+    Output = Setup_LiX_Simulation(Settings);
     
-    % Make a calculation history file with with current calculation state and
-    % history, accessible to all previous functions
-    T_dat.T = Settings.T0;
-    T_dat.dT = [Settings.lb Settings.ub]; % Error bounds on the melting temperature, initialized as the prior bounds
-    T_dat.df_bracket = [nan nan]; % The gradient for each member of the melting point bounds
-    T_dat.T_ref = Settings.T0;
-    T_dat.Ref_Density_Trace = Settings.T0;
-    T_dat.T_Trace = []; % Keeps track of temperature at each step of iteration
-    T_dat.f_Trace = []; % Keeps track of time to phase change at each step of iteration
-    T_dat.df_Trace = []; % Keeps track of gradient at each step of iteration
-    T_dat.Freeze_Trace = []; % Keeps track of whether the process froze at each iteration
-    T_dat.Melt_Trace = []; % Keeps track of whether the process melted at each iteration
-    T_dat.T_Freeze_Trace = []; % This will be a trace of only the temperatures where freezing was detected
-    T_dat.T_Melt_Trace = []; % This will be a trace of only the temperatures where melting was detected
-    T_dat.Alt_Structure = false; % This is a switch to kill the calculation if the wrong structure is freezing out
-    save(Settings.CurrentTFile,'T_dat')
+    if Output.Aborted
+        if Output.SolidMelted
+            
+            % Solid melted
+            time_to_phase_change = 1;
+            f = 1/time_to_phase_change;
+            df = 5000/(time_to_phase_change);
+            
+            % Update the current T_mp upper error bound
+            T_dat.T = Settings.T0;
+            T_dat.dT = [Settings.lb Settings.T0]; % Error bounds on the melting temperature, initialized as the prior bounds
+            T_dat.df_bracket = [nan df]; % The gradient for each member of the melting point bounds
+            T_dat.T_ref = Settings.T0;
+            T_dat.Ref_Density_Trace = Settings.T0;
+            T_dat.T_Trace = [Settings.T0]; % Keeps track of temperature at each step of iteration
+            T_dat.f_Trace = f; % Keeps track of time to phase change at each step of iteration
+            T_dat.df_Trace = df; % Keeps track of gradient at each step of iteration
+            T_dat.Freeze_Trace = false; % Keeps track of whether the process froze at each iteration
+            T_dat.Melt_Trace = true; % Keeps track of whether the process melted at each iteration
+            T_dat.T_Freeze_Trace = []; % This will be a trace of only the temperatures where freezing was detected
+            T_dat.T_Melt_Trace = Settings.T0; % This will be a trace of only the temperatures where melting was detected
+            T_dat.Alt_Structure = false; % This is a switch to kill the calculation if the wrong structure is freezing out
+            
+        elseif Output.LiquidFroze || Output.LiquidAmorphous
+            
+            % Liquid froze or became amorphous
+            time_to_phase_change = 1;
+            f = 1/time_to_phase_change;
+            df = -5000/(time_to_phase_change);
+            
+            % Update the current T_mp lower error bound
+            T_dat.T = Settings.T0;
+            T_dat.dT = [Settings.T0 Settings.ub]; % Error bounds on the melting temperature, initialized as the prior bounds
+            T_dat.df_bracket = [df nan]; % The gradient for each member of the melting point bounds
+            T_dat.T_ref = Settings.T0;
+            T_dat.Ref_Density_Trace = Settings.T0;
+            T_dat.T_Trace = Settings.T0; % Keeps track of temperature at each step of iteration
+            T_dat.f_Trace = f; % Keeps track of time to phase change at each step of iteration
+            T_dat.df_Trace = df; % Keeps track of gradient at each step of iteration
+            T_dat.Freeze_Trace = true; % Keeps track of whether the process froze at each iteration
+            T_dat.Melt_Trace = false; % Keeps track of whether the process melted at each iteration
+            T_dat.T_Freeze_Trace = Settings.T0; % This will be a trace of only the temperatures where freezing was detected
+            T_dat.T_Melt_Trace = []; % This will be a trace of only the temperatures where melting was detected
+            T_dat.Alt_Structure = false; % This is a switch to kill the calculation if the wrong structure is freezing out
+            
+        else
+            % Solid or liquid crystallized to an unwanted structure
+            % homogeneously, or calculation failed due to bad potential
+            % In this case, abort the calculation...
+            f = -1;
+            df = 0;
+            T_dat.Alt_Structure = true;
+            
+            T_dat.T = Settings.T0;
+            T_dat.dT = [Settings.lb Settings.ub]; % Error bounds on the melting temperature, initialized as the prior bounds
+            T_dat.df_bracket = [nan nan]; % The gradient for each member of the melting point bounds
+            T_dat.T_ref = Settings.T0;
+            T_dat.Ref_Density_Trace = Settings.T0;
+            T_dat.T_Trace = Settings.T0; % Keeps track of temperature at each step of iteration
+            T_dat.f_Trace = f; % Keeps track of time to phase change at each step of iteration
+            T_dat.df_Trace = df; % Keeps track of gradient at each step of iteration
+            T_dat.Freeze_Trace = []; % Keeps track of whether the process froze at each iteration
+            T_dat.Melt_Trace = []; % Keeps track of whether the process melted at each iteration
+            T_dat.T_Freeze_Trace = []; % This will be a trace of only the temperatures where freezing was detected
+            T_dat.T_Melt_Trace = []; % This will be a trace of only the temperatures where melting was detected
+            T_dat.Alt_Structure = true; % This is a switch to kill the calculation if the wrong structure is freezing out
+        end
+        save(Settings.CurrentTFile,'T_dat')
+    else
+        % Make a calculation history file with with current calculation state and
+        % history, accessible to all previous functions
+        T_dat.T = Settings.T0;
+        T_dat.dT = [Settings.lb Settings.ub]; % Error bounds on the melting temperature, initialized as the prior bounds
+        T_dat.df_bracket = [nan nan]; % The gradient for each member of the melting point bounds
+        T_dat.T_ref = Settings.T0;
+        T_dat.Ref_Density_Trace = Settings.T0;
+        T_dat.T_Trace = []; % Keeps track of temperature at each step of iteration
+        T_dat.f_Trace = []; % Keeps track of time to phase change at each step of iteration
+        T_dat.df_Trace = []; % Keeps track of gradient at each step of iteration
+        T_dat.Freeze_Trace = []; % Keeps track of whether the process froze at each iteration
+        T_dat.Melt_Trace = []; % Keeps track of whether the process melted at each iteration
+        T_dat.T_Freeze_Trace = []; % This will be a trace of only the temperatures where freezing was detected
+        T_dat.T_Melt_Trace = []; % This will be a trace of only the temperatures where melting was detected
+        T_dat.Alt_Structure = false; % This is a switch to kill the calculation if the wrong structure is freezing out
+        save(Settings.CurrentTFile,'T_dat')
 
-    % Rename the gro file at the given reference temperature
-    Strucure_Ref_File_old = fullfile(Settings.WorkDir,[Settings.JobName '.' Settings.CoordType]);
-    Strucure_Ref_File = fullfile(Settings.RefGeomDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '.' Settings.CoordType]);
-    movefile(Strucure_Ref_File_old, Strucure_Ref_File)
-    
-    % Move the solid info file
-    Sol_Ref_File_old = fullfile(Settings.WorkDir,[Settings.JobName '_SolInfo.mat']);
-    Sol_Ref_File = fullfile(Settings.RefGeomDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '_SolInfo.mat']);
-    movefile(Sol_Ref_File_old, Sol_Ref_File)
+        % Rename the gro file at the given reference temperature
+        Strucure_Ref_File_old = fullfile(Settings.WorkDir,[Settings.JobName '.' Settings.CoordType]);
+        Strucure_Ref_File = fullfile(Settings.RefGeomDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '.' Settings.CoordType]);
+        movefile(Strucure_Ref_File_old, Strucure_Ref_File)
+
+        % Move the solid info file
+        Sol_Ref_File_old = fullfile(Settings.WorkDir,[Settings.JobName '_SolInfo.mat']);
+        Sol_Ref_File = fullfile(Settings.RefGeomDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '_SolInfo.mat']);
+        movefile(Sol_Ref_File_old, Sol_Ref_File)
+    end
 else
-    disp('Calculation previously started. Restoring optimizer to previous state...')
+    if Settings.Verbose
+        disp('Calculation previously started. Restoring optimizer to previous state...')
+    end
 end
 
 % Define the function that checks the time to reach melting/freezing point
@@ -125,7 +206,12 @@ switch lower(Settings.Optimizer)
 case 'fmincon'
 
     % Options for fmincon
-    options = optimoptions(@fmincon,'Display','iter','Algorithm','trust-region-reflective',...
+    if Settings.Verbose
+        display_opt = 'iter';
+    else
+        display_opt = 'none';
+    end
+    options = optimoptions(@fmincon,'Display',display_opt,'Algorithm','trust-region-reflective',...
         'OptimalityTolerance',1/Settings.MaxCheckTime,'ObjectiveLimit',0,...
         'UseParallel',false,'MaxIterations',Settings.MaxMPIterations,'StepTolerance',Settings.StepTolerance,...
         'FunctionTolerance',Settings.FunctionTolerance,'MaxFunctionEvaluations',Settings.MaxMPIterations,...
@@ -135,7 +221,11 @@ case 'fmincon'
     [Tm,~,~,~,~,~,~] = fmincon(fun,Settings.T0,[],[],[],[],Settings.lb,Settings.ub,[],options);
 
 case 'bayesopt'
-    
+    if Settings.Verbose
+        display_opt = 1;
+    else
+        display_opt = 0;
+    end
     if Loaded_Prev_Data
         Loaded_checkpoint = true;
         try
@@ -143,14 +233,16 @@ case 'bayesopt'
             results = dat.BayesoptResults;
         catch
             % Catch corrupt files
-            disp('Unable to load bayesian optimization checkpoint file.')
-            disp('Attempting to load backup checkpoint.')
+            if Settings.Verbose
+                disp('Unable to load bayesian optimization checkpoint file.')
+                disp('Attempting to load backup checkpoint.')
+            end
 
             try
                 dat = load([Settings.BayesoptCheckpointFile '.PREV'],'-mat');
                 results = dat.BayesoptResults;
             catch
-                disp('Unable to load backup checkpoint of Bayesian Optimization. Restarting.')
+                disp('Warning: Unable to load backup checkpoint of Bayesian Optimization - Restarting Calculation.')
                 if isfile(Settings.BayesoptCheckpointFile)
                     delete(Settings.BayesoptCheckpointFile)
                 end
@@ -169,7 +261,7 @@ case 'bayesopt'
         remaining_evals = Settings.MaxMPIterations - results.NumObjectiveEvaluations;
         results = resume(results,'IsObjectiveDeterministic',false,...
             'PlotFcn','all','ExplorationRatio',Settings.ExplorationRatio,...
-            'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
+            'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',display_opt,...
             'MaxObjectiveEvaluations',remaining_evals,...
             'OutputFcn',@saveToFile,'SaveFileName',Settings.BayesoptCheckpointFile,...
             'GPActiveSetSize',Settings.MaxMPIterations,...
@@ -178,7 +270,7 @@ case 'bayesopt'
         Tparam = optimizableVariable('T',[Settings.lb Settings.ub],'Type','real'); % Units: K
         results = bayesopt_priv(fun,Tparam,'IsObjectiveDeterministic',false,...
             'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn','all',...
-            'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
+            'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',display_opt,...
             'UseParallel',false,'MaxObjectiveEvaluations',Settings.MaxMPIterations,...
             'NumSeedPoints',Settings.N_Seed_Points,'OutputFcn',@saveToFile,...
             'SaveFileName',Settings.BayesoptCheckpointFile,...
@@ -225,7 +317,7 @@ for idx = 1:length(T_contents)
 end
 
 % Optional: Calculate the density profile along the Z dimension between 100
-if Settings.FinalDensityProfile
+if Settings.FinalDensityProfile && ~T_dat.Alt_Structure
     trr_file = fullfile(Tm_folder,[Settings.JobName '.trr']);
     density_file = fullfile(Settings.WorkDir,[Settings.JobName '_Density_Profile.xvg']);
     gmx_echo = strrep(Settings.gmx_loc,'gmx',['echo "0 0" ' Settings.pipe ' gmx']);
@@ -254,7 +346,9 @@ if T_dat.Alt_Structure
     Tm_estimate = nan;
     Aborted = true;
 end
-disp(['Calculation complete. Epalsed Time: ' datestr(seconds(toc(total_timer)),'HH:MM:SS')])
+if Settings.Verbose
+    disp(['Calculation complete. Epalsed Time: ' datestr(seconds(toc(total_timer)),'HH:MM:SS')])
+end
 diary off
 if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
     diary(Settings.Diary_Loc)

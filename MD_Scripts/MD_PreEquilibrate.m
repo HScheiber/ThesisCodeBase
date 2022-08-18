@@ -1,4 +1,10 @@
-function MD_PreEquilibrate(Directory)
+function Output = MD_PreEquilibrate(Directory)
+
+Output.StructureChange = false;
+Output.SolidMelted = false;
+Output.LiquidFroze = false;
+Output.LiquidAmorphous = false;
+Output.Aborted = false;
 
 Settings = load(fullfile(Directory,'TempJobInfo.mat'));
 
@@ -12,9 +18,13 @@ if isfield(Settings,'Settings')
 end
 Inp_Settings = Settings;
 Settings.WorkDir = Directory;
+if ~isfield(Settings,'Verbose')
+    Settings.Verbose = true;
+end
 
-disp('*** Fast Pre-Equilibration Selected ***')
-
+if Settings.Verbose
+    disp('*** Fast Pre-Equilibration Selected ***')
+end
 % Set the number of steps
 timesteps = Settings.PreEquilibration/Settings.MDP.dt;
 Compressibility = Settings.QECompressibility.*ones(1,length(Settings.Target_P)); % bar^(-1)
@@ -86,25 +96,56 @@ if Settings.Table_Req
 end
     
 % Run system Equilibration
-disp(['Beginning System Pre-Equilibration for ' num2str(Settings.PreEquilibration) ' ps...'] )
+if Settings.Verbose
+    disp(['Beginning System Pre-Equilibration for ' num2str(Settings.PreEquilibration) ' ps...'] )
+end
 mintimer = tic;
 [state,mdrun_output] = system(mdrun_command);
 if state == 0
-    disp(['System Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+    if Settings.Verbose
+        disp(['System Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+    end
     copyfile(Equilibrated_Geom_File,Settings.SuperCellFile)
 else
-    disp('Equilibration failed. Retrying with stiffer compressibility.')
+    try % Clean up
+        [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+    catch me
+        if Settings.Verbose
+            disp(me.message)
+        end
+    end
+
     Settings = Inp_Settings;
-    Settings.QECompressibility = Settings.QECompressibility/2;
-    save(fullfile(Directory,'TempJobInfo.mat'),'Settings')
-    
+    if ~isfield(Settings,'QECompressibility_init')
+        Settings.QECompressibility_init = Settings.QECompressibility;
+    end
     if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-        MD_PreEquilibrate(Directory);
+        if Settings.Verbose
+            disp('Equilibration failed. Retrying with stiffer compressibility.')
+        end
+        Settings.QECompressibility = Settings.QECompressibility/2;
+        save(fullfile(Directory,'TempJobInfo.mat'),'Settings');
+        Output = MD_PreEquilibrate(Directory);
+        return
+    elseif Settings.MDP.dt > 1e-4
+        if Verbose
+            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp('Reducing time step.')
+        end
+        Settings.QECompressibility = Settings.QECompressibility_init;
+        Settings.MDP.dt = Settings.MDP.dt/2;
+        Settings.Output_Coords = Settings.Output_Coords*2;
+        save(fullfile(Directory,'TempJobInfo.mat'),'Settings');
+        Output = MD_PreEquilibrate(Settings);
         return
     else
-        disp('Equilibration failed. Stiffer compressibility did not resolve.')
-        disp(mdrun_output);
-        error(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
+        if Settings.Verbose
+            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp(mdrun_output);
+            disp(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
+        end
+        Output.Aborted = true;
+        return
     end
 end
 
@@ -138,7 +179,9 @@ if errcode ~= 0
     error(['Error running GROMPP. Problem command: ' newline GROMPP_command]);
 end
 
-disp('*** Pre-Equilibration of System Complete ***')
+if Settings.Verbose
+    disp('*** Pre-Equilibration of System Complete ***')
+end
 
 % Remove backups
 if Settings.Delete_Backups

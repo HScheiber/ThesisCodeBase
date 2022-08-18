@@ -1,22 +1,33 @@
-function Setup_LiX_Simulation(Settings)
+function Output = Setup_LiX_Simulation(Settings)
 
 %% Sanity checks
 if ~strcmpi(Settings.Annealing,'no')
     if Settings.Annealing_Times(end)/1000 ~= Settings.MDP.Trajectory_Time
         Settings.MDP.Trajectory_Time = Settings.Annealing_Times(end)/1000;
-        disp(['Warning: total trajectory time differant than final simulated annealing time point. Changing trajectory to ' num2str(Settings.MDP.Trajectory_Time) ' ns.']);
+        if Settings.Verbose
+            disp(['Warning: total trajectory time differant than final simulated annealing time point. Changing trajectory to ' num2str(Settings.MDP.Trajectory_Time) ' ns.']);
+        end
     end
     
     if Settings.Annealing_Temps(1) ~= Settings.MDP.Initial_T || Settings.Annealing_Temps(1) ~= Settings.Target_T
         Settings.MDP.Initial_T = Settings.Annealing_Temps(1);
         Settings.Target_T = Settings.Annealing_Temps(1);
-        disp(['Warning: Initial temperature reset to match First Annealing Temp (T = ' num2str(Settings.MDP.Initial_T) ')']);
+        if Settings.Verbose
+            disp(['Warning: Initial temperature reset to match First Annealing Temp (T = ' num2str(Settings.MDP.Initial_T) ')']);
+        end
     end
 end
 
 if ~Settings.Submit_Jobs
     disp('Calculation will run locally.')
 end
+
+% Initialize Output
+Output.StructureChange = false;
+Output.SolidMelted = false;
+Output.LiquidFroze = false;
+Output.LiquidAmorphous = false;
+Output.Aborted = false;
 
 % Turns off lattice parameter expansion when false
 if ~Settings.Expand_LP
@@ -46,7 +57,9 @@ Halide_Info = elements('Sym',Settings.Halide);
 if ~isfield(Settings,'WorkDir')
     [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
 end
-disp(['Current Job: ' Settings.Salt ' ' Settings.JobName])
+if Settings.Verbose
+    disp(['Current Job: ' Settings.Salt ' ' Settings.JobName])
+end
 
 % Create the working directory if it does not exist
 if ~exist(Settings.WorkDir,'dir')
@@ -347,10 +360,14 @@ else
     end
     % Check to make sure length of input pressure vector is correct
     if length(Settings.Target_P) < Npres
-        disp('Warning: Not enough values of target pressure given, extending first value to undefined pressure.')
+        if Settings.Verbose
+            disp('Warning: Not enough values of target pressure given, extending first value to undefined pressure.')
+        end
         Settings.Target_P(end+1:Npres) = Settings.Target_P(1);
     elseif length(Settings.Target_P) > Npres
-        disp('Warning: Too many values of target pressure given, excluding extra values.')
+        if Settings.Verbose
+            disp('Warning: Too many values of target pressure given, excluding extra values.')
+        end
         Settings.Target_P(Npres+1:end) = [];
     end
     MDP_Template = strrep(MDP_Template,'##COMPRESS##',pad(num2str(Compressibility),18));
@@ -371,7 +388,9 @@ elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
         '; Long-range dispersion correction' newline ...
         'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
 elseif Settings.MDP.Disp_Correction
-    disp('Disabling long-range dispersion correction as this is not compatible with tables as implemented here.')
+    if Settings.Verbose
+        disp('Disabling long-range dispersion correction as this is not compatible with tables as implemented here.')
+    end
 end
 
 % Simulated annealing
@@ -660,9 +679,11 @@ if DoGeomEdit
             else
                 N_Supercell_c = N_Supercell_c_tot;
             end
-            disp(['Warning: With ' num2str(old_atnum) ...
-                ' atoms, the cut-off length is longer than half the shortest box vector or longer than the smallest box diagonal element.'])
-            disp(['Expanding the box to ' num2str((N_Supercell_a*N_Supercell_b*N_Supercell_c_tot)*(Settings.Geometry.N)) ' atoms.'])
+            if Settings.Verbose
+                disp(['Warning: With ' num2str(old_atnum) ...
+                    ' atoms, the cut-off length is longer than half the shortest box vector or longer than the smallest box diagonal element.'])
+                disp(['Expanding the box to ' num2str((N_Supercell_a*N_Supercell_b*N_Supercell_c_tot)*(Settings.Geometry.N)) ' atoms.'])
+            end
         end
         
         N_Solid = N_Supercell_a*N_Supercell_b*N_Supercell_c*Settings.Geometry.N; % number of atoms
@@ -708,7 +729,9 @@ if DoGeomEdit
             [errcode,output] = system(Supercell_command);
             
             if errcode ~= 0
-                disp(output);
+                if Settings.Verbose
+                    disp(output);
+                end
                 error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
             end
         else
@@ -755,7 +778,9 @@ if DoGeomEdit
             [errcode,output] = system(Expand_command);
 
             if errcode ~= 0
-                disp(output);
+                if Settings.Verbose
+                    disp(output);
+                end
                 error(['Error expanding supercell with editconf. Problem command: ' newline Expand_command]);
             end
         end
@@ -902,15 +927,23 @@ cleanup_command = ['if [[ -f "' ConfOut_File '" ]]; then' newline ...
 %% Submitting / running job
 if ~Settings.BatchMode % Running job locally
     
-    disp('Starting Job Locally.')
+    if Settings.Verbose
+        disp('Starting Job Locally.')
+    end
     if ~Found_DataMatch || Settings.Liquid_Interface
-        MD_Preminimization(MinDir);
+        Output = MD_Preminimization(MinDir);
+        if Output.Aborted
+            return
+        end
     elseif strcmpi(Settings.Structure,'liquid')
         Create_Liquid_Box(MinDir)
     end
     
     if Settings.PreEquilibration > 0
-        MD_PreEquilibrate(MinDir);
+        Output = MD_PreEquilibrate(MinDir);
+        if Output.Aborted
+            return
+        end
     end
 
     % Make sure the initial configuration file is also available in gro format
@@ -919,7 +952,9 @@ if ~Settings.BatchMode % Running job locally
 
         % Catch error
         if errcode ~= 0
-            disp(outp);
+            if Settings.Verbose
+                disp(outp);
+            end
             error(['Error running TRJCONV. Problem command: ' newline trjconv_command]);
         end
     end
@@ -989,14 +1024,18 @@ elseif Settings.BatchMode && ~isempty(Settings.qsub) % Running job in batch mode
     fclose(fidBS);
 
     % Submit or run job
-    disp('Batch job input files produced.')
+    if Settings.Verbose
+        disp('Batch job input files produced.')
+    end
     
     if Settings.Submit_Jobs
         pdir = pwd;
         cd(Settings.WorkDir);
         
         [~,output] = system([Settings.qsub ' ' batch_file]);
-        disp('Job (Link 1) submitted.')
+        if Settings.Verbose
+            disp('Job (Link 1) submitted.')
+        end
 
         PrevJobID = regexp(output,'[0-9]+','match','ONCE');
         cpt_output_prev = CheckPoint_File;
@@ -1038,8 +1077,10 @@ elseif Settings.BatchMode && ~isempty(Settings.qsub) % Running job in batch mode
             else
                 [~,output] = system([Settings.qsub ' -W depend=afterany:' PrevJobID ' ' batch_file]);
             end
-
-            disp(['Job (Link ' num2str(jdx) ') submitted.'])
+            
+            if Settings.Verbose
+                disp(['Job (Link ' num2str(jdx) ') submitted.'])
+            end
 
             % Update previous job stuff
             cpt_output_prev = cpt_output_i;
@@ -1048,5 +1089,7 @@ elseif Settings.BatchMode && ~isempty(Settings.qsub) % Running job in batch mode
         cd(pdir); % Return to previous location
     end
 else
-    disp('Unable to run job in batch mode: no batch program available')
+    if Settings.Verbose
+        disp('Unable to run job in batch mode: no batch program available')
+    end
 end

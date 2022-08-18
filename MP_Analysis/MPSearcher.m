@@ -1,12 +1,16 @@
 function Tm = MPSearcher(fun,T0,lb,ub,Settings)
 
 if T0 < lb
-    disp(['Initial T = ' num2str(T0,'%.4f') ' K is lower than specified lower bound of '  num2str(lb,'%.4f') ' K.' ...
-        ' Setting initial T to lower bound.'])
+    if Settings.Verbose
+        disp(['Initial T = ' num2str(T0,'%.4f') ' K is lower than specified lower bound of '  num2str(lb,'%.4f') ' K.' ...
+            ' Setting initial T to lower bound.'])
+    end
     T = lb;
 elseif T0 > ub
-    disp(['Initial T = ' num2str(T0,'%.4f') ' K is higher than specified upper bound of '  num2str(ub,'%.4f') ' K.' ...
-        ' Setting initial T to upper bound.'])
+    if Settings.Verbose
+        disp(['Initial T = ' num2str(T0,'%.4f') ' K is higher than specified upper bound of '  num2str(ub,'%.4f') ' K.' ...
+            ' Setting initial T to upper bound.'])
+    end
     T = ub;
 else
     T = T0;
@@ -30,10 +34,12 @@ end
 
 if any(T_dat.T_Freeze_Trace > T_Melt_Min) || any(Potential_Tms > T_Melt_Min)...
     || any(T_dat.T_Melt_Trace < T_Freeze_Max) || any(Potential_Tms < T_Freeze_Max)
-
-    disp('Warning: updating classification of at least one freezing/melting point.')
-    disp('This occurs when a new melted T is found to be lower than a previous freezing or unknown T')
-    disp('or when a new freezing T is found to be higher than a previous melting or unknown T.')
+    
+    if Settings.Verbose
+        disp('Note: updating classification of at least one freezing/melting point.')
+        disp('This occurs when a new melted T is found to be lower than a previous freezing or unknown T')
+        disp('or when a new freezing T is found to be higher than a previous melting or unknown T.')
+    end
     T_dat.Melt_Trace = T_dat.T_Trace >= T_Melt_Min;
     T_dat.Freeze_Trace = T_dat.T_Trace <= T_Freeze_Max;
 
@@ -81,13 +87,15 @@ end
 
 while TBracket > Settings.BracketThreshold
 
-    disp(['Current melting point bracket: ' num2str(TBracket,'%.4f') ...
-        ' K, between T[Freeze] = ' num2str(T_dat.dT(1),'%.4f') ' K and T[Melt] = ' ...
-        num2str(T_dat.dT(2),'%.4f') ' K.'])
-    % Info
-    disp(['Checked temperatures that melted: ' num2str(sort(T_dat.T_Melt_Trace),'%.4f K    ')])
-    disp(['Checked temperatures that froze:  ' num2str(sort(T_dat.T_Freeze_Trace,'descend'),'%.4f K    ')])
-    disp(['Checked indeterminate points:             ' num2str(sort(T_dat.T_Trace(MP_check)),'%.4f K    ')])
+    if Settings.Verbose
+        disp(['Current melting point bracket: ' num2str(TBracket,'%.4f') ...
+            ' K, between T[Freeze] = ' num2str(T_dat.dT(1),'%.4f') ' K and T[Melt] = ' ...
+            num2str(T_dat.dT(2),'%.4f') ' K.'])
+        % Info
+        disp(['Checked temperatures that melted: ' num2str(sort(T_dat.T_Melt_Trace),'%.4f K    ')])
+        disp(['Checked temperatures that froze:  ' num2str(sort(T_dat.T_Freeze_Trace,'descend'),'%.4f K    ')])
+        disp(['Checked indeterminate points:             ' num2str(sort(T_dat.T_Trace(MP_check)),'%.4f K    ')])
+    end
     
     if any(MP_check)
 
@@ -150,9 +158,11 @@ while TBracket > Settings.BracketThreshold
     if any(T_dat.T_Freeze_Trace > T_Melt_Min) || any(Potential_Tms > T_Melt_Min)...
         || any(T_dat.T_Melt_Trace < T_Freeze_Max) || any(Potential_Tms < T_Freeze_Max)
         
-        disp('Warning: updating classification of at least one freezing/melting point.')
-        disp('This occurs when a new melted T is found to be lower than a previous freezing or unknown T')
-        disp('or when a new freezing T is found to be higher than a previous melting or unknown T.')
+        if Settings.Verbose
+            disp('Note: updating classification of at least one freezing/melting point.')
+            disp('This occurs when a new melted T is found to be lower than a previous freezing or unknown T')
+            disp('or when a new freezing T is found to be higher than a previous melting or unknown T.')
+        end
         T_dat.Melt_Trace = T_dat.T_Trace >= T_Melt_Min;
         T_dat.Freeze_Trace = T_dat.T_Trace <= T_Freeze_Max;
         
@@ -180,11 +190,15 @@ while TBracket > Settings.BracketThreshold
     end
 
     if T == ub && (df < 0) % derivative less than 0 indicates the system froze
-        disp('System froze at upper T bound. Unable to bracket melting point within bounds!')
+        if Settings.Verbose
+            disp('System froze at upper T bound. Unable to bracket melting point within bounds!')
+        end
         Tm = T;
         return
     elseif T == lb && df > 0  % derivative greater than 0 indicates the system melted
-        disp('System melted at lower T bound. Unable to bracket melting point within bounds!')
+        if Settings.Verbose
+            disp('System melted at lower T bound. Unable to bracket melting point within bounds!')
+        end
         Tm = T;
         return
     end
@@ -216,36 +230,34 @@ else
     Tm = T_dat.dT(1); % Report the freezing side of the melting point range by convention
 end
 
+if Settings.Verbose
+    disp(['Melting point bracketed to within: ' num2str(TBracket,'%.4f') ' K.'])
+    disp(['This is smaller than the specified M.P. temperature bracket threshold of ' ...
+        num2str(Settings.BracketThreshold,'%.4f') ' K.'])
+    disp(repmat('*',1,40));
+    disp(['Estimated melting point is: ' num2str(mean(T_dat.dT),'%.4f') ' K.'])
+    disp(repmat('*',1,40));
+    disp('Summary of melting point trajectory:')
+    disp(repmat('*',1,40));
 
-disp(['Melting point bracketed to within: ' num2str(TBracket,'%.4f') ' K.'])
-disp(['This is smaller than the specified M.P. temperature bracket threshold of ' ...
-    num2str(Settings.BracketThreshold,'%.4f') ' K.'])
-disp(repmat('*',1,40));
-disp(['Estimated melting point is: ' num2str(mean(T_dat.dT),'%.4f') ' K.'])
-disp(repmat('*',1,40));
-disp('Summary of melting point trajectory:')
-disp(repmat('*',1,40));
-for idx = 1:length(T_dat.T_Trace)
-    if T_dat.df_Trace(idx) < 0
-        cls = 'freezing';
-    elseif T_dat.df_Trace(idx) > 0
-        cls = 'melting';
-    else
-        cls = 'indeterminate';
+    for idx = 1:length(T_dat.T_Trace)
+        if T_dat.df_Trace(idx) < 0
+            cls = 'freezing';
+        elseif T_dat.df_Trace(idx) > 0
+            cls = 'melting';
+        else
+            cls = 'indeterminate';
+        end
+
+        if T_dat.Freeze_Trace(idx)
+            cls2 = 'freezing';
+        elseif T_dat.Melt_Trace(idx)
+            cls2 = 'melting';
+        else
+            cls2 = 'indeterminate';
+        end
+        disp(['At T = ' num2str(T_dat.T_Trace(idx),'%.4f') ' K, detected as ' cls ' and classified as ' cls2 '.'])
     end
-
-    if T_dat.Freeze_Trace(idx)
-        cls2 = 'freezing';
-    elseif T_dat.Melt_Trace(idx)
-        cls2 = 'melting';
-    else
-        cls2 = 'indeterminate';
-    end
-
-    disp(['At T = ' num2str(T_dat.T_Trace(idx),'%.4f') ' K, detected as ' cls ' and classified as ' cls2 '.'])
+    disp(repmat('*',1,40));
 end
-disp(repmat('*',1,40));
-
-
-    
 end

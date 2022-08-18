@@ -41,11 +41,13 @@ function varargout = Melting_Point_Check(T,Settings)
         end
     end
     
-    disp(newline)
-    disp(repmat('*',1,40));
-    disp(['Current Temperature: ' num2str(T,'%.4f') ' K']);
-    disp(repmat('*',1,40));
-    disp(newline)
+    if Settings.Verbose
+        disp(newline)
+        disp(repmat('*',1,40));
+        disp(['Current Temperature: ' num2str(T,'%.4f') ' K']);
+        disp(repmat('*',1,40));
+        disp(newline)
+    end
     
     % Make the new work directory
     RefGeomDir = Settings.RefGeomDir;
@@ -108,31 +110,100 @@ function varargout = Melting_Point_Check(T,Settings)
         end
         
         if MakeNewConfig
-            disp('Updating initial system configuration...')
+            if Settings.Verbose
+                disp('Updating initial system configuration...')
+            end
             % Make a new reference T
             T_dat.T_ref = T;
             Settings.Target_T = T_dat.T_ref; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
             Settings.MDP.Initial_T = T_dat.T_ref; % Initial termpature at which to generate velocities
 
             % Reset the initial configuration
-            Setup_LiX_Simulation(Settings);
+            Output = Setup_LiX_Simulation(Settings);
+            
+            % Check if the output is aborted
+            if Output.Aborted
+                if Output.SolidMelted
+                    
+                    time_to_phase_change = 1;
+                    f = 1/time_to_phase_change;
+                    df = 5000/(time_to_phase_change);
+                    T_dat.T_Melt_Trace = [T_dat.T_Freeze_Trace T];
+                    
+                    % Update the current T_mp lower error bound
+                    T_dat.dT(2) = T;
+                    T_dat.df_bracket(2) = df;
+                    T_dat.Ref_Density_Trace = [T_dat.Ref_Density_Trace T_dat.T_ref];
+                    T_dat.T = T;
+                    T_dat.T_Trace = [T_dat.T_Trace T];
+                    T_dat.f_Trace = [T_dat.f_Trace f];
+                    T_dat.df_Trace = [T_dat.df_Trace df];
+                    T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                    T_dat.Melt_Trace = [T_dat.Melt_Trace true];
+                    T_dat.Alt_Structure = false;
+                    
+                elseif Output.LiquidFroze || Output.LiquidAmorphous
 
-            % Rename the gro and sol.mat file at the given temperature
-            Strucure_Ref_File_old = fullfile(OuterDir,[Settings.JobName '.' Settings.CoordType]);
-            Strucure_Ref_File = fullfile(RefGeomDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '.' Settings.CoordType]);
-            movefile(Strucure_Ref_File_old, Strucure_Ref_File)
-            % Move the partial files from minimization
-            Sol_Ref_File_old = fullfile(OuterDir,[Settings.JobName '_SolInfo.mat']);
-            Sol_Ref_File = fullfile(RefGeomDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '_SolInfo.mat']);
-            movefile(Sol_Ref_File_old, Sol_Ref_File)
-            Strucure_In_File = fullfile(WorkDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '.' Settings.CoordType]);
-            Sol_In_File = fullfile(WorkDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '_SolInfo.mat']);
+                    time_to_phase_change = 1;
+                    f = 1/time_to_phase_change;
+                    df = -5000/(time_to_phase_change);
+                    T_dat.T_Freeze_Trace = [T_dat.T_Freeze_Trace T];
+                    
+                    % Update the current T_mp lower error bound
+                    T_dat.dT(1) = T;
+                    T_dat.df_bracket(1) = df;
+                    T_dat.Ref_Density_Trace = [T_dat.Ref_Density_Trace T_dat.T_ref];
+                    T_dat.T = T;
+                    T_dat.T_Trace = [T_dat.T_Trace T];
+                    T_dat.f_Trace = [T_dat.f_Trace f];
+                    T_dat.df_Trace = [T_dat.df_Trace df];
+                    T_dat.Freeze_Trace = [T_dat.Freeze_Trace true];
+                    T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                    T_dat.Alt_Structure = false;
+                    
+                else
+                    % Solid or liquid crystallized to an unwanted structure
+                    % homogeneously, or calculation failed due to bad potential
+                    % In this case, abort the calculation...
+                    f = -1;
+                    df = 0;
+                    T_dat.Alt_Structure = true;
+                    T_dat.T = T;
+                    T_dat.T_Trace = [T_dat.T_Trace T];
+                    T_dat.f_Trace = [T_dat.f_Trace f];
+                    T_dat.df_Trace = [T_dat.df_Trace df];
+                    T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                    T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                end
+                
+                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                save(Settings.CurrentTFile,'T_dat')
+                varargout = cell(1,3); % Outputs function, coupled constraints, and user data
+                varargout{1} = f; % function evaluation
+                varargout{2} = df; % function derivative
+                varargout{3} = T_dat; % user data
+                return
+            else
+                % Rename the gro and sol.mat file at the given temperature
+                Strucure_Ref_File_old = fullfile(OuterDir,[Settings.JobName '.' Settings.CoordType]);
+                Strucure_Ref_File = fullfile(RefGeomDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '.' Settings.CoordType]);
+                movefile(Strucure_Ref_File_old, Strucure_Ref_File)
+                % Move the partial files from minimization
+                Sol_Ref_File_old = fullfile(OuterDir,[Settings.JobName '_SolInfo.mat']);
+                Sol_Ref_File = fullfile(RefGeomDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '_SolInfo.mat']);
+                movefile(Sol_Ref_File_old, Sol_Ref_File)
+                Strucure_In_File = fullfile(WorkDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '.' Settings.CoordType]);
+                Sol_In_File = fullfile(WorkDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '_SolInfo.mat']);
 
-            % Update reference T file
-            T_dat.Ref_Density_Trace = [T_dat.Ref_Density_Trace T_dat.T_ref];
-            copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-            save(Settings.CurrentTFile,'T_dat')
-            disp('Successfully updated initial configuration.')
+                % Update reference T file
+                T_dat.Ref_Density_Trace = [T_dat.Ref_Density_Trace T_dat.T_ref];
+                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                save(Settings.CurrentTFile,'T_dat')
+                if Settings.Verbose
+                    disp('Successfully updated initial configuration.')
+                end
+            end
+            
         elseif Settings.Manual_Box
             Settings.SuperCellFile = Strucure_Ref_File;
             UpdateTopology(Settings)
@@ -146,7 +217,9 @@ function varargout = Melting_Point_Check(T,Settings)
             UpdateTopology(Settings)
         end
     end
-    disp(['Intial configuration reference density: T = ' num2str(T_dat.T_ref,'%.4f') ' K.']);
+    if Settings.Verbose
+        disp(['Intial configuration reference density: T = ' num2str(T_dat.T_ref,'%.4f') ' K.']);
+    end
     
     % Look for a checkpoint file
     cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
@@ -156,7 +229,9 @@ function varargout = Melting_Point_Check(T,Settings)
         cptch = fullfile(WorkDir,cpt_check(idx).name);
         [errc,~] = system([Settings.gmx_loc ' check -f ' cptch]);
         if errc ~= 0
-            disp(['Detected and deleted corrupted checkpoint file: ' cptch])
+            if Settings.Verbose
+                disp(['Detected and deleted corrupted checkpoint file: ' cptch])
+            end
             delete(cptch)
             prevcpt = strrep(cptch,'.cpt','_prev.cpt');
             if isfile(prevcpt)
@@ -216,8 +291,10 @@ function varargout = Melting_Point_Check(T,Settings)
     
     % If usable checkpoint file found...
     if ContinueFromCheckPoint
-        disp(['Usable checkpoint file found for T = ' num2str(T,'%.4f')])
-        disp(['Previously, simulation stopped at ' num2str(telpse,'%.1f') ' ps'])
+        if Settings.Verbose
+            disp(['Usable checkpoint file found for T = ' num2str(T,'%.4f')])
+            disp(['Previously, simulation stopped at ' num2str(telpse,'%.1f') ' ps'])
+        end
         CheckTime = max(PrevCheckTime,Settings.CheckTime);
         
         % Maximum number of time segments
@@ -234,7 +311,9 @@ function varargout = Melting_Point_Check(T,Settings)
         
         % Check if the structure OUT file exists, indicating the previous segment finished
         if isfile(Structure_Out_File)
-            disp(['Step ' cpt_number{1} '/' max_steps ' previously completed.'])
+            if Settings.Verbose
+                disp(['Step ' cpt_number{1} '/' max_steps ' previously completed.'])
+            end
         else
             % If not, continue the current segment of the simulation
             mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(Traj_Conf_File) ...
@@ -248,8 +327,10 @@ function varargout = Melting_Point_Check(T,Settings)
             end
 
             MDtimer = tic;
-            disp(['Continuing MD simulation segment ' cpt_number{1} '/' max_steps ...
-                ' (' num2str(str2double(cpt_number{1})*CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ' ps).'])
+            if Settings.Verbose
+                disp(['Continuing MD simulation segment ' cpt_number{1} '/' max_steps ...
+                    ' (' num2str(str2double(cpt_number{1})*CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ' ps).'])
+            end
             
             if Settings.slurm
                 mdrun_command = regexprep(mdrun_command,' -maxh ([0-9]|\.)+','','once');
@@ -261,8 +342,12 @@ function varargout = Melting_Point_Check(T,Settings)
             
             [errcode,outp] = system(mdrun_command);
             if errcode ~= 0
-                disp(outp);
+                if Settings.Verbose
+                    disp(outp);
+                end
                 if T > 1700
+                    f = -1;
+                    df = 0;
                     T_dat.Alt_Structure = true;
                     T_dat.T = T;
                     T_dat.T_Trace = [T_dat.T_Trace T];
@@ -275,30 +360,39 @@ function varargout = Melting_Point_Check(T,Settings)
                     varargout = cell(1,3); % Outputs function, coupled constraints, and user data
                     varargout{1} = -1; % function evaluation
                     varargout{2} = 0; % function derivative
-                    varargout{3} = T_dat; % user data 
-                    disp('Detected system blow up! This potential may be unusable')
-                    disp('Aborting Melting Point calculation.')
+                    varargout{3} = T_dat; % user data
+                    if Settings.Verbose
+                        disp('Detected system blow up! This potential may be unusable')
+                        disp('Aborting Melting Point calculation.')
+                    end
                     return
                 else
                     error(['Error running mdrun. Problem command: ' newline mdrun_command]);
                 end
             elseif ~isfile(windows2unix(Structure_Out_File))
-                disp('Calculation time is almost up, ending MATLAB session now.')
+                if Settings.Verbose
+                    disp('Calculation time is almost up, ending MATLAB session now.')
+                end
                 exit
             end
-            disp(['MD simulation segment ' cpt_number{1} '/' max_steps ...
-                ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
-                ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+            if Settings.Verbose
+                disp(['MD simulation segment ' cpt_number{1} '/' max_steps ...
+                    ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
+                    ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+            end
         end
         
-        disp('Checking melting/freezing status...')
+        if Settings.Verbose
+            disp('Checking melting/freezing status...')
+        end
         CheckStructureTimer = tic;
         PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
             pyargs('SystemName',Settings.JobName,...
             'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
             'RefChangeThreshold',Settings.MeltFreezeThreshold,...
             'FileType',Settings.CoordType,...
-            'T_Ref',T_dat.T_ref));
+            'T_Ref',T_dat.T_ref,...
+            'Verbose',Settings.Verbose));
         Froze = logical(PyOut{1});
         Melted = logical(PyOut{2});
         Froze_alt = logical(PyOut{6});
@@ -364,8 +458,10 @@ function varargout = Melting_Point_Check(T,Settings)
         end
         
         MDtimer = tic;
-        disp(['Beginning MD simulation segment 001/' max_steps ...
-            ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ' ps).'])
+        if Settings.Verbose
+            disp(['Beginning MD simulation segment 001/' max_steps ...
+                ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ' ps).'])
+        end
         
         if Settings.slurm
             mdrun_command = regexprep(mdrun_command,' -maxh ([0-9]|\.)+','','once');
@@ -377,8 +473,12 @@ function varargout = Melting_Point_Check(T,Settings)
 
         [errcode,outp] = system(mdrun_command);
         if errcode ~= 0
-            disp(outp);
+            if Settings.Verbose
+                disp(outp);
+            end
             if T > 1700
+                f = -1;
+                df = 0;
                 T_dat.Alt_Structure = true;
                 T_dat.T = T;
                 T_dat.T_Trace = [T_dat.T_Trace T];
@@ -392,19 +492,25 @@ function varargout = Melting_Point_Check(T,Settings)
                 varargout{1} = -1; % function evaluation
                 varargout{2} = 0; % function derivative
                 varargout{3} = T_dat; % user data
-                disp('Possible system blow up! This potential may be unusable!')
-                disp('Aborting Melting Point calculation.')
+                if Settings.Verbose
+                    disp('Possible system blow up! This potential may be unusable!')
+                    disp('Aborting Melting Point calculation.')
+                end
                 return
             else
                 error(['Error running mdrun. Problem command: ' newline mdrun_command]);
             end
         elseif ~isfile(windows2unix(Structure_Out_File))
-            disp('Calculation time is almost up, ending MATLAB session now.')
+            if Settings.Verbose
+                disp('Calculation time is almost up, ending MATLAB session now.')
+            end
             exit
         end
-        disp(['MD simulation segment 001/' max_steps ...
-            ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
-            ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+        if Settings.Verbose
+            disp(['MD simulation segment 001/' max_steps ...
+                ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
+                ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+        end
 
         % Check the final frame of the simulation chunk
         disp('Checking melting/freezing status...')
@@ -414,7 +520,8 @@ function varargout = Melting_Point_Check(T,Settings)
             'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
             'RefChangeThreshold',Settings.MeltFreezeThreshold,...
             'FileType',Settings.CoordType,...
-            'T_Ref',T_dat.T_ref));
+            'T_Ref',T_dat.T_ref,...
+            'Verbose',Settings.Verbose));
         Froze = logical(PyOut{1});
         Melted = logical(PyOut{2});
         Froze_alt = logical(PyOut{6});
@@ -424,10 +531,11 @@ function varargout = Melting_Point_Check(T,Settings)
     end
     
     while IsNotComplete && ~Froze_alt && (CheckTime*ext_idx <= Settings.MaxCheckTime) 
-        
-        disp(['Simulation inconclusive, extending simulation to step ' num2str(ext_idx,'%03.f') '/' max_steps ...
-            ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ' ps).' ...
-            ' Time elapsed: ' datestr(seconds(toc(CheckStructureTimer)),'HH:MM:SS')])
+        if Settings.Verbose
+            disp(['Simulation inconclusive, extending simulation to step ' num2str(ext_idx,'%03.f') '/' max_steps ...
+                ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ' ps).' ...
+                ' Time elapsed: ' datestr(seconds(toc(CheckStructureTimer)),'HH:MM:SS')])
+        end
         
         MDtimer = tic;
         % If simulation did not find an answer after 1 time chunk, keep trying. Update the input files.
@@ -469,22 +577,29 @@ function varargout = Melting_Point_Check(T,Settings)
             disp(outp);
             error(['Error running mdrun. Problem command: ' newline mdrun_command]);
         elseif ~isfile(windows2unix(Structure_Out_File))
-            disp('Calculation time is almost up, ending MATLAB session now.')
+            if Settings.Verbose
+                disp('Calculation time is almost up, ending MATLAB session now.')
+            end
             exit
         end
-        disp(['MD simulation segment ' num2str(ext_idx,'%03.f') '/' max_steps ...
-            ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
-            ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+        if Settings.Verbose
+            disp(['MD simulation segment ' num2str(ext_idx,'%03.f') '/' max_steps ...
+                ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
+                ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+        end
 
         % Check the final frame of the simulation chunk
-        disp('Checking melting/freezing status...')
+        if Settings.Verbose
+            disp('Checking melting/freezing status...')
+        end
         CheckStructureTimer = tic;
         PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
             pyargs('SystemName',Settings.JobName,...
             'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
             'RefChangeThreshold',Settings.MeltFreezeThreshold,...
             'FileType',Settings.CoordType,...
-            'T_Ref',T_dat.T_ref));
+            'T_Ref',T_dat.T_ref,...
+            'Verbose',Settings.Verbose));
         Froze = logical(PyOut{1});
         Melted = logical(PyOut{2});
         Froze_alt = logical(PyOut{6});
@@ -505,7 +620,9 @@ function varargout = Melting_Point_Check(T,Settings)
     end
 
     % Once complete, calculate the function and "gradient"
-    disp('Checking full trajectory for time-to-phase-change...')
+    if Settings.Verbose
+        disp('Checking full trajectory for time-to-phase-change...')
+    end
     CheckStructureTimer = tic;
     PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
         pyargs('SystemName',Settings.JobName,...
@@ -518,9 +635,12 @@ function varargout = Melting_Point_Check(T,Settings)
         'FileType',Settings.CoordType,...
         'T_Ref',T_dat.T_ref,...
         'T',T,...
-        'TimePerFrame',10));
-    disp(['Completed trajectory check. Time elapsed: ' ...
-        datestr(seconds(toc(CheckStructureTimer)),'HH:MM:SS')])
+        'TimePerFrame',10,...
+        'Verbose',Settings.Verbose));
+    if Settings.Verbose
+        disp(['Completed trajectory check. Time elapsed: ' ...
+            datestr(seconds(toc(CheckStructureTimer)),'HH:MM:SS')])
+    end
     Froze = logical(PyOut{1});
     Melted = logical(PyOut{2});
     time_to_phase_change = PyOut{3};
@@ -533,17 +653,21 @@ function varargout = Melting_Point_Check(T,Settings)
         f = -1;
         df = 0;
         T_dat.Alt_Structure = true;
-        disp(['Detected system freezing into unexpected structure at ' num2str(time_to_phase_change) ' ps.'])
-        disp('Aborting Melting Point calculation.')
+        if Settings.Verbose
+            disp(['Detected system freezing into unexpected structure at ' num2str(time_to_phase_change) ' ps.'])
+            disp('Aborting Melting Point calculation.')
+        end
     elseif ~Froze && ~Melted
         f = -1;
         df = 0;
         
-        disp(repmat('*',1,40));
-        disp(['System has not melted or froze after max time of ' num2str(Settings.MaxCheckTime) ' ps. Indeterminate point found.'])
-        disp(['Indeterminate point found at T = ' num2str(T,'%.4f') ' K. Error bounds: Tm = ' ...
-            num2str(T_dat.dT(1),'%.4f') ' - ' num2str(T_dat.dT(2),'%.4f') ' K.']);
-        disp(repmat('*',1,40));
+        if Settings.Verbose
+            disp(repmat('*',1,40));
+            disp(['System has not melted or froze after max time of ' num2str(Settings.MaxCheckTime) ' ps. Indeterminate point found.'])
+            disp(['Indeterminate point found at T = ' num2str(T,'%.4f') ' K. Error bounds: Tm = ' ...
+                num2str(T_dat.dT(1),'%.4f') ' - ' num2str(T_dat.dT(2),'%.4f') ' K.']);
+            disp(repmat('*',1,40));
+        end
     elseif Froze
         if time_to_phase_change < 1
             time_to_phase_change = 1;
@@ -557,7 +681,9 @@ function varargout = Melting_Point_Check(T,Settings)
             T_dat.dT(1) = T;
             T_dat.df_bracket(1) = df;
         end
-        disp(['Detected system freezing at ' num2str(time_to_phase_change) ' ps.'])
+        if Settings.Verbose
+            disp(['Detected system freezing at ' num2str(time_to_phase_change) ' ps.'])
+        end
     elseif Melted
         if time_to_phase_change < 1
             time_to_phase_change = 1;
@@ -571,7 +697,9 @@ function varargout = Melting_Point_Check(T,Settings)
             T_dat.dT(2) = T;
             T_dat.df_bracket(2) = df;
         end
-        disp(['Detected system melting at ' num2str(time_to_phase_change) ' ps.'])
+        if Settings.Verbose
+            disp(['Detected system melting at ' num2str(time_to_phase_change) ' ps.'])
+        end
     end
     
     % Save data to file before returning

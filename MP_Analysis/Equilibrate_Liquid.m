@@ -1,4 +1,4 @@
-function Equil_density = Equilibrate_Liquid(Settings)
+function Output = Equilibrate_Liquid(Settings)
 
     %% What this function does:
     % Initialize density based on experiment
@@ -10,10 +10,21 @@ function Equil_density = Equilibrate_Liquid(Settings)
     % Calculate average density of equilibrated box based on last 25% of simulation
     % Give new density as output
 
+    
+	Output.StructureChange = false;
+    Output.SolidMelted = false;
+    Output.LiquidFroze = false;
+    Output.LiquidAmorphous = false;
+    Output.Aborted = false;
+    Output.Equil_density = nan;
+    
     %% Possibility 1 Implemented
-    disp('*** Separate Equilibration of Liquid Selected ***')
+    if Settings.Verbose
+        disp('*** Separate Equilibration of Liquid Selected ***')
+    end
     
     Inp_Settings = Settings;
+    MinDir = Settings.WorkDir;
     Settings.WorkDir = fullfile(Settings.WorkDir,'Equil_Liq');
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
@@ -50,7 +61,9 @@ function Equil_density = Equilibrate_Liquid(Settings)
     Ref_X = fullfile(Settings.home,'templates','GRO_Templates',[Settings.Halide '_Box.gro']);
 
     % Add metal
-    disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Metal ' ions to liquid box...'])
+    if Settings.Verbose
+        disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Metal ' ions to liquid box...'])
+    end
     mtimer = tic;
     Prep_Liq_Metal_Only = fullfile(Settings.WorkDir,['Prep_Liq_Metal_Only.' Settings.CoordType]);
     cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
@@ -58,14 +71,20 @@ function Equil_density = Equilibrate_Liquid(Settings)
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
-        disp(output);
+        if Settings.Verbose
+            disp(output);
+        end
         error(['Error adding ' Settings.Metal ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
+    if Settings.Verbose
+        disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
+    end
 
     % Add Halide
     Prep_Liq_Random_Liq = fullfile(Settings.WorkDir,['Prep_Liq_Random_Liq.' Settings.CoordType]);
-    disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
+    if Settings.Verbose
+        disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
+    end
     htimer = tic;
     cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
         ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 400'];
@@ -73,10 +92,14 @@ function Equil_density = Equilibrate_Liquid(Settings)
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
-        disp(output);
+        if Settings.Verbose
+            disp(output);
+        end
         error(['Error adding ' Settings.Halide ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
+    if Settings.Verbose
+        disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
+    end
 
 
     % Load current randomly-generated liquid file data
@@ -145,7 +168,9 @@ function Equil_density = Equilibrate_Liquid(Settings)
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
     elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
-        disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        if Settings.Verbose
+            disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        end
         MDP.Minimization_txt = [MDP.Minimization_txt newline newline ...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
@@ -248,13 +273,19 @@ function Equil_density = Equilibrate_Liquid(Settings)
     end
     
     % Liquid Minimization
-    disp('Begining Liquid Minimization...')
+    if Settings.Verbose
+        disp('Begining Liquid Minimization...')
+    end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
-        disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        if Settings.Verbose
+            disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
     else
-        disp(mdrun_output);
+        if Settings.Verbose
+            disp(mdrun_output);
+        end
         error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
     end
     
@@ -291,6 +322,7 @@ function Equil_density = Equilibrate_Liquid(Settings)
     MDP_Template = regexprep(MDP_Template,'(nstpcouple += *)(.+?)( *);',['$1 ' num2str(nstpcouple) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(compressibility += *)(.+?)( *);',['$1 ' num2str(Compressibility) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(ref-p += *)(.+?)( *);',['$1 ' num2str(Settings.Target_P(1)) '$3;']);
+    MDP_Template = regexprep(MDP_Template,'(dt += *)(.+?)( *);',['$1' num2str(Settings.MDP.dt) '$3;']);
 
     % Pair it with velocity rescale thermostat + small time constant
     MDP_Template = regexprep(MDP_Template,'(tcoupl += *)(.+?)( +);','$1v-rescale$3;');
@@ -337,25 +369,131 @@ function Equil_density = Equilibrate_Liquid(Settings)
     end
 
     % Run Liquid Equilibration
-    disp(['Begining Liquid Equilibration for ' num2str(Settings.Equilibrate_Liquid) ' ps...'] )
+    if Settings.Verbose
+        disp(['Begining Liquid Equilibration for ' num2str(Settings.Equilibrate_Liquid) ' ps...'] )
+    end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
-        disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        if Settings.Verbose
+            disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
     else
-        disp('Equilibration failed. Retrying with stiffer compressibility.')
+        try % Clean up
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+        catch me
+            disp(me.message)
+        end
+
         Settings = Inp_Settings;
-        Settings.QECompressibility = Settings.QECompressibility/2;
+        if ~isfield(Settings,'QECompressibility_init')
+            Settings.QECompressibility_init = Settings.QECompressibility;
+        end
+        
         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-            Equil_density = Equilibrate_Liquid(Settings);
+            if Settings.Verbose
+                disp('Equilibration failed. Retrying with stiffer compressibility.')
+            end
+            Settings.QECompressibility = Settings.QECompressibility/2;
+            Output = Equilibrate_Liquid(Settings);
+            return
+        elseif Settings.MDP.dt > 1e-4
+            if Settings.Verbose
+                disp('Equilibration failed. Stiffer compressibility did not resolve.')
+                disp('Reducing time step.')
+            end
+            Settings.QECompressibility = Settings.QECompressibility_init;
+            Settings.MDP.dt = Settings.MDP.dt/2;
+            Settings.Output_Coords = Settings.Output_Coords*2;
+            Output = Equilibrate_Liquid(Settings);
             return
         else
-            disp('Equilibration failed. Stiffer compressibility did not resolve.')
-            disp(mdrun_output);
-            error(['Error running mdrun for equilibration. Problem command: ' newline mdrun_command]);
+            if Settings.Verbose
+                disp('Equilibration failed. Stiffer compressibility did not resolve.')
+                disp(mdrun_output);
+                disp(['Error running mdrun for equilibration. Problem command: ' newline mdrun_command]);
+            end
+            Output.Aborted = true;
+            TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+            copyfile(Settings.WorkDir,TDir)
+            try
+                if Settings.Delete_Equil
+                    rmdir(Settings.WorkDir,'s')
+                end
+            catch
+                disp(['Unable to remove directory: ' Settings.WorkDir])
+            end
+            return
         end
     end
-
+    
+    % Check to ensure system remained liquid
+    copyfile(Minimized_Geom_File,fullfile(Settings.WorkDir,['Equil_Liq.' Settings.CoordType]));
+    PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
+        pyargs('SystemName','Equil_Liq',...
+        'RefStructure',Settings.Structure,...
+        'CheckFullTrajectory',false,...
+        'FileType',Settings.CoordType,...
+        'ML_TimeLength',0,...
+        'ML_TimeStep',0,...
+        'SaveTrajectory',false,...
+        'SavePredictionsImage',false,...
+        'Verbose',Settings.Verbose));
+    Sol_Fraction = PyOut{4};
+    Liq_Fraction = PyOut{5};
+    
+    if Liq_Fraction < (1 - Settings.MeltFreezeThreshold)
+        if Settings.Verbose
+            disp('Detected Liquid Phase change.')
+        end
+        if Sol_Fraction > 0.5*Settings.MeltFreezeThreshold
+            Output.LiquidFroze = true;
+        else
+            Output.StructureChange = true;
+        end
+        Output.Aborted = true;
+        TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
+        [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+        copyfile(Settings.WorkDir,TDir)
+        return
+    end
+    
+    %% Optional: Check if liquid is properly mobile (i.e. not amorphous solid)
+    if Settings.CheckAmorphousLiquid
+        
+        MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
+        MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
+        msd_command = [Settings.wsl 'echo 0 ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
+            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b ' num2str(Settings.Equilibrate_Liquid/2) ' -e ' num2str(Settings.Equilibrate_Liquid) ...
+            ' -trestart 1 -beginfit 1 -endfit ' num2str(0.75*Settings.Equilibrate_Liquid/2) Settings.passlog windows2unix(MSD_Log_File)];
+        [~,~] = system(msd_command);
+        outp = fileread(MSD_Log_File);
+        Diff_txt = regexp(outp,'D\[ *System] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+','tokens','once');
+        Diff_const = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+        
+        if Diff_const <= Settings.AmorphousDiffThreshold
+            if Settings.Verbose
+                disp('Detected liquid has hardened to amorphous solid.')
+            end
+            Output.LiquidAmorphous = true;
+            Output.Aborted = true;
+            TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+            copyfile(Settings.WorkDir,TDir);
+            try
+                if Settings.Delete_Equil
+                    rmdir(Settings.WorkDir,'s')
+                end
+            catch
+                if Settings.Verbose
+                    disp(['Unable to remove directory: ' Settings.WorkDir])
+                end
+            end
+            return
+        end
+    end
+    
     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq_Energy.xvg');
 
     % Check energy options
@@ -393,12 +531,20 @@ function Equil_density = Equilibrate_Liquid(Settings)
     % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
     % stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
 
-    Equil_density = nmol_liquid/Equil_Volume;
+    Output.Equil_density = nmol_liquid/Equil_Volume;
 
-    if Settings.Delete_Equil
-        rmdir(Settings.WorkDir,'s')
+    try
+        if Settings.Delete_Equil
+            rmdir(Settings.WorkDir,'s')
+        end
+    catch
+        if Settings.Verbose
+            disp(['Unable to remove directory: ' Settings.WorkDir])
+        end
     end
     
-    disp('*** Separate Equilibration of Liquid Complete ***')
+    if Settings.Verbose
+        disp('*** Separate Equilibration of Liquid Complete ***')
+    end
 
 end

@@ -60,7 +60,9 @@ function Minimize_Solid(Settings)
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
     elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
-        disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        if Settings.Verbose
+            disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        end
         MDP.Minimization_txt = [MDP.Minimization_txt newline newline ...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
@@ -176,7 +178,9 @@ function Minimize_Solid(Settings)
             disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        disp(mdrun_output);
+        if Settings.Verbose
+            disp(mdrun_output);
+        end
         error(['Error running mdrun for system minimization. Problem command: ' newline mdrun_command]);
     end
     

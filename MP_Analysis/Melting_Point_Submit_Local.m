@@ -83,7 +83,7 @@ for jdx = 1:length(JobStuff)
     Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).InitialMeshSize = 5; % K
     Settings_array(idx).Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
-    Settings_array(idx).JobID = 'Prod2'; % An ID that is tacked onto the folder name of all current jobs
+    Settings_array(idx).JobID = 'Test'; % An ID that is tacked onto the folder name of all current jobs
     if contained_in_cell(Structure,{'Rocksalt' 'Sphalerite' 'CsCl'})
         Settings_array(idx).Isotropy = 'semiisotropic';
         Settings_array(idx).Target_P = [1 1]; % Bar
@@ -94,7 +94,7 @@ for jdx = 1:length(JobStuff)
         Settings_array(idx).Use_Conv_cell = false;
     end
     Settings_array(idx).c_over_a = 2;
-    Settings_array(idx).N_atoms = 11000;
+    Settings_array(idx).N_atoms = 2000;
 
     Settings_array(idx).BracketThreshold = 1; % K
     Settings_array(idx).MinStepSize = 0.25;

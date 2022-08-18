@@ -1,7 +1,9 @@
 function Minimize_Liquid_Interface(Settings)
-
-    disp('Warning: Skipping Liquid Equilibration.')
-    disp('*** Combined Minimization of Liquid Selected ***')
+    
+    if Settings.Verbose
+        disp('Warning: Skipping Liquid Equilibration.')
+        disp('*** Combined Minimization of Liquid Selected ***')
+    end
     
     Supercell_file_data = load_gro_file(Settings.SuperCellFile);
     
@@ -65,7 +67,9 @@ function Minimize_Liquid_Interface(Settings)
     Ref_X = fullfile(Settings.home,'templates','GRO_Templates',[Settings.Halide '_Box.gro']);
     
     % Add metal
-    disp(['Randomly adding ' num2str(Settings.nmol_liquid) ' ' Settings.Metal ' ions to liquid box...'])
+    if Settings.Verbose
+        disp(['Randomly adding ' num2str(Settings.nmol_liquid) ' ' Settings.Metal ' ions to liquid box...'])
+    end
     mtimer = tic;
     Comb_Equil_Sol_Metal_File = fullfile(Settings.WorkDir,['Comb_Equil_Sol_Metal.' Settings.CoordType]);
     cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Comb_Equil_Sol_File) ' -ci ' windows2unix(Ref_M) ...
@@ -74,14 +78,20 @@ function Minimize_Liquid_Interface(Settings)
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
-        disp(output);
+        if Settings.Verbose
+            disp(output);
+        end
         error(['Error adding ' Settings.Metal ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
+    if Settings.Verbose
+        disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
+    end
 
     % Add Halide
     Comb_Equil_File = fullfile(Settings.WorkDir,['Comb_Equil.' Settings.CoordType]);
-    disp(['Randomly adding ' num2str(Settings.nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
+    if Settings.Verbose
+        disp(['Randomly adding ' num2str(Settings.nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
+    end
     htimer = tic;
     cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Comb_Equil_Sol_Metal_File) ...
         ' -o ' windows2unix(Comb_Equil_File) ' -nmol ' num2str(Settings.nmol_liquid) ...
@@ -89,10 +99,14 @@ function Minimize_Liquid_Interface(Settings)
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
-        disp(output);
+        if Settings.Verbose
+            disp(output);
+        end
         error(['Error adding ' Settings.Halide ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
+    if Settings.Verbose
+        disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
+    end
 
     % Load current randomly-generated liquid file data
     Comb_Equil_data = load_gro_file(Comb_Equil_File);
@@ -205,7 +219,9 @@ function Minimize_Liquid_Interface(Settings)
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
     elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
-        disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        if Settings.Verbose
+            disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        end
         MDP.Minimization_txt = [MDP.Minimization_txt newline newline ...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
@@ -311,17 +327,25 @@ function Minimize_Liquid_Interface(Settings)
     delete(Settings.SuperCellFile)
 
     % Final minimization, output geometry is the new supercell file
-    disp('Beginning Combined System minimization...')
+    if Settings.Verbose
+        disp('Beginning Combined System minimization...')
+    end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
-        disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        if Settings.Verbose
+            disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
     else
-        disp(mdrun_output);
+        if Settings.Verbose
+            disp(mdrun_output);
+        end
         error(['Error running mdrun for system minimization. Problem command: ' newline mdrun_command]);
     end
     
-    disp('*** Minimization of Liquid Complete ***')
+    if Settings.Verbose
+        disp('*** Minimization of Liquid Complete ***')
+    end
     
     % Remove backups
     if Settings.Delete_Backups

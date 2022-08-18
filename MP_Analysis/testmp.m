@@ -3,7 +3,7 @@ Settings.BatchMode = false; % Sets up batch job when true, or runs immediately w
 Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
 Settings.Liquid_Fraction = 0.50; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
-Settings.Equilibrate_Liquid = 5; % ps
+Settings.Equilibrate_Liquid = 20; % ps
 Settings.Equilibrate_Solid = 15; % ps
 Settings.PreEquilibration = 0.3; % ps
 Settings.JobSettings.MPI_Ranks = 2;
@@ -17,7 +17,7 @@ Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'C
 Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing (usually liquid)
 Settings.Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
 Settings.JobID = 'Test'; % An ID that is tacked onto the folder name of all current jobs
-Settings.N_atoms = 1000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
+Settings.N_atoms = 2000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
 Settings.Thermal_Solid = false;
 Settings.MDP.Disp_Correction = true;
 Settings.MinMDP.Disp_Correction = true;
@@ -32,7 +32,7 @@ Settings.Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be
 Settings.Nstpcouple = Get_nstcouple(Settings.Time_Constant_P,Settings.MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
 
 % Thermostat Options
-T0 = 1285; %BestKnownMP(Settings);
+T0 = 200; %BestKnownMP(Settings);
 Settings.Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'v-rescale' (set NO for NVE)
 Settings.Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
 Settings.Nsttcouple = Get_nstcouple(Settings.Time_Constant_T,Settings.MDP.dt); %[ps] The frequency for coupling the temperature. 
@@ -49,7 +49,7 @@ Settings.T0 = T0; % K, Initial temperature
 Settings.MeltFreezeThreshold = 0.25; % Required CHANGE in fraction or number of atoms either frozen or melted to flag the end of the simulation
 Settings.SaveTrajectory = true; % Save processed xyz trajectory file for each temperature check when true
 Settings.SavePredictionsImage = true; % Save structure fraction vs time image when true for each temperature check
-Settings.c_over_a = 1;
+Settings.c_over_a = 2;
 Settings.MaxTDiff = 0.01; % Max change in temperature before generating new initial conditions
 
 % Debugging

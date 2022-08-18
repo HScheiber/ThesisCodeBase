@@ -3,7 +3,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     p.FunctionName = 'Calc_Solid_Properties_at_MP';
     addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
     addOptional(p,'Skip_Cell_Construction',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
-
+    
     parse(p,varargin{:});
     Verbose = p.Results.Verbose;
     Settings.Skip_Cell_Construction =  p.Results.Skip_Cell_Construction;
@@ -451,7 +451,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
 %             return
         elseif Settings.MDP.dt > 1e-4
             if Verbose
-                disp('Solid Equilibration failed. Pre-Minimization did not resolve.')
+                disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
                 disp('Reducing time step.')
             end
             Settings.QECompressibility = Settings.QECompressibility_init;

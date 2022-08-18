@@ -1,5 +1,10 @@
-function MD_Preminimization(Directory)
+function Output = MD_Preminimization(Directory)
 
+Output.StructureChange = false;
+Output.SolidMelted = false;
+Output.LiquidFroze = false;
+Output.LiquidAmorphous = false;
+Output.Aborted = false;
 
 %% Move to input directory and load input variables
 Settings = load(fullfile(Directory,'TempJobInfo.mat'));
@@ -33,12 +38,14 @@ if Run_Min
         diary(DiaryFile);
 
         % Initial Structure Minimization
-        disp(['*************** ' Settings.Salt ' ' Settings.Structure ' ' Settings.Full_Model_Name ' Optimization ****************'])
-        disp('********************** Convergence Requirements ***********************')
-        disp(['Max ' char(916) 'E between cycles: ' num2str(Settings.MinMDP.Energy_Tol,'%4.4E') ' a.u.']);
-        disp(['Max RMS ' char(8711) 'E: ' num2str(Settings.MinMDP.Gradient_Tol_RMS,'%4.4E') ' a.u. / ' char(0197)]);
-        disp(['Max component ' char(8711) 'E: ' num2str(Settings.MinMDP.Gradient_Tol_Max,'%4.4E') ' a.u. / ' char(0197)]);
-        disp('***********************************************************************')
+        if Settings.Verbose
+            disp(['*************** ' Settings.Salt ' ' Settings.Structure ' ' Settings.Full_Model_Name ' Optimization ****************'])
+            disp('********************** Convergence Requirements ***********************')
+            disp(['Max ' char(916) 'E between cycles: ' num2str(Settings.MinMDP.Energy_Tol,'%4.4E') ' a.u.']);
+            disp(['Max RMS ' char(8711) 'E: ' num2str(Settings.MinMDP.Gradient_Tol_RMS,'%4.4E') ' a.u. / ' char(0197)]);
+            disp(['Max component ' char(8711) 'E: ' num2str(Settings.MinMDP.Gradient_Tol_Max,'%4.4E') ' a.u. / ' char(0197)]);
+            disp('***********************************************************************')
+        end
         MinOut = Structure_Minimization(Settings);
         diary off
         save(OutputFile,'MinOut')
@@ -174,9 +181,11 @@ if Run_Min
         else
             N_Supercell_c = N_Supercell_c_tot;
         end
-        disp(['Warning: With ' num2str(old_atnum) ...
-            ' atoms, the cut-off length is longer than half the shortest box vector or longer than the smallest box diagonal element.'])
-        disp(['Expanding the box to ' num2str((N_Supercell_a*N_Supercell_b*N_Supercell_c_tot)*(Settings.Geometry.N)) ' atoms.'])
+        if Settings.Verbose
+            disp(['Warning: With ' num2str(old_atnum) ...
+                ' atoms, the cut-off length is longer than half the shortest box vector or longer than the smallest box diagonal element.'])
+            disp(['Expanding the box to ' num2str((N_Supercell_a*N_Supercell_b*N_Supercell_c_tot)*(Settings.Geometry.N)) ' atoms.'])
+        end
     else
         N_Supercell_a = Settings.N_Supercell_a;
         N_Supercell_b = Settings.N_Supercell_b;
@@ -214,7 +223,9 @@ if Run_Min
     [errcode,output] = system(Supercell_command);
 
     if errcode ~= 0
-        disp(output);
+        if Settings.Verbose
+            disp(output);
+        end
         error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
     end
     
@@ -240,7 +251,9 @@ if Run_Min
         [errcode,output] = system(Expand_command);
 
         if errcode ~= 0
-            disp(output);
+            if Settings.Verbose
+                disp(output);
+            end
             error(['Error expanding supercell with editconf. Problem command: ' newline Expand_command]);
         end
         if Settings.MinMDP.OptPos
@@ -249,7 +262,9 @@ if Run_Min
     end
     copyfile(temp_SuperCellFile,Settings.SuperCellFile);
 else
-    disp('Minimization of lattice parameters skipped.')
+    if Settings.Verbose
+        disp('Minimization of lattice parameters skipped.')
+    end
 end
 
 %% Gromacs final minimize after geometry editing
@@ -319,14 +334,19 @@ if Run_Min && ReRun_OptPos
     % Final minimization
     [state,mdrun_output] = system(mdrun_command);
     if state ~= 0
-        disp(mdrun_output);
+        if Settings.Verbose
+            disp(mdrun_output);
+        end
         error(['Error running mdrun for final minimization. Problem command: ' newline mdrun_command]);
     end
 end
 
 % Add a liquid interface if requested        
 if Settings.Liquid_Interface
-    Create_Liquid_Solid_Interface(Settings);
+    Output = Create_Liquid_Solid_Interface(Settings);
+    if Output.Aborted
+        return
+    end
 end
 
 % Generate final topology file for molecular dynamics

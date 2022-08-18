@@ -39,7 +39,7 @@ Settings.JobSettings.dds = 0.8; % default = 0.8. Fraction in (0,1) by whose reci
 % dds may need to be set lower for cluster jobs due to high inhomogeniety in the system
 Settings.JobSettings.DLB = true; % Turns on Gromacs dynamic load balancing when true
 Settings.JobSettings.TunePME = true; % Optimizes PME load between PP/PME ranks or GPU/CPU
-
+Settings.Verbose = true;
 
 %% Interaction and Structure Settings
 % These can be arrays
@@ -233,6 +233,9 @@ Settings.Equilibrate_Liquid = 0; % number of ps to equilibrate the liquid for, u
 Settings.MinInterfaceWidth = 0.075; % [nm] +- distance from the solid-liquid interface within which to minimize
 Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing
 Settings.QECompressibility = 1e-6; % Compressibility used during the rapid-equilibration stages
+Settings.AbortIfBadStructure = true; % Stops MP calculations when a solid is unstable
+Settings.CheckAmorphousLiquid = true; % When true, this enables a check for liquid -> amorphous based on the mean-squared displacement
+Settings.AmorphousDiffThreshold = 1e-6; % [cm^2/s] When CheckAmorphousLiquid is true, this sets the threshold for amorphous vs liquid
 
 % optimizer settings
 Settings.Optimizer = 'MPSearcher'; % One of fmincon, patternsearch, MPSearcher, or bayesopt
