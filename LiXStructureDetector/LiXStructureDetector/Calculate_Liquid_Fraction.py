@@ -731,7 +731,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
             Ql_result_traj[t_idx] = np.column_stack(Ql_result)
         
         if timeless:
-            Ql_initial = Ql_result_traj
+            Ql_initial = Ql_result_traj[0,:,:]
         else:
             Ql_initial = Ql_result_traj.transpose(1, 0, 2)
         
