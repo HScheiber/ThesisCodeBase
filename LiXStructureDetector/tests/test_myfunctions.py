@@ -189,8 +189,8 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'/home/user/project/BO_Model_Raw_Data/Test/Minimization/Equil_Sol'
-Salt = 'LiI'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\MP_Test\Tm_1121.4000'
+Salt = 'LiF'
 SystemName = 'Equil_Sol'
 RefStructure='Rocksalt'
 SaveTrajectory=True
@@ -199,7 +199,7 @@ SavePredictions=False
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=1
+TimePerFrame=0.1
 FileType='gro'
 Verbose=True
 StartPoint = None
@@ -218,7 +218,7 @@ LoadFeatures = True
 T = None
 T_Ref = None
 RefChangeThreshold = 0.25
-CheckFullTrajectory = False
+CheckFullTrajectory = True
 
 
 
