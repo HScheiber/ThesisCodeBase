@@ -81,10 +81,10 @@ Settings.ML_TimeLength = 21;
 Settings.ML_TimeStep = 5;
 Settings.TimePerFrame = 10; % ps
 
-Settings.MDP.RVDW_Cutoff = 1.40; % nm
-Settings.MDP.RCoulomb_Cutoff = 1.40; % nm
-Settings.MDP.RList_Cutoff = 1.40; % nm
-Settings.Cutoff_Buffer = 1.01;
+Settings.MDP.RVDW_Cutoff = 1.00; % nm
+Settings.MDP.RCoulomb_Cutoff = 1.10; % nm
+Settings.MDP.RList_Cutoff = 1.10; % nm
+Settings.Cutoff_Buffer = 1.20;
 
 
 Settings.MinMDP.RVDW_Cutoff = 1.90; % nm
