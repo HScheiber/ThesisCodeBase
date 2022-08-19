@@ -521,12 +521,16 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
     elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
-        disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        if Verbose
+            disp('Warning: enabling long-range dispersion correction for tabulated potential!')
+        end
         MDP_Template = [MDP_Template newline newline ...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
     elseif Settings.MDP.Disp_Correction
-        disp('Disabling long-range dispersion correction as this is not compatible with tables as implemented here.')
+        if Verbose
+            disp('Disabling long-range dispersion correction as this is not compatible with tables as implemented here.')
+        end
     end
     
     % Add in parameters to MDP template
@@ -644,22 +648,21 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         Settings = Inp_Settings;
         Settings.WorkDir = WorkDir;
         Settings.Verbose = Verbose;
-        if ~isfield(Settings,'QECompressibility_init')
-            Settings.QECompressibility_init = Settings.QECompressibility;
-        end
-        if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+%         if ~isfield(Settings,'QECompressibility_init')
+%             Settings.QECompressibility_init = Settings.QECompressibility;
+%         end
+%         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+%             if Verbose
+%                 disp('Liquid Equilibration failed. Retrying with stiffer compressibility.')
+%             end
+%             Settings.QECompressibility = Settings.QECompressibility/2;
+%             Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
+%             return
+        if Settings.MDP.dt > 1e-4
             if Verbose
-                disp('Liquid Equilibration failed. Retrying with stiffer compressibility.')
+                disp('Liquid Equilibration failed. Reducing time step.')
             end
-            Settings.QECompressibility = Settings.QECompressibility/2;
-            Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
-            return
-        elseif Settings.MDP.dt > 1e-4
-            if Verbose
-                disp('Liquid Equilibration failed. Stiffer compressibility did not resolve.')
-                disp('Reducing time step.')
-            end
-            Settings.QECompressibility = Settings.QECompressibility_init;
+            %Settings.QECompressibility = Settings.QECompressibility_init;
             Settings.MDP.dt = Settings.MDP.dt/2;
             Settings.Output_Coords = Settings.Output_Coords*2;
             Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
@@ -667,7 +670,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         else
             if Verbose
                 disp('Liquid equilibration failed.')
-                disp('Liquid may be completely unstable!')
+                disp('Model may be completely unstable!')
                 disp(['WorkDir: ' WorkDir])
             end
             Output.Liquid_V_MP = nan;
@@ -688,8 +691,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         'RefStructure','Liquid',...
         'CheckFullTrajectory',true,...
         'FileType',Settings.CoordType,...
-        'ML_TimeLength',10,...
-        'ML_TimeStep',1,...
+        'ML_TimeLength',0,...
+        'ML_TimeStep',0,...
         'TimePerFrame',Settings.Output_Coords*Settings.MDP.dt,...
         'SaveTrajectory',true,...
         'SavePredictionsImage',true));
@@ -711,6 +714,36 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         return
     end
     
+    %% Optional: Check if liquid is properly mobile (i.e. not amorphous solid)
+    if Settings.CheckAmorphousLiquid
+        MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
+        MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
+        msd_command = [Settings.wsl 'echo 0 ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
+            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b ' num2str(Settings.Liquid_Test_Time/2) ' -e ' num2str(Settings.Liquid_Test_Time) ...
+            ' -trestart 1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time/2) Settings.passlog windows2unix(MSD_Log_File)];
+        [~,~] = system(msd_command);
+        outp = fileread(MSD_Log_File);
+        Diff_txt = regexp(outp,'D\[ *System] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+','tokens','once');
+        Diff_const = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+        
+        if Diff_const <= Settings.AmorphousDiffThreshold
+            if Settings.Verbose
+                disp('Detected liquid has hardened to amorphous solid.')
+            end
+            if Settings.Delete_Equil
+                try
+                    rmdir(Settings.WorkDir,'s')
+                catch
+                    disp(['Unable to remove directory: ' Settings.WorkDir])
+                end
+            end
+            Output.Liquid_V_MP = nan;
+            Output.Liquid_H_MP = nan;
+            return
+        end
+    end
+    
+    %% Calculate volume and enthalpy of liquid
     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq_Energy.xvg');
     
     % Check energy options

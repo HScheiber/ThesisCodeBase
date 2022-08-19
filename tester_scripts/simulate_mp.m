@@ -1,4 +1,4 @@
-N = 1e6;
+N = 1e8;
 
 mu = 1000;
 Delta_T_min = 1;
@@ -13,14 +13,32 @@ for idx = 1:N
 end
 
 figure
-histogram(T_LB,100)
+histogram(T_LB,(mu-0.6250):0.025:mu,'Normalization','probability')
 hold on
-histogram(T_UB,100)
+histogram(T_UB,mu:0.025:(mu+0.6250),'Normalization','probability')
 xlim([mu-Delta_T_min*1.5 mu+Delta_T_min*1.5])
+set(gca,'fontsize',25)
+legend({'$T_{LB}$' '$T_{UB}$'},'interpreter','latex','fontsize',25)
+xaxisproperties= get(gca, 'XAxis');
+xaxisproperties.TickLabelInterpreter = 'latex'; % latex for x-axis
+yaxisproperties= get(gca, 'YAxis');
+yaxisproperties.TickLabelInterpreter = 'latex'; % latex for x-axis
+ylabel('$\rho(T)$','interpreter','latex')
+xlabel('$T$','interpreter','latex')
+xticks(gca,[mu-0.6250 mu mu+0.6250])
+xticklabels(gca,{'$T_{m}-0.625$' '$T_{m}$' '$T_{m}+0.625$'})
 figure
-histogram(MP,100)
-xlim([mu-Delta_T_min*1.5 mu+Delta_T_min*1.5])
-
+histogram(MP,(mu-0.3125):0.025:(mu+0.3125),'Normalization','probability')
+xlim([mu-Delta_T_min*0.75 mu+Delta_T_min*0.75])
+set(gca,'fontsize',25)
+xaxisproperties= get(gca, 'XAxis');
+xaxisproperties.TickLabelInterpreter = 'latex'; % latex for x-axis
+yaxisproperties= get(gca, 'YAxis');
+yaxisproperties.TickLabelInterpreter = 'latex'; % latex for x-axis
+ylabel('$\rho(T)$','interpreter','latex')
+xlabel('$T$','interpreter','latex')
+xticks(gca,[mu-0.3125 mu mu+0.3125])
+xticklabels(gca,{'$T_{m}-0.3125$' '$T_{m}$' '$T_{m}+0.3125$'})
 
 % When gamma neq 1
 % x is the number of steps taken to reach the point where lb and ub are defined
@@ -43,6 +61,9 @@ unique(width)
 % % When gamma = 1
 % x = ceil(log(step_size/Delta_T_min)/log(2));
 % width = step_size/(2^x)
+
+% exportgraphics(gca,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\SI_Figures\Simulated_MP_Dist.pdf','Resolution',300)
+% exportgraphics(gca,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\SI_Figures\Simulated_TLB_TUB_Dist.pdf','Resolution',300)
 
 
 function [lb,ub,mp] = sim(mu,T0,step_size,gamma,Delta_T_min)
@@ -84,5 +105,4 @@ function [lb,ub,mp] = sim(mu,T0,step_size,gamma,Delta_T_min)
         steps = steps + 1;
     end
     mp = (ub + lb)/2;
-
 end

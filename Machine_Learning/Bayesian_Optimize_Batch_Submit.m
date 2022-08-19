@@ -45,7 +45,6 @@
 % Models(idx).Loss_Options.(Structure).Gap.Type = @lt;
 % Models(idx).Loss_Options.(Structure).Gap.Ref = 'Rocksalt';
 
-
 %% Additional_GAdjust options: 'MM' 'MX' 'XX'
 % Introduces additional inverted Gaussians with 3 additional parameters each. 
 % Leave empty to exclude

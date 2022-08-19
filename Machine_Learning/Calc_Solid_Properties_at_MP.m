@@ -425,20 +425,20 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         Settings.SuperCellFile = SuperCellFile;
         Settings.WorkDir = WorkDir;
         Settings.Verbose = Verbose;
-        if ~isfield(Settings,'QECompressibility_init')
-            Settings.QECompressibility_init = Settings.QECompressibility;
-        end
+%         if ~isfield(Settings,'QECompressibility_init')
+%             Settings.QECompressibility_init = Settings.QECompressibility;
+%         end
 %         if ~isfield(Settings,'MinComplete')
 %             Settings.MinComplete = false;
 %         end
         
-        if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-            if Verbose
-                disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
-            end
-            Settings.QECompressibility = Settings.QECompressibility/2;
-            Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
-            return
+%         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+%             if Verbose
+%                 disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
+%             end
+%             Settings.QECompressibility = Settings.QECompressibility/2;
+%             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
+%             return
 %         elseif ~Settings.MinComplete
 %             if Verbose
 %                 disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
@@ -449,12 +449,11 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
 %             Settings.MinComplete = true;
 %             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
 %             return
-        elseif Settings.MDP.dt > 1e-4
+        if Settings.MDP.dt > 1e-4
             if Verbose
-                disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
-                disp('Reducing time step.')
+                disp('Solid Equilibration failed. Reducing time step.')
             end
-            Settings.QECompressibility = Settings.QECompressibility_init;
+            %Settings.QECompressibility = Settings.QECompressibility_init;
             Settings.MDP.dt = Settings.MDP.dt/2;
             Settings.Output_Coords = Settings.Output_Coords*2;
             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
@@ -477,8 +476,8 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         'RefStructure',Settings.Structure,...
         'CheckFullTrajectory',true,...
         'FileType',Settings.CoordType,...
-        'ML_TimeLength',10,...
-        'ML_TimeStep',1,...
+        'ML_TimeLength',0,...
+        'ML_TimeStep',0,...
         'TimePerFrame',Settings.Output_Coords*Settings.MDP.dt,...
         'SaveTrajectory',true,...
         'SavePredictionsImage',true));
