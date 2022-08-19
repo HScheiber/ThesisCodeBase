@@ -97,7 +97,7 @@ Shared_Settings.MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number
 Shared_Settings.Optimizer = 'MPSearcher';
 Shared_Settings.lb = 0; % K, lower bound on MP search
 Shared_Settings.ub = 2200; % K, upper bound on MP search
-Shared_Settings.BracketThreshold = 5; % [K] Sets the target bracket for the melting point
+Shared_Settings.BracketThreshold = 10; % [K] Sets the target bracket for the melting point
 Shared_Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearcher algorithm
 Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
 Shared_Settings.Liquid_Fraction = 0.50;
@@ -115,12 +115,11 @@ Shared_Settings.Cutoff_Buffer = 1.20;
 Shared_Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
 Shared_Settings.c_over_a = 2;
 Shared_Settings.N_atoms = 2000;
-Shared_Settings.BracketThreshold = 5; % K
 Shared_Settings.MinStepSize = 0.25;
 Shared_Settings.MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
 Shared_Settings.MeltFreezeThreshold = 0.25;
 Shared_Settings.Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Shared_Settings.Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Shared_Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Shared_Settings.PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 Shared_Settings.InitialMeshSize = 20;
 Shared_Settings.MeshSizeMultiplier = 5;
@@ -623,165 +622,7 @@ switch lower(computer)
         Shared_Settings.ub = 2200; % K, upper bound on MP search
         Shared_Settings.Max_Local_Iterations = 100;
         
-        %% BH Models JA, JB, JC
-        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-        Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-        Theories = {'BH'};
-        Replicates = 1:5;
 
-        for tidx = 1:length(Theories)
-            Theory = Theories{tidx};
-
-            for sidx = 1:length(Salts)
-                Salt = Salts{sidx};
-
-                % Set initial MP temperature
-                Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
-                Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-
-                for ridx = 1:length(Replicates)
-                    Rep = num2str(Replicates(ridx));
-
-                    %% Model BH: JA
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JA' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
-
-                    %% Model BH: JB
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JB' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
-
-                    %% Model BH: JC
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JC' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = false;
-                    Models(idx).Additivity = true;
-
-                end
-            end
-        end
-        %% JC Models JA, JB, JC
-        Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-        Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-        Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-        Theories = {'JC'};
-        Replicates = 1:5;
-
-        for tidx = 1:length(Theories)
-            Theory = Theories{tidx};
-
-            for sidx = 1:length(Salts)
-                Salt = Salts{sidx};
-
-                % Set initial MP temperature
-                Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
-                Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-
-                for ridx = 1:length(Replicates)
-                    Rep = num2str(Replicates(ridx));
-
-                    %% Model BH: JA
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JA' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                    Models(idx).SigmaEpsilon = false;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
-
-                    %% Model BH: JB
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JB' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                    Models(idx).SigmaEpsilon = false;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
-
-                    %% Model BH: JC
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JC' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
-                    Models(idx).SigmaEpsilon = false;
-                    Models(idx).Fix_Charge = false;
-                    Models(idx).Additivity = true;
-
-                end
-            end
-        end
-        
     otherwise % Place jobs here for later assignment
         
         %% Shared_Settings
