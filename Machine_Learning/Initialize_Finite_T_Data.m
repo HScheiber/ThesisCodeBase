@@ -13,7 +13,9 @@ function Finite_T_Data = Initialize_Finite_T_Data(Settings)
     Finite_T_Data.Solid_H_MP = nan;
     Finite_T_Data.Liquid_V_MP = nan;
     Finite_T_Data.Solid_V_MP = nan;
+    Finite_T_Data.Liquid_DM_MP = nan;
     Finite_T_Data.MP = nan;
+    
     
     % Load experimental data
     Exp = Load_Experimental_Data;
@@ -25,4 +27,5 @@ function Finite_T_Data = Initialize_Finite_T_Data(Settings)
     Finite_T_Data.Exp_MP = Exp.(Settings.Salt).mp; % MP in K
     Finite_T_Data.Exp_Solid_V0 = Exp.(Settings.Salt).(Finite_T_Data.Structure).V_zero;
     Finite_T_Data.Exp_Solid_LE = Exp.(Settings.Salt).(Finite_T_Data.Structure).E;
+    Finite_T_Data.Exp_DM_MP = Exp.(Settings.Salt).Liquid.DM_mp; % Experimental diffusion constant of the metal at the experimental MP
 end

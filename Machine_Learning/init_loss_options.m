@@ -22,10 +22,11 @@ function Loss_Options = init_loss_options
     Loss_Options.Experimental_LP = true;
     
     % High temperature experimental properties of the liquid and solid
-    Loss_Options.Fusion_Enthalpy = 0; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+    Loss_Options.Fusion_Enthalpy  = 0; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
     Loss_Options.MP_Volume_Change = 0; % Fitting the experimental change in volume due to melting at the experimental MP
     Loss_Options.Liquid_MP_Volume = 0; % Fitting the experimental volume per formula unit at the experimental MP
     Loss_Options.Solid_MP_Volume  = 0; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+    Loss_Options.Liquid_DM_MP = 0; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
     Loss_Options.MP  = 0; % Fitting the experimental MP, using the experimental structure as the solid
     
     % Properties of the solid structures

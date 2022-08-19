@@ -1131,15 +1131,9 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
     strmatch = strcmp(Settings.Finite_T_Data.Structure,Structures);
     if any(strmatch)
         
-        V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
-        V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
-        V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
-        
         LE_model = Settings.Minimization_Data{strmatch}.E;
         LE_exp = Settings.Finite_T_Data.Exp_Solid_LE;
-        E_Model_Mismatch = abs((LE_model - LE_exp)/LE_exp);
-        
-        Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+        Model_Mismatch = abs((LE_model - LE_exp)/LE_exp);
         
         if ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Settings.Therm_Prop_Override
             Loss_add = Loss_add + log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
@@ -1152,7 +1146,6 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         end
     else
         Settings.Ref_Density = 1/(Settings.Finite_T_Data.Exp_Liquid_V_MP*(0.1^3)); % molecules / nm^3
-        Model_Mismatch = Settings.BadFcnLossPenalty;
     end
 end
 
@@ -1188,21 +1181,20 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Submit_Jobs = false;
     Settings.Skip_Minimization = true; % Skip the automatic geometry minimization
     Settings.RefStructure = Settings.Finite_T_Data.Structure;
-    try
-        [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
-    catch me
-        disp(['Problem with MP calculation: ' Settings.WorkDir])
-        disp(me.message)
-        disp(me.stack)
-        Aborted = true;
-        T_dat = struct();
-    end
+    [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
     
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
         Settings.Finite_T_Data.MP = nan;
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
+        if Settings.Delete_Equil && isfolder(Settings.WorkDir)
+            try
+                rmdir(Settings.WorkDir,'s')
+            catch
+                disp(['Unable to remove directory: ' Settings.WorkDir])
+            end
+        end
     end
     if Settings.Parallel_Bayesopt
         setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
@@ -1251,6 +1243,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
+    Settings.Finite_T_Data.Liquid_DM_MP = Liq_Output.Liquid_DM_MP; % cm^2 / s
     if Settings.Parallel_Bayesopt
         setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
         setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);

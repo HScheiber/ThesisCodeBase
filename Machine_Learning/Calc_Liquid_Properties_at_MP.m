@@ -675,6 +675,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
             end
             Output.Liquid_V_MP = nan;
             Output.Liquid_H_MP = nan;
+            Output.Liquid_DM_MP = nan;
             return
         end
     end
@@ -711,36 +712,36 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         end
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
+        Output.Liquid_DM_MP = nan;
         return
     end
     
-    %% Optional: Check if liquid is properly mobile (i.e. not amorphous solid)
-    if Settings.CheckAmorphousLiquid
-        MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
-        MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
-        msd_command = [Settings.wsl 'echo 0 ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
-            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b ' num2str(Settings.Liquid_Test_Time/2) ' -e ' num2str(Settings.Liquid_Test_Time) ...
-            ' -trestart 1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time/2) Settings.passlog windows2unix(MSD_Log_File)];
-        [~,~] = system(msd_command);
-        outp = fileread(MSD_Log_File);
-        Diff_txt = regexp(outp,'D\[ *System] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+','tokens','once');
-        Diff_const = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
-        
-        if Diff_const <= Settings.AmorphousDiffThreshold
-            if Settings.Verbose
-                disp('Detected liquid has hardened to amorphous solid.')
-            end
-            if Settings.Delete_Equil
-                try
-                    rmdir(Settings.WorkDir,'s')
-                catch
-                    disp(['Unable to remove directory: ' Settings.WorkDir])
-                end
-            end
-            Output.Liquid_V_MP = nan;
-            Output.Liquid_H_MP = nan;
-            return
+    %% Calculate metal ion diffusion coefficient
+    
+    MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
+    MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
+    msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
+        ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b ' num2str(Settings.Liquid_Test_Time/2) ' -e ' num2str(Settings.Liquid_Test_Time) ...
+        ' -trestart 1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time/2) Settings.passlog windows2unix(MSD_Log_File)];
+    [~,~] = system(msd_command);
+    outp = fileread(MSD_Log_File);
+    Diff_txt = regexp(outp,'D\[ *System] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+','tokens','once');
+    Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+    
+    if Settings.CheckAmorphousLiquid && Output.Liquid_DM_MP <= Settings.AmorphousDiffThreshold
+        if Settings.Verbose
+            disp('Detected liquid has hardened to amorphous solid.')
         end
+        if Settings.Delete_Equil
+            try
+                rmdir(Settings.WorkDir,'s')
+            catch
+                disp(['Unable to remove directory: ' Settings.WorkDir])
+            end
+        end
+        Output.Liquid_V_MP = nan;
+        Output.Liquid_H_MP = nan;
+        return
     end
     
     %% Calculate volume and enthalpy of liquid

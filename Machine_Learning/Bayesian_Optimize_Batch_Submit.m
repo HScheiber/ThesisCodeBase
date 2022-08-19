@@ -185,7 +185,7 @@ switch lower(computer)
 
             for sidx = 1:length(Salts)
                 Salt = Salts{sidx};
-
+                
                 % Set initial MP temperature
                 Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
                 Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
@@ -209,7 +209,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                     Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -230,7 +230,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                     Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -251,7 +251,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                     Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
@@ -272,7 +272,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                     Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = false;
@@ -320,7 +320,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                     Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -341,7 +341,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                     Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -362,7 +362,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                     Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
@@ -418,7 +418,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
                     Models(idx).Loss_Options.Rocksalt.a = 1;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -435,7 +435,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Rocksalt.a = 1;
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -453,7 +453,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Rocksalt.a = 1;
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = false;
@@ -470,7 +470,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Rocksalt.a = 1;
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
@@ -510,7 +510,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
                     Models(idx).Loss_Options.FiveFive.RLE = 1;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -529,7 +529,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Wurtzite.a = 2/3;
                     Models(idx).Loss_Options.Wurtzite.c = 1/3;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -552,7 +552,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.NiAs.RLE = 1;
                     Models(idx).Loss_Options.CsCl.RLE = 1;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -575,7 +575,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.NiAs.RLE = 1;
                     Models(idx).Loss_Options.CsCl.RLE = 1;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = false;
@@ -598,7 +598,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.NiAs.RLE = 1;
                     Models(idx).Loss_Options.CsCl.RLE = 1;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
@@ -673,7 +673,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Rocksalt.a = 1;
                     Models(idx).Loss_Options.MP  = 2;
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -691,7 +691,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
                     Models(idx).Loss_Options.MP  = 2;
 
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -709,7 +709,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
                     Models(idx).Loss_Options.MP  = 2;
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
@@ -727,7 +727,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
                     Models(idx).Loss_Options.MP  = 2;
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = false;
@@ -773,7 +773,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Rocksalt.a = 1;
                     Models(idx).Loss_Options.MP  = 2;
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -791,7 +791,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
                     Models(idx).Loss_Options.MP  = 2;
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
@@ -809,7 +809,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
                     Models(idx).Loss_Options.MP  = 2;
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
@@ -827,7 +827,7 @@ switch lower(computer)
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
                     Models(idx).Loss_Options.MP  = 2;
                     
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = false;

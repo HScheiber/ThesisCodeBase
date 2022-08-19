@@ -217,6 +217,19 @@ function Loss = LiX_Loss(Settings)
             Loss = Loss + rel_er;
         end
         
+        
+        % Fit the metal ion diffusivity at the MP
+        if Settings.Loss_Options.Liquid_DM_MP > tol
+            rel_er = Settings.Loss_Options.Liquid_DM_MP*...
+                reg((Settings.Finite_T_Data.Liquid_DM_MP - Settings.Finite_T_Data.Exp_DM_MP)/...
+                Settings.Finite_T_Data.Exp_DM_MP);
+            if isnan(rel_er)
+                rel_er = Settings.Loss_Options.Liquid_DM_MP*Settings.BadFcnLossPenalty;
+            end
+            Loss = Loss + rel_er;
+        end
+        
+        
         % Fit the experimental melting point
         if Settings.Loss_Options.MP > tol
             rel_er = Settings.Loss_Options.MP*...

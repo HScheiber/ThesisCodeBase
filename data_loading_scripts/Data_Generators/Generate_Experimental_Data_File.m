@@ -417,6 +417,36 @@ Experiment.CsCl.dH_fus	= 20.4;
 Experiment.CsBr.dH_fus	= 23.6;
 Experiment.CsI.dH_fus	= 25.7;
 
+%% Metal Ion diffusion Constants of Molten of Alkali Halides at MP
+% Data Source: https://aip.scitation.org/doi/pdf/10.1063/1.555665
+% LiBr: https://journals.aps.org/pre/pdf/10.1103/PhysRevE.101.062603
+% Units: cm^2 / s
+Experiment.LiF.Liquid.DM_mp     = 1.22e-4;
+Experiment.LiCl.Liquid.DM_mp	= 1.06e-4;
+Experiment.LiBr.Liquid.DM_mp	= 1.19e-4;
+Experiment.LiI.Liquid.DM_mp     = 1.10e-4;
+
+Experiment.NaF.Liquid.DM_mp     = 1.34e-4;
+Experiment.NaCl.Liquid.DM_mp	= 7.77e-5;
+Experiment.NaBr.Liquid.DM_mp	= 7.6e-5;
+Experiment.NaI.Liquid.DM_mp     = 7.25e-5;
+
+Experiment.KF.Liquid.DM_mp      = 8.98e-5;
+Experiment.KCl.Liquid.DM_mp     = 7.08e-5;
+Experiment.KBr.Liquid.DM_mp     = nan;
+Experiment.KI.Liquid.DM_mp      = nan;
+
+Experiment.RbF.Liquid.DM_mp     = nan;
+Experiment.RbCl.Liquid.DM_mp	= nan;
+Experiment.RbBr.Liquid.DM_mp	= nan;
+Experiment.RbI.Liquid.DM_mp     = nan;
+
+Experiment.CsF.Liquid.DM_mp     = nan;
+Experiment.CsCl.Liquid.DM_mp	= nan;
+Experiment.CsBr.Liquid.DM_mp	= nan;
+Experiment.CsI.Liquid.DM_mp     = nan;
+
+
 %% Additional data: Molar masses, Entropies of fusion, Redundant Geometric Data
 % Elemental Molar masses
 % Unit: g / mol

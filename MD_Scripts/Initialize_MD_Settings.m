@@ -233,7 +233,6 @@ Settings.Equilibrate_Liquid = 0; % number of ps to equilibrate the liquid for, u
 Settings.MinInterfaceWidth = 0.075; % [nm] +- distance from the solid-liquid interface within which to minimize
 Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing
 Settings.QECompressibility = 1e-6; % Compressibility used during the rapid-equilibration stages
-Settings.AbortIfBadStructure = true; % Stops MP calculations when a solid is unstable
 Settings.CheckAmorphousLiquid = true; % When true, this enables a check for liquid -> amorphous based on the mean-squared displacement
 Settings.AmorphousDiffThreshold = 1e-6; % [cm^2/s] When CheckAmorphousLiquid is true, this sets the threshold for amorphous vs liquid
 

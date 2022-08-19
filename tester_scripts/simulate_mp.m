@@ -13,9 +13,9 @@ for idx = 1:N
 end
 
 figure
-histogram(T_LB,(mu-0.6250):0.025:mu,'Normalization','probability')
+histogram(T_LB,(mu-0.6250):0.025:mu,'Normalization','pdf')
 hold on
-histogram(T_UB,mu:0.025:(mu+0.6250),'Normalization','probability')
+histogram(T_UB,mu:0.025:(mu+0.6250),'Normalization','pdf')
 xlim([mu-Delta_T_min*1.5 mu+Delta_T_min*1.5])
 set(gca,'fontsize',25)
 legend({'$T_{LB}$' '$T_{UB}$'},'interpreter','latex','fontsize',25)
@@ -28,7 +28,7 @@ xlabel('$T$','interpreter','latex')
 xticks(gca,[mu-0.6250 mu mu+0.6250])
 xticklabels(gca,{'$T_{m}-0.625$' '$T_{m}$' '$T_{m}+0.625$'})
 figure
-histogram(MP,(mu-0.3125):0.025:(mu+0.3125),'Normalization','probability')
+histogram(MP,(mu-0.3125):0.025:(mu+0.3125),'Normalization','pdf')
 xlim([mu-Delta_T_min*0.75 mu+Delta_T_min*0.75])
 set(gca,'fontsize',25)
 xaxisproperties= get(gca, 'XAxis');
