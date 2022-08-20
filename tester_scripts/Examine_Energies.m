@@ -1,4 +1,4 @@
-Energy_file = 'Equil_Liq.edr';
+Energy_file = 'Equil_Liq_2.edr';
 system(['wsl source ~/.bashrc; echo "5 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
@@ -6,7 +6,7 @@ system(['wsl source ~/.bashrc; echo "5 15 0" ^| gmx_d energy -f ' windows2unix(E
 %     plot(Data(:,1),Data(:,2)./nmol_liquid) % Potential
 %     ylim([-1000 1000])
 
-data = import_xvg('energy.xvg');
+Data = import_xvg('energy.xvg');
 
 % @ s0 legend "Potential"
 % @ s1 legend "Pressure"
@@ -17,24 +17,24 @@ data = import_xvg('energy.xvg');
 
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
-nmol_solid = 1000/2;
+nmol_solid = 2000/2;
 
 figure
-plot(data(:,1),data(:,2)./nmol_solid) % potential (kj/mol ion pairs)
+plot(Data(:,1),Data(:,2)./nmol_solid) % potential (kj/mol ion pairs)
 ylim([-5000 100])
 hold on
-plot(data(:,1),data(:,3))              % Pressure (bar)
-plot(data(:,1),data(:,4)./nmol_solid) % Volume (nm^3 / ion pair)
-plot(data(:,1),data(:,5)./nmol_solid) % Enthalpy ( kJ/mol ion pairs)
+plot(Data(:,1),Data(:,3))              % Pressure (bar)
+plot(Data(:,1),Data(:,4)./nmol_solid) % Volume (nm^3 / ion pair)
+plot(Data(:,1),Data(:,5)./nmol_solid) % Enthalpy ( kJ/mol ion pairs)
 
 ylim([-2000 100])
 
-midpoint = ceil(length(data)/2);
+midpoint = ceil(length(Data)/2);
 
 
-P = data(midpoint:end,3);
-V = data(midpoint:end,4).*(10^3)./nmol_solid;
-H = data(midpoint:end,5)./nmol_solid;
+P = Data(midpoint:end,3);
+V = Data(midpoint:end,4).*(10^3)./nmol_solid;
+H = Data(midpoint:end,5)./nmol_solid;
 
 % Statistics on Pressure
 SEM = std(P)/sqrt(length(P));               % Standard Error

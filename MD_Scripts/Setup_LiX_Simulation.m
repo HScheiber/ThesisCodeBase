@@ -18,10 +18,6 @@ if ~strcmpi(Settings.Annealing,'no')
     end
 end
 
-if ~Settings.Submit_Jobs
-    disp('Calculation will run locally.')
-end
-
 % Initialize Output
 Output.StructureChange = false;
 Output.SolidMelted = false;
@@ -807,7 +803,7 @@ if DoGeomEdit
             fclose(fidTOP);
 
             GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
-                ' -f ' windows2unix(Equil_System) ' -p ' windows2unix(Settings.Topology_File) ...
+                ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
                 ' -o ' windows2unix(Settings.Traj_Conf_File) ' -po ' windows2unix(Settings.MDP_out_File) ...
                 ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
             [errcode,~] = system(GROMPP_command);
@@ -829,6 +825,10 @@ if DoGeomEdit
 end
 
 if Settings.PreEquilibration > 0
+    MinDir = fullfile(Settings.WorkDir,'Minimization');
+    if ~exist(MinDir,'dir')
+        mkdir(MinDir);
+    end
     JobFile = fullfile(MinDir,'TempJobInfo.mat');
     if ~isfile(JobFile)
         save(JobFile);

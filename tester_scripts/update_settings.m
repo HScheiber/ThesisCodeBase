@@ -24,6 +24,9 @@ Settings.Verbose = true;
 Settings.Equilibrate_Liquid = 20;
 Settings.CheckAmorphousLiquid = true;
 Settings.AmorphousDiffThreshold = 1e-6;
+Settings.Liquid_Test_Time = 100; % ps
+Settings.Liquid_Equilibrate_Time = 25; % ps
+Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 %[Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings);
 
 Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',true);

@@ -135,7 +135,8 @@ Settings.Parallel_Struct_Min = false; % Run the parallel version of the LiX_Mini
 Settings.Parallel_Bayesopt = true; % Run the parallel version of Bayesian Optimization when true
 
 % Finite T settings
-Settings.Liquid_Test_Time = 50; % ps
+Settings.Liquid_Test_Time = 100; % ps
+Settings.Liquid_Equilibrate_Time = 25; % ps
 Settings.Solid_Test_Time = 30; % ps
 
 end

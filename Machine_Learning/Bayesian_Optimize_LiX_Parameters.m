@@ -25,10 +25,15 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     [Model.Metal,Model.Halide] = Separate_Metal_Halide(Model.Salt);
     Model.Longest_Cutoff = max([Model.MDP.RList_Cutoff Model.MDP.RCoulomb_Cutoff Model.MDP.RVDW_Cutoff]);
     [~,Model.gmx,Model.gmx_loc,Model.mdrun_opts] = MD_Batch_Template(Model.JobSettings);
-    if Model.Loss_Options.MP > sqrt(eps)
-        Deterministic = false; % Melting points are not deterministic
+    
+    
+    Finite_T_Calc = any([Model.Loss_Options.Fusion_Enthalpy Model.Loss_Options.MP_Volume_Change Model.Loss_Options.Liquid_MP_Volume ...
+        Model.Loss_Options.Solid_MP_Volume Model.Loss_Options.Liquid_DM_MP Model.Loss_Options.MP ] > sqrt(eps));
+    
+    if Finite_T_Calc
+        Deterministic = false; % Thermal properties are not deterministic
     else
-        Deterministic = true; % default is that the function is deterministic
+        Deterministic = true; % Lattice energies are deterministic
     end
     
     %% Display input summary on first iteration

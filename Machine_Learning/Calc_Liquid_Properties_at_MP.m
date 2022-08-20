@@ -326,7 +326,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     %% System is now minimized, run a fast equilibration to get equilibrium properties at requested T and P
 
     % Set the number of steps
-    MD_nsteps = Settings.Liquid_Test_Time/Settings.MDP.dt;
+    MD_nsteps = Settings.Liquid_Equilibrate_Time/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt,'Isotropy','isotropic','Molten',true);
     Compressibility = Settings.QECompressibility; % bar^(-1)
     tau_p = Settings.MDP.dt; % ps
@@ -553,6 +553,17 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     MDP_Template = strrep(MDP_Template,'##MET##',pad(Settings.Metal,3));
     MDP_Template = strrep(MDP_Template,'##HAL##',pad(Settings.Halide,3));
     
+    % Remove annealing inputs from MDP
+    MDP_Template = strrep(MDP_Template,'##ANNEALING##',pad('no',18));
+    MDP_Template = regexprep(MDP_Template,'annealing-npoints +.+?\n','');
+    MDP_Template = regexprep(MDP_Template,'annealing-time +.+?\n','');
+    MDP_Template = regexprep(MDP_Template,'annealing-temp +.+?\n','');
+    
+    MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' BH_TestModel']);
+    
+    % Save MDP Template
+    MDP_Template_sv = MDP_Template;
+    
     % Ensure fast equilibration with Berendsen barostat + small time constant
     MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
     MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
@@ -567,14 +578,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     MDP_Template = strrep(MDP_Template,'##TTIMECONST##',pad(num2str(tau_t),18));
     MDP_Template = strrep(MDP_Template,'##NSTTCOUPLE##',pad(num2str(nsttcouple),18));
     MDP_Template = strrep(MDP_Template,'##REFT##',pad(num2str(Settings.T0),18));
-    
-    % Remove annealing inputs from MDP
-    MDP_Template = strrep(MDP_Template,'##ANNEALING##',pad('no',18));
-    MDP_Template = regexprep(MDP_Template,'annealing-npoints +.+?\n','');
-    MDP_Template = regexprep(MDP_Template,'annealing-time +.+?\n','');
-    MDP_Template = regexprep(MDP_Template,'annealing-temp +.+?\n','');
-    
-    MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' BH_TestModel']);
     
     % Save MDP file
     MDP_Filename = fullfile(Settings.WorkDir,'Equil_Liq.mdp');
@@ -603,39 +606,39 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
         ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
     [state,~] = system(FEquil_Grompp);
-
+    
     % Catch errors in grompp
     if state ~= 0
         error(['Error running GROMPP. Problem command: ' newline FEquil_Grompp]);
     else
         delete(GrompLog_File)
     end
-
+    
     % Prepare Equilibration mdrun command
     Log_File = fullfile(Settings.WorkDir,'Equil_Liq.log');
     Energy_file = fullfile(Settings.WorkDir,'Equil_Liq.edr');
     TRR_File = fullfile(Settings.WorkDir,'Equil_Liq.trr');
-    Equilibrated_Geom_File = fullfile(Settings.WorkDir,['Equil_Liq_out.' Settings.CoordType]);
-
+    Equilibrated_Geom_File = fullfile(Settings.WorkDir,['MSD_Liq.' Settings.CoordType]);
+    
     mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
         ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
         ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Equilibrated_Geom_File) ...
         ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Liq')) ...
         Settings.mdrun_opts];
-
+    
     if Table_Req
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
 
     % Run Liquid Equilibration
     if Verbose
-        disp(['Begining Liquid Equilibration for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
+        disp(['(1/2) Begining Liquid Equilibration for ' num2str(Settings.Liquid_Equilibrate_Time) ' ps...'] )
     end
     mintimer = tic;
     [state,~] = system(mdrun_command);
     if state == 0
         if Verbose
-            disp(['Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+            disp(['(1/2) Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
         try % Clean up
@@ -716,21 +719,107 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         return
     end
     
-    %% Calculate metal ion diffusion coefficient
+    %% Calculate metal ion diffusion coefficient - Start with a simulation using normal barostat/thermostat settings
+    MD_nsteps = Settings.Liquid_Test_Time/Settings.MDP.dt;
+    MDP_Template = regexprep(MDP_Template_sv,'(nstenergy += *)(.+?)( *);','$11$3;');
+    MDP_Template = regexprep(MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(MD_nsteps) '$3;']);
+    xyz_out = num2str(0.1 / Settings.MDP.dt); % Output coords every 0.1 ps
+    MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);',['$1' xyz_out '$3;']);
     
-    MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
-    MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
-    msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
-        ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b ' num2str(Settings.Liquid_Test_Time/2) ' -e ' num2str(Settings.Liquid_Test_Time) ...
-        ' -trestart 1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time/2) Settings.passlog windows2unix(MSD_Log_File)];
-    [~,~] = system(msd_command);
-    outp = fileread(MSD_Log_File);
-    Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
-    Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+    % Thermostat settings
+    MDP_Template = strrep(MDP_Template,'##THERMOSTAT##',pad(Settings.Thermostat,18));
+    MDP_Template = strrep(MDP_Template,'##TTIMECONST##',pad(num2str(Settings.Time_Constant_T),18));
+    MDP_Template = strrep(MDP_Template,'##NSTTCOUPLE##',pad(num2str(Settings.Nsttcouple),18));
+    MDP_Template = strrep(MDP_Template,'##REFT##',pad(num2str(Settings.T0),18));
+    MDP_Template = regexprep(MDP_Template,'(gen-vel += *)(.+?)( *);','$1no$3;');
+    MDP_Template = regexprep(MDP_Template,'gen-temp.+?\n','');
+
+    % Barostat settings
+    % Get box compressibility based on the salt
+    Settings.Isotropy = 'isotropic';
+    Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt,...
+        'Isotropy',Settings.Isotropy,'Molten',Settings.UseMoltenCompressibility,...
+        'ScaleFactor',Settings.ScaleCompressibility);
+
+    MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad(Settings.Barostat,18));
+    MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad(num2str(Settings.Isotropy),18));
+    MDP_Template = strrep(MDP_Template,'##COMPRESS##',pad(num2str(Compressibility),18));
+    MDP_Template = strrep(MDP_Template,'##REFP##',pad(num2str(Settings.Target_P(1)),18));
+    MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(Settings.Time_Constant_P),18));
+    MDP_Template = strrep(MDP_Template,'##NSTPCOUPLE##',pad(num2str(Settings.Nstpcouple),18));
     
-    if Settings.CheckAmorphousLiquid && Output.Liquid_DM_MP <= Settings.AmorphousDiffThreshold
-        if Settings.Verbose
-            disp('Detected liquid has hardened to amorphous solid.')
+    % Save MDP file
+    MDP_Filename = fullfile(Settings.WorkDir,'MSD_Liq.mdp');
+    fidMDP = fopen(MDP_Filename,'wt');
+    fwrite(fidMDP,regexprep(MDP_Template,'\r',''));
+    fclose(fidMDP);
+    
+    TPR_File = fullfile(Settings.WorkDir,'MSD_Liq.tpr');
+    MDPout_File = fullfile(Settings.WorkDir,'MSD_Liq_out.mdp');
+    GrompLog_File = fullfile(Settings.WorkDir,'MSD_Liq_Grompplog.log');
+    
+    FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Equilibrated_Geom_File) ...
+        ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
+        ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
+        ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+    [state,~] = system(FEquil_Grompp);
+    
+    % Catch errors in grompp
+    if state ~= 0
+        error(['Error running GROMPP. Problem command: ' newline FEquil_Grompp]);
+    else
+        delete(GrompLog_File)
+    end
+    
+    % Prepare Equilibration mdrun command
+    Log_File = fullfile(Settings.WorkDir,'MSD_Liq.log');
+    Energy_file = fullfile(Settings.WorkDir,'MSD_Liq.edr');
+    TRR_File = fullfile(Settings.WorkDir,'MSD_Liq.trr');
+    Equilibrated_Geom_File = fullfile(Settings.WorkDir,['MSD_Liq_out.' Settings.CoordType]);
+    
+    mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
+        ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
+        ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Equilibrated_Geom_File) ...
+        ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'MSD_Liq')) ...
+        Settings.mdrun_opts];
+    
+    if Table_Req
+        mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
+    end
+
+    % Run Liquid Equilibration
+    if Verbose
+        disp(['(2/2) Running liquid with realistic dynamics for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
+    end
+    mintimer = tic;
+    [state,~] = system(mdrun_command);
+    if state == 0
+        if Verbose
+            disp(['(2/2) Liquid dynamics simulation complete. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
+    else
+        if Verbose
+            disp(['(2/2) Liquid Dynamics Failed! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+        end
+        Output.Liquid_DM_MP = nan;
+    end
+    
+    % Check to ensure system remained liquid
+    PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
+        pyargs('SystemName','MSD_Liq',...
+        'RefStructure','Liquid',...
+        'CheckFullTrajectory',true,...
+        'FileType',Settings.CoordType,...
+        'ML_TimeLength',0,...
+        'ML_TimeStep',0,...
+        'TimePerFrame',Settings.Output_Coords*Settings.MDP.dt,...
+        'SaveTrajectory',true,...
+        'SavePredictionsImage',true));
+    Liq_Fraction = PyOut{4};
+    
+    if Liq_Fraction < 0.85
+        if Verbose
+            disp('Detected Liquid Freezing at Experimental MP')
         end
         if Settings.Delete_Equil
             try
@@ -741,11 +830,12 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         end
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
+        Output.Liquid_DM_MP = nan;
         return
     end
     
     %% Calculate volume and enthalpy of liquid
-    En_xvg_file = fullfile(Settings.WorkDir,'Equil_Liq_Energy.xvg');
+    En_xvg_file = fullfile(Settings.WorkDir,'MSD_Liq_Energy.xvg');
     
     % Check energy options
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo 0 ' Settings.pipe ' gmx']) ...
@@ -760,8 +850,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     En_set = [En_set ' 0'];
     En_set = regexprep(En_set,' +',' ');
     
-    % Grab last 20% of data from results
-    startpoint = Settings.Liquid_Test_Time*0.5; % ps
+    % Grab data from results
+    startpoint = 0; % ps
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
     ' energy -f ' windows2unix(Energy_file)...
     ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
@@ -769,13 +859,40 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     
     [err,~] = system(gmx_command);
     if err ~= 0
-        error('Failed to collect data.')
+        error('Failed to collect energy data.')
     end
     
     Data = import_xvg(En_xvg_file); % Gather X,Y,Z lengths
     
     Output.Liquid_V_MP = mean(Data(:,2))*(10^3)/nmol_liquid; % A^3 / ion pair
     Output.Liquid_H_MP = mean(Data(:,3))/nmol_liquid; % kJ/mol
+    
+    %% MSD Calculation to check
+    MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd.xvg');
+    MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd.log');
+    msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
+        ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
+        ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+    [~,~] = system(msd_command);
+    outp = fileread(MSD_Log_File);
+    Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+    Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+    
+    if Settings.CheckAmorphousLiquid && Output.Liquid_DM_MP <= Settings.Finite_T_Data.Exp_DM_MP/100
+        if Settings.Verbose
+            disp('Detected liquid has hardened to amorphous solid.')
+        end
+        if Settings.Delete_Equil
+            try
+                rmdir(Settings.WorkDir,'s')
+            catch
+                disp(['Unable to remove directory: ' Settings.WorkDir])
+            end
+        end
+        Output.Liquid_V_MP = nan;
+        Output.Liquid_H_MP = nan;
+        return
+    end
     
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)
     % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
