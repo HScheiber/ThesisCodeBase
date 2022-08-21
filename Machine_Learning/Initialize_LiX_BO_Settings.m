@@ -90,7 +90,7 @@ Settings.Loss_Options = init_loss_options; % default loss options
 Settings.CheckBadFcn = true; % Switch to turn on or off the checking of pathological functions, adding a loss penalty for such functions
 Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
-Settings.MaxModelMismatch = 1; % [Fraction] This is the maximum allowed mismatch for the experimental vs model lattice energy before a loss penalty is applied and finite T calculations are skipped
+Settings.MaxModelMismatch = 0.75; % [Fraction] This is the maximum allowed mismatch for the experimental vs model lattice energy before a loss penalty is applied and finite T calculations are skipped
 Settings.BadFcnLossPenalty = 1000; % Penalty to give when function shape is deemed pathological
 
 % Intial optimization settings

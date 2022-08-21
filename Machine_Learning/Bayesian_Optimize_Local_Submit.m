@@ -161,11 +161,11 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
             Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
             Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-            Models(idx).Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
             Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
             
             % Aux options
-            Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
             Models(idx).SigmaEpsilon = true;
             Models(idx).Fix_Charge = true;
             Models(idx).Additivity = true;
@@ -191,6 +191,7 @@ for idx = 1:length(Models)
     
     % Turn diary on and submit job
     diary(Model.Diary_Loc);
+    setenv('OMP_NUM_THREADS',num2str(Model.JobSettings.OMP_Threads))
     Bayesian_Optimize_LiX_Parameters(Model)
     diary('off')
     close all % closes figures
