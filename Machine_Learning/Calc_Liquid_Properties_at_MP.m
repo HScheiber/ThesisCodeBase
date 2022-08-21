@@ -879,7 +879,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
     
     if Settings.CheckAmorphousLiquid && Output.Liquid_DM_MP <= Settings.Finite_T_Data.Exp_DM_MP/100
-        if Settings.Verbose
+        if Verbose
             disp('Detected liquid has hardened to amorphous solid.')
         end
         if Settings.Delete_Equil
