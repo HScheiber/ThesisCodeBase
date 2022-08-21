@@ -1136,13 +1136,13 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 %         E_Model_Mismatch = abs((LE_model - LE_exp)/LE_exp);
         
         V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
-        V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
-        Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
+        %V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
+        %Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
         %V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
         
 %         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
         
-        if ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Settings.Therm_Prop_Override
+        if V0_model <= 6.75 % ( Model_Mismatch > Settings.MaxModelMismatch ) && ~Settings.Therm_Prop_Override
             Loss_add = Loss_add + log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
             Settings.skip_finite_T = true;
         else
