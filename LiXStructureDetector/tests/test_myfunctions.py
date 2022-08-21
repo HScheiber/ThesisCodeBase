@@ -189,17 +189,17 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\Tm_876.0875'
-Salt = 'LiF'
-SystemName = 'Prod2_W_TF_NPT'
-RefStructure='Wurtzite'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing'
+Salt = 'LiI'
+SystemName = 'MSD_Liq'
+RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
 SavePredictions=False 
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=50
+TimePerFrame=0.1
 FileType='gro'
 Verbose=True
 StartPoint = None
@@ -216,7 +216,7 @@ Spatial_Interfacial = None
 SaveTrajectoryAux = 2
 LoadFeatures = True
 T = None
-T_Ref = 876.0875
+T_Ref = None
 RefChangeThreshold = 0.25
 CheckFullTrajectory = True
 

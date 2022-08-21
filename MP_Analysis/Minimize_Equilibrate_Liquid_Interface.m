@@ -543,71 +543,73 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             if Settings.Verbose
                 disp(['(2/2) Liquid dynamics simulation complete. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
             end
-        else
-            error(['(2/2) Liquid Dynamics Failed! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
-        end
+            
+            % Check to ensure system remained liquid
+            copyfile(Equilibrated_Geom_File,fullfile(Settings.WorkDir,['MSD_Liq.' Settings.CoordType]));
+            PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
+                pyargs('SystemName','MSD_Liq',...
+                'RefStructure',Settings.Structure,...
+                'CheckFullTrajectory',true,...
+                'FileType',Settings.CoordType,...
+                'ML_TimeLength',0,...
+                'ML_TimeStep',0,...
+                'SaveTrajectory',true,...
+                'SavePredictionsImage',true,...
+                'Verbose',Settings.Verbose));
+            Sol_Fraction = PyOut{4};
+            Liq_Fraction = PyOut{5};
 
-        % Check to ensure system remained liquid
-        copyfile(Equilibrated_Geom_File,fullfile(Settings.WorkDir,['MSD_Liq.' Settings.CoordType]));
-        PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
-            pyargs('SystemName','MSD_Liq',...
-            'RefStructure',Settings.Structure,...
-            'CheckFullTrajectory',true,...
-            'FileType',Settings.CoordType,...
-            'ML_TimeLength',0,...
-            'ML_TimeStep',0,...
-            'SaveTrajectory',true,...
-            'SavePredictionsImage',true,...
-            'Verbose',Settings.Verbose));
-        Sol_Fraction = PyOut{4};
-        Liq_Fraction = PyOut{5};
-
-        if Liq_Fraction < (1 - Settings.MeltFreezeThreshold)
-            if Settings.Verbose
-                disp('Detected Liquid Phase change.')
-            end
-            if (1-Liq_Fraction-Sol_Fraction) >= Settings.MeltFreezeThreshold
-                Output.StructureChange = true;
-            else
-                Output.LiquidFroze = true;
-            end
-            Output.Aborted = true;
-            TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
-            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
-            copyfile(Settings.WorkDir,TDir)
-            return
-        end
-        
-        MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
-        MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
-        msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
-            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
-            ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
-        [~,~] = system(msd_command);
-        outp = fileread(MSD_Log_File);
-        Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
-        Diff_const = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
-        
-        Exp = Load_Experimental_Data;
-        if Diff_const <= Exp.(Settings.Salt).Liquid.DM_mp/100
-            if Settings.Verbose
-                disp('Detected liquid has hardened to amorphous solid.')
-            end
-            Output.LiquidAmorphous = true;
-            Output.Aborted = true;
-            TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
-            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
-            copyfile(Settings.WorkDir,TDir);
-            try
-                if Settings.Delete_Equil
-                    rmdir(Settings.WorkDir,'s')
-                end
-            catch
+            if Liq_Fraction < (1 - Settings.MeltFreezeThreshold)
                 if Settings.Verbose
-                    disp(['Unable to remove directory: ' Settings.WorkDir])
+                    disp('Detected Liquid Phase change.')
                 end
+                if (1-Liq_Fraction-Sol_Fraction) >= Settings.MeltFreezeThreshold
+                    Output.StructureChange = true;
+                else
+                    Output.LiquidFroze = true;
+                end
+                Output.Aborted = true;
+                TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
+                [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+                copyfile(Settings.WorkDir,TDir)
+                return
             end
-            return
+
+            MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
+            MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
+            msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
+                ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
+                ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+            [~,~] = system(msd_command);
+            outp = fileread(MSD_Log_File);
+            Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+            Diff_const = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+
+            Exp = Load_Experimental_Data;
+            if Diff_const <= Exp.(Settings.Salt).Liquid.DM_mp/100
+                if Settings.Verbose
+                    disp('Detected liquid has hardened to amorphous solid.')
+                end
+                Output.LiquidAmorphous = true;
+                Output.Aborted = true;
+                TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
+                [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+                copyfile(Settings.WorkDir,TDir);
+                try
+                    if Settings.Delete_Equil
+                        rmdir(Settings.WorkDir,'s')
+                    end
+                catch
+                    if Settings.Verbose
+                        disp(['Unable to remove directory: ' Settings.WorkDir])
+                    end
+                end
+                return
+            end
+        else
+            if Settings.Verbose
+                disp(['(2/2) Liquid Dynamics Failed! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+            end
         end
     end
     
