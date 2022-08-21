@@ -443,7 +443,8 @@ classdef BayesianOptimization_priv
                 % Run the optimization using the new options
                 Results = initializeParallel(Results);
                 Results = initializeTimers(Results, true);
-                NewResults = run(Results);
+                Resuming = true;
+                NewResults = run(Results,Resuming);
             end
         end
     end
@@ -1880,6 +1881,7 @@ classdef BayesianOptimization_priv
     end
     
     methods     % Dependent property getters
+        
         function ObjectiveFcn = get.ObjectiveFcn(this)
             ObjectiveFcn = this.PrivOptions.ObjectiveFcn;
         end
@@ -1996,11 +1998,16 @@ classdef BayesianOptimization_priv
     
     methods(Access=protected)
         %% Main algorithm
-        function this = run(this)
+        function this = run(this,varargin)
+            if nargin > 1
+                resuming = varargin{1};
+            else
+                resuming = false;
+            end
             if this.PrivOptions.UseParallel
                 this = runParallel(this);
             else
-                this = runSerial(this);
+                this = runSerial(this,resuming);
             end
         end
         
@@ -2032,7 +2039,7 @@ classdef BayesianOptimization_priv
             end
         end
         
-        function this = runSerial(this)
+        function this = runSerial(this,resuming)
             checkForOptimizableVariables(this);
             checkXConstraintFcnSatisfiability(this);
             this = processInitializationData(this);
@@ -2041,7 +2048,11 @@ classdef BayesianOptimization_priv
             this = callOutputFcn(this, 'initial');
             this = fitModels(this);
             [this.IncumbentF, this.IncumbentX] = findIncumbent(this);
-            this = chooseNextPoint(this);
+            if resuming
+                this.XNext = this.NextPoint{:,:};
+            else
+                this = chooseNextPoint(this);
+            end
             iteration = this.NumObjectiveEvaluations + 1;          
             if iteration == 1 && this.PrivOptions.Verbose >= 1 && ...
                     (this.PrivOptions.FitcAutoSingleLearner || this.PrivOptions.FitcautoMultipleLearners)

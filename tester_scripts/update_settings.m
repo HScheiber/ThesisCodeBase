@@ -1,13 +1,13 @@
 
 Settings.JobSettings.Cores = 8;
-Settings.JobSettings.MPI_Ranks = 8;
-Settings.JobSettings.OMP_Threads = 1;
-Settings.JobSettings.dd  = [2 2 2];
+Settings.JobSettings.MPI_Ranks = 2;
+Settings.JobSettings.OMP_Threads = 4;
+Settings.JobSettings.dd  = [1 1 2];
 Settings.JobSettings.npme = [];
 
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
     Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
-[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
+[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.MLModelDir] = MD_Batch_Template(Settings.JobSettings);
 Settings.WorkDir = pwd;
 Settings.OuterDir = pwd;
 % Settings.Output_Energies = 1;

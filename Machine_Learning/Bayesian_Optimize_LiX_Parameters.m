@@ -195,13 +195,13 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         if ~isempty(gcp('nocreate')) % If there is currently a parallel pool
             Cur_Pool = gcp;
             Cur_Workers = Cur_Pool.NumWorkers;
-
+            
             % Start the parallel pool
             if Cur_Workers ~= PrefCores
                 delete(Cur_Pool);
                 % Create a "local" cluster object
                 local_cluster = parcluster('local');
-
+                
                 % Modify the JobStorageLocation to a temporary directory
                 [~,~,computer,~] = find_home;
                 switch computer
@@ -216,14 +216,14 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                     mkdir(tmp);
                 end
                 local_cluster.JobStorageLocation = tmp;
-
+                
                 parpool(local_cluster,PrefCores);
             end
         else
             % Create a "local" cluster object
             local_cluster = parcluster('local');
             local_cluster.NumWorkers = PrefCores;
-
+            
             % Modify the JobStorageLocation to a temporary directory
             [~,~,computer] = find_home;
             switch computer
@@ -328,9 +328,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 else
                     plotopt = [];
                 end
-        
+                
                 BayesoptResults = dat.BayesoptResults;
-
                 remaining_evals = Model.Max_Bayesian_Iterations - BayesoptResults.NumObjectiveEvaluations;
                 
                 if isfield(BayesoptResults.Options,'KernelFunction')
