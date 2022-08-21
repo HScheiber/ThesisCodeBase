@@ -213,11 +213,13 @@ function Output = Equilibrate_Solid(Settings,varargin)
         if Settings.Verbose
             disp('Detected Solid Phase change.')
         end
-        if Liq_Fraction > 0.5*Settings.MeltFreezeThreshold
-            Output.SolidMelted = true;
-        else
+        
+        if (1-Liq_Fraction-Sol_Fraction) >= Settings.MeltFreezeThreshold
             Output.StructureChange = true;
+        else
+            Output.SolidMelted = true;
         end
+        
         Output.Aborted = true;
         TDir = fullfile(strrep(Settings.WorkDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
         [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
