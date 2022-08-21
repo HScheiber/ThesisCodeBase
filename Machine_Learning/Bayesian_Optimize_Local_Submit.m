@@ -63,7 +63,7 @@ Shared_Settings.switch_final_opt = false;
 Shared_Settings.JobSettings.Cores = 8;
 Shared_Settings.JobSettings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
 Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
+Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
 Shared_Settings.JobSettings.dd = [1 2 4]; % Domain decomposition
 Shared_Settings.Cutoff_Buffer = 1.2; % This affects Structure_Minimization as well as other aspects of code
 Shared_Settings.MaxWarn = 2;
@@ -82,9 +82,11 @@ Shared_Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearc
 Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
 Shared_Settings.Liquid_Fraction = 0.50;
 Shared_Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
-Shared_Settings.Liquid_Test_Time = 50; % ps. simulation time to sample the liquid (second half averaged for enthalpy / volume)
+Shared_Settings.Liquid_Test_Time = 100; % ps. simulation time to sample the liquid for enthalpy / MSD calculations
+Shared_Settings.Liquid_Equilibrate_Time = 25; % ps. time spent relaxing the liquid for enthalpy / MSD calculations
 Shared_Settings.Solid_Test_Time = 30; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
-Shared_Settings.Delete_Equil = true; % switch to delete temporary calculation folders for finite T calcs
+Shared_Settings.Liquid_Test_Time = 50; % ps. simulation time to sample the liquid (second half averaged for enthalpy / volume)
+Shared_Settings.Delete_Equil = false; % switch to delete temporary calculation folders for finite T calcs
 
 % More Finite T setings
 Shared_Settings.Manual_Box = false; % When set to true, rather than setting the number of atoms in a box, user sets the a, b, and c dimensions of the box
@@ -147,24 +149,25 @@ for tidx = 1:length(Theories)
             Models(idx) = Shared_Settings;
             Models(idx).Salt = Salt;
             Models(idx).Theory = Theory;
-            Models(idx).Trial_ID = ['JG3' Rep];
+            Models(idx).Trial_ID = ['XX' Rep];
             
-            % T=0 Loss
-            Models(idx).Loss_Options.Rocksalt.LE = 1;
-            Models(idx).Loss_Options.Rocksalt.a = 1;
-            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+%             % T=0 Loss
+%             Models(idx).Loss_Options.Rocksalt.LE = 1;
+%             Models(idx).Loss_Options.Rocksalt.a = 1;
+%             Models(idx).Loss_Options.Wurtzite.RLE = 1;
             
             % Finite T loss
             Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
             Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
             Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
             Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-            Models(idx).Loss_Options.MP  = 0; % Fitting the experimental MP, using the experimental structure as the solid
+            Models(idx).Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
             
             % Aux options
             Models(idx).Structures = Auto_Structure_Selection(Models(idx).Loss_Options);
             Models(idx).SigmaEpsilon = true;
-            Models(idx).Fix_Charge = false;
+            Models(idx).Fix_Charge = true;
             Models(idx).Additivity = true;
             
         end

@@ -594,8 +594,6 @@ switch lower(computer)
             end
         end
         
-        
-
     otherwise % Place jobs here for later assignment
         
         %% Shared_Settings
