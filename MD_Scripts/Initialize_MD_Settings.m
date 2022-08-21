@@ -268,4 +268,10 @@ Settings.CR_Damp = Init_CRDamping_Object; % note: b = steepness of damping, r_d 
 Settings.C6_Damp = Init_C6Damping_Object;
 [Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
 
+% Finite T settings
+Settings.Liquid_Test_Time = 100; % ps
+Settings.Liquid_Equilibrate_Time = 25; % ps
+Settings.Solid_Test_Time = 30; % ps
+
+
 end
