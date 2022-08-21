@@ -465,10 +465,10 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         if Settings.Verbose
             disp('Detected Liquid Phase change.')
         end
-        if Sol_Fraction > 0.5*Settings.MeltFreezeThreshold
-            Output.LiquidFroze = true;
-        else
+        if (1-Liq_Fraction-Sol_Fraction) >= Settings.MeltFreezeThreshold
             Output.StructureChange = true;
+        else
+            Output.LiquidFroze = true;
         end
         Output.Aborted = true;
         TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
