@@ -106,7 +106,6 @@ Shared_Settings.MaxTDiff = 0.01; % K, maximum change in temperature between poin
 Shared_Settings.Liquid_Test_Time = 100; % ps. simulation time to sample the liquid for enthalpy / MSD calculations
 Shared_Settings.Liquid_Equilibrate_Time = 25; % ps. time spent relaxing the liquid for enthalpy / MSD calculations
 Shared_Settings.Solid_Test_Time = 30; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
-Shared_Settings.Liquid_Test_Time = 50; % ps. simulation time to sample the liquid (second half averaged for enthalpy / volume)
 Shared_Settings.Delete_Equil = true; % switch to delete temporary calculation folders for finite T calcs
 
 % More Finite T setings
