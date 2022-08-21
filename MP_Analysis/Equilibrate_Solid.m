@@ -176,7 +176,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
             return
         else
             if Settings.Verbose
-                disp('Equilibration failed. Stiffer compressibility and shorter time steps did not resolve.')
+                disp('Equilibration failed. Shorter time steps did not resolve.')
                 disp(mdrun_output);
                 disp(['Error running mdrun for solid equilibration. Problem command: ' newline mdrun_command]);
             end
