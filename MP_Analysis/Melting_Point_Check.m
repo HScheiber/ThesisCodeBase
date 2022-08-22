@@ -596,15 +596,18 @@ function varargout = Melting_Point_Check(T,Settings)
         
         [errcode,outp] = system(mdrun_command);
         if errcode ~= 0
-            disp(outp);
-            error(['Error running mdrun. Problem command: ' newline mdrun_command]);
+            if Settings.Verbose
+                disp(['MD simulation segment ' num2str(ext_idx,'%03.f') '/' max_steps ...
+                    ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
+                    ' ps) failed to complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+            end
         elseif ~isfile(windows2unix(Structure_Out_File))
             if Settings.Verbose
                 disp('Calculation time is almost up, ending MATLAB session now.')
             end
             exit
         end
-        if Settings.Verbose
+        if Settings.Verbose && errcode == 0
             disp(['MD simulation segment ' num2str(ext_idx,'%03.f') '/' max_steps ...
                 ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
                 ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
@@ -641,6 +644,11 @@ function varargout = Melting_Point_Check(T,Settings)
         Structure_Out_File = Structure_Out_File_idx;
         Traj_Conf_File = Traj_Conf_File_idx;
         ext_idx = ext_idx+1;
+        
+        if IsNotComplete && ~Froze_alt && errcode ~= 0
+            disp(outp);
+            error(['mdrun error but simulation result still inconclusive. Problem command: ' newline mdrun_command]);
+        end
     end
 
     % Once complete, calculate the function and "gradient"

@@ -191,7 +191,7 @@ import LiXStructureDetector
 
 WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing'
 Salt = 'LiI'
-SystemName = 'MSD_Liq'
+SystemName = 'Test_MP'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
@@ -199,7 +199,7 @@ SavePredictions=False
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=0.1
+TimePerFrame=1
 FileType='gro'
 Verbose=True
 StartPoint = None
