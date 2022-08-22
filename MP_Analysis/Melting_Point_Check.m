@@ -18,25 +18,10 @@ function varargout = Melting_Point_Check(T,Settings)
         if f <= 0 && Settings.Continue
             % Continue a calculation from the previously determined melting point with new updated settings
         else
-            switch lower(Settings.Optimizer)
-            case 'fmincon'
-                varargout = cell(1,2); % Outputs function and derivative
-                varargout{1} = f;
-                varargout{2} = df;
-            case 'bayesopt'
-                varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-                varargout{1} = f; % function evaluation
-                varargout{2} = []; % coupled constraints
-                varargout{3} = T_dat; % user data
-            case 'patternsearch'
-                varargout = cell(1,1); % Outputs function only
-                varargout{1} = f; % function evaluation
-            case 'mpsearcher'
-                varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-                varargout{1} = f; % function evaluation
-                varargout{2} = df; % function derivative
-                varargout{3} = T_dat; % user data 
-            end
+            varargout = cell(1,3); % Outputs function, coupled constraints, and user data
+            varargout{1} = f; % function evaluation
+            varargout{2} = df; % function derivative
+            varargout{3} = T_dat; % user data
             return
         end
     end
