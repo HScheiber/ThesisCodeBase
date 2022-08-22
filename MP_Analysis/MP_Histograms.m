@@ -155,32 +155,99 @@ for sidx = 1:N_Sets
             'EdgeColor',Colours(sidx,:),'Linewidth',2,'FaceAlpha',0.25);
 
 
+
+
+        
+%         % Statistics
+%         varc = var(Y);
+%         meanc = mean(Y);
+% 
+%         SEM = std(Y)/sqrt(length(Y));               % Standard Error
+%         ts = tinv([0.025  0.975],length(Y)-1);      % T-Score
+%         CI = mean(Y) + ts*SEM;                      % Confidence Intervals
+
+        
+        
+        
+        
+        
+        varc = var(bmeans);
+        meanc = mean(bmeans);
+
+        SEM = std(bmeans)/sqrt(length(bmeans));               % Standard Error
+        ts = tinv([0.025  0.975],length(bmeans)-1);      % T-Score
+        CI = mean(Y) + ts*SEM;                      % Confidence Intervals
+        
+        
+        
+        
+        % Sample data
+        data = Y; 
+        % Run bootci (percentile method is chosen since that's how we're 
+        % computing it below in the other method.  
+        nBoot = 100000; %number of bootstraps
+        [bci,bmeans] = bootci(nBoot,{@mean,data},'alpha',.05,'type','bca'); %95 confidence interval
+        % Compute bootstrap sample mean
+        bmu = mean(bmeans); 
+        smu = std(bmeans);
+        % Now repeat that process with lower-level bootstrapping
+        % using the same sampling proceedure and the same data.
+        bootMeans = nan(1,nBoot); 
+        for i = 1:nBoot
+            bootMeans(i) = mean(data(randi(numel(data),size(data)))); 
+        end
+        CI = prctile(bootMeans,[2.5,97.5]); 
+        mu = mean(bootMeans); 
+        % Plot the bootci() results
+        figure()
+        ax1 = subplot(2,1,1);
+        histogram(bmeans); 
+        hold on
+        xline(bmu, 'k-', sprintf('mu = %.2f',bmu),'LineWidth',2,'FontSize',12)
+        xline(bci(1),'k-',sprintf('%.1f',bci(1)),'LineWidth',2,'FontSize',12)
+        xline(bci(2),'k-',sprintf('%.1f',bci(2)),'LineWidth',2,'FontSize',12)
+        title('bootci()')
+        % plot the lower-level, direct computation results
+        ax2 = subplot(2,1,2);
+        histogram(bootMeans); 
+        hold on
+        xline(mu, 'k-', sprintf('mu = %.2f',mu),'LineWidth',2,'FontSize',12)
+        xline(CI(1),'k-',sprintf('%.1f',CI(1)),'LineWidth',2,'FontSize',12)
+        xline(CI(2),'k-',sprintf('%.1f',CI(2)),'LineWidth',2,'FontSize',12)
+        title('Lower level')
+        linkaxes([ax1,ax2], 'xy')
+        
+        
+        
+        
         % Generate a Gaussian Fit model
-        X_known = bin_centers;
-        Y_known = YDat./sum(YDat.*w);
-        modelfun = @(b,x)normpdf(x,b(1),b(2));
-        beta0 = [1289.9 1];
-        opts = statset('Display','iter','TolFun',1e-20,'TolX',1e-20,'maxiter',1000);
-        model = fitnlm(X_known',Y_known',modelfun,beta0,'Options',opts);
+%         X_known = bin_centers;
+%         Y_known = YDat./sum(YDat.*w);
+%         modelfun = @(b,x)normpdf(x,b(1),b(2));
+%         beta0 = [1289.9 1];
+%         opts = statset('Display','iter','TolFun',1e-20,'TolX',1e-20,'maxiter',1000);
+%         model = fitnlm(X_known',Y_known',modelfun,beta0,'Options',opts);
+        
+        
+        model = @(x)normpdf(x,bmu,smu);
 
         x = (dist_start:0.001:dist_end)';
-        y = model.predict(x);
+        y = model(x);
         %y = normpdf(x,b(sidx,1),b(sidx,2));
         hold on
         p(2*sidx) = plot(x,y,'Linewidth',3,'Color',Colours(sidx,:));
-        Legend_txt{2*sidx} = ['PDF: $\mu = ' num2str(model.Coefficients.Estimate(1),'%.1f') '$ K, $\sigma = ' num2str(model.Coefficients.Estimate(2),'%.2f') '$ K'];
-
+        %Legend_txt{2*sidx} = ['PDF: $\mu = ' num2str(model.Coefficients.Estimate(1),'%.1f') '$ K, $\sigma = ' num2str(model.Coefficients.Estimate(2),'%.2f') '$ K'];
+        Legend_txt{2*sidx} = ['PDF: $\mu = ' num2str(bmu,'%.1f') '$ K, $\sigma = ' num2str(smu,'%.2f') '$ K'];
         %Legend_txt{2*sidx} = ['PDF: $\mu = ' num2str(b(sidx,1),'%.1f') '$ K, $\sigma = ' num2str(b(sidx,2),'%.2f') '$ K'];
-
         
-        % Statistics
-        varc = var(Y);
-        meanc = mean(Y);
-
-        SEM = std(Y)/sqrt(length(Y));               % Standard Error
-        ts = tinv([0.025  0.975],length(Y)-1);      % T-Score
-        CI = mean(Y) + ts*SEM;                      % Confidence Intervals
-
+        
+        
+        
+        
+        
+        
+        
+        
     else
         
 %         p(sidx) = area(axh,bin_centers,YDat./sum(YDat),'FaceColor',Colours(sidx,:),...

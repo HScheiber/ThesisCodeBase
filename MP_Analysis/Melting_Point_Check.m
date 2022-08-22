@@ -1,4 +1,4 @@
-function varargout = Melting_Point_Check(T,Settings)
+function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
 
     % Load the data trace
     T_dat = load(Settings.CurrentTFile,'T_dat').T_dat;
@@ -18,10 +18,9 @@ function varargout = Melting_Point_Check(T,Settings)
         if f <= 0 && Settings.Continue
             % Continue a calculation from the previously determined melting point with new updated settings
         else
-            varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-            varargout{1} = f; % function evaluation
-            varargout{2} = df; % function derivative
-            varargout{3} = T_dat; % user data
+            feval = f; % function evaluation
+            fderiv = df; % function derivative
+            User_data = T_dat; % user data
             return
         end
     end
@@ -163,10 +162,9 @@ function varargout = Melting_Point_Check(T,Settings)
                 
                 copyfile(Settings.CurrentTFile,Settings.PrevTFile)
                 save(Settings.CurrentTFile,'T_dat')
-                varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-                varargout{1} = f; % function evaluation
-                varargout{2} = df; % function derivative
-                varargout{3} = T_dat; % user data
+                feval = f; % function evaluation
+                fderiv = df; % function derivative
+                User_data = T_dat; % user data
                 return
             else
                 % Rename the gro and sol.mat file at the given temperature
@@ -256,12 +254,12 @@ function varargout = Melting_Point_Check(T,Settings)
         
         Trajectory_File = fullfile(WorkDir,[Settings.JobName '.trr']);
         gmx_check_cmd = [Settings.gmx_loc ' check -f ' windows2unix(Trajectory_File)];
-        [errcode,output] = system(gmx_check_cmd);
+        [errcode,outchk] = system(gmx_check_cmd);
         if errcode ~= 0
             ContinueFromCheckPoint = false;
         end
         
-        ftime = regexp(output,'Coords +([0-9]|\.|e|E)+ +([0-9]|\.|e|E)+','tokens','once');
+        ftime = regexp(outchk,'Coords +([0-9]|\.|e|E)+ +([0-9]|\.|e|E)+','tokens','once');
         if isempty(ftime)
             ContinueFromCheckPoint = false;
         else
@@ -466,7 +464,7 @@ function varargout = Melting_Point_Check(T,Settings)
                 end
                 Settings.MDP.dt = Settings.MDP.dt/2;
                 Settings.Output_Coords = Settings.Output_Coords*2;
-                varargout = Melting_Point_Check(T,Settings);
+                [feval,fderiv,User_data] = Melting_Point_Check(T,Settings);
                 return
             else
                 if Settings.Verbose
@@ -509,10 +507,9 @@ function varargout = Melting_Point_Check(T,Settings)
                     T_dat.Melt_Trace = [T_dat.Melt_Trace false];
                     copyfile(Settings.CurrentTFile,Settings.PrevTFile)
                     save(Settings.CurrentTFile,'T_dat')
-                    varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-                    varargout{1} = -1; % function evaluation
-                    varargout{2} = 0; % function derivative
-                    varargout{3} = T_dat; % user data
+                    feval = -1; % function evaluation
+                    fderiv = 0; % function derivative
+                    User_data = T_dat; % user data
                     if Settings.Verbose
                         disp('Possible system blow up. This potential may be unusable!')
                         disp('Aborting Melting Point calculation.')
@@ -591,7 +588,7 @@ function varargout = Melting_Point_Check(T,Settings)
         if Settings.slurm
             mdrun_command = regexprep(mdrun_command,' -maxh ([0-9]|\.)+','','once');
             HoursRemain = JobTimeRemaining;
-            mdrun_command = [mdrun_command ' -maxh ' num2str(HoursRemain)];
+            mdrun_command = [mdrun_command ' -maxh ' num2str(HoursRemain)]; %#ok<AGROW>
         else
             mdrun_command = regexprep(mdrun_command,' -maxh ([0-9]|\.)+','','once');
         end
@@ -791,8 +788,7 @@ function varargout = Melting_Point_Check(T,Settings)
         system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" -delete']);
     end
     
-    varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-    varargout{1} = f; % function evaluation
-    varargout{2} = df; % function derivative
-    varargout{3} = T_dat; % user data 
+    feval = f; % function evaluation
+    fderiv = df; % function derivative
+    User_data = T_dat; % user data 
 end
