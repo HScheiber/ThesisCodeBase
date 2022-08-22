@@ -39,14 +39,14 @@ Settings.SAMM_Range = [0.1 10]; % Default range for MM repulsive exponent scalin
 Settings.SAXX_Range = [0.1 5]; % Default range for XX repulsive exponent scaling in TF model.
 Settings.SAMX_Range = [0.1 5]; % Default range for MX repulsive prefactor scaling in TF model.
 
-Settings.SRMM_Range = [0.3 10]; % Default range for MM repulsive prefactor scaling in JC/BH model.
-Settings.SRXX_Range = [0.3 5]; % Default range for XX repulsive prefactor scaling in JC/BH model.
-Settings.SRMX_Range = [0.3 5]; % Default range for MX repulsive prefactor scaling in JC/BH model.
+Settings.SRMM_Range = [0.1 50]; % Default range for MM repulsive prefactor scaling in JC/BH model.
+Settings.SRXX_Range = [0.1 50]; % Default range for XX repulsive prefactor scaling in JC/BH model.
+Settings.SRMX_Range = [0.1 50]; % Default range for MX repulsive prefactor scaling in JC/BH model.
 
 % Exp-C6 or Exp-C6-C8: "sigma-epsilon" version parameters
 Settings.Sr0MM_Range = [0.1 0.4];  % [nm] Default range for MM r0 parameter
-Settings.Sr0XX_Range = [0.1 0.5]; % [nm] Default range for XX r0 parameter
-Settings.Sr0MX_Range = [0.1 0.5]; % [nm] Default range for MX r0 parameter
+Settings.Sr0XX_Range = [0.1 0.8]; % [nm] Default range for XX r0 parameter
+Settings.Sr0MX_Range = [0.1 0.8]; % [nm] Default range for MX r0 parameter
 
 Settings.SepsMM_Range = [0 1000]; % [kJ/mol] Default range for MM epsilon parameter
 Settings.SepsXX_Range = [0 1000]; % [kJ/mol] Default range for XX epsilon parameter
@@ -55,9 +55,9 @@ Settings.SepsMX_Range = [0 1000]; % [kJ/mol] Default range for MX epsilon parame
 Settings.SgamMM_Range = [1 48/7]; % [Unitless] Default range for MM gamma parameter in TF models
 Settings.SgamXX_Range = [1 48/7]; % [Unitless] Default range for XX gamma parameter in TF models
 Settings.SgamMX_Range = [1 48/7]; % [Unitless] Default range for MX gamma parameter in TF models
-Settings.SgamMM_RangeBH = [6 50]; % [Unitless] Default range for MM gamma parameter in BH models
-Settings.SgamXX_RangeBH = [6 50]; % [Unitless] Default range for XX gamma parameter in BH models
-Settings.SgamMX_RangeBH = [6 50]; % [Unitless] Default range for MX gamma parameter in BH models
+Settings.SgamMM_RangeBH = [6 80]; % [Unitless] Default range for MM gamma parameter in BH models
+Settings.SgamXX_RangeBH = [6 80]; % [Unitless] Default range for XX gamma parameter in BH models
+Settings.SgamMX_RangeBH = [6 80]; % [Unitless] Default range for MX gamma parameter in BH models
 
 Settings.Q_Range = [0.95 1.05]; % Default range for charge scaling. Only meaningful when Fix_Charge = false
 Settings.Q_value = 1.0; % Default value for the charge scale. Only meaningful when Fix_Charge = true

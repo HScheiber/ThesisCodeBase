@@ -162,21 +162,20 @@ switch lower(computer)
         
         %% Shared_Settings
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
-        Shared_Settings.Max_Bayesian_Iterations = 400;
-        Shared_Settings.Max_Secondary_Iterations = 100;
+        Shared_Settings.Max_Bayesian_Iterations = 800;
+        Shared_Settings.Max_Secondary_Iterations = 200;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
-        Shared_Settings.ub = 2200; % K, upper bound on MP search
-        Shared_Settings.Max_Local_Iterations = 10;
+        Shared_Settings.Max_Local_Iterations = 100;
         Shared_Settings.Liquid_Test_Time = 100; % ps
         Shared_Settings.Liquid_Equilibrate_Time = 25; % ps
         Shared_Settings.Solid_Test_Time = 30; % ps
-        %% BH Models JH
+        %% BH Models JL
         Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
-        Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
+        Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
@@ -198,26 +197,32 @@ switch lower(computer)
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
 
-                    %% Model BH: JH
+                    %% Model BH: JL
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JH' Rep];
+                    Models(idx).Trial_ID = ['JL' Rep];
 
                     % Loss
-                    Models(idx).Loss_Options.MP  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
                     
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
+                    
                 end
             end
         end
-        %% JC Models JH
+        %% JC Models JL
         Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
-        Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
+        Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
         Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
@@ -240,15 +245,20 @@ switch lower(computer)
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
 
-                    %% Model JC: JH
+                    %% Model JC: JL
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JH' Rep];
+                    Models(idx).Trial_ID = ['JL' Rep];
 
                     % Loss
-                    Models(idx).Loss_Options.MP  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
                     
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
@@ -273,7 +283,6 @@ switch lower(computer)
         Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
         Shared_Settings.Max_Local_Iterations = 1000;
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
-        Shared_Settings.ub = 2200; % K, upper bound on MP search
         
         %% BH Models IA, IB, IC, ID
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
@@ -504,7 +513,6 @@ switch lower(computer)
         Shared_Settings.Parallel_LiX_Minimizer = false;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
-        Shared_Settings.ub = 2200; % K, upper bound on MP search
         Shared_Settings.Max_Local_Iterations = 10;
         Shared_Settings.Liquid_Test_Time = 100; % ps
         Shared_Settings.Liquid_Equilibrate_Time = 25; % ps
@@ -604,7 +612,6 @@ switch lower(computer)
         Shared_Settings.Parallel_LiX_Minimizer = false;
         Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
-        Shared_Settings.ub = 2200; % K, upper bound on MP search
         Shared_Settings.Max_Local_Iterations = 10;
         Shared_Settings.Liquid_Test_Time = 100; % ps
         Shared_Settings.Liquid_Equilibrate_Time = 25; % ps
@@ -719,7 +726,6 @@ switch lower(computer)
                 end
             end
         end
-        
         %% JC Models JH, JI, JJ, JK
         Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
