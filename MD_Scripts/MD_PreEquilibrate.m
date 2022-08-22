@@ -116,29 +116,28 @@ else
     end
 
     Settings = Inp_Settings;
-    if ~isfield(Settings,'QECompressibility_init')
-        Settings.QECompressibility_init = Settings.QECompressibility;
-    end
-    if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+%     if ~isfield(Settings,'QECompressibility_init')
+%         Settings.QECompressibility_init = Settings.QECompressibility;
+%     end
+%     if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
+%         if Settings.Verbose
+%             disp('Equilibration failed. Retrying with stiffer compressibility.')
+%         end
+%         Settings.QECompressibility = Settings.QECompressibility/2;
+%         save(fullfile(Directory,'TempJobInfo.mat'),'Settings');
+%         Output = MD_PreEquilibrate(Directory);
+%         return
+	if Settings.MDP.dt > 1e-4
         if Settings.Verbose
-            disp('Equilibration failed. Retrying with stiffer compressibility.')
+            disp('Equilibration failed. Reducing time step.')
         end
-        Settings.QECompressibility = Settings.QECompressibility/2;
-        save(fullfile(Directory,'TempJobInfo.mat'),'Settings');
-        Output = MD_PreEquilibrate(Directory);
-        return
-    elseif Settings.MDP.dt > 1e-4
-        if Verbose
-            disp('Equilibration failed. Stiffer compressibility did not resolve.')
-            disp('Reducing time step.')
-        end
-        Settings.QECompressibility = Settings.QECompressibility_init;
+        %Settings.QECompressibility = Settings.QECompressibility_init;
         Settings.MDP.dt = Settings.MDP.dt/2;
         Settings.Output_Coords = Settings.Output_Coords*2;
         save(fullfile(Directory,'TempJobInfo.mat'),'Settings');
         Output = MD_PreEquilibrate(Settings);
         return
-    else
+	else
         if Settings.Verbose
             disp('Equilibration failed. Stiffer compressibility did not resolve.')
             disp(mdrun_output);
@@ -146,7 +145,7 @@ else
         end
         Output.Aborted = true;
         return
-    end
+	end
 end
 
 %     system(['wsl source ~/.bashrc; echo "5 8 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
