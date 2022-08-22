@@ -1311,7 +1311,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
         Verbose = Settings.Verbose;
         Settings.Verbose = true;
-        Sol_Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
+        Sol_Output = Calc_Solid_Properties_at_MP(Settings);
         Settings.Verbose = Verbose;
         Settings.JobSettings.dd = dd;
         Settings.JobSettings.npme = npme;
