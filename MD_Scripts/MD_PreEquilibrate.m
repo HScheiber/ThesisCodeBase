@@ -114,7 +114,6 @@ else
             disp(me.message)
         end
     end
-
     Settings = Inp_Settings;
 %     if ~isfield(Settings,'QECompressibility_init')
 %         Settings.QECompressibility_init = Settings.QECompressibility;
@@ -139,7 +138,7 @@ else
         return
 	else
         if Settings.Verbose
-            disp('Equilibration failed. Shorter time step did not resolve.')
+            disp('Equilibration failed. Reducing time step did not resolve.')
             disp(mdrun_output);
             disp(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
         end

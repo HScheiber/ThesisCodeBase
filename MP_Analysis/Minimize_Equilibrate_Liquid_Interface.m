@@ -420,7 +420,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             return
         else
             if Settings.Verbose
-                disp('Equilibration failed. Stiffer compressibility did not resolve.')
+                disp('Equilibration failed. Reducing time step did not resolve.')
                 disp(mdrun_output);
                 disp(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
             end
@@ -456,8 +456,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         'ML_TimeLength',0,...
         'ML_TimeStep',0,...
         'SaveTrajectory',true,...
-        'SavePredictionsImage',true,...
-        'Verbose',Settings.Verbose));
+        'SavePredictionsImage',true));
     Sol_Fraction = PyOut{4};
     Liq_Fraction = PyOut{5};
     
@@ -554,11 +553,10 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                 'ML_TimeLength',0,...
                 'ML_TimeStep',0,...
                 'SaveTrajectory',true,...
-                'SavePredictionsImage',true,...
-                'Verbose',Settings.Verbose));
+                'SavePredictionsImage',true));
             Sol_Fraction = PyOut{4};
             Liq_Fraction = PyOut{5};
-
+            
             if Liq_Fraction < (1 - Settings.MeltFreezeThreshold)
                 if Settings.Verbose
                     disp('Detected Liquid Phase change.')
@@ -609,6 +607,41 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         else
             if Settings.Verbose
                 disp(['(2/2) Liquid Dynamics Failed! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+            end
+            try
+                % Attempt to check to ensure system remained liquid
+                copyfile(Equilibrated_Geom_File,fullfile(Settings.WorkDir,['MSD_Liq.' Settings.CoordType]));
+                PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
+                    pyargs('SystemName','MSD_Liq',...
+                    'RefStructure',Settings.Structure,...
+                    'CheckFullTrajectory',true,...
+                    'FileType',Settings.CoordType,...
+                    'ML_TimeLength',0,...
+                    'ML_TimeStep',0,...
+                    'SaveTrajectory',true,...
+                    'SavePredictionsImage',true));
+                Sol_Fraction = PyOut{4};
+                Liq_Fraction = PyOut{5};
+
+                if Liq_Fraction < (1 - Settings.MeltFreezeThreshold)
+                    if Settings.Verbose
+                        disp('Detected Liquid Phase change.')
+                    end
+                    if (1-Liq_Fraction-Sol_Fraction) >= Settings.MeltFreezeThreshold
+                        Output.StructureChange = true;
+                    else
+                        Output.LiquidFroze = true;
+                    end
+                    Output.Aborted = true;
+                    TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
+                    [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+                    copyfile(Settings.WorkDir,TDir)
+                    return
+                end
+            catch
+                if Settings.Verbose
+                    disp('Unable to check liquid dynamics trajectory for phase change!');
+                end
             end
         end
     end
