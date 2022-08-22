@@ -31,6 +31,18 @@ function Output = Equilibrate_Solid(Settings,varargin)
     Na = ceil(La/(Settings.Geometry.a/10));
     Nb = ceil(Lb/(Settings.Geometry.b/10));
     Nc = ceil(Lc/(Settings.Geometry.c/10));
+    
+    % Calculate number of formula units
+    nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
+    while nmol_solid < 500 % Enforce a minimum of 1000 atoms
+        La = La*1.1;
+        Lb = Lb*1.1;
+        Lc = Lc*1.1;
+        Na = ceil(La/(Settings.Geometry.a/10));
+        Nb = ceil(Lb/(Settings.Geometry.b/10));
+        Nc = ceil(Lc/(Settings.Geometry.c/10));
+        nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
+    end
         
     SuperCell_File = fullfile(WorkDir,['Equil_Sol.' Settings.CoordType]);
     
