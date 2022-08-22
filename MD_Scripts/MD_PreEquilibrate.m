@@ -139,7 +139,7 @@ else
         return
 	else
         if Settings.Verbose
-            disp('Equilibration failed. Stiffer compressibility did not resolve.')
+            disp('Equilibration failed. Shorter time step did not resolve.')
             disp(mdrun_output);
             disp(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
         end
