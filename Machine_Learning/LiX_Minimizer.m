@@ -28,16 +28,14 @@ coupledconstraints = []; % No coupled constraints on the system
 % Optional inputs
 p = inputParser;
 p.FunctionName = 'LiX_Minimizer';
-addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Extra_Properties',Settings.Extra_Properties,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Therm_Prop_Override',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 
 parse(p,varargin{:});
-Settings.MinMDP.Verbose = p.Results.Verbose;
-Verbose = p.Results.Verbose;
 Extra_Properties = p.Results.Extra_Properties;
 Settings.Therm_Prop_Override = p.Results.Therm_Prop_Override;
 
+Settings.MinMDP.Verbose = Settings.Verbose;
 if Settings.Parallel_LiX_Minimizer && Settings.Parallel_Struct_Min
     Settings.Parallel_Struct_Min = false;
 end
@@ -1188,7 +1186,10 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Submit_Jobs = false;
     Settings.Skip_Minimization = true; % Skip the automatic geometry minimization
     Settings.RefStructure = Settings.Finite_T_Data.Structure;
+    Verbose = Settings.Verbose;
+    Settings.Verbose = true;
     [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
+    Settings.Verbose = Verbose;
     
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
@@ -1199,7 +1200,9 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
             try
                 rmdir(Settings.WorkDir,'s')
             catch
-                disp(['Unable to remove directory: ' Settings.WorkDir])
+                if Settings.Verbose
+                    disp(['Unable to remove directory: ' Settings.WorkDir])
+                end
             end
         end
     end
@@ -1239,14 +1242,20 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-        Liq_Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose); % Output is nan if liquid converts to >0.85 solid
+        Verbose = Settings.Verbose;
+        Settings.Verbose = true;
+        Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.85 solid
+        Settings.Verbose = Verbose;
     else
         dd = Settings.JobSettings.dd;
         npme = Settings.JobSettings.npme;
         Settings.JobSettings.dd = [];
         Settings.JobSettings.npme = [];
         [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
-        Liq_Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose); % Output is nan if liquid converts to >0.85 solid
+        Verbose = Settings.Verbose;
+        Settings.Verbose = true;
+        Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.85 solid
+        Settings.Verbose = Verbose;
         Settings.JobSettings.dd = dd;
         Settings.JobSettings.npme = npme;
         [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
@@ -1290,14 +1299,20 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         setenv('KMP_AFFINITY','disabled');
         Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
         Settings.gmx = Settings.gmx_loc;
-        Sol_Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
+        Verbose = Settings.Verbose;
+        Settings.Verbose = true;
+        Sol_Output = Calc_Solid_Properties_at_MP(Settings);
+        Settings.Verbose = Verbose;
     else
         dd = Settings.JobSettings.dd;
         npme = Settings.JobSettings.npme;
         Settings.JobSettings.dd = [];
         Settings.JobSettings.npme = [];
         [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        Verbose = Settings.Verbose;
+        Settings.Verbose = true;
         Sol_Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose);
+        Settings.Verbose = Verbose;
         Settings.JobSettings.dd = dd;
         Settings.JobSettings.npme = npme;
         [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
@@ -1331,7 +1346,9 @@ if Settings.Delete_Equil && Settings.Therm_Prop_Override
         try
             rmdir(fullfile(CalcDir,prev_calcs{idx}),'s')
         catch
-            disp(['Unable to remove failed calculation directory: ' fullfile(CalcDir,prev_calcs{idx})])
+            if Settings.Verbose
+                disp(['Unable to remove failed calculation directory: ' fullfile(CalcDir,prev_calcs{idx})])
+            end
         end
     end
 end

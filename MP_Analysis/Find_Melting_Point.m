@@ -62,6 +62,10 @@ if isfile(ResultsFile) && ~Settings.Continue
         if Settings.Verbose
             disp(repmat('*',1,40));
         end
+        diary off
+        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+            diary(Settings.Diary_Loc)
+        end
         return
     catch
     end

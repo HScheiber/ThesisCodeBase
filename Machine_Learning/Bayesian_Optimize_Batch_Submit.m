@@ -90,6 +90,7 @@ Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is 
 Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
 Shared_Settings.Loss_Convergence = 1e-6;
 Shared_Settings.Param_Convergence = 1e-3;
+Shared_Settings.Verbose = false;
 
 % MP / Finite T Settings
 Shared_Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
@@ -963,7 +964,7 @@ end
 %% Prepare batch scripts
 % Find the scheduler and get the batch script template file
 
-calc_cmd = 'matlab -nodisplay -r "Bayesian_Optimize_LiX_Parameters(''##TASKNAME##.inp'')" >> ##TASKNAME##.log';
+calc_cmd = 'matlab -nodisplay -r "Bayesian_Optimize_LiX_Parameters(''##TASKNAME##.inp'')"';
 clean_cmd =  'matlab -r "cleanup_BO_log(''##TASKNAME##.log'')"';
 
 % Loop through all models and build their submission file
@@ -989,6 +990,7 @@ for idx = 1:length(Models)
     % Generate and move to the submission directory
     submit_dir = fullfile(project,'Model_Building',Model.Salt,Model_Name_abrv);
     Batch_Template = strrep(Batch_Template,'##DIRECTORY##',submit_dir);
+    Model.Diary_Loc = fullfile(submit_dir,[Model_Name '.log']);
     if ~exist(submit_dir, 'dir')
        mkdir(submit_dir)
     end

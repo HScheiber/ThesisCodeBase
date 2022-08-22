@@ -20,12 +20,14 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     Intermediate_BO_backup = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat.PREV');
     Intermediate_Secondary_file = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat');
     Intermediate_Seconary_backup = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat.PREV');
+    if isfield(Model,'Diary_Loc') && ~isempty(Model.Diary_Loc)
+        diary(Model.Diary_Loc)
+    end
     
     % Initialize some global settings for later
     [Model.Metal,Model.Halide] = Separate_Metal_Halide(Model.Salt);
     Model.Longest_Cutoff = max([Model.MDP.RList_Cutoff Model.MDP.RCoulomb_Cutoff Model.MDP.RVDW_Cutoff]);
     [~,Model.gmx,Model.gmx_loc,Model.mdrun_opts] = MD_Batch_Template(Model.JobSettings);
-    
     
     Finite_T_Calc = any([Model.Loss_Options.Fusion_Enthalpy Model.Loss_Options.MP_Volume_Change Model.Loss_Options.Liquid_MP_Volume ...
         Model.Loss_Options.Solid_MP_Volume Model.Loss_Options.Liquid_DM_MP Model.Loss_Options.MP ] > sqrt(eps));
@@ -836,8 +838,9 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
     Model.Delete_Equil = false; % save the final MP calculation directories
     Model.Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+    Model.Verbose = true;
     [loss,~,UserData] = LiX_Minimizer(Model,full_opt_point,...
-        'Verbose',true,'Extra_Properties',true,'Therm_Prop_Override',true);
+        'Extra_Properties',true,'Therm_Prop_Override',true);
     
     if Model.SigmaEpsilon && Model.Additivity && strcmp(Model.Theory,'JC')        
         % Sigma scaling
@@ -1272,5 +1275,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     % Save final results
     save(Full_opt_filename,'full_opt_results','loss','full_opt_point',...
         'Minimization_Data','Finite_T_Data','Pars','Calculation_properties');
+    diary off
     
 end

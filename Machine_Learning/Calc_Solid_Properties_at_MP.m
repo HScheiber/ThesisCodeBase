@@ -1,11 +1,9 @@
 function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     p = inputParser;
     p.FunctionName = 'Calc_Solid_Properties_at_MP';
-    addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
     addOptional(p,'Skip_Cell_Construction',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
     
     parse(p,varargin{:});
-    Verbose = p.Results.Verbose;
     Settings.Skip_Cell_Construction =  p.Results.Skip_Cell_Construction;
 	Inp_Settings = Settings;
     
@@ -17,8 +15,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         mkdir(Settings.WorkDir)
     end
     save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
+    diary off
+    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
     
-    if Verbose
+    if Settings.Verbose
         disp('*** Separate Equilibration of Solid Selected ***')
     end
     
@@ -403,13 +403,13 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     end
 
     % Run solid Equilibration
-    if Verbose
+    if Settings.Verbose
         disp(['Beginning Solid Equilibration for ' num2str(Settings.Solid_Test_Time) ' ps...'] )
     end
     mintimer = tic;
     [state,~] = system(mdrun_command);
     if state == 0
-        if Verbose
+        if Settings.Verbose
             disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
@@ -424,7 +424,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         Settings = Inp_Settings;
         Settings.SuperCellFile = SuperCellFile;
         Settings.WorkDir = WorkDir;
-        Settings.Verbose = Verbose;
 %         if ~isfield(Settings,'QECompressibility_init')
 %             Settings.QECompressibility_init = Settings.QECompressibility;
 %         end
@@ -433,39 +432,43 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
 %         end
         
 %         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-%             if Verbose
+%             if Settings.Verbose
 %                 disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
 %             end
 %             Settings.QECompressibility = Settings.QECompressibility/2;
-%             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
+%             Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
 %             return
 %         elseif ~Settings.MinComplete
-%             if Verbose
+%             if Settings.Verbose
 %                 disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
 %                 disp('Running Pre-Minimization of Solid.')
 %             end
 %             Minimize_Solid(Settings);
 %             Settings.QECompressibility = Settings.QECompressibility_init;
 %             Settings.MinComplete = true;
-%             Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
+%             Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
 %             return
         if Settings.MDP.dt > 1e-4
-            if Verbose
+            if Settings.Verbose
                 disp('Solid Equilibration failed. Reducing time step.')
             end
             %Settings.QECompressibility = Settings.QECompressibility_init;
             Settings.MDP.dt = Settings.MDP.dt/2;
             Settings.Output_Coords = Settings.Output_Coords*2;
-            Output = Calc_Solid_Properties_at_MP(Settings,'Verbose',Verbose,'Skip_Cell_Construction',true);
+            Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
             return
         else
-            if Verbose
+            if Settings.Verbose
                 disp('Solid equilibration failed.')
                 disp('Solid may be completely unstable!')
                 disp(['WorkDir: ' WorkDir])
             end
             Output.Solid_V_MP = nan;
             Output.Solid_H_MP = nan;
+            diary off
+            if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+                diary(Settings.Diary_Loc)
+            end
             return
         end
     end
@@ -484,7 +487,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     Sol_Fraction = PyOut{4};
     
     if Sol_Fraction < 0.85
-        if Verbose
+        if Settings.Verbose
             disp('Detected Solid Phase change at Experimental MP')
         end
         if Settings.Delete_Equil
@@ -496,6 +499,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         end
         Output.Solid_V_MP = nan;
         Output.Solid_H_MP = nan;
+        diary off
+        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+            diary(Settings.Diary_Loc)
+        end
         return
     end
     
@@ -523,8 +530,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     
     [err,~] = system(gmx_command);
     if err ~= 0
-        warndlg('Failed to collect data.')
-        return
+        error('Failed to collect energy data.')
     end
     
     Data = import_xvg(En_xvg_file); % Gather X,Y,Z lengths
@@ -536,7 +542,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
 %     plot(Data(:,1),Data(:,3)./nmol_solid)
 %     V = mean((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
 %     stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
-    if Verbose
+    if Settings.Verbose
         disp('*** Separate Equilibration of Solid Complete ***')
     end
     
@@ -546,5 +552,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         catch
             disp(['Unable to remove directory: ' Settings.WorkDir])
         end
+    end
+    diary off
+    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+        diary(Settings.Diary_Loc)
     end
 end

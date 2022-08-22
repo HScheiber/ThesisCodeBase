@@ -1,4 +1,4 @@
-function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
+function Output = Calc_Liquid_Properties_at_MP(Settings)
 
     %% What this function does:
     % Initialize density based on experiment
@@ -10,13 +10,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     % Calculate average density of equilibrated box based on last 25% of simulation
     % Give new density as output
     
-    % Optional inputs
-    p = inputParser;
-    p.FunctionName = 'Calc_Liquid_Properties_at_MP';
-    addOptional(p,'Verbose',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
-
-    parse(p,varargin{:});
-    Verbose = p.Results.Verbose;
     Inp_Settings = Settings;
     
     if ~isfield(Settings,'WorkDir')
@@ -27,6 +20,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         mkdir(Settings.WorkDir)
     end
     save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
+    diary off
+    diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
 
     % Grab reference density, cutoff, and corresponding box size
     L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer; % nm, the box dimension
@@ -66,7 +61,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     Ref_X = fullfile(Settings.home,'templates','GRO_Templates',[Settings.Halide '_Box.gro']);
 
     % Add metal
-    if Verbose
+    if Settings.Verbose
         disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Metal ' ions to liquid box...'])
     end
     mtimer = tic;
@@ -79,13 +74,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         disp(output);
         error(['Error adding ' Settings.Metal ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    if Verbose
+    if Settings.Verbose
         disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
     end
 
     % Add Halide
     Prep_Liq_Random_Liq = fullfile(Settings.WorkDir,['Prep_Liq_Random_Liq.' Settings.CoordType]);
-    if Verbose
+    if Settings.Verbose
         disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
     end
     htimer = tic;
@@ -98,7 +93,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         disp(output);
         error(['Error adding ' Settings.Halide ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    if Verbose
+    if Settings.Verbose
         disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
     end
 
@@ -302,13 +297,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     end
 
     % Liquid Minimization
-    if Verbose
+    if Settings.Verbose
         disp('Begining Liquid Minimization...')
     end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
     if state == 0
-        if Verbose
+        if Settings.Verbose
             disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
@@ -521,14 +516,14 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
     elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
-        if Verbose
+        if Settings.Verbose
             disp('Warning: enabling long-range dispersion correction for tabulated potential!')
         end
         MDP_Template = [MDP_Template newline newline ...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
     elseif Settings.MDP.Disp_Correction
-        if Verbose
+        if Settings.Verbose
             disp('Disabling long-range dispersion correction as this is not compatible with tables as implemented here.')
         end
     end
@@ -631,13 +626,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     end
 
     % Run Liquid Equilibration
-    if Verbose
+    if Settings.Verbose
         disp(['(1/2) Begining Liquid Equilibration for ' num2str(Settings.Liquid_Equilibrate_Time) ' ps...'] )
     end
     mintimer = tic;
     [state,~] = system(mdrun_command);
     if state == 0
-        if Verbose
+        if Settings.Verbose
             disp(['(1/2) Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
@@ -650,28 +645,27 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         WorkDir = Settings.WorkDir;
         Settings = Inp_Settings;
         Settings.WorkDir = WorkDir;
-        Settings.Verbose = Verbose;
 %         if ~isfield(Settings,'QECompressibility_init')
 %             Settings.QECompressibility_init = Settings.QECompressibility;
 %         end
 %         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-%             if Verbose
+%             if Settings.Verbose
 %                 disp('Liquid Equilibration failed. Retrying with stiffer compressibility.')
 %             end
 %             Settings.QECompressibility = Settings.QECompressibility/2;
-%             Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
+%             Output = Calc_Liquid_Properties_at_MP(Settings);
 %             return
         if Settings.MDP.dt > 1e-4
-            if Verbose
+            if Settings.Verbose
                 disp('Liquid Equilibration failed. Reducing time step.')
             end
             %Settings.QECompressibility = Settings.QECompressibility_init;
             Settings.MDP.dt = Settings.MDP.dt/2;
             Settings.Output_Coords = Settings.Output_Coords*2;
-            Output = Calc_Liquid_Properties_at_MP(Settings,'Verbose',Verbose);
+            Output = Calc_Liquid_Properties_at_MP(Settings);
             return
         else
-            if Verbose
+            if Settings.Verbose
                 disp('Liquid equilibration failed.')
                 disp('Model may be completely unstable!')
                 disp(['WorkDir: ' WorkDir])
@@ -679,6 +673,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
             Output.Liquid_V_MP = nan;
             Output.Liquid_H_MP = nan;
             Output.Liquid_DM_MP = nan;
+            diary off
+            if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+                diary(Settings.Diary_Loc)
+            end
             return
         end
     end
@@ -703,7 +701,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     Liq_Fraction = PyOut{4};
     
     if Liq_Fraction < 0.85
-        if Verbose
+        if Settings.Verbose
             disp('Detected Liquid Freezing at Experimental MP')
         end
         if Settings.Delete_Equil
@@ -716,6 +714,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
+        diary off
+        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+            diary(Settings.Diary_Loc)
+        end
         return
     end
     
@@ -788,22 +790,26 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     end
 
     % Run Liquid Equilibration
-    if Verbose
+    if Settings.Verbose
         disp(['(2/2) Running liquid with realistic dynamics for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
     end
     mintimer = tic;
     [state,~] = system(mdrun_command);
     if state == 0
-        if Verbose
+        if Settings.Verbose
             disp(['(2/2) Liquid dynamics simulation complete. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        if Verbose
+        if Settings.Verbose
             disp(['(2/2) Liquid Dynamics Failed! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
+        diary off
+        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+            diary(Settings.Diary_Loc)
+        end
         return
     end
     
@@ -821,7 +827,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     Liq_Fraction = PyOut{4};
     
     if Liq_Fraction < 0.85
-        if Verbose
+        if Settings.Verbose
             disp('Detected Liquid Freezing at Experimental MP')
         end
         if Settings.Delete_Equil
@@ -834,6 +840,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
+        diary off
+        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+            diary(Settings.Diary_Loc)
+        end
         return
     end
     
@@ -882,7 +892,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
 
     if Settings.CheckAmorphousLiquid && Output.Liquid_DM_MP <= Settings.Finite_T_Data.Exp_DM_MP/100
-        if Verbose
+        if Settings.Verbose
             disp('Detected liquid has hardened to amorphous solid.')
         end
         if Settings.Delete_Equil
@@ -894,13 +904,17 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         end
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
+        diary off
+        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+            diary(Settings.Diary_Loc)
+        end
         return
     end
     
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)
     % V = mean((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
     % stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_liquid) % A^3/molecule
-    if Verbose
+    if Settings.Verbose
         disp('*** Separate Equilibration of Liquid Complete ***')
     end
     if Settings.Delete_Equil
@@ -909,6 +923,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         catch
             disp(['Unable to remove directory: ' Settings.WorkDir])
         end
+    end
+    diary off
+    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+        diary(Settings.Diary_Loc)
     end
 
 end
