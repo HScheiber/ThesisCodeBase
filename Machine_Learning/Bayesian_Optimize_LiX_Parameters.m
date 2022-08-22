@@ -96,6 +96,10 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         if Model.Loss_Options.Solid_MP_Volume > tol
             disp(['Solid Volume at Experimental MP - Weight: ' num2str(Model.Loss_Options.Solid_MP_Volume)])
         end
+        if Model.Loss_Options.Liquid_DM_MP > tol
+            disp([Model.Metal ' Diffusion Constant at Experimental MP - Weight: ' num2str(Model.Loss_Options.Liquid_DM_MP)])
+        end
+        
         if Model.Loss_Options.MP > tol
             disp(['Melting Point - Weight: ' num2str(Model.Loss_Options.MP)])
         end

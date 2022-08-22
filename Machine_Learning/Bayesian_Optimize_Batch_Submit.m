@@ -162,7 +162,7 @@ switch lower(computer)
         
         %% Shared_Settings
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
-        Shared_Settings.Max_Bayesian_Iterations = 500;
+        Shared_Settings.Max_Bayesian_Iterations = 400;
         Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
@@ -174,7 +174,7 @@ switch lower(computer)
         Shared_Settings.Liquid_Equilibrate_Time = 25; % ps
         Shared_Settings.Solid_Test_Time = 30; % ps
         
-        %% BH Models JH, JI, JJ, JK
+        %% BH Models JI
         Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
@@ -198,21 +198,6 @@ switch lower(computer)
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
 
-                    %% Model BH: JH
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JH' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.MP  = 1;
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
-                    
                     %% Model BH: JI
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
@@ -228,62 +213,10 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-
-                    %% Model BH: JJ
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JJ' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.MP  = 2;
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
-
-                    %% Model BH: JK
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JK' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.MP  = 2;
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = false;
-                    Models(idx).Additivity = true;
-
-                    %% Model BH: JL
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JL' Rep];
-                    
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.MP  = 2;
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = false;
-
                 end
             end
         end
-        %% JC Models JH, JI, JJ, JK
+        %% JC Models JI
         Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
         Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
@@ -307,22 +240,6 @@ switch lower(computer)
 
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
-
-                    %% Model JC: JH
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JH' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.MP  = 1;
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = false;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
-
                     %% Model JC: JI
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
@@ -338,62 +255,9 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-
-                    %% Model JC: JJ
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JJ' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.MP  = 2;
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = false;
-                    Models(idx).Fix_Charge = false;
-                    Models(idx).Additivity = true;
-                    
-                    %% Model JC: JK
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JK' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.MP  = 2;
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = false;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = false;
-                    
-                    %% Model JC: JL
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['JL' Rep];
-                    
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.MP  = 2;
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = false;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = false;
                 end
             end
         end
-        
         %% Shared_Settings
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
         Shared_Settings.Max_Bayesian_Iterations = 800;
