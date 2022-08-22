@@ -343,31 +343,9 @@ function varargout = Melting_Point_Check(T,Settings)
             [errcode,outp] = system(mdrun_command);
             if errcode ~= 0
                 if Settings.Verbose
-                    disp(outp);
-                end
-                if T > 1700
-                    f = -1;
-                    df = 0;
-                    T_dat.Alt_Structure = true;
-                    T_dat.T = T;
-                    T_dat.T_Trace = [T_dat.T_Trace T];
-                    T_dat.f_Trace = [T_dat.f_Trace f];
-                    T_dat.df_Trace = [T_dat.df_Trace df];
-                    T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
-                    T_dat.Melt_Trace = [T_dat.Melt_Trace false];
-                    copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-                    save(Settings.CurrentTFile,'T_dat')
-                    varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-                    varargout{1} = -1; % function evaluation
-                    varargout{2} = 0; % function derivative
-                    varargout{3} = T_dat; % user data
-                    if Settings.Verbose
-                        disp('Detected system blow up! This potential may be unusable')
-                        disp('Aborting Melting Point calculation.')
-                    end
-                    return
-                else
-                    error(['Error running mdrun. Problem command: ' newline mdrun_command]);
+                    disp(['MD simulation segment ' cpt_number{1} '/' max_steps ...
+                        ' (' num2str(str2double(cpt_number{1})*CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
+                        ' ps) failed to complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
                 end
             elseif ~isfile(windows2unix(Structure_Out_File))
                 if Settings.Verbose
@@ -375,7 +353,7 @@ function varargout = Melting_Point_Check(T,Settings)
                 end
                 exit
             end
-            if Settings.Verbose
+            if Settings.Verbose && errcode == 0
                 disp(['MD simulation segment ' cpt_number{1} '/' max_steps ...
                     ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
                     ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
@@ -386,22 +364,30 @@ function varargout = Melting_Point_Check(T,Settings)
             disp('Checking melting/freezing status...')
         end
         CheckStructureTimer = tic;
-        PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
-            pyargs('SystemName',Settings.JobName,...
-            'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
-            'RefChangeThreshold',Settings.MeltFreezeThreshold,...
-            'FileType',Settings.CoordType,...
-            'ML_TimeLength',0,...
-            'ML_TimeStep',0,...
-            'T_Ref',T_dat.T_ref,...
-            'Verbose',Settings.Verbose));
-        Froze = logical(PyOut{1});
-        Melted = logical(PyOut{2});
-        Froze_alt = logical(PyOut{6});
+        try
+            PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
+                pyargs('SystemName',Settings.JobName,...
+                'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
+                'RefChangeThreshold',Settings.MeltFreezeThreshold,...
+                'FileType',Settings.CoordType,...
+                'ML_TimeLength',0,...
+                'ML_TimeStep',0,...
+                'T_Ref',T_dat.T_ref,...
+                'Verbose',Settings.Verbose));
+            Froze = logical(PyOut{1});
+            Melted = logical(PyOut{2});
+            Froze_alt = logical(PyOut{6});
+            IsNotComplete = ~Froze && ~Melted;
+            ext_idx = str2double(cpt_number{1}) + 1; % increment step
+        catch
+            IsNotComplete = true;
+            Froze_alt = false;
+        end
         
-        IsNotComplete = ~Froze && ~Melted;
-        
-        ext_idx = str2double(cpt_number{1}) + 1; % increment step
+        if IsNotComplete && ~Froze_alt && errcode ~= 0
+            disp(outp);
+            error(['mdrun error and simulation result inconclusive. Problem command: ' newline mdrun_command]);
+        end
         
     else % No checkpoint file found
         
@@ -499,57 +485,91 @@ function varargout = Melting_Point_Check(T,Settings)
                 varargout = Melting_Point_Check(T,Settings);
                 return
             else
-                f = -1;
-                df = 0;
-                T_dat.Alt_Structure = true;
-                T_dat.T = T;
-                T_dat.T_Trace = [T_dat.T_Trace T];
-                T_dat.f_Trace = [T_dat.f_Trace f];
-                T_dat.df_Trace = [T_dat.df_Trace df];
-                T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
-                T_dat.Melt_Trace = [T_dat.Melt_Trace false];
-                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-                save(Settings.CurrentTFile,'T_dat')
-                varargout = cell(1,3); % Outputs function, coupled constraints, and user data
-                varargout{1} = -1; % function evaluation
-                varargout{2} = 0; % function derivative
-                varargout{3} = T_dat; % user data
                 if Settings.Verbose
-                    disp('Possible system blow up. This potential may be unusable!')
-                    disp('Aborting Melting Point calculation.')
+                    disp(['MD simulation segment 001/' max_steps ...
+                        ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
+                        ' ps) failed to complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
                 end
-                return
+
+                % Check the final frame of the simulation chunk
+                if Settings.Verbose
+                    disp('Checking melting/freezing status...')
+                end
+                try
+                    PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
+                        pyargs('SystemName',Settings.JobName,...
+                        'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
+                        'RefChangeThreshold',Settings.MeltFreezeThreshold,...
+                        'FileType',Settings.CoordType,...
+                        'ML_TimeLength',0,...
+                        'ML_TimeStep',0,...
+                        'T_Ref',T_dat.T_ref,...
+                        'Verbose',Settings.Verbose));
+                    Froze = logical(PyOut{1});
+                    Melted = logical(PyOut{2});
+                    Froze_alt = logical(PyOut{6});
+                    IsNotComplete = ~Froze && ~Melted;
+                catch
+                    IsNotComplete = true;
+                    Froze_alt = false;
+                end
+                
+                if IsNotComplete && ~Froze_alt
+                    f = -1;
+                    df = 0;
+                    T_dat.Alt_Structure = true;
+                    T_dat.T = T;
+                    T_dat.T_Trace = [T_dat.T_Trace T];
+                    T_dat.f_Trace = [T_dat.f_Trace f];
+                    T_dat.df_Trace = [T_dat.df_Trace df];
+                    T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                    T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                    copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                    save(Settings.CurrentTFile,'T_dat')
+                    varargout = cell(1,3); % Outputs function, coupled constraints, and user data
+                    varargout{1} = -1; % function evaluation
+                    varargout{2} = 0; % function derivative
+                    varargout{3} = T_dat; % user data
+                    if Settings.Verbose
+                        disp('Possible system blow up. This potential may be unusable!')
+                        disp('Aborting Melting Point calculation.')
+                    end
+                    return
+                end
             end
         elseif ~isfile(windows2unix(Structure_Out_File))
             if Settings.Verbose
                 disp('Calculation time is almost up, ending MATLAB session now.')
             end
             exit
-        end
-        if Settings.Verbose
-            disp(['MD simulation segment 001/' max_steps ...
-                ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
-                ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
-        end
+        else
+            if Settings.Verbose
+                disp(['MD simulation segment 001/' max_steps ...
+                    ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
+                    ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+            end
 
-        % Check the final frame of the simulation chunk
-        disp('Checking melting/freezing status...')
-        CheckStructureTimer = tic;
-        PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
-            pyargs('SystemName',Settings.JobName,...
-            'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
-            'RefChangeThreshold',Settings.MeltFreezeThreshold,...
-            'FileType',Settings.CoordType,...
-            'ML_TimeLength',0,...
-            'ML_TimeStep',0,...
-            'T_Ref',T_dat.T_ref,...
-            'Verbose',Settings.Verbose));
-        Froze = logical(PyOut{1});
-        Melted = logical(PyOut{2});
-        Froze_alt = logical(PyOut{6});
-        
-        IsNotComplete = ~Froze && ~Melted;
-        ext_idx = 2;
+            % Check the final frame of the simulation chunk
+            if Settings.Verbose
+                disp('Checking melting/freezing status...')
+            end
+            CheckStructureTimer = tic;
+            PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
+                pyargs('SystemName',Settings.JobName,...
+                'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
+                'RefChangeThreshold',Settings.MeltFreezeThreshold,...
+                'FileType',Settings.CoordType,...
+                'ML_TimeLength',0,...
+                'ML_TimeStep',0,...
+                'T_Ref',T_dat.T_ref,...
+                'Verbose',Settings.Verbose));
+            Froze = logical(PyOut{1});
+            Melted = logical(PyOut{2});
+            Froze_alt = logical(PyOut{6});
+
+            IsNotComplete = ~Froze && ~Melted;
+            ext_idx = 2;
+        end
     end
     
     while IsNotComplete && ~Froze_alt && (CheckTime*ext_idx <= Settings.MaxCheckTime) 
@@ -618,18 +638,30 @@ function varargout = Melting_Point_Check(T,Settings)
             disp('Checking melting/freezing status...')
         end
         CheckStructureTimer = tic;
-        PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
-            pyargs('SystemName',Settings.JobName,...
-            'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
-            'RefChangeThreshold',Settings.MeltFreezeThreshold,...
-            'FileType',Settings.CoordType,...
-            'ML_TimeLength',0,...
-            'ML_TimeStep',0,...
-            'T_Ref',T_dat.T_ref,...
-            'Verbose',Settings.Verbose));
-        Froze = logical(PyOut{1});
-        Melted = logical(PyOut{2});
-        Froze_alt = logical(PyOut{6});
+        try
+            PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
+                pyargs('SystemName',Settings.JobName,...
+                'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
+                'RefChangeThreshold',Settings.MeltFreezeThreshold,...
+                'FileType',Settings.CoordType,...
+                'ML_TimeLength',0,...
+                'ML_TimeStep',0,...
+                'T_Ref',T_dat.T_ref,...
+                'Verbose',Settings.Verbose));
+            Froze = logical(PyOut{1});
+            Melted = logical(PyOut{2});
+            Froze_alt = logical(PyOut{6});
+            
+            % Update and increment
+            IsNotComplete = ~Froze && ~Melted;
+            CheckPoint_File = Checkpoint_File_idx;
+            Structure_Out_File = Structure_Out_File_idx;
+            Traj_Conf_File = Traj_Conf_File_idx;
+            ext_idx = ext_idx+1;
+        catch
+            IsNotComplete = true;
+            Froze_alt = false;
+        end
         
 %         % Delete previous cpt and tpr files
 %         if Settings.Delete_Backups
@@ -638,16 +670,9 @@ function varargout = Melting_Point_Check(T,Settings)
 %             delete(Structure_Out_File)
 %         end
         
-        % Update and increment
-        IsNotComplete = ~Froze && ~Melted;
-        CheckPoint_File = Checkpoint_File_idx;
-        Structure_Out_File = Structure_Out_File_idx;
-        Traj_Conf_File = Traj_Conf_File_idx;
-        ext_idx = ext_idx+1;
-        
         if IsNotComplete && ~Froze_alt && errcode ~= 0
             disp(outp);
-            error(['mdrun error but simulation result still inconclusive. Problem command: ' newline mdrun_command]);
+            error(['mdrun error and simulation result still inconclusive. Problem command: ' newline mdrun_command]);
         end
     end
 
