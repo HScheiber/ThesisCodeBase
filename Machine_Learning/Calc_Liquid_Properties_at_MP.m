@@ -801,7 +801,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
         if Verbose
             disp(['(2/2) Liquid Dynamics Failed! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
+        Output.Liquid_V_MP = nan;
+        Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
+        return
     end
     
     % Check to ensure system remained liquid
@@ -877,7 +880,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings,varargin)
     outp = fileread(MSD_Log_File);
     Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
     Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
-    
+
     if Settings.CheckAmorphousLiquid && Output.Liquid_DM_MP <= Settings.Finite_T_Data.Exp_DM_MP/100
         if Verbose
             disp('Detected liquid has hardened to amorphous solid.')
