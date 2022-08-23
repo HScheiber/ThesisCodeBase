@@ -163,6 +163,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
     else
         try % Clean up
             [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
         catch me
             disp(me.message)
         end
@@ -195,6 +196,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
             Output.Aborted = true;
             TDir = fullfile(strrep(Settings.WorkDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
             [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
             copyfile(WorkDir,TDir)
             try
                 if Settings.Delete_Equil
@@ -235,6 +237,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
         Output.Aborted = true;
         TDir = fullfile(strrep(Settings.WorkDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
         [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+        [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
         copyfile(WorkDir,TDir)
         try
             if Settings.Delete_Equil

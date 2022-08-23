@@ -569,6 +569,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                 Output.Aborted = true;
                 TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+                [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
                 copyfile(Settings.WorkDir,TDir)
                 return
             end
@@ -592,6 +593,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                 Output.Aborted = true;
                 TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+                [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
                 copyfile(Settings.WorkDir,TDir);
                 try
                     if Settings.Delete_Equil
@@ -635,6 +637,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                     Output.Aborted = true;
                     TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
                     [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+                    [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
                     copyfile(Settings.WorkDir,TDir)
                     return
                 end

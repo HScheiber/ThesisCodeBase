@@ -17,6 +17,9 @@ end
 if ~isfield(Settings,'gmx')
     [Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
 end
+if ~isfield(Settings,'OuterDir')
+    Settings.OuterDir = WorkDir;
+end
 
 Settings.mdrun_opts = regexprep(Settings.mdrun_opts,' -maxh [0-9]+','','once');
 Settings.CurrentTFile = fullfile(Settings.WorkDir,[Settings.JobName '_MP.mat']);

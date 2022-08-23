@@ -109,6 +109,7 @@ if state == 0
 else
     try % Clean up
         [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+        [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
     catch me
         if Settings.Verbose
             disp(me.message)
