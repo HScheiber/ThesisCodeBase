@@ -341,6 +341,21 @@ function Output = Equilibrate_Solid(Settings,varargin)
         fclose(fid);
     end
     
+    
+    Data = load_gro_file(Settings.SuperCellFile);
+    LatticeLength = min([Settings.Geometry.Skew_a*norm(Data.a_vec) ...
+                        Settings.Geometry.Skew_b*norm(Data.b_vec) ...
+                        Settings.Geometry.Skew_c*norm(Data.c_vec)]);
+    if LatticeLength/2 <= Settings.Longest_Cutoff*1.10
+        if Settings.Verbose
+            disp('Equilibrated solid has shrunk too far, expanding.')
+        end
+        Settings = Inp_Settings;
+        Settings.Cutoff_Buffer = Settings.Cutoff_Buffer*1.25;
+        Output = Equilibrate_Solid(Settings,'Skip_Cell_Construction',false);
+        return
+    end
+    
     try
         if Settings.Delete_Equil
             rmdir(WorkDir,'s')
