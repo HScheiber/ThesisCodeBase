@@ -1,4 +1,7 @@
 function cleanup_BO_log(logfile)
+if ~isfile(logfile)
+    return
+end
 
 logtxt = fileread(logfile);
 
