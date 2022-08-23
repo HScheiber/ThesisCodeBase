@@ -134,7 +134,7 @@ else
         Settings.MDP.dt = Settings.MDP.dt/2;
         Settings.Output_Coords = Settings.Output_Coords*2;
         save(fullfile(Directory,'TempJobInfo.mat'),'Settings');
-        Output = MD_PreEquilibrate(Settings);
+        Output = MD_PreEquilibrate(Directory);
         return
 	else
         if Settings.Verbose
