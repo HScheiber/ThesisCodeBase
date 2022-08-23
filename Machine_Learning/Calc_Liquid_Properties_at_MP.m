@@ -19,6 +19,9 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
+    if ~isfield(Settings,'CheckAmorphousHalide')
+        Settings.CheckAmorphousHalide = false; % default
+    end
     save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
@@ -673,6 +676,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             Output.Liquid_V_MP = nan;
             Output.Liquid_H_MP = nan;
             Output.Liquid_DM_MP = nan;
+            Output.Liquid_DX_MP = nan;
             diary off
             if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
                 diary(Settings.Diary_Loc)
@@ -714,6 +718,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
+        Output.Liquid_DX_MP = nan;
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -812,6 +817,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
+        Output.Liquid_DX_MP = nan;
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -846,6 +852,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
+        Output.Liquid_DX_MP = nan;
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -915,6 +922,40 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             diary(Settings.Diary_Loc)
         end
         return
+    end
+    
+    if Settings.CheckAmorphousLiquid && Settings.CheckAmorphousHalide
+        MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.xvg');
+        MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.log');
+        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
+            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
+            ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+        [~,~] = system(msd_command);
+        outp = fileread(MSD_Log_File);
+        Diff_txt = regexp(outp,['D\[ *' Settings.Halide '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+        Output.Liquid_DX_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+        
+        if Output.Liquid_DX_MP <= Settings.AmorphousDiffThreshold
+            if Settings.Verbose
+                disp('Detected halide in liquid is amorphous.')
+            end
+            if Settings.Delete_Equil
+                try
+                    rmdir(Settings.WorkDir,'s')
+                catch
+                    disp(['Unable to remove directory: ' Settings.WorkDir])
+                end
+            end
+            Output.Liquid_V_MP = nan;
+            Output.Liquid_H_MP = nan;
+            diary off
+            if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+                diary(Settings.Diary_Loc)
+            end
+            return
+        end
+    else
+        Output.Liquid_DX_MP = nan;
     end
     
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)

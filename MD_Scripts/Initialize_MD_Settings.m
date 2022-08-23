@@ -234,6 +234,7 @@ Settings.MinInterfaceWidth = 0.075; % [nm] +- distance from the solid-liquid int
 Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing
 Settings.QECompressibility = 1e-6; % Compressibility used during the rapid-equilibration stages
 Settings.CheckAmorphousLiquid = true; % When true, this enables a check for liquid -> amorphous based on the mean-squared displacement
+Settings.CheckAmorphousHalide = false; % (specific to non-MP liquid calc) When false, only check the metal diffusion, when true: check both metal and halide diffusion
 Settings.AmorphousDiffThreshold = 1e-6; % [cm^2/s] When CheckAmorphousLiquid is true, this sets the threshold for amorphous vs liquid
 
 % optimizer settings

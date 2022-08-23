@@ -7,9 +7,9 @@
 % Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
-Theory = 'JC';
+Theory = 'BH';
 Basenum = 'J';
-Midnum = 'F';
+Midnum = 'G';
 savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
 
@@ -539,7 +539,7 @@ Titles = {['Minimized Objective Function' spec_ther] ...
     'Error in $V$: $\left( V - V^{*} \right) / \left| V^{*} \right|$'};
 
 MP_Titles = {'MP Er.' '$\Delta H_{\mathrm{Fus.}}$ Er.' '$\Delta V_{\mathrm{Fus.}}$ Er.' ...
-    '$V_{\mathrm{Liq.}}$(MP) Er.' '$V_{\mathrm{Sol.}}$(MP) Er.' 'D$_{\mathrm{Li}}$($T_{m}$) Er.'};
+    '$V_{\mathrm{Liq.}}$($T_{m}$) Er.' '$V_{\mathrm{Sol.}}$($T_{m}$) Er.' 'D$_{\mathrm{Li}}$($T_{m}$) Er.'};
 if show_as_percent_error
     ylabs = {'Loss' ...
         '' ...

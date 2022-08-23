@@ -128,6 +128,7 @@ Shared_Settings.InitialMeshSize = 20;
 Shared_Settings.MeshSizeMultiplier = 5;
 Shared_Settings.QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
 Shared_Settings.ScaleInitialLiqDensity = 0.8;
+Shared_Settings.CheckAmorphousHalide = false;
 
 % Barostat Options
 Shared_Settings.Isotropy = 'semiisotropic';
@@ -412,7 +413,7 @@ switch lower(computer)
         Shared_Settings.Liquid_Test_Time = 100; % ps
         Shared_Settings.Liquid_Equilibrate_Time = 25; % ps
         Shared_Settings.Solid_Test_Time = 30; % ps
-        %% BH Models JN, JO
+        %% BH Models JN, JO, JP
         Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
@@ -476,11 +477,32 @@ switch lower(computer)
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
+                    %% Model BH: JP
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['JP' Rep];
                     
+                    Models(idx).CheckAmorphousHalide = true; % check to make sure halide ion is properly mobile in the liquid
+                    
+                    % Loss
+                    Models(idx).Loss_Options.Rocksalt.LE = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).SigmaEpsilon = true;
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
                 end
             end
         end
-        %% JC Models JN, JO
+        %% JC Models JN, JO, JP
         Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
         Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
@@ -544,6 +566,28 @@ switch lower(computer)
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = false;
+                    Models(idx).Additivity = true;
+                    %% Model JC: JP
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['JP' Rep];
+                    
+                    Models(idx).CheckAmorphousHalide = true; % check to make sure halide ion is properly mobile in the liquid
+                    
+                    % Loss
+                    Models(idx).Loss_Options.Rocksalt.LE = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).SigmaEpsilon = false;
+                    Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
                 end
             end
