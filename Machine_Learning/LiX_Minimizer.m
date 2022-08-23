@@ -1264,6 +1264,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
     Settings.Finite_T_Data.Liquid_DM_MP = Liq_Output.Liquid_DM_MP; % cm^2 / s
+    Settings.Finite_T_Data.Liquid_DX_MP = Liq_Output.Liquid_DX_MP;
     if Settings.Parallel_Bayesopt
         setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
         setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
