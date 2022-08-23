@@ -930,6 +930,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         end
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
+        Output.Liquid_DX_MP = nan;
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
