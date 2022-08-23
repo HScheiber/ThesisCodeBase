@@ -136,11 +136,15 @@ Fusion_dV = nan(N_Salts,N_Models);
 Liquid_V_MP = nan(N_Salts,N_Models);
 Solid_V_MP = nan(N_Salts,N_Models);
 MP = nan(N_Salts,N_Models);
+Liquid_DM_MP = nan(N_Salts,N_Models);
 Exp_Fusion_dH = nan(N_Salts,N_Models);
 Exp_Fusion_dV = nan(N_Salts,N_Models);
 Exp_Liquid_V_MP = nan(N_Salts,N_Models);
 Exp_Solid_V_MP = nan(N_Salts,N_Models);
 Exp_MP = nan(N_Salts,N_Models);
+Exp_DM_MP = nan(N_Salts,N_Models);
+
+
 
 % Plot color scheme
 Colours = cbrewer('qual','Set3',N_Salts);
@@ -290,6 +294,11 @@ for idx = 1:N_Salts
             warning(['No finite T data for ' Salt ' ' Theory ' Model ' Model])
         end
         
+        if ~isfield(Finite_T_Data,'Liquid_DM_MP')
+            Finite_T_Data.Liquid_DM_MP = nan;
+            Finite_T_Data.Exp_DM_MP = nan;
+        end
+        
         % Grab available structures from data
         Min_Dat_Structs = cell(1,length(Minimization_Data));
         for jdx = 1:length(Minimization_Data)
@@ -425,11 +434,13 @@ for idx = 1:N_Salts
             Liquid_V_MP(idx,iidx) = Finite_T_Data.Liquid_V_MP;
             Solid_V_MP(idx,iidx) = Finite_T_Data.Solid_V_MP;
             MP(idx,iidx) = Finite_T_Data.MP;
+            Liquid_DM_MP(idx,iidx) = Finite_T_Data.Liquid_DM_MP;
             Exp_Fusion_dH(idx,iidx) = Finite_T_Data.Exp_Fusion_dH;
             Exp_Fusion_dV(idx,iidx) = Finite_T_Data.Exp_Fusion_dV;
             Exp_Liquid_V_MP(idx,iidx) = Finite_T_Data.Exp_Liquid_V_MP;
             Exp_Solid_V_MP(idx,iidx) = Finite_T_Data.Exp_Solid_V_MP;
             Exp_MP(idx,iidx) = Finite_T_Data.Exp_MP;
+            Exp_DM_MP(idx,iidx) = Finite_T_Data.Exp_DM_MP;
         end
     end
 end
@@ -441,12 +452,14 @@ if show_as_percent_error && plot_finite_T_data
     Liquid_V_MP = (Liquid_V_MP - Exp_Liquid_V_MP)*100./abs(Exp_Liquid_V_MP);
     Solid_V_MP = (Solid_V_MP - Exp_Solid_V_MP)*100./abs(Exp_Solid_V_MP);
     MP = (MP - Exp_MP)*100./abs(Exp_MP);
+    Liquid_DM_MP = (Liquid_DM_MP - Exp_DM_MP)*100./abs(Exp_DM_MP);
 elseif plot_finite_T_data
     Fusion_dH = Fusion_dH - Exp_Fusion_dH;
     Fusion_dV = Fusion_dV - Exp_Fusion_dV;
     Liquid_V_MP = Liquid_V_MP - Exp_Liquid_V_MP;
     Solid_V_MP = Solid_V_MP - Exp_Solid_V_MP;
     MP = MP - Exp_MP;
+    Liquid_DM_MP = Liquid_DM_MP - Exp_DM_MP;
 end
 
 if BestOnly
@@ -464,6 +477,7 @@ if BestOnly
     Liquid_V_MP_base = zeros(size(Liquid_V_MP,1),1);
     Solid_V_MP_base = zeros(size(Solid_V_MP,1),1);
     MP_base = zeros(size(MP,1),1);
+    Liquid_DM_MP_base = zeros(size(Liquid_DM_MP,1),1);
     
     for idx = 1:N_Salts
         Energies_base(idx,:,:) = Energies(idx,min_idx(idx),:);
@@ -478,6 +492,7 @@ if BestOnly
         Liquid_V_MP_base(idx,:) = Liquid_V_MP(idx,min_idx(idx))
         Solid_V_MP_base(idx,:) = Solid_V_MP(idx,min_idx(idx))
         MP_base(idx,:) = MP(idx,min_idx(idx))
+        Liquid_DM_MP_base(idx,:) = Liquid_DM_MP(idx,min_idx(idx))
     end
     
     Energies = Energies_base;
@@ -492,17 +507,18 @@ if BestOnly
     Liquid_V_MP = Liquid_V_MP_base;
     Solid_V_MP = Solid_V_MP_base;
     MP = MP_base;
+    Liquid_DM_MP = Liquid_DM_MP_base;
     
     N_Models = 1;
 end
-Finite_T_Data = cat(3,MP,Fusion_dH,Fusion_dV,Liquid_V_MP,Solid_V_MP);
+Finite_T_Data = cat(3,MP,Fusion_dH,Fusion_dV,Liquid_V_MP,Solid_V_MP,Liquid_DM_MP);
 
 plot_switches = [plot_loss plot_finite_T_data plot_LE plot_RLE plot_a plot_c plot_ac plot_density plot_volume];
 N_compares = sum(plot_switches);
 all_y = {Total_loss, Finite_T_Data, Energies, Rel_Energies, LatPars_a, LatPars_c, LatPars_ca Densities Volumes};
 all_ylim = {[],[],LE_ylim, RLE_ylim, a_ylim, c_ylim, ca_ylim density_ylim volume_ylim};
 plot_types = {'loss' 'finite T' 'LE' 'RLE' 'a' 'c' 'ca' 'density' 'V'};
-finite_T_types = {'MP' 'Fusion_Enthalpy' 'MP_Volume_Change' 'Liquid_MP_Volume' 'Solid_MP_Volume'};
+finite_T_types = {'MP' 'Fusion_Enthalpy' 'MP_Volume_Change' 'Liquid_MP_Volume' 'Solid_MP_Volume' 'Liquid_DM_MP'};
 
 bar_x = 1:N_Structures;
 
@@ -522,7 +538,8 @@ Titles = {['Minimized Objective Function' spec_ther] ...
     'Error in $\rho$: $\left( \rho - \rho^{*} \right) / \left| \rho^{*} \right|$' ...
     'Error in $V$: $\left( V - V^{*} \right) / \left| V^{*} \right|$'};
 
-MP_Titles = {'MP Er.' '$\Delta H_{\mathrm{Fus.}}$ Er.' '$\Delta V_{\mathrm{Fus.}}$ Er.' '$V_{\mathrm{Liq.}}$(MP) Er.' '$V_{\mathrm{Sol.}}$(MP) Er.'};
+MP_Titles = {'MP Er.' '$\Delta H_{\mathrm{Fus.}}$ Er.' '$\Delta V_{\mathrm{Fus.}}$ Er.' ...
+    '$V_{\mathrm{Liq.}}$(MP) Er.' '$V_{\mathrm{Sol.}}$(MP) Er.' 'D$_{\mathrm{Li}}$($T_{m}$) Er.'};
 if show_as_percent_error
     ylabs = {'Loss' ...
         '' ...
@@ -533,7 +550,7 @@ if show_as_percent_error
         '[\%]' ...
         '[\%]' ...
         '[\%]'};
-    MP_ylabs = {'[\%]' '[\%]' '[\%]' '[\%]' '[\%]'};
+    MP_ylabs = {'[\%]' '[\%]' '[\%]' '[\%]' '[\%]' '[\%]'};
 else
     ylabs = {'Loss' ...
         '[kJ mol$^{-1}$], [$\AA^{3}$], [K]' ...
@@ -544,7 +561,7 @@ else
         '[$(c/a)$]' ...
         '[g cm$^{-3}$]' ...
         '[$\AA^{3}$ / formula unit]'};
-    MP_ylabs = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$\AA^{3}$]'};
+    MP_ylabs = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[cm$^{2}$s$^{-1}$]'};
 end
 
 % Create figure and axis

@@ -18,6 +18,7 @@ function Output = Create_Liquid_Solid_Interface(Settings)
     % This will update the SuperCell file
     if Settings.Equilibrate_Solid > 0
         Output = Equilibrate_Solid(Settings);
+        Settings.nmol_liquid = Output.nmol_liquid;
         if Output.Aborted
             return
         end

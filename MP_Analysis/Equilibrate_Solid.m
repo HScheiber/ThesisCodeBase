@@ -11,6 +11,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
     Output.LiquidFroze = false;
     Output.LiquidAmorphous = false;
     Output.Aborted = false;
+    Initial_Liq_nmol = Settings.nmol_liquid;
     
 	if Settings.Verbose
     	disp('*** Separate Equilibration of Solid Selected ***')
@@ -34,14 +35,19 @@ function Output = Equilibrate_Solid(Settings,varargin)
     
     % Calculate number of formula units
     nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
-    while nmol_solid < 500 % Enforce a minimum of 1000 atoms
-        La = La*1.1;
-        Lb = Lb*1.1;
-        Lc = Lc*1.1;
-        Na = ceil(La/(Settings.Geometry.a/10));
-        Nb = ceil(Lb/(Settings.Geometry.b/10));
-        Nc = ceil(Lc/(Settings.Geometry.c/10));
-        nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
+%     while nmol_solid < 500 % Enforce a minimum of 1000 atoms
+%         La = La*1.1;
+%         Lb = Lb*1.1;
+%         Lc = Lc*1.1;
+%         Na = ceil(La/(Settings.Geometry.a/10));
+%         Nb = ceil(Lb/(Settings.Geometry.b/10));
+%         Nc = ceil(Lc/(Settings.Geometry.c/10));
+%         nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
+%     end
+    Sol_fraction = 1 - Settings.Liquid_Fraction;
+    Output.nmol_liquid = 2*round((nmol_solid)*(1/Sol_fraction - 1));
+    if Settings.Verbose && Output.nmol_liquid ~= Initial_Liq_nmol
+        disp(['Expanding system to ' num2str(2*(nmol_solid + Output.nmol_liquid)) ' atoms'])
     end
         
     SuperCell_File = fullfile(WorkDir,['Equil_Sol.' Settings.CoordType]);
