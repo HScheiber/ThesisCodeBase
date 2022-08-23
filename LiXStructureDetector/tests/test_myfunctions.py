@@ -190,7 +190,7 @@ import LiXStructureDetector
 
 
 WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing'
-Salt = 'LiI'
+Salt = 'LiBr'
 SystemName = 'Test_MP'
 RefStructure='Rocksalt'
 SaveTrajectory=True

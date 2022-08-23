@@ -323,7 +323,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 mdrun_command = regexprep(mdrun_command,' -maxh ([0-9]|\.)+','','once');
             end
             
-            [errcode,outp] = system(mdrun_command);
+            [errcode,~] = system(mdrun_command);
             if errcode ~= 0
                 if Settings.Verbose
                     disp(['MD simulation segment ' cpt_number{1} '/' max_steps ...
@@ -367,8 +367,25 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         end
         
         if IsNotComplete && ~Froze_alt && errcode ~= 0
-            disp(outp);
-            error(['mdrun error and simulation result inconclusive. Problem command: ' newline mdrun_command]);
+            f = -1;
+            df = 0;
+            T_dat.Alt_Structure = true;
+            T_dat.T = T;
+            T_dat.T_Trace = [T_dat.T_Trace T];
+            T_dat.f_Trace = [T_dat.f_Trace f];
+            T_dat.df_Trace = [T_dat.df_Trace df];
+            T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+            T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+            copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+            save(Settings.CurrentTFile,'T_dat')
+            feval = -1; % function evaluation
+            fderiv = 0; % function derivative
+            User_data = T_dat; % user data
+            if Settings.Verbose
+                disp('Possible system blow up. This potential may be unusable!')
+                disp('Aborting Melting Point calculation.')
+            end
+            return
         end
         
     else % No checkpoint file found
@@ -593,7 +610,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             mdrun_command = regexprep(mdrun_command,' -maxh ([0-9]|\.)+','','once');
         end
         
-        [errcode,outp] = system(mdrun_command);
+        [errcode,~] = system(mdrun_command);
         if errcode ~= 0
             if Settings.Verbose
                 disp(['MD simulation segment ' num2str(ext_idx,'%03.f') '/' max_steps ...
@@ -649,8 +666,25 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
 %         end
         
         if IsNotComplete && ~Froze_alt && errcode ~= 0
-            disp(outp);
-            error(['mdrun error and simulation result still inconclusive. Problem command: ' newline mdrun_command]);
+            f = -1;
+            df = 0;
+            T_dat.Alt_Structure = true;
+            T_dat.T = T;
+            T_dat.T_Trace = [T_dat.T_Trace T];
+            T_dat.f_Trace = [T_dat.f_Trace f];
+            T_dat.df_Trace = [T_dat.df_Trace df];
+            T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+            T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+            copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+            save(Settings.CurrentTFile,'T_dat')
+            feval = -1; % function evaluation
+            fderiv = 0; % function derivative
+            User_data = T_dat; % user data
+            if Settings.Verbose
+                disp('Possible system blow up. This potential may be unusable!')
+                disp('Aborting Melting Point calculation.')
+            end
+            return
         end
     end
 
