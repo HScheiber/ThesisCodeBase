@@ -17,6 +17,7 @@ Delete_output_files = p.Results.Delete_output_files; % When true: runs calculati
 N_atoms = p.Results.N_atoms; % Minimum number of atoms to include in super cell
 Find_Min_Params = p.Results.Find_Min_Params; % When true, finds lowest energy parameters for IC based on Data_Types. When false, uses input IC
 Find_Similar_Params = p.Results.Find_Similar_Params; % When true, finds lowest energy parameters for IC if possible, but if no data is available, also looks for the same IC with non-scaled model
+Settings.MinMDP.Verbose = false;
 
 if isfield(Settings,'Parallel_LiX_Minimizer') && Settings.Parallel_LiX_Minimizer
     gmx_serial = true;
