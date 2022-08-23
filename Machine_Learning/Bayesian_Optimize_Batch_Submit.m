@@ -400,25 +400,28 @@ switch lower(computer)
         end
     case 'narval'
         %% Shared_Settings
+        Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
         Shared_Settings.Max_Bayesian_Iterations = 800;
         Shared_Settings.Max_Secondary_Iterations = 200;
-        Shared_Settings.Parallel_Bayesopt = true;
-        Shared_Settings.Parallel_Struct_Min = false;
+        Shared_Settings.Parallel_Bayesopt = false;
+        Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
+        Shared_Settings.switch_final_opt = false;
+        Shared_Settings.Max_Local_Iterations = 100;
+        Shared_Settings.Liquid_Test_Time = 100; % ps
+        Shared_Settings.Liquid_Equilibrate_Time = 25; % ps
+        Shared_Settings.Solid_Test_Time = 30; % ps
+        %% BH Models JN, JO
+        Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
+        Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
-        Shared_Settings.switch_final_opt = true;
-        Shared_Settings.final_opt_type = 'fminsearchbnd';
-        Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
-        Shared_Settings.Max_Local_Iterations = 1000;
-        Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
-        %% BH Models IA, IB, IC, ID
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BH'};
         Replicates = 1:5;
-
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
 
@@ -430,84 +433,62 @@ switch lower(computer)
                 Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
                 Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
 
-
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
 
-                    %% Model BH: IA
+                    %% Model BH: JN
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['IA' Rep];
+                    Models(idx).Trial_ID = ['JN' Rep];
                     
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-
+                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-
-                    %% Model BH: IB
+                    %% Model BH: JO
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['IB' Rep];
+                    Models(idx).Trial_ID = ['JO' Rep];
                     
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
                     
-
-                    %% Model BH: IC
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['IC' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = false;
-
-                    %% Model BH: ID
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['ID' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).SigmaEpsilon = true;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
-
+                    
                 end
             end
         end
-        %% BH Models IE, IF, IG, IH, II
+        %% JC Models JN, JO
+        Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
+        Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
+        Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-        Theories = {'BH'};
+        Theories = {'JC'};
         Replicates = 1:5;
 
         for tidx = 1:length(Theories)
@@ -524,115 +505,49 @@ switch lower(computer)
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
 
-                    %% Model BH: IE
+                    %% Model JC: JN
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['IE' Rep];
-
+                    Models(idx).Trial_ID = ['JN' Rep];
+                    
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.FiveFive.RLE = 1;
-
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
+                    Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
-                    
-                    %% Model BH: IF
+                    %% Model JC: JO
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['IF' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.Wurtzite.a = 2/3;
-                    Models(idx).Loss_Options.Wurtzite.c = 1/3;
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
+                    Models(idx).Trial_ID = ['JO' Rep];
                     
-                    %% Model BH: IG
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['IG' Rep];
-
                     % Loss
                     Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
                     Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.FiveFive.RLE = 1;
-                    Models(idx).Loss_Options.Sphalerite.RLE = 1;
-                    Models(idx).Loss_Options.BetaBeO.RLE = 1;
-                    Models(idx).Loss_Options.AntiNiAs.RLE = 1;
-                    Models(idx).Loss_Options.NiAs.RLE = 1;
-                    Models(idx).Loss_Options.CsCl.RLE = 1;
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
                     
-                    %% Model BH: IH
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['IH' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.FiveFive.RLE = 1;
-                    Models(idx).Loss_Options.Sphalerite.RLE = 1;
-                    Models(idx).Loss_Options.BetaBeO.RLE = 1;
-                    Models(idx).Loss_Options.AntiNiAs.RLE = 1;
-                    Models(idx).Loss_Options.NiAs.RLE = 1;
-                    Models(idx).Loss_Options.CsCl.RLE = 1;
-
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = false;
-                    
-                    %% Model BH: II
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['II' Rep];
-
-                    % Loss
-                    Models(idx).Loss_Options.Rocksalt.LE = 1;
-                    Models(idx).Loss_Options.Rocksalt.a = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
-                    Models(idx).Loss_Options.FiveFive.RLE = 1;
-                    Models(idx).Loss_Options.Sphalerite.RLE = 1;
-                    Models(idx).Loss_Options.BetaBeO.RLE = 1;
-                    Models(idx).Loss_Options.AntiNiAs.RLE = 1;
-                    Models(idx).Loss_Options.NiAs.RLE = 1;
-                    Models(idx).Loss_Options.CsCl.RLE = 1;
-
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).SigmaEpsilon = true;
+                    Models(idx).SigmaEpsilon = false;
                     Models(idx).Fix_Charge = false;
                     Models(idx).Additivity = true;
                 end
             end
         end
-        
     case 'graham'
         %% Shared_Settings
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
@@ -764,7 +679,6 @@ switch lower(computer)
                 end
             end
         end
-        
     otherwise % Place jobs here for later assignment
         
         %% Shared_Settings
