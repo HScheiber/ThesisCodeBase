@@ -648,21 +648,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         WorkDir = Settings.WorkDir;
         Settings = Inp_Settings;
         Settings.WorkDir = WorkDir;
-%         if ~isfield(Settings,'QECompressibility_init')
-%             Settings.QECompressibility_init = Settings.QECompressibility;
-%         end
-%         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-%             if Settings.Verbose
-%                 disp('Liquid Equilibration failed. Retrying with stiffer compressibility.')
-%             end
-%             Settings.QECompressibility = Settings.QECompressibility/2;
-%             Output = Calc_Liquid_Properties_at_MP(Settings);
-%             return
         if Settings.MDP.dt > 1e-4
             if Settings.Verbose
                 disp('Liquid Equilibration failed. Reducing time step.')
             end
-            %Settings.QECompressibility = Settings.QECompressibility_init;
             Settings.MDP.dt = Settings.MDP.dt/2;
             Settings.Output_Coords = Settings.Output_Coords*2;
             Output = Calc_Liquid_Properties_at_MP(Settings);
@@ -901,7 +890,31 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
     [~,~] = system(msd_command);
     outp = fileread(MSD_Log_File);
-    Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+    try
+        Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+    catch
+        if isfield(Settings,'Retry') && Settings.Retry
+            if Settings.Verbose
+                error('Failed to gather metal diffusion constant on retry attempt!')
+            end
+        else
+            if Settings.Verbose
+                disp('Failed to gather metal diffusion constant, retrying...')
+            end
+            try % Clean up
+                [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ' Settings.pipe ' xargs rm']);
+                [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
+            catch me
+                disp(me.message)
+            end
+            WorkDir = Settings.WorkDir;
+            Settings = Inp_Settings;
+            Settings.WorkDir = WorkDir;
+            Settings.Retry = true;
+            Output = Calc_Liquid_Properties_at_MP(Settings);
+            return
+        end
+    end
     Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
 
     if Settings.CheckAmorphousLiquid && Output.Liquid_DM_MP <= Settings.Finite_T_Data.Exp_DM_MP/100
