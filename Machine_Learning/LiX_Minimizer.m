@@ -1340,7 +1340,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
 end
 
 % Delete previous calculations that did not complete
-if Settings.Delete_Equil && Settings.Therm_Prop_Override
+if Settings.Therm_Prop_Override
     files = dir(CalcDir);
     dirFlags = [files.isdir];
     subFolders = files(dirFlags);
