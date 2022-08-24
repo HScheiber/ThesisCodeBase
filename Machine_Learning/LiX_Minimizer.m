@@ -1134,18 +1134,24 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 %         E_Model_Mismatch = abs((LE_model - LE_exp)/LE_exp);
         
         V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
-        V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
-        Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
-        %V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
+%         V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
+%         Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
+%         V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
+%         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
         
-        %Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
-        if ~isfield(Settings,'MaxModelVolume')
-            Settings.MaxModelVolume = 1000; % A^3/molecule
+        if V0_model > Settings.MaxModelVolume
+            Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
+            Loss_add_Vol = log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
+        elseif V0_model < Settings.MinModelVolume
+            Model_Mismatch = (Settings.MinModelVolume - V0_model)/Settings.MinModelVolume;
+            Loss_add_Vol = log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
+        else
+            Loss_add_Vol = 0;
         end
         
-        if (V0_model <= Settings.MinModelVolume || V0_model >= Settings.MaxModelVolume) && ~Settings.Therm_Prop_Override
-            Loss_add = Loss_add + log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
+        if Loss_add_Vol > 1 && ~Settings.Therm_Prop_Override
             Settings.skip_finite_T = true;
+            Loss_add = Loss_add + Loss_add_Vol;
         else
             Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
             Settings.Geometry.a = Settings.Minimization_Data{strmatch}.a;

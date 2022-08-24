@@ -161,10 +161,9 @@ idx=0;
 
 switch lower(computer)
     case 'cedar'
-        
         %% Shared_Settings
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
-        Shared_Settings.Max_Bayesian_Iterations = 400;
+        Shared_Settings.Max_Bayesian_Iterations = 600;
         Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
