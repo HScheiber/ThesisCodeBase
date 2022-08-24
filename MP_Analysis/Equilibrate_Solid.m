@@ -341,6 +341,8 @@ function Output = Equilibrate_Solid(Settings,varargin)
         if Settings.Verbose && Output.nmol_liquid ~= Initial_Liq_nmol
             disp(['Equilibrated solid has shrunk too far, expanding system to ' num2str(2*(nmol_solid + Output.nmol_liquid)) ' atoms'])
         end
+    else
+        Output.nmol_liquid = Settings.nmol_liquid;
     end
     
     % Save the updated super cell file
