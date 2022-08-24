@@ -25,22 +25,27 @@ function Output = Equilibrate_Solid(Settings,varargin)
     
     % Generate a box with the structure of interest containing the smallest
     % possible number of atoms for the given cutoff, plus a buffer in case of contraction
+    % NOTE this initial box is not the same as the final box !!!!!!!!
     La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
     Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_b; % nm, the minimum box dimension
     Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_c; % nm, the minimum box dimension
-
+    
     Na = ceil(La/(Settings.Geometry.a/10));
     Nb = ceil(Lb/(Settings.Geometry.b/10));
     Nc = ceil(Lc/(Settings.Geometry.c/10));
     
-    % Calculate number of formula units
     nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
-    Sol_fraction = 1 - Settings.Liquid_Fraction;
-    Output.nmol_liquid = round((nmol_solid)*(1/Sol_fraction - 1));
-    if Settings.Verbose && Output.nmol_liquid ~= Initial_Liq_nmol
-        disp(['Expanding system to ' num2str(2*(nmol_solid + Output.nmol_liquid)) ' atoms'])
+    while nmol_solid < 500 % Enforce a minimum of 1000 atoms on the test box!
+        La = La*1.1;
+        Lb = Lb*1.1;
+        Lc = Lc*1.1;
+        Na = ceil(La/(Settings.Geometry.a/10));
+        Nb = ceil(Lb/(Settings.Geometry.b/10));
+        Nc = ceil(Lc/(Settings.Geometry.c/10));
+        nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
     end
-        
+    
+    % Calculate number of formula units       
     SuperCell_File = fullfile(WorkDir,['Equil_Sol.' Settings.CoordType]);
     
     if ~Settings.Skip_Cell_Construction
@@ -308,9 +313,38 @@ function Output = Equilibrate_Solid(Settings,varargin)
     Coordinate_Text = strrep(Coordinate_Text,'##HAL##',Hal);
     Coordinate_Text = AddCartesianCoord(Coordinate_Text,Settings.Geometry,1,false,Settings.CoordType); %input coordinates
     
+    % Check to ensure solid did not shrink too far: equilibrated box dimensions
+    La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
+    Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_b; % nm, the minimum box dimension
+    Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_c; % nm, the minimum box dimension
+    
+    Na = ceil(La/(Settings.Geometry.a/10));
+    Nb = ceil(Lb/(Settings.Geometry.b/10));
+    Nc = ceil(Lc/(Settings.Geometry.c/10));
+    
+    nmol_solid_inp = prod([Settings.N_Supercell_a Settings.N_Supercell_b Settings.N_Supercell_c Settings.Geometry.NF]);
+    
+    if Na > Settings.N_Supercell_a
+        Settings.N_Supercell_a = Na;
+    end
+    if Nb > Settings.N_Supercell_b
+        Settings.N_Supercell_b = Nb;
+    end
+    if Nc > Settings.N_Supercell_c
+        Settings.N_Supercell_c = Nc;
+    end
+    
+    nmol_solid = prod([Settings.N_Supercell_a Settings.N_Supercell_b Settings.N_Supercell_c Settings.Geometry.NF]);
+    if nmol_solid > nmol_solid_inp
+        Sol_fraction = 1 - Settings.Liquid_Fraction;
+        Output.nmol_liquid = round((nmol_solid)*(1/Sol_fraction - 1));
+        if Settings.Verbose && Output.nmol_liquid ~= Initial_Liq_nmol
+            disp(['Equilibrated solid has shrunk too far, expanding system to ' num2str(2*(nmol_solid + Output.nmol_liquid)) ' atoms'])
+        end
+    end
+    
     % Save the updated super cell file
     if sum([Settings.N_Supercell_a Settings.N_Supercell_b Settings.N_Supercell_c]) > 3
-        
         fid = fopen(Settings.UnitCellFile,'wt');
         fwrite(fid,regexprep(Coordinate_Text,'\r',''));
         fclose(fid);
@@ -335,21 +369,6 @@ function Output = Equilibrate_Solid(Settings,varargin)
         fid = fopen(Settings.SuperCellFile,'wt');
         fwrite(fid,regexprep(Coordinate_Text,'\r',''));
         fclose(fid);
-    end
-    
-    
-    Data = load_gro_file(Settings.SuperCellFile);
-    LatticeLength = min([Settings.Geometry.Skew_a*norm(Data.a_vec) ...
-                        Settings.Geometry.Skew_b*norm(Data.b_vec) ...
-                        Settings.Geometry.Skew_c*norm(Data.c_vec)]);
-    if LatticeLength/2 <= Settings.Longest_Cutoff*1.10
-        if Settings.Verbose
-            disp('Equilibrated solid has shrunk too far, expanding.')
-        end
-        Settings = Inp_Settings;
-        Settings.Cutoff_Buffer = Settings.Cutoff_Buffer*1.25;
-        Output = Equilibrate_Solid(Settings,'Skip_Cell_Construction',false);
-        return
     end
     
     try

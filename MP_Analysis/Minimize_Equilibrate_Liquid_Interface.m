@@ -721,7 +721,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     save(Solid_Geometry_file,'Solid_Geometry');
     
     % Freeze all atoms except those near the edge
-    Atoms_at_Edge = [Sol_atoms_at_edge; Liq_atoms_at_edge];
+    Atoms_at_Edge = Liq_atoms_at_edge; %[Sol_atoms_at_edge; Liq_atoms_at_edge];
     Freeze_atnums = double(Combined_file_data.atom_number(~Atoms_at_Edge));
     
     % Create an index file to keep track of frozen atom numbers
