@@ -921,13 +921,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         if Settings.Verbose
             disp('Detected liquid has hardened to amorphous solid.')
         end
-        if Settings.Delete_Equil
-            try
-                rmdir(Settings.WorkDir,'s')
-            catch
-                disp(['Unable to remove directory: ' Settings.WorkDir])
-            end
-        end
+%         if Settings.Delete_Equil
+%             try
+%                 rmdir(Settings.WorkDir,'s')
+%             catch
+%                 disp(['Unable to remove directory: ' Settings.WorkDir])
+%             end
+%         end
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         Output.Liquid_DX_MP = nan;
@@ -953,13 +953,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             if Settings.Verbose
                 disp('Detected halide in liquid is amorphous.')
             end
-            if Settings.Delete_Equil
-                try
-                    rmdir(Settings.WorkDir,'s')
-                catch
-                    disp(['Unable to remove directory: ' Settings.WorkDir])
-                end
-            end
+%             if Settings.Delete_Equil
+%                 try
+%                     rmdir(Settings.WorkDir,'s')
+%                 catch
+%                     disp(['Unable to remove directory: ' Settings.WorkDir])
+%                 end
+%             end
             Output.Liquid_V_MP = nan;
             Output.Liquid_H_MP = nan;
             diary off

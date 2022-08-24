@@ -399,21 +399,10 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         end
         
         Settings = Inp_Settings;
-%         if ~isfield(Settings,'QECompressibility_init')
-%             Settings.QECompressibility_init = Settings.QECompressibility;
-%         end
-%         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-%             if Settings.Verbose
-%                 disp('Equilibration failed. Retrying with stiffer compressibility.')
-%             end
-%             Settings.QECompressibility = Settings.QECompressibility/2;
-%             Output = Minimize_Equilibrate_Liquid_Interface(Settings);
-%             return
         if Settings.MDP.dt > 1e-4
             if Settings.Verbose
                 disp('Equilibration failed. Reducing time step.')
             end
-            %Settings.QECompressibility = Settings.QECompressibility_init;
             Settings.MDP.dt = Settings.MDP.dt/2;
             Settings.Output_Coords = Settings.Output_Coords*2;
             Output = Minimize_Equilibrate_Liquid_Interface(Settings);
@@ -473,6 +462,15 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
         [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
         copyfile(Settings.WorkDir,TDir)
+        try
+            if Settings.Delete_Equil
+                rmdir(Settings.WorkDir,'s')
+            end
+        catch
+            if Settings.Verbose
+                disp(['Unable to remove directory: ' Settings.WorkDir])
+            end
+        end
         return
     end
     
@@ -571,6 +569,15 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
                 copyfile(Settings.WorkDir,TDir)
+                try
+                    if Settings.Delete_Equil
+                        rmdir(Settings.WorkDir,'s')
+                    end
+                catch
+                    if Settings.Verbose
+                        disp(['Unable to remove directory: ' Settings.WorkDir])
+                    end
+                end
                 return
             end
 
@@ -639,6 +646,15 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                     [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
                     [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
                     copyfile(Settings.WorkDir,TDir)
+                    try
+                        if Settings.Delete_Equil
+                            rmdir(Settings.WorkDir,'s')
+                        end
+                    catch
+                        if Settings.Verbose
+                            disp(['Unable to remove directory: ' Settings.WorkDir])
+                        end
+                    end
                     return
                 end
             catch
