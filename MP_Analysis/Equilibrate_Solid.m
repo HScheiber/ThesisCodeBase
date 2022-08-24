@@ -36,7 +36,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
     % Calculate number of formula units
     nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
     Sol_fraction = 1 - Settings.Liquid_Fraction;
-    Output.nmol_liquid = 2*round((nmol_solid)*(1/Sol_fraction - 1));
+    Output.nmol_liquid = round((nmol_solid)*(1/Sol_fraction - 1));
     if Settings.Verbose && Output.nmol_liquid ~= Initial_Liq_nmol
         disp(['Expanding system to ' num2str(2*(nmol_solid + Output.nmol_liquid)) ' atoms'])
     end
@@ -215,8 +215,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
         'ML_TimeLength',0,...
         'ML_TimeStep',0,...
         'SaveTrajectory',true,...
-        'SavePredictionsImage',true,...
-        'Verbose',Settings.Verbose));
+        'SavePredictionsImage',true));
     Sol_Fraction = PyOut{4};
     Liq_Fraction = PyOut{5};
     

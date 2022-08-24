@@ -673,12 +673,12 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     Solid_file_data = load_gro_file(Settings.SuperCellFile);
     Liquid_file_data = load_gro_file(Equilibrated_Geom_File);
     
-    MinInterfaceWidth = Settings.Geometry.a/20;
+    MinInterfaceWidth = Settings.Geometry.c/10; % Convert to nm. Minimize the liquid one unit cell above/below the solid
     
     Liq_Z = norm(Liquid_file_data.c_vec);
-    Liq_atoms_at_edge = Liquid_file_data.xyz(:,3) < MinInterfaceWidth | Liquid_file_data.xyz(:,3) > (Liq_Z - MinInterfaceWidth); % index of atoms within +-1 angstrom of of liquid-solid interfaces
-    Sol_Z = norm(Solid_file_data.c_vec);
-    Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
+    Liq_atoms_at_edge = Liquid_file_data.xyz(:,3) < MinInterfaceWidth | Liquid_file_data.xyz(:,3) > (Liq_Z - MinInterfaceWidth); % index of atoms within +-1 unit cell of of liquid-solid interfaces
+%     Sol_Z = norm(Solid_file_data.c_vec);
+%     Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
     
     buffer_vec = 0.1.*(Liquid_file_data.c_vec)/norm(Liquid_file_data.c_vec); % 1 Angstrom buffer
     
