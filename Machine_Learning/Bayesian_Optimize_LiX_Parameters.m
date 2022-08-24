@@ -18,8 +18,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     Model.OuterDir = pwd;
     Intermediate_BO_file = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat');
     Intermediate_BO_backup = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat.PREV');
-    Intermediate_Secondary_file = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat');
-    Intermediate_Seconary_backup = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat.PREV');
+    Intermediate_Fullopt_file = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat');
+    Intermediate_Fullopt_backup = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat.PREV');
     if isfield(Model,'Diary_Loc') && ~isempty(Model.Diary_Loc)
         diary(Model.Diary_Loc)
     end
@@ -39,7 +39,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
     
     %% Display input summary on first iteration
-    if ~isfile(Intermediate_BO_file) && ~isfile(Intermediate_Secondary_file)
+    if ~isfile(Intermediate_BO_file) && ~isfile(Intermediate_Fullopt_file)
         disp(newline)
         disp(repmat('*',1,30))
         disp('Model Input Parameters')
@@ -251,7 +251,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     %% Global optimization with bayesian optimization
     % Deal with restart requests
-    if Model.Restart_Calculation && (isfile(Intermediate_Secondary_file) || isfile(Intermediate_Seconary_backup))
+    if Model.Restart_Calculation && (isfile(Intermediate_Fullopt_file) || isfile(Intermediate_Fullopt_backup))
         run_bayesopt = false;
         continue_bayesopt = false;
         continue_fullopt = true;
@@ -508,7 +508,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                 if continue_fullopt
                     try
-                        dat = load(Intermediate_Secondary_file);
+                        dat = load(Intermediate_Fullopt_file);
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;
 
@@ -519,13 +519,13 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                         optionsNM.MaxIter = remaining_evals;
                     catch
-                        disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                        if isfile(Intermediate_Secondary_file)
-                            delete(Intermediate_Secondary_file);
+                        disp('Unable to load local optimization checkpoint file, attempting to load backup.')
+                        if isfile(Intermediate_Fullopt_file)
+                            delete(Intermediate_Fullopt_file);
                         end
                         try
 
-                            dat = load(Intermediate_Seconary_backup,'-mat');
+                            dat = load(Intermediate_Fullopt_backup,'-mat');
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;
 
@@ -536,8 +536,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                             optionsNM.MaxIter = remaining_evals;
                         catch
-                            if isfile(Intermediate_Seconary_backup)
-                                delete(Intermediate_Seconary_backup);
+                            if isfile(Intermediate_Fullopt_backup)
+                                delete(Intermediate_Fullopt_backup);
                             end
                             disp('Unable to load backup secondary optimization checkpoint file, restarting.')
                             x0 = results.XAtMinObjective{:,:};
@@ -577,7 +577,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                 if continue_fullopt
                     try
-                        dat = load(Intermediate_Secondary_file);
+                        dat = load(Intermediate_Fullopt_file);
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;
 
@@ -590,11 +590,11 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         optionsNM.MaxIter = remaining_evals;
                     catch
                         disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                        if isfile(Intermediate_Secondary_file)
-                            delete(Intermediate_Secondary_file);
+                        if isfile(Intermediate_Fullopt_file)
+                            delete(Intermediate_Fullopt_file);
                         end
                         try
-                            dat = load(Intermediate_Seconary_backup,'-mat');
+                            dat = load(Intermediate_Fullopt_backup,'-mat');
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;
 
@@ -607,8 +607,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             optionsNM.MaxIter = remaining_evals;
                         catch
                             disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                            if isfile(Intermediate_Seconary_backup)
-                                delete(Intermediate_Seconary_backup);
+                            if isfile(Intermediate_Fullopt_backup)
+                                delete(Intermediate_Fullopt_backup);
                             end
                             remaining_evals = Model.Max_Local_Iterations;
                             x0 = results.XAtMinObjective{:,:};
@@ -647,7 +647,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 % Load previous data
                 if continue_fullopt
                     try
-                        dat = load(Intermediate_Secondary_file);
+                        dat = load(Intermediate_Fullopt_file);
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;    
 
@@ -662,11 +662,11 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         max_iter = Model.Max_Local_Iterations - current_iterations;
                     catch
                         disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                        if isfile(Intermediate_Secondary_file)
-                            delete(Intermediate_Secondary_file);
+                        if isfile(Intermediate_Fullopt_file)
+                            delete(Intermediate_Fullopt_file);
                         end
                         try
-                            dat = load(Intermediate_Seconary_backup,'-mat');
+                            dat = load(Intermediate_Fullopt_backup,'-mat');
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;    
 
@@ -682,8 +682,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                         catch
                             disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                            if isfile(Intermediate_Seconary_backup)
-                                delete(Intermediate_Seconary_backup);
+                            if isfile(Intermediate_Fullopt_backup)
+                                delete(Intermediate_Fullopt_backup);
                             end
                             x0 = results.XAtMinObjective{:,:};
                             init_meshsize = 0.1;
@@ -742,7 +742,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 % Load previous data
                 if continue_fullopt
                     try
-                        dat = load(Intermediate_Secondary_file);
+                        dat = load(Intermediate_Fullopt_file);
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;    
 
@@ -750,11 +750,11 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         max_iter = Model.Max_Local_Iterations - current_iterations;
                     catch
                         disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                        if isfile(Intermediate_Secondary_file)
-                            delete(Intermediate_Secondary_file);
+                        if isfile(Intermediate_Fullopt_file)
+                            delete(Intermediate_Fullopt_file);
                         end
                         try
-                            dat = load(Intermediate_Seconary_backup,'-mat');
+                            dat = load(Intermediate_Fullopt_backup,'-mat');
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;    
 
@@ -762,8 +762,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             max_iter = Model.Max_Local_Iterations - current_iterations;
                         catch
                             disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                            if isfile(Intermediate_Seconary_backup)
-                                delete(Intermediate_Seconary_backup);
+                            if isfile(Intermediate_Fullopt_backup)
+                                delete(Intermediate_Fullopt_backup);
                             end
                             x0 = results.XAtMinObjective{:,:};
                             max_iter = Model.Max_Local_Iterations;
