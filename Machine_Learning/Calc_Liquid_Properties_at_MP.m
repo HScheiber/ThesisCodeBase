@@ -892,6 +892,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     outp = fileread(MSD_Log_File);
     try
         Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+        Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
     catch
         if isfield(Settings,'Retry') && Settings.Retry
             if Settings.Verbose
@@ -915,7 +916,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             return
         end
     end
-    Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
 
     if Settings.CheckAmorphousLiquid && Output.Liquid_DM_MP <= Settings.Finite_T_Data.Exp_DM_MP/100
         if Settings.Verbose

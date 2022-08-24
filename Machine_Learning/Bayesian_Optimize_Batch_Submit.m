@@ -169,7 +169,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'fminsearchbnd';
+        Shared_Settings.final_opt_type = 'patternsearch';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 10;
         Shared_Settings.Liquid_Test_Time = 100; % ps
@@ -299,7 +299,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'fminsearchbnd';
+        Shared_Settings.final_opt_type = 'patternsearch';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 100;
         Shared_Settings.Liquid_Test_Time = 100; % ps
@@ -407,7 +407,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'fminsearchbnd';
+        Shared_Settings.final_opt_type = 'patternsearch';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 100;
         Shared_Settings.Liquid_Test_Time = 100; % ps
@@ -600,7 +600,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'fminsearchbnd';
+        Shared_Settings.final_opt_type = 'patternsearch';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 10;
         Shared_Settings.Liquid_Test_Time = 100; % ps
@@ -724,7 +724,6 @@ switch lower(computer)
             end
         end
     otherwise % Place jobs here for later assignment
-        
         %% Shared_Settings
         Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
         Shared_Settings.Max_Bayesian_Iterations = 400;
@@ -732,7 +731,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'fminsearchbnd';
+        Shared_Settings.final_opt_type = 'patternsearch';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 10;
         Shared_Settings.Liquid_Test_Time = 100; % ps
