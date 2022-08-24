@@ -1139,8 +1139,11 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         %V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
         
         %Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+        if ~isfield(Settings,'MaxModelVolume')
+            Settings.MaxModelVolume = 250; % A^3/molecule
+        end
         
-        if V0_model <= Settings.MinModelVolume && ~Settings.Therm_Prop_Override
+        if (V0_model <= Settings.MinModelVolume || V0_model >= Settings.MaxModelVolume) && ~Settings.Therm_Prop_Override
             Loss_add = Loss_add + log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
             Settings.skip_finite_T = true;
         else

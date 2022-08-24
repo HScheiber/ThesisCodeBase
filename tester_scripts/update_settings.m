@@ -33,6 +33,10 @@ Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 
 Output = Calc_Liquid_Properties_at_MP(Settings);
 
+
+Structure_Minimization(Settings)
+
+
 [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
     'Startpoint',0.001);
 
