@@ -798,6 +798,16 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 error('Unknown final optimization scheme. Choose one of "fminsearch", "patternsearch", "fminsearchbnd", or "none"')
         end
         
+        if ~Deterministic
+            dat = load(Intermediate_Fullopt_file).intermediate_data;
+            fvals = zeros(1,length(dat));
+            for idx = 1:length(dat)
+                fvals(idx) = dat(idx).optimValues.fval;
+            end
+            [~,minidx] = min(fvals);
+            full_opt_point = dat(minidx).x;
+        end
+        
         % Save a structure containing some calculation properties
         Calculation_properties.Salt = Model.Salt;
         Calculation_properties.Theory = Model.Theory;

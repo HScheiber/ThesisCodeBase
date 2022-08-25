@@ -1168,7 +1168,6 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 end
 
 % Melting point
-CalcDir = pwd;
 if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
     
     if Settings.Parallel_Bayesopt % Run serially
@@ -1189,7 +1188,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     end
     if Settings.Therm_Prop_Override
         [~,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-        Settings.WorkDir = fullfile(CalcDir,'BestPoint_Thermal','Melting_Point');
+        Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Melting_Point');
     else
         [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
         Settings.WorkDir = [WorkDir '_MP'];
@@ -1236,7 +1235,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
     
     if Settings.Therm_Prop_Override
-        Settings.WorkDir = fullfile(CalcDir,'BestPoint_Thermal','Liq_Properties_at_MP');
+        Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Liq_Properties_at_MP');
     else
         [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
         Settings.WorkDir = [WorkDir '_LP'];
@@ -1294,7 +1293,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
     
     if Settings.Therm_Prop_Override
-        Settings.WorkDir = fullfile(CalcDir,'BestPoint_Thermal','Sol_Properties_at_MP');
+        Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Sol_Properties_at_MP');
     else
         [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
         Settings.WorkDir = [WorkDir '_SP'];
@@ -1351,17 +1350,17 @@ end
 
 % Delete previous calculations that did not complete
 if Settings.Therm_Prop_Override
-    files = dir(CalcDir);
+    files = dir(Settings.OuterDir);
     dirFlags = [files.isdir];
     subFolders = files(dirFlags);
     subFolderNames = {subFolders(3:end).name};
     prev_calcs = subFolderNames(cellfun(@(x) ~isempty(x),regexp(subFolderNames,'.+?_[S|M|L]P','once')));
     for idx = 1:length(prev_calcs)
         try
-            rmdir(fullfile(CalcDir,prev_calcs{idx}),'s')
+            rmdir(fullfile(Settings.OuterDir,prev_calcs{idx}),'s')
         catch
             if Settings.Verbose
-                disp(['Unable to remove failed calculation directory: ' fullfile(CalcDir,prev_calcs{idx})])
+                disp(['Unable to remove failed calculation directory: ' fullfile(Settings.OuterDir,prev_calcs{idx})])
             end
         end
     end
