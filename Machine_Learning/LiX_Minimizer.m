@@ -1138,6 +1138,10 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 %         Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
 %         V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
 %         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+
+        if ~isfield(Settings,'MaxModelVolume')
+            Settings.MaxModelVolume = 2000;
+        end
         
         if V0_model > Settings.MaxModelVolume
             Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
