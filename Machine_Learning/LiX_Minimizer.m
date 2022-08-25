@@ -1189,6 +1189,10 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
 
     [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
     Settings.WorkDir = [WorkDir '_MP'];
+    ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Melting_Point');
+    if Settings.Therm_Prop_Override && isfolder(ThermFolder)
+        Settings.WorkDir = ThermFolder;
+    end
     
     Settings.BatchMode = false;
     Settings.Submit_Jobs = false;
@@ -1199,7 +1203,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
     Settings.Verbose = Verbose;
     
-    if Settings.Therm_Prop_Override
+    if Settings.Therm_Prop_Override && ~isfolder(ThermFolder)
         ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Melting_Point');
         copyfile(Settings.WorkDir,ThermFolder)
     end
