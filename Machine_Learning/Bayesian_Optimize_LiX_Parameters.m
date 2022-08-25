@@ -757,7 +757,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             dat = load(Intermediate_Fullopt_backup,'-mat');
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;    
-
+                            
                             current_iterations = length(intermediate_data);
                             max_iter = Model.Max_Local_Iterations - current_iterations;
                         catch
@@ -799,7 +799,24 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         end
         
         if ~Deterministic
-            dat = load(Intermediate_Fullopt_file).intermediate_data;
+            try
+                dat = load(Intermediate_Fullopt_file).intermediate_data;
+            catch
+                disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                if isfile(Intermediate_Fullopt_file)
+                    delete(Intermediate_Fullopt_file);
+                end
+                    try
+                        dat = load(Intermediate_Fullopt_backup,'-mat');
+                    catch
+                        disp('Unable to load backup secondary optimization checkpoint file, starting new.')
+                        if isfile(Intermediate_Fullopt_backup)
+                            delete(Intermediate_Fullopt_backup);
+                        end
+                        Bayesian_Optimize_LiX_Parameters(Input_Model);
+                        return
+                    end
+            end
             fvals = zeros(1,length(dat));
             for idx = 1:length(dat)
                 fvals(idx) = dat(idx).optimValues.fval;
