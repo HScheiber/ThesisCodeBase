@@ -1204,7 +1204,6 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Verbose = Verbose;
     
     if Settings.Therm_Prop_Override && ~isfolder(ThermFolder)
-        ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Melting_Point');
         copyfile(Settings.WorkDir,ThermFolder)
     end
     
