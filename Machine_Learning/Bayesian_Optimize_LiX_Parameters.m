@@ -1292,6 +1292,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     disp(repmat('*',1,120))
     
     disp(['Final Optimized Loss: ' num2str(loss,'%.10e')])
+    disp(['Final Optimized Parameters: ' num2str(full_opt_point,'%.10e ')])
     if Model.SigmaEpsilon && strcmp(Model.Theory,'JC')
         disp(['Parameters (Sigma/Epsilon): ' num2str(Pars,'\t%.15e')])
     else
