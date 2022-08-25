@@ -693,8 +693,9 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     
     Liq_Z = norm(Liquid_file_data.c_vec);
     Liq_atoms_at_edge = Liquid_file_data.xyz(:,3) < MinInterfaceWidth | Liquid_file_data.xyz(:,3) > (Liq_Z - MinInterfaceWidth); % index of atoms within +-1 unit cell of of liquid-solid interfaces
-%     Sol_Z = norm(Solid_file_data.c_vec);
-%     Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
+	Sol_atoms_at_edge = false(Solid_file_data.N_atoms,1);
+    %Sol_Z = norm(Solid_file_data.c_vec);
+    %Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
     
     buffer_vec = 0.1.*(Liquid_file_data.c_vec)/norm(Liquid_file_data.c_vec); % 1 Angstrom buffer
     
@@ -737,7 +738,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     save(Solid_Geometry_file,'Solid_Geometry');
     
     % Freeze all atoms except those near the edge
-    Atoms_at_Edge = Liq_atoms_at_edge; %[Sol_atoms_at_edge; Liq_atoms_at_edge];
+    Atoms_at_Edge = [Sol_atoms_at_edge; Liq_atoms_at_edge];
     Freeze_atnums = double(Combined_file_data.atom_number(~Atoms_at_Edge));
     
     % Create an index file to keep track of frozen atom numbers
@@ -753,22 +754,22 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     addnan = 15 - mod(length(system_atnums),15);
     system_atnums(end+1:end+addnan) = nan;
     system_atnums = reshape(system_atnums,15,[])';
-    system_atnum_txt = strtrim(char(regexprep(strjoin(string(num2str(system_atnums)),newline),' +NaN','')));
+    system_atnum_txt = strtrim(char(regexprep(strjoin(string(num2str(system_atnums)),newline),' *NaN','')));
     
     addnan = 15 - mod(length(Freeze_atnums),15);
     Freeze_atnums(end+1:end+addnan) = nan;
     Freeze_atnums = reshape(Freeze_atnums,15,[])';
-    sol_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(Freeze_atnums)),newline),' +NaN','')));
+    sol_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(Freeze_atnums)),newline),' *NaN','')));
     
     addnan = 15 - mod(length(M_atnums),15);
     M_atnums(end+1:end+addnan) = nan;
     M_atnums = reshape(M_atnums,15,[])';
-    M_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(M_atnums)),newline),' +NaN','')));
+    M_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(M_atnums)),newline),' *NaN','')));
 
     addnan = 15 - mod(length(X_atnums),15);
     X_atnums(end+1:end+addnan) = nan;
     X_atnums = reshape(X_atnums,15,[])';
-    X_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(X_atnums)),newline),' +NaN','')));
+    X_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(X_atnums)),newline),' *NaN','')));
 
     ndx_text = ['[ System ]'     newline system_atnum_txt newline ...
     '[ Freeze ]'      newline sol_atnums_txt newline ...
