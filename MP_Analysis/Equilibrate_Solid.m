@@ -171,21 +171,18 @@ function Output = Equilibrate_Solid(Settings,varargin)
             disp(me.message)
         end
         Settings = Inp_Settings;
-%         if ~isfield(Settings,'QECompressibility_init')
-%             Settings.QECompressibility_init = Settings.QECompressibility;
-%         end
-%         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-%             if Settings.Verbose
-%                 disp('Equilibration failed. Retrying with stiffer compressibility.')
-%             end
-%             Settings.QECompressibility = Settings.QECompressibility/2;
-%             Output = Equilibrate_Solid(Settings,'Skip_Cell_Construction',true);
-%             return
-        if Settings.MDP.dt > 1e-4
+        if ~isempty(regexp(mdrun_output,'[box|cell] size','match','once'))
+            if Settings.Verbose
+                disp('Equilibration failed due to shrinking box. Increasing box size.')
+            end
+            % System shrunk too far, increase buffer size
+            Settings.Cutoff_Buffer = Settings.Cutoff_Buffer.*1.25;
+            Output = Equilibrate_Solid(Settings);
+            return
+        elseif Settings.MDP.dt > 1e-4
             if Settings.Verbose
                 disp('Equilibration failed. Reducing time step.')
             end
-            %Settings.QECompressibility = Settings.QECompressibility_init;
             Settings.MDP.dt = Settings.MDP.dt/2;
             Settings.Output_Coords = Settings.Output_Coords*2;
             Output = Equilibrate_Solid(Settings,'Skip_Cell_Construction',true);

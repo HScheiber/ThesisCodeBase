@@ -452,18 +452,16 @@ Settings.UnitCellFile = fullfile(Settings.WorkDir,[Settings.JobName '_UnitCell.'
 Settings.SuperCellFile = fullfile(Settings.WorkDir,[Settings.JobName '.' Settings.CoordType]);
 
 % Find minimum lattice parameter for this salt/structure/model (or use initial ones)
-if Settings.Find_Min_Params
+if Settings.Find_Min_Params && ~Settings.Skip_Minimization
     [Settings,Found_DataMatch] = FindMinLatticeParam(Settings,...
         'Find_Similar_Params',Settings.Find_Similar_Params,'Center_Coordinates',true);
+elseif Settings.Skip_Minimization || strcmpi(Settings.Structure,'liquid') || strcmpi(Settings.Structure,'previous')
+    Found_DataMatch = true;
 else
     Found_DataMatch = false;
 end
 
 Premintxt = '';
-if Settings.Skip_Minimization || strcmpi(Settings.Structure,'liquid') || strcmpi(Settings.Structure,'previous')
-    Found_DataMatch = true;
-end
-
 % Structure Template filename
 DoGeomEdit = true;
 if strcmpi(Settings.Structure,'previous')

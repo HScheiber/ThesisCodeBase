@@ -1,8 +1,8 @@
 
 Settings.JobSettings.Cores = 8;
-Settings.JobSettings.MPI_Ranks = 8;
-Settings.JobSettings.OMP_Threads = 1;
-Settings.JobSettings.dd  = [1 2 4];
+Settings.JobSettings.MPI_Ranks = 2;
+Settings.JobSettings.OMP_Threads = 4;
+Settings.JobSettings.dd  = [1 1 2];
 Settings.JobSettings.npme = [];
 
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
@@ -17,7 +17,7 @@ Settings.OuterDir = pwd;
 Settings.QECompressibility = 1e-7;
 Settings.ScaleInitialLiqDensity = 0.8;
 Settings.MDP.dt = 0.001;
-Settings.Output_Coords = 1000;
+Settings.Output_Coords = 100;
 Settings.Delete_Equil = false;
 Settings.Verbose = true;
 Settings.Diary_Loc = '';
@@ -35,7 +35,8 @@ Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 Output = Calc_Liquid_Properties_at_MP(Settings);
 
 
-Structure_Minimization(Settings)
+Settings.MinMDP.Verbose = true;
+Output = Structure_Minimization(Settings);
 
 
 [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...

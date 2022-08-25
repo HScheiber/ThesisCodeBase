@@ -126,7 +126,7 @@ Settings.Update_NeighbourList = 10; % Frequency to update the neighbor list. Whe
 %% Pre-Minimization Settings
 Settings.Skip_Minimization = false; % TURNED ON FOR LIQUIDS AUTOMATICALLY. When true, skip the pre-minimization step 
 Settings.Find_Min_Params = true; % When true, finds lowest energy parameters for IC based on Data_Types. When false, uses input IC
-Settings.Find_Similar_Params = true; % If no exact minimized geometry is found for the input model, find geometry for a similar model
+Settings.Find_Similar_Params = false; % If no exact minimized geometry is found for the input model, find geometry for a similar model
 Settings.Data_Types = 1; % Allowed data types for automatic search of initial conditions (0 = normal, 1 = cell optimized, 2 = full optimized, 3 = atom optimized only)
 Settings.MinMDP.Parallel_Min = true; % run minimization routine using matlab parallel when true
 Settings.MinMDP.Verbose = false; % Sets verbosity of minimization routine
