@@ -1186,13 +1186,9 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     elseif ~isempty(gcp('nocreate')) % close the current ppool, it will likely close on its own anyway, causing issues
         delete(gcp);
     end
-    if Settings.Therm_Prop_Override
-        [~,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-        Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Melting_Point');
-    else
-        [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-        Settings.WorkDir = [WorkDir '_MP'];
-    end
+
+    [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+    Settings.WorkDir = [WorkDir '_MP'];
     
     Settings.BatchMode = false;
     Settings.Submit_Jobs = false;
@@ -1202,6 +1198,11 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Verbose = true;
     [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
     Settings.Verbose = Verbose;
+    
+    if Settings.Therm_Prop_Override
+        ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Melting_Point');
+        copyfile(Settings.WorkDir,ThermFolder)
+    end
     
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
