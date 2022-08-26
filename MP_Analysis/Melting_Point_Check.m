@@ -225,7 +225,6 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
     end
     
     if length(cpt_check) > 1
-        
         % Remove any "prev" checkpoints
         if sum(~contains({cpt_check.name},'prev')) > 0
             cpt_check = cpt_check(~contains({cpt_check.name},'prev'));
@@ -367,25 +366,50 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         end
         
         if IsNotComplete && ~Froze_alt && errcode ~= 0
-            f = -1;
-            df = 0;
-            T_dat.Alt_Structure = true;
-            T_dat.T = T;
-            T_dat.T_Trace = [T_dat.T_Trace T];
-            T_dat.f_Trace = [T_dat.f_Trace f];
-            T_dat.df_Trace = [T_dat.df_Trace df];
-            T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
-            T_dat.Melt_Trace = [T_dat.Melt_Trace false];
-            copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-            save(Settings.CurrentTFile,'T_dat')
-            feval = -1; % function evaluation
-            fderiv = 0; % function derivative
-            User_data = T_dat; % user data
-            if Settings.Verbose
-                disp('Possible system blow up. This potential may be unusable!')
-                disp('Aborting Melting Point calculation.')
+            
+            try % Clean up
+                [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+            catch me
+                disp(me.message)
             end
-            return
+            
+            if Settings.MDP.dt > 1e-4
+                if Settings.Verbose
+                    disp('Simulation failed. Restarting with reduced time step.')
+                end
+                
+                % Look for and delete all checkpoint files
+                cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
+                for idx = 1:length(cpt_check)
+                    CheckPoint_File = fullfile(WorkDir,cpt_check(idx).name);
+                    delete(CheckPoint_File)
+                end
+                
+                Settings.MDP.dt = Settings.MDP.dt/2;
+                Settings.Output_Coords = Settings.Output_Coords*2;
+                [feval,fderiv,User_data] = Melting_Point_Check(T,Settings);
+                return
+            else
+                f = -1;
+                df = 0;
+                T_dat.Alt_Structure = true;
+                T_dat.T = T;
+                T_dat.T_Trace = [T_dat.T_Trace T];
+                T_dat.f_Trace = [T_dat.f_Trace f];
+                T_dat.df_Trace = [T_dat.df_Trace df];
+                T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                save(Settings.CurrentTFile,'T_dat')
+                feval = -1; % function evaluation
+                fderiv = 0; % function derivative
+                User_data = T_dat; % user data
+                if Settings.Verbose
+                    disp('Possible system blow up. This potential may be unusable!')
+                    disp('Aborting Melting Point calculation.')
+                end
+                return
+            end
         end
         
     else % No checkpoint file found
@@ -463,9 +487,6 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
 
         [errcode,outp] = system(mdrun_command);
         if errcode ~= 0
-            if Settings.Verbose
-                disp(outp);
-            end
             try % Clean up
                 [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
             catch me
@@ -528,6 +549,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                     fderiv = 0; % function derivative
                     User_data = T_dat; % user data
                     if Settings.Verbose
+                        disp(outp);
                         disp('Possible system blow up. This potential may be unusable!')
                         disp('Aborting Melting Point calculation.')
                     end
@@ -611,22 +633,23 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         end
         
         [errcode,~] = system(mdrun_command);
-        if errcode ~= 0
+        if errcode == 0
             if Settings.Verbose
                 disp(['MD simulation segment ' num2str(ext_idx,'%03.f') '/' max_steps ...
                     ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
-                    ' ps) failed to complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+                    ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
             end
         elseif ~isfile(windows2unix(Structure_Out_File))
             if Settings.Verbose
                 disp('Calculation time is almost up, ending MATLAB session now.')
             end
             exit
-        end
-        if Settings.Verbose && errcode == 0
-            disp(['MD simulation segment ' num2str(ext_idx,'%03.f') '/' max_steps ...
-                ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
-                ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+        else
+            if Settings.Verbose
+                disp(['MD simulation segment ' num2str(ext_idx,'%03.f') '/' max_steps ...
+                    ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
+                    ' ps) failed to complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
+            end
         end
 
         % Check the final frame of the simulation chunk
@@ -666,25 +689,48 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
 %         end
         
         if IsNotComplete && ~Froze_alt && errcode ~= 0
-            f = -1;
-            df = 0;
-            T_dat.Alt_Structure = true;
-            T_dat.T = T;
-            T_dat.T_Trace = [T_dat.T_Trace T];
-            T_dat.f_Trace = [T_dat.f_Trace f];
-            T_dat.df_Trace = [T_dat.df_Trace df];
-            T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
-            T_dat.Melt_Trace = [T_dat.Melt_Trace false];
-            copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-            save(Settings.CurrentTFile,'T_dat')
-            feval = -1; % function evaluation
-            fderiv = 0; % function derivative
-            User_data = T_dat; % user data
-            if Settings.Verbose
-                disp('Possible system blow up. This potential may be unusable!')
-                disp('Aborting Melting Point calculation.')
+            try % Clean up
+                [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
+            catch me
+                disp(me.message)
             end
-            return
+            if Settings.MDP.dt > 1e-4
+                if Settings.Verbose
+                    disp('Simulation failed with inconclusive result. Restarting with reduced time step.')
+                end
+
+                % Look for and delete all checkpoint files
+                cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
+                for idx = 1:length(cpt_check)
+                    CheckPoint_File = fullfile(WorkDir,cpt_check(idx).name);
+                    delete(CheckPoint_File)
+                end
+
+                Settings.MDP.dt = Settings.MDP.dt/2;
+                Settings.Output_Coords = Settings.Output_Coords*2;
+                [feval,fderiv,User_data] = Melting_Point_Check(T,Settings);
+                return
+            else
+                f = -1;
+                df = 0;
+                T_dat.Alt_Structure = true;
+                T_dat.T = T;
+                T_dat.T_Trace = [T_dat.T_Trace T];
+                T_dat.f_Trace = [T_dat.f_Trace f];
+                T_dat.df_Trace = [T_dat.df_Trace df];
+                T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                save(Settings.CurrentTFile,'T_dat')
+                feval = -1; % function evaluation
+                fderiv = 0; % function derivative
+                User_data = T_dat; % user data
+                if Settings.Verbose
+                    disp('Possible system blow up. This potential may be unusable!')
+                    disp('Aborting Melting Point calculation.')
+                end
+                return
+            end
         end
     end
 
