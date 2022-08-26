@@ -253,7 +253,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(XX_JC_Param.epsilon,'%10.8e'));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(MX_JC_Param.epsilon,'%10.8e'));
     else
-        error(['Warning: Unknown model type: "' Settings.Theory '.'])
+        error(['Unknown model type: "' Settings.Theory '.'])
     end
     
     % Add in the atom list
@@ -304,14 +304,29 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         disp('Begining Liquid Minimization...')
     end
     mintimer = tic;
-    [state,mdrun_output] = system(mdrun_command);
+    [state,~] = system(mdrun_command);
     if state == 0
         if Settings.Verbose
             disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        disp(mdrun_output);
-        error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
+        if Settings.Verbose
+            disp('Failed to minimize, retrying with fewer MPI ranks.')
+        end
+        mdrun_command = [Settings.gmx_loc ' mdrun -s ' windows2unix(TPR_File) ...
+            ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
+            ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Minimized_Geom_File) ...
+            ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq'))];
+        
+        if Table_Req || strncmp(Settings.Theory,'BH',2)
+            mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
+        end
+        [state,~] = system(mdrun_command);
+        
+        if state ~= 0
+            disp(mdrun_output);
+            error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
+        end
     end
     
 %     system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])

@@ -292,10 +292,24 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
+        
         if Settings.Verbose
-            disp(mdrun_output);
+            disp('Failed to minimize, retrying with fewer MPI ranks.')
         end
-        error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
+        mdrun_command = [Settings.gmx_loc ' mdrun -s ' windows2unix(TPR_File) ...
+            ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
+            ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Minimized_Geom_File) ...
+            ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq'))];
+        
+        if Settings.Table_Req || strcmp(Settings.Theory,'BH')
+            mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
+        end
+        [state,~] = system(mdrun_command);
+        
+        if state ~= 0
+            disp(mdrun_output);
+            error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
+        end
     end
     
     %% System is now minimized, run a fast equilibration, allowing box to equilibrate in Z dimension only
