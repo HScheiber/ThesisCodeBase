@@ -479,7 +479,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         
         % Set the number of steps
         MD_nsteps = Settings.Liquid_Test_Time/Settings.MDP.dt;
-
+        
         % Ensure fast equilibration with Berendsen barostat + small time constant
         xyz_out = num2str(0.1 / Settings.MDP.dt); % Output coords every 0.1 ps
         MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(MD_nsteps) '$3;']);
@@ -506,7 +506,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
             ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
         [state,~] = system(FEquil_Grompp);
-
+        
         % Catch errors in grompp
         if state ~= 0
             error(['Error running GROMPP. Problem command: ' newline FEquil_Grompp]);
@@ -519,17 +519,17 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         Energy_file = fullfile(Settings.WorkDir,'MSD_Liq.edr');
         TRR_File = fullfile(Settings.WorkDir,'MSD_Liq.trr');
         Dynamics_Geom_File = fullfile(Settings.WorkDir,['MSD_Liq_out.' Settings.CoordType]);
-
+        
         mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
             ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Dynamics_Geom_File) ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'MSD_Liq')) ...
             Settings.mdrun_opts];
-
+        
         if Settings.Table_Req
             mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
         end
-
+        
         % Run Liquid Equilibration
         if Settings.Verbose
             disp(['(2/2) Running liquid with realistic dynamics for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
@@ -589,8 +589,15 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             [~,~] = system(msd_command);
             outp = fileread(MSD_Log_File);
             Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
-            Diff_const = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
-
+            if ~isempty(Diff_txt)
+                Diff_const = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+            else
+                Diff_const = nan;
+                if Settings.Verbose
+                    disp(['(2/2) Unable to collect MSD. Liquid Dynamics likely failed. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+                end
+            end
+                
             Exp = Load_Experimental_Data;
             if Diff_const <= Exp.(Settings.Salt).Liquid.DM_mp/100
                 if Settings.Verbose

@@ -1035,7 +1035,12 @@ if Settings.CheckBadFcn
     end
 end
 
-if Loss_add >= 1
+if ~isfield(Settings,'MinSkipLoss')
+    defSettings = Initialize_LiX_BO_Settings;
+    Settings.MinSkipLoss = defSettings.MinSkipLoss;
+end
+
+if Loss_add >= Settings.MinSkipLoss
     Loss = Loss_add;
     UserData.Minimization_Data = Settings.Minimization_Data;
     UserData.Finite_T_Data = Settings.Finite_T_Data;
@@ -1140,7 +1145,8 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 %         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
 
         if ~isfield(Settings,'MaxModelVolume')
-            Settings.MaxModelVolume = 2000;
+            defSettings = Initialize_LiX_BO_Settings;
+            Settings.MaxModelVolume = defSettings.MaxModelVolume;
         end
         
         if V0_model > Settings.MaxModelVolume
@@ -1153,9 +1159,9 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
             Loss_add_Vol = 0;
         end
         
-        if Loss_add_Vol > 1 && ~Settings.Therm_Prop_Override
+        Loss_add = Loss_add + Loss_add_Vol;
+        if Loss_add_Vol >= Settings.MinSkipLoss && ~Settings.Therm_Prop_Override
             Settings.skip_finite_T = true;
-            Loss_add = Loss_add + Loss_add_Vol;
         else
             Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
             Settings.Geometry.a = Settings.Minimization_Data{strmatch}.a;

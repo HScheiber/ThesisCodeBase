@@ -93,6 +93,7 @@ Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a 
 Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.BadFcnLossPenalty = 1000; % Penalty to give when (1) the function shape is deemed pathological or (2) the optimized crystal volume is too small or large
+Settings.MinSkipLoss = 1; % Minimum loss value required before skipping further computation
 
 % Intial optimization settings
 Settings.initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'

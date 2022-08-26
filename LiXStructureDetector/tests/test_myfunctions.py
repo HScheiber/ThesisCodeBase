@@ -189,9 +189,9 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\Minimization'
-Salt = 'LiCl'
-SystemName = 'Equil_System'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\Minimization\Equil_Liq'
+Salt = 'LiI'
+SystemName = 'MSD_Liq'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
@@ -199,7 +199,7 @@ SavePredictions=False
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=0.001
+TimePerFrame=1
 FileType='gro'
 Verbose=True
 StartPoint = None

@@ -1,7 +1,7 @@
 
 Settings.JobSettings.Cores = 8;
-Settings.JobSettings.MPI_Ranks = 8;
-Settings.JobSettings.OMP_Threads = 1;
+Settings.JobSettings.MPI_Ranks = 2;
+Settings.JobSettings.OMP_Threads = 4;
 Settings.JobSettings.dd  = [];
 Settings.JobSettings.npme = [];
 

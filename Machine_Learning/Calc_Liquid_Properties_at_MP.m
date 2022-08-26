@@ -31,8 +31,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Volume = L^3; % Volume in nm^3
     nmol_liquid = round(Volume*Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
     
-    if nmol_liquid < 500 % Enforce a minimum of 1000 atoms
-        nmol_liquid = 500;
+    if nmol_liquid < Settings.N_atoms % Enforce a minimum of [Settings.N_atoms] atoms
+        nmol_liquid = Settings.N_atoms;
         Volume = nmol_liquid/(Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
         L = Volume^(1/3);
     end

@@ -168,7 +168,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'patternsearch';
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 30;
         Shared_Settings.Liquid_Test_Time = 100; % ps
@@ -298,7 +298,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'patternsearch';
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 100;
         Shared_Settings.Liquid_Test_Time = 100; % ps
@@ -406,7 +406,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'patternsearch';
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 100;
         Shared_Settings.Liquid_Test_Time = 100; % ps
@@ -599,7 +599,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'patternsearch';
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 30;
         Shared_Settings.Liquid_Test_Time = 100; % ps
@@ -730,7 +730,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.final_opt_type = 'patternsearch';
+        Shared_Settings.final_opt_type = 'fminsearchbnd';
         Shared_Settings.switch_final_opt = false;
         Shared_Settings.Max_Local_Iterations = 10;
         Shared_Settings.Liquid_Test_Time = 100; % ps
