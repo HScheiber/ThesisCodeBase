@@ -2,12 +2,13 @@ function [WorkDir,JobName,Full_Model_Name] = GetMDWorkdir(Settings,varargin)
 
 % If this is part of a bayesopt calculation, return a temporary folder as
 % the working directory
-if isfield(Settings,'Therm_Prop_Override') && Settings.Therm_Prop_Override
-    WorkDir = fullfile(pwd,'BestPoint_Thermal');
-    JobName = 'Test_MP';
-    Full_Model_Name = Settings.Model;
-    return
-elseif isfield(Settings,'initial_opt_type')
+% if isfield(Settings,'Therm_Prop_Override') && Settings.Therm_Prop_Override
+%     WorkDir = fullfile(pwd,'BestPoint_Thermal');
+%     JobName = 'Test_MP';
+%     Full_Model_Name = Settings.Model;
+%     return
+% else
+if isfield(Settings,'initial_opt_type')
     Hashobj.S = Settings.S;
     Hashobj.CR_Damp = Settings.CR_Damp;
     Hashobj.Model = Settings.Model;
