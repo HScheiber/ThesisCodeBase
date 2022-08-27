@@ -286,13 +286,12 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         disp('Beginning Liquid Minimization...')
     end
     mintimer = tic;
-    [state,mdrun_output] = system(mdrun_command);
+    [state,~] = system(mdrun_command);
     if state == 0
         if Settings.Verbose
             disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
-        
         if Settings.Verbose
             disp('Failed to minimize, retrying with fewer MPI ranks.')
         end
@@ -304,7 +303,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         if Settings.Table_Req || strcmp(Settings.Theory,'BH')
             mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
         end
-        [state,~] = system(mdrun_command);
+        [state,mdrun_output] = system(mdrun_command);
         
         if state ~= 0
             disp(mdrun_output);

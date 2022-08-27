@@ -317,11 +317,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Minimized_Geom_File) ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq'))];
-        
+
         if Table_Req || strncmp(Settings.Theory,'BH',2)
             mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
         end
-        [state,~] = system(mdrun_command);
+        [state,mdrun_output] = system(mdrun_command);
         
         if state ~= 0
             disp(mdrun_output);
