@@ -1244,11 +1244,13 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.Liquid_DM_MP] > tol) ...
         && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
     
-    if Settings.Therm_Prop_Override
-        Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Liq_Properties_at_MP');
-    else
-        [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-        Settings.WorkDir = [WorkDir '_LP'];
+
+    [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+    Settings.WorkDir = [WorkDir '_LP'];
+    
+    ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Liq_Properties_at_MP');
+    if Settings.Therm_Prop_Override && isfolder(ThermFolder)
+        Settings.WorkDir = ThermFolder;
     end
     
     if Settings.Parallel_Bayesopt % Run serially
@@ -1281,6 +1283,10 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.JobSettings.dd = dd;
         Settings.JobSettings.npme = npme;
         [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+    end
+    
+    if Settings.Therm_Prop_Override && ~isfolder(ThermFolder)
+        copyfile(Settings.WorkDir,ThermFolder)
     end
     
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
@@ -1302,11 +1308,12 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.Solid_MP_Volume] > tol) ...
         && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
     
-    if Settings.Therm_Prop_Override
-        Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Sol_Properties_at_MP');
-    else
-        [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-        Settings.WorkDir = [WorkDir '_SP'];
+    [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+    Settings.WorkDir = [WorkDir '_SP'];
+    
+    ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Sol_Properties_at_MP');
+    if Settings.Therm_Prop_Override && isfolder(ThermFolder)
+        Settings.WorkDir = ThermFolder;
     end
     
     if Settings.Parallel_Bayesopt % Run serially
@@ -1339,6 +1346,10 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.JobSettings.dd = dd;
         Settings.JobSettings.npme = npme;
         [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+    end
+    
+    if Settings.Therm_Prop_Override && ~isfolder(ThermFolder)
+        copyfile(Settings.WorkDir,ThermFolder)
     end
     
     Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;

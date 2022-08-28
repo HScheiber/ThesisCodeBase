@@ -14,9 +14,24 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
-    save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
+
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
+    
+    Output_Properties_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
+    if isfile(Output_Properties_File)
+        try
+            Output = load(Output_Properties_File).Output;
+            diary off
+            return
+        catch
+            if Settings.Verbose
+                disp('Failed to load previously completed output, restarting calculation')
+            end
+            delete(Output_Properties_File);
+        end
+    end
+    save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
     
     if Settings.Verbose
         disp('*** Separate Equilibration of Solid Selected ***')
@@ -424,30 +439,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         Settings = Inp_Settings;
         Settings.SuperCellFile = SuperCellFile;
         Settings.WorkDir = WorkDir;
-%         if ~isfield(Settings,'QECompressibility_init')
-%             Settings.QECompressibility_init = Settings.QECompressibility;
-%         end
-%         if ~isfield(Settings,'MinComplete')
-%             Settings.MinComplete = false;
-%         end
-        
-%         if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-%             if Settings.Verbose
-%                 disp('Solid Equilibration failed. Retrying with stiffer compressibility.')
-%             end
-%             Settings.QECompressibility = Settings.QECompressibility/2;
-%             Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
-%             return
-%         elseif ~Settings.MinComplete
-%             if Settings.Verbose
-%                 disp('Solid Equilibration failed. Stiffer compressibility did not resolve.')
-%                 disp('Running Pre-Minimization of Solid.')
-%             end
-%             Minimize_Solid(Settings);
-%             Settings.QECompressibility = Settings.QECompressibility_init;
-%             Settings.MinComplete = true;
-%             Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
-%             return
         if Settings.MDP.dt > 1e-4
             if Settings.Verbose
                 disp('Solid Equilibration failed. Reducing time step.')
@@ -469,6 +460,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
                 diary(Settings.Diary_Loc)
             end
+            save(Output_Properties_File,'Output');
             return
         end
     end
@@ -503,6 +495,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
         end
+        save(Output_Properties_File,'Output');
         return
     end
     
@@ -553,6 +546,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp(['Unable to remove directory: ' Settings.WorkDir])
         end
     end
+    save(Output_Properties_File,'Output');
     diary off
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
         diary(Settings.Diary_Loc)

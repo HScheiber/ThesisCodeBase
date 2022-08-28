@@ -1,7 +1,7 @@
 
 Settings.JobSettings.Cores = 8;
-Settings.JobSettings.MPI_Ranks = 2;
-Settings.JobSettings.OMP_Threads = 4;
+Settings.JobSettings.MPI_Ranks = 8;
+Settings.JobSettings.OMP_Threads = 1;
 Settings.JobSettings.dd  = [];
 Settings.JobSettings.npme = [];
 
@@ -14,10 +14,10 @@ Settings.OuterDir = pwd;
 % Settings.Output_Energies = 1;
 % Settings.Calc_Energies = 1;
 % Settings.Output_Coords = 1;
-Settings.QECompressibility = 1e-7;
-Settings.ScaleInitialLiqDensity = 0.8;
-Settings.MDP.dt = 0.001;
-Settings.Output_Coords = 100;
+%Settings.QECompressibility = 1e-7;
+%Settings.ScaleInitialLiqDensity = 0.8;
+%Settings.MDP.dt = 0.001;
+%Settings.Output_Coords = 100;
 Settings.Delete_Equil = false;
 Settings.Verbose = true;
 Settings.Diary_Loc = '';
