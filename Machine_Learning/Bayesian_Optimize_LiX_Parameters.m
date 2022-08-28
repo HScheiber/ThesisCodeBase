@@ -1268,8 +1268,47 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         Pars(L_pars+1:L_pars+Ex_fun) = full_opt_point(end+1-Ex_fun:end);
     end
     
+    % Load targets
+    DFT = Load_Best_DFT_Data;
+    Structures = Model.Structures;
+    N = length(Structures);
+    if Model.Loss_Options.Experimental_LE || Model.Loss_Options.Experimental_LP
+        Exp = Load_Experimental_Data;
+        
+        if Model.Loss_Options.Experimental_LE
+            E_Correction = Exp.(Model.Salt).Rocksalt.E - DFT.(Model.Salt).Rocksalt.Energy;        
+            for idx = 1:N
+                try
+                    DFT.(Model.Salt).(Structures{idx}).Energy = DFT.(Model.Salt).(Structures{idx}).Energy + E_Correction;
+                catch
+                    DFT.(Model.Salt).(Structures{idx}).Energy = nan;
+                    DFT.(Model.Salt).(Structures{idx}).a = nan;
+                    DFT.(Model.Salt).(Structures{idx}).b = nan;
+                    DFT.(Model.Salt).(Structures{idx}).c = nan;
+                end
+            end
+        end
+        if Model.Loss_Options.Experimental_LP
+            DFT.(Model.Salt).Rocksalt.a = Exp.(Model.Salt).Rocksalt.a_zero;
+            DFT.(Model.Salt).Rocksalt.b = Exp.(Model.Salt).Rocksalt.b_zero;
+            DFT.(Model.Salt).Rocksalt.c = Exp.(Model.Salt).Rocksalt.c_zero;
+            DFT.(Model.Salt).Rocksalt.V = Exp.(Model.Salt).Rocksalt.V_zero;
+            if isfield(Exp.(Model.Salt),'Wurtzite')
+                DFT.(Model.Salt).Wurtzite.a = Exp.(Model.Salt).Wurtzite.a_zero;
+                DFT.(Model.Salt).Wurtzite.b = Exp.(Model.Salt).Wurtzite.b_zero;
+                DFT.(Model.Salt).Wurtzite.c = Exp.(Model.Salt).Wurtzite.c_zero;
+                DFT.(Model.Salt).Wurtzite.V = Exp.(Model.Salt).Wurtzite.V_zero;
+            end
+        end
+    end
+    
     Minimization_Data = UserData.Minimization_Data;
     Finite_T_Data = UserData.Finite_T_Data;
+    
+    disp(repmat('*',1,80))
+    disp(['Final Results - [Salt: ' Model.Salt '] - [Potential Form: ' Model.Theory '] - [Model name: ' Model.Trial_ID ']'])
+    disp(repmat('*',1,80))
+    
     format long g
     En = zeros(size(Model.Structures));
     for idx = 1:length(Model.Structures)
@@ -1281,9 +1320,16 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 En(end+1) = Minimization_Data{idx}.a; %#ok<AGROW>
                 En(end+1) = Minimization_Data{idx}.c; %#ok<AGROW>
         end
+        disp(repmat('*',1,60))
         disp(Model.Structures{idx})
+        disp('Target (Exp/DFT) Data:')
+        disp(repmat('*',1,60))
+        disp(DFT.(Model.Salt).(Model.Structures{idx}))
+        disp(repmat('*',1,60))
+        disp(Model.Structures{idx})
+        disp('Model Result:')
+        disp(repmat('*',1,60))
         disp(Minimization_Data{idx})
-        Minimization_Data{idx}.Structure = Model.Structures{idx};
     end
     disp(repmat('*',1,120))
     disp('Finite Temperature Data (Enthalpy in kJ/mol, Entropy in J/(mol K), Volume in A^3/Forumla Unit, Temperature in K)')
