@@ -957,6 +957,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         if Settings.Verbose
             disp('System dynamics step previously completed.')
         end
+        Energy_file = fullfile(Settings.WorkDir,'MSD_Liq.edr');
     end
     
     % Check to ensure system remained liquid
