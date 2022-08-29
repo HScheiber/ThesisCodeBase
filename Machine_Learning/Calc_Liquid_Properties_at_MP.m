@@ -371,6 +371,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Halide_Info = elements('Sym',Settings.Halide);
         Table_Req = IsGmxTableRequired(Settings);
         Settings.JobName = [Settings.Theory '_TestModel'];
+        dat = load_gro_file(Minimized_Geom_File);
+        nmol_liquid = dat.N_atoms/2;
 	end
     
 %     system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
