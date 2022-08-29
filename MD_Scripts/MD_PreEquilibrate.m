@@ -105,7 +105,14 @@ if state == 0
     if Settings.Verbose
         disp(['System Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
     end
-    copyfile(Equilibrated_Geom_File,Settings.SuperCellFile)
+    while true
+        try
+            copyfile(Equilibrated_Geom_File,Settings.SuperCellFile)
+            break
+        catch
+            pause(10)
+        end
+    end
 else
     try % Clean up
         [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);

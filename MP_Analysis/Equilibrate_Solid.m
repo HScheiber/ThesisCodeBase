@@ -197,11 +197,16 @@ function Output = Equilibrate_Solid(Settings,varargin)
             TDir = fullfile(strrep(Settings.WorkDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
             [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
             [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
-            copyfile(WorkDir,TDir)
-            try
-                if Settings.Delete_Equil
-                    rmdir(WorkDir,'s')
+            while true
+                try
+                    copyfile(WorkDir,TDir)
+                    break
+                catch
+                    pause(10)
                 end
+            end
+            try
+            	rmdir(WorkDir,'s')
             catch
                 disp(['Unable to remove directory: ' WorkDir])
             end
@@ -237,11 +242,16 @@ function Output = Equilibrate_Solid(Settings,varargin)
         TDir = fullfile(strrep(Settings.WorkDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
         [~,~] = system([Settings.wsl 'find ' windows2unix(WorkDir) ' -iname "#*#" ^| xargs rm']);
         [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
-        copyfile(WorkDir,TDir)
-        try
-            if Settings.Delete_Equil
-                rmdir(WorkDir,'s')
+        while true
+            try
+                copyfile(WorkDir,TDir)
+                break
+            catch
+                pause(10)
             end
+        end
+        try
+            rmdir(WorkDir,'s')
         catch
             disp(['Unable to remove directory: ' WorkDir])
         end
@@ -370,9 +380,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
     end
     
     try
-        if Settings.Delete_Equil
-            rmdir(WorkDir,'s')
-        end
+    	rmdir(WorkDir,'s')
     catch
         if Settings.Verbose
             disp(['Unable to remove directory: ' WorkDir])

@@ -429,11 +429,16 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             Output.Aborted = true;
             TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
             [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
-            copyfile(Settings.WorkDir,TDir)
-            try
-                if Settings.Delete_Equil
-                    rmdir(Settings.WorkDir,'s')
+            while true
+                try
+                    copyfile(Settings.WorkDir,TDir)
+                    break
+                catch
+                    pause(10)
                 end
+            end
+            try
+            	rmdir(Settings.WorkDir,'s')
             catch
                 disp(['Unable to remove directory: ' Settings.WorkDir])
             end
@@ -449,7 +454,14 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
 %     plot(Data(:,1),(10^3).*Data(:,4)./Settings.nmol_liquid) % Volume
     
     % Check to ensure system remained liquid
-    copyfile(Minimized_Geom_File,fullfile(Settings.WorkDir,['Equil_Liq.' Settings.CoordType]));
+    while true
+        try
+            copyfile(Minimized_Geom_File,fullfile(Settings.WorkDir,['Equil_Liq.' Settings.CoordType]));
+            break
+        catch
+            pause(10)
+        end
+    end
     PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
         pyargs('SystemName','Equil_Liq',...
         'RefStructure',Settings.Structure,...
@@ -474,11 +486,16 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         Output.Aborted = true;
         TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
         [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
-        copyfile(Settings.WorkDir,TDir)
-        try
-            if Settings.Delete_Equil
-                rmdir(Settings.WorkDir,'s')
+        while true
+            try
+                copyfile(Settings.WorkDir,TDir)
+                break
+            catch
+                pause(10)
             end
+        end
+        try
+            rmdir(Settings.WorkDir,'s')
         catch
             if Settings.Verbose
                 disp(['Unable to remove directory: ' Settings.WorkDir])
@@ -555,7 +572,14 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             end
             
             % Check to ensure system remained liquid
-            copyfile(Equilibrated_Geom_File,fullfile(Settings.WorkDir,['MSD_Liq.' Settings.CoordType]));
+            while true
+                try
+                    copyfile(Equilibrated_Geom_File,fullfile(Settings.WorkDir,['MSD_Liq.' Settings.CoordType]));
+                    break
+                catch
+                    pause(10)
+                end
+            end
             PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
                 pyargs('SystemName','MSD_Liq',...
                 'RefStructure',Settings.Structure,...
@@ -581,11 +605,16 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                 TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
-                copyfile(Settings.WorkDir,TDir)
-                try
-                    if Settings.Delete_Equil
-                        rmdir(Settings.WorkDir,'s')
+                while true
+                    try
+                        copyfile(Settings.WorkDir,TDir)
+                        break
+                    catch
+                        pause(10)
                     end
+                end
+                try
+                    rmdir(Settings.WorkDir,'s')
                 catch
                     if Settings.Verbose
                         disp(['Unable to remove directory: ' Settings.WorkDir])
@@ -621,11 +650,16 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                 TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
-                copyfile(Settings.WorkDir,TDir);
-                try
-                    if Settings.Delete_Equil
-                        rmdir(Settings.WorkDir,'s')
+                while true
+                    try
+                        copyfile(Settings.WorkDir,TDir);
+                        break
+                    catch
+                        pause(10)
                     end
+                end
+                try
+                	rmdir(Settings.WorkDir,'s')
                 catch
                     if Settings.Verbose
                         disp(['Unable to remove directory: ' Settings.WorkDir])
@@ -639,7 +673,14 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             end
             try
                 % Attempt to check to ensure system remained liquid
-                copyfile(Equilibrated_Geom_File,fullfile(Settings.WorkDir,['MSD_Liq.' Settings.CoordType]));
+                while true
+                    try
+                        copyfile(Equilibrated_Geom_File,fullfile(Settings.WorkDir,['MSD_Liq.' Settings.CoordType]));
+                        break
+                    catch
+                        pause(10)
+                    end
+                end
                 PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Settings.Salt, ...
                     pyargs('SystemName','MSD_Liq',...
                     'RefStructure',Settings.Structure,...
@@ -665,11 +706,16 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                     TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
                     [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
                     [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
-                    copyfile(Settings.WorkDir,TDir)
-                    try
-                        if Settings.Delete_Equil
-                            rmdir(Settings.WorkDir,'s')
+                    while true
+                        try
+                            copyfile(Settings.WorkDir,TDir)
+                            break
+                        catch
+                            pause(10)
                         end
+                    end
+                    try
+                        rmdir(Settings.WorkDir,'s')
                     catch
                         if Settings.Verbose
                             disp(['Unable to remove directory: ' Settings.WorkDir])
@@ -686,9 +732,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     end
     
     try
-        if Settings.Delete_Equil
-            rmdir(Settings.WorkDir,'s')
-        end
+    	rmdir(Settings.WorkDir,'s')
     catch
         if Settings.Verbose
             disp(['Unable to remove directory: ' Settings.WorkDir])

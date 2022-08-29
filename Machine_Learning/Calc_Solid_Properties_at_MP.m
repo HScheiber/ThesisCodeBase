@@ -384,8 +384,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
     fclose(fidTOP);
     
-    
-    
     Equilibrate_TRR_File = fullfile(Settings.WorkDir,'Equil_Sol.trr');
     Final_Geom_File = fullfile(Settings.WorkDir,['Equil_Sol_out.' Settings.CoordType]);
     
