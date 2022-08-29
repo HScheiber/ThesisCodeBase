@@ -1289,6 +1289,16 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         copyfile(Settings.WorkDir,ThermFolder)
     end
     
+    if Settings.Delete_Equil && isfolder(Settings.WorkDir)
+        try
+            rmdir(Settings.WorkDir,'s')
+        catch
+            if Settings.Verbose
+                warning(['Unable to remove directory: ' Settings.WorkDir])
+            end
+        end
+    end
+    
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
     Settings.Finite_T_Data.Liquid_DM_MP = Liq_Output.Liquid_DM_MP; % cm^2 / s
@@ -1350,6 +1360,16 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     
     if Settings.Therm_Prop_Override && ~isfolder(ThermFolder)
         copyfile(Settings.WorkDir,ThermFolder)
+    end
+    
+    if Settings.Delete_Equil && isfolder(Settings.WorkDir)
+        try
+            rmdir(Settings.WorkDir,'s')
+        catch
+            if Settings.Verbose
+                warning(['Unable to remove directory: ' Settings.WorkDir])
+            end
+        end
     end
     
     Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;

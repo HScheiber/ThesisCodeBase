@@ -529,13 +529,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         Output.Solid_V_MP = nan;
         Output.Solid_H_MP = nan;
         save(Output_Properties_File,'Output');
-        if Settings.Delete_Equil
-            try
-                rmdir(Settings.WorkDir,'s')
-            catch
-                disp(['Unable to remove directory: ' Settings.WorkDir])
-            end
-        end
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -583,13 +576,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         disp('*** Separate Equilibration of Solid Complete ***')
     end
     save(Output_Properties_File,'Output');
-    if Settings.Delete_Equil
-        try
-            rmdir(Settings.WorkDir,'s')
-        catch
-            disp(['Unable to remove directory: ' Settings.WorkDir])
-        end
-    end
     diary off
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
         diary(Settings.Diary_Loc)

@@ -805,13 +805,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_DM_MP = nan;
         Output.Liquid_DX_MP = nan;
         save(Output_Properties_File,'Output');
-        if Settings.Delete_Equil
-            try
-                rmdir(Settings.WorkDir,'s')
-            catch
-                disp(['Unable to remove directory: ' Settings.WorkDir])
-            end
-        end
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -985,13 +978,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_DM_MP = nan;
         Output.Liquid_DX_MP = nan;
         save(Output_Properties_File,'Output');
-        if Settings.Delete_Equil
-            try
-                rmdir(Settings.WorkDir,'s')
-            catch
-                disp(['Unable to remove directory: ' Settings.WorkDir])
-            end
-        end
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -1075,13 +1061,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_H_MP = nan;
         Output.Liquid_DX_MP = nan;
         save(Output_Properties_File,'Output');
-%         if Settings.Delete_Equil
-%             try
-%                 rmdir(Settings.WorkDir,'s')
-%             catch
-%                 disp(['Unable to remove directory: ' Settings.WorkDir])
-%             end
-%         end
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -1107,13 +1086,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             Output.Liquid_V_MP = nan;
             Output.Liquid_H_MP = nan;
             save(Output_Properties_File,'Output');
-%             if Settings.Delete_Equil
-%                 try
-%                     rmdir(Settings.WorkDir,'s')
-%                 catch
-%                     disp(['Unable to remove directory: ' Settings.WorkDir])
-%                 end
-%             end
             diary off
             if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
                 diary(Settings.Diary_Loc)
@@ -1131,13 +1103,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         disp('*** Separate Equilibration of Liquid Complete ***')
     end
     save(Output_Properties_File,'Output');
-    if Settings.Delete_Equil
-        try
-            rmdir(Settings.WorkDir,'s')
-        catch
-            disp(['Unable to remove directory: ' Settings.WorkDir])
-        end
-    end
     diary off
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
         diary(Settings.Diary_Loc)
