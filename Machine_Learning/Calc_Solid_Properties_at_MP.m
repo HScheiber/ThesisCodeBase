@@ -384,84 +384,128 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
     fclose(fidTOP);
     
-    TPR_File = fullfile(Settings.WorkDir,'Equil_Sol.tpr');
-    MDPout_File = fullfile(Settings.WorkDir,'Equil_Sol_out.mdp');
-    GrompLog_File = fullfile(Settings.WorkDir,'Equil_Sol_Grompplog.log');
     
-    FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
-        ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
-        ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-        ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
-    [state,~] = system(FEquil_Grompp);
     
-    % Catch errors in grompp
-    if state ~= 0
-        error(['Error running GROMPP. Problem command: ' newline FEquil_Grompp]);
-    else
-        delete(GrompLog_File)
-    end
-
-    % Prepare Equilibration mdrun command
-    Log_File = fullfile(Settings.WorkDir,'Equil_Sol.log');
-    Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
-    TRR_File = fullfile(Settings.WorkDir,'Equil_Sol.trr');
+    Equilibrate_TRR_File = fullfile(Settings.WorkDir,'Equil_Sol.trr');
     Final_Geom_File = fullfile(Settings.WorkDir,['Equil_Sol_out.' Settings.CoordType]);
-
-    mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
-        ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
-        ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Final_Geom_File) ...
-        ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Sol')) ...
-        Settings.mdrun_opts];
     
-    if Table_Req
-        mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
+    Run_Equilibration = true;
+    if isfile(Final_Geom_File)
+        gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Equilibrate_TRR_File)];
+        [state,outp] = system(gmx_check);
+        lf = regexp(outp,'Step *([0-9]|\.)+ *([0-9]|\.)+\nTime','tokens','once');
+        if state == 0 || ~isempty(lf)
+            traj_time = (str2double(lf{1})-1)*str2double(lf{2});
+            if traj_time >=Settings.Solid_Test_Time
+                Run_Equilibration = false;
+            end
+        end
     end
+    
+    
+    
+    
+    
+    if Run_Equilibration
+        
+        % Check for a checkpoint file
+        cpt_file = fullfile(Settings.WorkDir,'Equil_Sol.cpt');
+        prev_cpt_file = fullfile(Settings.WorkDir,'Equil_Sol_prev.cpt');
+        
+        add_cpt = '';
+        if isfile(cpt_file) || isfile(prev_cpt_file)
+            gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(cpt_file)];
+            [state,~] = system(gmx_check);
+            if state == 0
+                add_cpt = [' -cpi ' windows2unix(cpt_file)];
+            elseif isfile(prev_cpt_file)
+                gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(prev_cpt_file)];
+                [state,~] = system(gmx_check);
+                if state == 0
+                    add_cpt = [' -cpi ' windows2unix(prev_cpt_file)];
+                end
+            end
+        end
 
-    % Run solid Equilibration
-    if Settings.Verbose
-        disp(['Beginning Solid Equilibration for ' num2str(Settings.Solid_Test_Time) ' ps...'] )
-    end
-    mintimer = tic;
-    [state,~] = system(mdrun_command);
-    if state == 0
+        TPR_File = fullfile(Settings.WorkDir,'Equil_Sol.tpr');
+        MDPout_File = fullfile(Settings.WorkDir,'Equil_Sol_out.mdp');
+        GrompLog_File = fullfile(Settings.WorkDir,'Equil_Sol_Grompplog.log');
+        
+        if ~isfile(TPR_File) || isempty(add_cpt)
+            FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
+                ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
+                ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
+                ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+            [state,~] = system(FEquil_Grompp);
+
+            % Catch errors in grompp
+            if state ~= 0
+                error(['Error running GROMPP. Problem command: ' newline FEquil_Grompp]);
+            else
+                delete(GrompLog_File)
+            end
+        end
+
+        % Prepare Equilibration mdrun command
+        Log_File = fullfile(Settings.WorkDir,'Equil_Sol.log');
+        Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
+
+        mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
+            ' -o ' windows2unix(Equilibrate_TRR_File) ' -g ' windows2unix(Log_File) ...
+            ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Final_Geom_File) add_cpt ...
+            ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Sol')) ...
+            Settings.mdrun_opts];
+
+        if Table_Req
+            mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
+        end
+
+        % Run solid Equilibration
         if Settings.Verbose
-            disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+            disp(['Beginning Solid Equilibration for ' num2str(Settings.Solid_Test_Time) ' ps...'] )
         end
-    else
-        try % Clean up
-            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
-            [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ^| xargs rm']);
-        catch me
-            disp(me.message)
-        end
-        SuperCellFile = Settings.SuperCellFile;
-        WorkDir = Settings.WorkDir;
-        Settings = Inp_Settings;
-        Settings.SuperCellFile = SuperCellFile;
-        Settings.WorkDir = WorkDir;
-        if Settings.MDP.dt > 1e-4
+        mintimer = tic;
+        [state,~] = system(mdrun_command);
+        if state == 0
             if Settings.Verbose
-                disp('Solid Equilibration failed. Reducing time step.')
+                disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
             end
-            %Settings.QECompressibility = Settings.QECompressibility_init;
-            Settings.MDP.dt = Settings.MDP.dt/2;
-            Settings.Output_Coords = Settings.Output_Coords*2;
-            Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
-            return
         else
-            if Settings.Verbose
-                disp('Solid equilibration failed.')
-                disp('Solid may be completely unstable!')
-                disp(['WorkDir: ' WorkDir])
+            try % Clean up
+                [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
+                [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ^| xargs rm']);
+            catch me
+                disp(me.message)
             end
-            Output.Solid_V_MP = nan;
-            Output.Solid_H_MP = nan;
-            diary off
-            if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-                diary(Settings.Diary_Loc)
+            SuperCellFile = Settings.SuperCellFile;
+            WorkDir = Settings.WorkDir;
+            Settings = Inp_Settings;
+            Settings.SuperCellFile = SuperCellFile;
+            Settings.WorkDir = WorkDir;
+            if Settings.MDP.dt > 1e-4
+                if Settings.Verbose
+                    disp('Solid Equilibration failed. Reducing time step.')
+                end
+                %Settings.QECompressibility = Settings.QECompressibility_init;
+                Settings.MDP.dt = Settings.MDP.dt/2;
+                Settings.Output_Coords = Settings.Output_Coords*2;
+                Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
+                return
+            else
+                if Settings.Verbose
+                    disp('Solid equilibration failed.')
+                    disp('Solid may be completely unstable!')
+                    disp(['WorkDir: ' WorkDir])
+                end
+                Output.Solid_V_MP = nan;
+                Output.Solid_H_MP = nan;
+                diary off
+                if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+                    diary(Settings.Diary_Loc)
+                end
+                save(Output_Properties_File,'Output');
+                return
             end
-            save(Output_Properties_File,'Output');
-            return
         end
     end
     

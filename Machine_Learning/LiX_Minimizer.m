@@ -1223,7 +1223,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
                 rmdir(Settings.WorkDir,'s')
             catch
                 if Settings.Verbose
-                    disp(['Unable to remove directory: ' Settings.WorkDir])
+                    warning(['Unable to remove directory: ' Settings.WorkDir])
                 end
             end
         end
