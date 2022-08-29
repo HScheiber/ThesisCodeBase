@@ -800,6 +800,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         if Settings.Verbose
             disp('Detected Liquid Freezing at Experimental MP')
         end
+        Output.Liquid_V_MP = nan;
+        Output.Liquid_H_MP = nan;
+        Output.Liquid_DM_MP = nan;
+        Output.Liquid_DX_MP = nan;
+        save(Output_Properties_File,'Output');
         if Settings.Delete_Equil
             try
                 rmdir(Settings.WorkDir,'s')
@@ -807,11 +812,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 disp(['Unable to remove directory: ' Settings.WorkDir])
             end
         end
-        Output.Liquid_V_MP = nan;
-        Output.Liquid_H_MP = nan;
-        Output.Liquid_DM_MP = nan;
-        Output.Liquid_DX_MP = nan;
-        save(Output_Properties_File,'Output');
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -980,6 +980,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         if Settings.Verbose
             disp('Detected Liquid Freezing at Experimental MP')
         end
+        Output.Liquid_V_MP = nan;
+        Output.Liquid_H_MP = nan;
+        Output.Liquid_DM_MP = nan;
+        Output.Liquid_DX_MP = nan;
+        save(Output_Properties_File,'Output');
         if Settings.Delete_Equil
             try
                 rmdir(Settings.WorkDir,'s')
@@ -987,11 +992,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 disp(['Unable to remove directory: ' Settings.WorkDir])
             end
         end
-        Output.Liquid_V_MP = nan;
-        Output.Liquid_H_MP = nan;
-        Output.Liquid_DM_MP = nan;
-        Output.Liquid_DX_MP = nan;
-        save(Output_Properties_File,'Output');
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -1071,6 +1071,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         if Settings.Verbose
             disp('Detected liquid has hardened to amorphous solid.')
         end
+        Output.Liquid_V_MP = nan;
+        Output.Liquid_H_MP = nan;
+        Output.Liquid_DX_MP = nan;
+        save(Output_Properties_File,'Output');
 %         if Settings.Delete_Equil
 %             try
 %                 rmdir(Settings.WorkDir,'s')
@@ -1078,10 +1082,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
 %                 disp(['Unable to remove directory: ' Settings.WorkDir])
 %             end
 %         end
-        Output.Liquid_V_MP = nan;
-        Output.Liquid_H_MP = nan;
-        Output.Liquid_DX_MP = nan;
-        save(Output_Properties_File,'Output');
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -1104,6 +1104,9 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             if Settings.Verbose
                 disp('Detected halide in liquid is amorphous.')
             end
+            Output.Liquid_V_MP = nan;
+            Output.Liquid_H_MP = nan;
+            save(Output_Properties_File,'Output');
 %             if Settings.Delete_Equil
 %                 try
 %                     rmdir(Settings.WorkDir,'s')
@@ -1111,9 +1114,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
 %                     disp(['Unable to remove directory: ' Settings.WorkDir])
 %                 end
 %             end
-            Output.Liquid_V_MP = nan;
-            Output.Liquid_H_MP = nan;
-            save(Output_Properties_File,'Output');
             diary off
             if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
                 diary(Settings.Diary_Loc)
@@ -1130,6 +1130,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     if Settings.Verbose
         disp('*** Separate Equilibration of Liquid Complete ***')
     end
+    save(Output_Properties_File,'Output');
     if Settings.Delete_Equil
         try
             rmdir(Settings.WorkDir,'s')
@@ -1137,7 +1138,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             disp(['Unable to remove directory: ' Settings.WorkDir])
         end
     end
-    save(Output_Properties_File,'Output');
     diary off
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
         diary(Settings.Diary_Loc)

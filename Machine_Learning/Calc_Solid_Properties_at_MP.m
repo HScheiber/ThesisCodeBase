@@ -526,6 +526,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         if Settings.Verbose
             disp('Detected Solid Phase change at Experimental MP')
         end
+        Output.Solid_V_MP = nan;
+        Output.Solid_H_MP = nan;
+        save(Output_Properties_File,'Output');
         if Settings.Delete_Equil
             try
                 rmdir(Settings.WorkDir,'s')
@@ -533,13 +536,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
                 disp(['Unable to remove directory: ' Settings.WorkDir])
             end
         end
-        Output.Solid_V_MP = nan;
-        Output.Solid_H_MP = nan;
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
         end
-        save(Output_Properties_File,'Output');
         return
     end
     
@@ -582,7 +582,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     if Settings.Verbose
         disp('*** Separate Equilibration of Solid Complete ***')
     end
-    
+    save(Output_Properties_File,'Output');
     if Settings.Delete_Equil
         try
             rmdir(Settings.WorkDir,'s')
@@ -590,7 +590,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp(['Unable to remove directory: ' Settings.WorkDir])
         end
     end
-    save(Output_Properties_File,'Output');
     diary off
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
         diary(Settings.Diary_Loc)
