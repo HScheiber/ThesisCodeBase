@@ -958,6 +958,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             disp('System dynamics step previously completed.')
         end
         Energy_file = fullfile(Settings.WorkDir,'MSD_Liq.edr');
+        TPR_File = fullfile(Settings.WorkDir,'MSD_Liq.tpr');
     end
     
     % Check to ensure system remained liquid
