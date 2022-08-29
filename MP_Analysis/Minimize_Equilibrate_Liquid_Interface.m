@@ -866,16 +866,29 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         disp('Beginning Combined System minimization...')
     end
     mintimer = tic;
-    [state,mdrun_output] = system(mdrun_command);
+    [state,~] = system(mdrun_command);
     if state == 0
         if Settings.Verbose
             disp(['System Successfully Minimized! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
         end
     else
         if Settings.Verbose
-            disp(mdrun_output);
+            disp('Failed to minimize, retrying with fewer MPI ranks.')
         end
-        error(['Error running mdrun for system minimization. Problem command: ' newline mdrun_command]);
+        mdrun_command = [Settings.gmx_loc ' mdrun -s ' windows2unix(TPR_File) ...
+            ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
+            ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Settings.SuperCellFile) ...
+            ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Comb_Equil'))];
+
+        if Settings.Table_Req || strcmp(Settings.Theory,'BH')
+            mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
+        end
+        [state,mdrun_output] = system(mdrun_command);
+        
+        if state ~= 0
+            disp(mdrun_output);
+            error(['Error running mdrun for liquid system minimization. Problem command: ' newline mdrun_command]);
+        end
     end
 
 %     system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
