@@ -636,6 +636,39 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Save MDP Template
     MDP_Template_sv = MDP_Template;
     
+    % Ensure fast equilibration with Berendsen barostat + small time constant
+    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
+    MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
+    MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad('isotropic',18));
+    MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(tau_p),18));
+    MDP_Template = strrep(MDP_Template,'##NSTPCOUPLE##',pad(num2str(nstpcouple),18));
+    MDP_Template = strrep(MDP_Template,'##COMPRESS##',pad(num2str(Compressibility),18));
+    MDP_Template = strrep(MDP_Template,'##REFP##',pad(num2str(Settings.Target_P(1)),18));
+
+    % Pair it with velocity rescale thermostat + small time constant
+    MDP_Template = strrep(MDP_Template,'##THERMOSTAT##',pad('v-rescale',18));
+    MDP_Template = strrep(MDP_Template,'##TTIMECONST##',pad(num2str(tau_t),18));
+    MDP_Template = strrep(MDP_Template,'##NSTTCOUPLE##',pad(num2str(nsttcouple),18));
+    MDP_Template = strrep(MDP_Template,'##REFT##',pad(num2str(Settings.T0),18));
+
+    % Save MDP file
+    MDP_Filename = fullfile(Settings.WorkDir,'Equil_Liq.mdp');
+    fidMDP = fopen(MDP_Filename,'wt');
+    fwrite(fidMDP,regexprep(MDP_Template,'\r',''));
+    fclose(fidMDP);
+
+    % Finish the topology file: add in title and the atom list
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##',num2str(nmol_liquid));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##GEOM##','molecule liquid');
+    Atomlist = copy_atom_order(Minimized_Geom_File);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
+    Top_Filename = fullfile(Settings.WorkDir,'Equil_Liq.top');
+
+    % Save topology file
+    fidTOP = fopen(Top_Filename,'wt');
+    fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
+    fclose(fidTOP);
+    
     if Run_Equilibration
         
         % Check for a checkpoint file
@@ -656,39 +689,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 end
             end
         end
-        
-        % Ensure fast equilibration with Berendsen barostat + small time constant
-        MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
-        MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
-        MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad('isotropic',18));
-        MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(tau_p),18));
-        MDP_Template = strrep(MDP_Template,'##NSTPCOUPLE##',pad(num2str(nstpcouple),18));
-        MDP_Template = strrep(MDP_Template,'##COMPRESS##',pad(num2str(Compressibility),18));
-        MDP_Template = strrep(MDP_Template,'##REFP##',pad(num2str(Settings.Target_P(1)),18));
-
-        % Pair it with velocity rescale thermostat + small time constant
-        MDP_Template = strrep(MDP_Template,'##THERMOSTAT##',pad('v-rescale',18));
-        MDP_Template = strrep(MDP_Template,'##TTIMECONST##',pad(num2str(tau_t),18));
-        MDP_Template = strrep(MDP_Template,'##NSTTCOUPLE##',pad(num2str(nsttcouple),18));
-        MDP_Template = strrep(MDP_Template,'##REFT##',pad(num2str(Settings.T0),18));
-
-        % Save MDP file
-        MDP_Filename = fullfile(Settings.WorkDir,'Equil_Liq.mdp');
-        fidMDP = fopen(MDP_Filename,'wt');
-        fwrite(fidMDP,regexprep(MDP_Template,'\r',''));
-        fclose(fidMDP);
-
-        % Finish the topology file: add in title and the atom list
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##',num2str(nmol_liquid));
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##GEOM##','molecule liquid');
-        Atomlist = copy_atom_order(Minimized_Geom_File);
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
-        Top_Filename = fullfile(Settings.WorkDir,'Equil_Liq.top');
-
-        % Save topology file
-        fidTOP = fopen(Top_Filename,'wt');
-        fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
-        fclose(fidTOP);
 
         TPR_File = fullfile(Settings.WorkDir,'Equil_Liq.tpr');
         MDPout_File = fullfile(Settings.WorkDir,'Equil_Liq_out.mdp');
