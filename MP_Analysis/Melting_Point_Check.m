@@ -160,8 +160,15 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                     T_dat.Melt_Trace = [T_dat.Melt_Trace false];
                 end
                 
-                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-                save(Settings.CurrentTFile,'T_dat')
+                while true
+                    try
+                        copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                        save(Settings.CurrentTFile,'T_dat')
+                        break
+                    catch
+                        pause(10)
+                    end
+                end
                 feval = f; % function evaluation
                 fderiv = df; % function derivative
                 User_data = T_dat; % user data
@@ -180,8 +187,15 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
 
                 % Update reference T file
                 T_dat.Ref_Density_Trace = [T_dat.Ref_Density_Trace T_dat.T_ref];
-                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-                save(Settings.CurrentTFile,'T_dat')
+                while true
+                    try
+                        copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                        save(Settings.CurrentTFile,'T_dat')
+                        break
+                    catch
+                        pause(10)
+                    end
+                end
                 if Settings.Verbose
                     disp('Successfully updated initial configuration.')
                 end
@@ -399,8 +413,15 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 T_dat.df_Trace = [T_dat.df_Trace df];
                 T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
                 T_dat.Melt_Trace = [T_dat.Melt_Trace false];
-                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-                save(Settings.CurrentTFile,'T_dat')
+                while true
+                    try
+                        copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                        save(Settings.CurrentTFile,'T_dat')
+                        break
+                    catch
+                        pause(10)
+                    end
+                end
                 feval = -1; % function evaluation
                 fderiv = 0; % function derivative
                 User_data = T_dat; % user data
@@ -421,11 +442,25 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         max_steps = num2str(Settings.MaxCheckTime/CheckTime,'%03.f');
         
         % Copy over the structure, mdp, and top files
-        copyfile(Strucure_Ref_File,Strucure_In_File)
-        copyfile(Sol_Ref_File,Sol_In_File)
+        while true
+            try
+                copyfile(Strucure_Ref_File,Strucure_In_File)
+                copyfile(Sol_Ref_File,Sol_In_File)
+                break
+            catch
+                pause(10)
+            end
+        end
         Topology_File = fullfile(OuterDir,[Settings.JobName '.top']);
         MDP_in_File = fullfile(WorkDir,[Settings.JobName '.mdp']);
-        copyfile(fullfile(OuterDir,[Settings.JobName '.mdp']),MDP_in_File)
+        while true
+            try
+                copyfile(fullfile(OuterDir,[Settings.JobName '.mdp']),MDP_in_File)
+                break
+            catch
+                pause(10)
+            end
+        end
 
         Traj_Conf_File = fullfile(WorkDir,[Settings.JobName '_001.tpr']);
         MDP_out_File = fullfile(WorkDir,[Settings.JobName '_out.mdp']);
@@ -543,8 +578,15 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                     T_dat.df_Trace = [T_dat.df_Trace df];
                     T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
                     T_dat.Melt_Trace = [T_dat.Melt_Trace false];
-                    copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-                    save(Settings.CurrentTFile,'T_dat')
+                    while true
+                        try
+                            copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                            save(Settings.CurrentTFile,'T_dat')
+                            break
+                        catch
+                            pause(10)
+                        end
+                    end
                     feval = -1; % function evaluation
                     fderiv = 0; % function derivative
                     User_data = T_dat; % user data
@@ -720,8 +762,15 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 T_dat.df_Trace = [T_dat.df_Trace df];
                 T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
                 T_dat.Melt_Trace = [T_dat.Melt_Trace false];
-                copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-                save(Settings.CurrentTFile,'T_dat')
+                while true
+                    try
+                        copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                        save(Settings.CurrentTFile,'T_dat')
+                        break
+                    catch
+                        pause(10)
+                    end
+                end
                 feval = -1; % function evaluation
                 fderiv = 0; % function derivative
                 User_data = T_dat; % user data
@@ -825,8 +874,15 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
     T_dat.df_Trace = [T_dat.df_Trace df];
     T_dat.Freeze_Trace = [T_dat.Freeze_Trace Froze];
     T_dat.Melt_Trace = [T_dat.Melt_Trace Melted];
-    copyfile(Settings.CurrentTFile,Settings.PrevTFile)
-    save(Settings.CurrentTFile,'T_dat')
+    while true
+        try
+            copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+            save(Settings.CurrentTFile,'T_dat')
+            break
+        catch
+            pause(10)
+        end
+    end
     
     % Delete all but final cpt, tpr, and OutConf files
     if Settings.Delete_Backups
