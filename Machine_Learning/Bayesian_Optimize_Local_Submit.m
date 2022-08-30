@@ -179,14 +179,16 @@ for tidx = 1:length(Theories)
 end
 
 %% Submit jobs
+[home,project,computer,~,~,~,~,~,~,~,scratch] = find_home;
 workdir = pwd;
 % Loop through all models and build their submission file
 for idx = 1:length(Models)
     Model = Models(idx);
     Calc_Name = [Model.Salt '_' Model.Theory '_Model_' Model.Trial_ID];
+    Model_Name_abrv = [Model.Theory '_Model_' Model.Trial_ID];
     Calc_Dir = [workdir filesep Calc_Name];
     Model.Diary_Loc = [Calc_Dir filesep Calc_Name '.log'];
-    
+    Model.scratch_dir = fullfile(scratch,'Model_Building',Model.Salt,Model_Name_abrv);
     % Move to new directory
     if ~isfolder(Calc_Dir)
         mkdir(Calc_Dir)
