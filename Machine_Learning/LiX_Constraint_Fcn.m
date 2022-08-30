@@ -923,7 +923,7 @@ else
         end
     end
     if log1p(Loss) >= Settings.MinSkipLoss
-        tf(jdx) = false;
+        tf = false;
     end
 end
 
