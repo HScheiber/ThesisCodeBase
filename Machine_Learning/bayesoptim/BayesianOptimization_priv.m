@@ -2346,7 +2346,7 @@ classdef BayesianOptimization_priv
             % Random search
             XBest = randomXFeasiblePoints(this, N);
             bsf = minDist(XBest);
-            reps = 50;
+            reps = 10;
             for r = 1:reps
                 X = randomXFeasiblePoints(this, N);
                 if minDist(X) > bsf

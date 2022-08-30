@@ -61,6 +61,7 @@ tf = true(size(Params,1),1);
 
 if size(Params,1) > 1
     disp('Searching for initial feasible points...')
+    warning('off','MATLAB:mir_warning_maybe_uninitialized_temporary')
     parfor jdx = 1:size(Params,1)
         Param = Params(jdx,:);
         Settings = Input_Settings;
