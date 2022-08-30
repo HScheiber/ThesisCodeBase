@@ -201,7 +201,7 @@ Settings.Delete_Equil = true; % Deletes the equilibration folder, if it exists, 
 Settings.Delete_outputs = false; % delete stde and stdo after job finishes
 Settings.Delete_subms = false; % delete subm scripts after job finishes
 Settings.Delete_cpt = true; % delete all but one last checkpoint after job finishes
-Settings.MaxWarn = 1; % Maximum allowed warnings for gmx grompp
+Settings.MaxWarn = 2; % Maximum allowed warnings for gmx grompp
 
 %% Topology settings
 Settings.Top_gen_pairs = 'no'; % Automatically generate pairs
@@ -228,8 +228,6 @@ Settings.StepTolerance = 0; % K, tolerence for the melting point step size
 Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
 Settings.FinalDensityProfile = true; % Set to true to run a final density profile along the Z-dimension
 Settings.Delete_T_History = false; % deletes the intermediate temperature check files when true
-Settings.Equilibrate_Solid = 0; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Settings.Equilibrate_Liquid = 0; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.MinInterfaceWidth = 0.075; % [nm] +- distance from the solid-liquid interface within which to minimize
 Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing
 Settings.QECompressibility = 1e-6; % Compressibility used during the rapid-equilibration stages
@@ -273,6 +271,7 @@ Settings.C6_Damp = Init_C6Damping_Object;
 Settings.Liquid_Test_Time = 100; % ps
 Settings.Liquid_Equilibrate_Time = 25; % ps
 Settings.Solid_Test_Time = 30; % ps
-
+Settings.Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 
 end

@@ -50,8 +50,9 @@ clear;
 
 % Shared calculation parameters
 Shared_Settings = Initialize_LiX_BO_Settings;
-Shared_Settings.Max_Bayesian_Iterations = 400;
+Shared_Settings.Max_Bayesian_Iterations = 100;
 Shared_Settings.Max_Secondary_Iterations = 100;
+Shared_Settings.Max_Local_Iterations = 10;
 Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
 Shared_Settings.Loss_Convergence = 1e-6;
 Shared_Settings.Param_Convergence = 1e-3;
@@ -66,10 +67,12 @@ Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per
 Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
 Shared_Settings.JobSettings.dd = [1 2 4]; % Domain decomposition
 Shared_Settings.Cutoff_Buffer = 1.2; % This affects Structure_Minimization as well as other aspects of code
-Shared_Settings.MaxWarn = 2;
-Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
-Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
 
+% Constraints
+Shared_Settings.MinExpWallHeight = 200; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
+Shared_Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
+Shared_Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
 
 % MP / Finite T Settings
 Shared_Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
@@ -77,7 +80,7 @@ Shared_Settings.MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number
 Shared_Settings.Optimizer = 'MPSearcher';
 Shared_Settings.lb = 0; % K, lower bound on MP search
 Shared_Settings.ub = 2200; % K, upper bound on MP search
-Shared_Settings.BracketThreshold = 5; % [K] Sets the target bracket for the melting point
+Shared_Settings.BracketThreshold = 10; % [K] Sets the target bracket for the melting point
 Shared_Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearcher algorithm
 Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
 Shared_Settings.Liquid_Fraction = 0.50;
@@ -101,7 +104,7 @@ Shared_Settings.MinStepSize = 0.25;
 Shared_Settings.MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
 Shared_Settings.MeltFreezeThreshold = 0.25;
 Shared_Settings.Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Shared_Settings.Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Shared_Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Shared_Settings.PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 Shared_Settings.InitialMeshSize = 20;
 Shared_Settings.MeshSizeMultiplier = 5;
@@ -127,6 +130,8 @@ Shared_Settings.MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of
 Shared_Settings.MDP.Fourier_Spacing = 0.12;
 Shared_Settings.MDP.VerletBT = -1;
 
+Shared_Settings.MinSkipLoss = 2;
+
 idx = 0;
 
 %% BH Model (MP Test) XZ
@@ -150,10 +155,10 @@ for tidx = 1:length(Theories)
             Models(idx).Theory = Theory;
             Models(idx).Trial_ID = ['XX' Rep];
             
-%             % T=0 Loss
-%             Models(idx).Loss_Options.Rocksalt.LE = 1;
+            % T=0 Loss
+%            Models(idx).Loss_Options.Rocksalt.LE = 1;
 %             Models(idx).Loss_Options.Rocksalt.a = 1;
-%             Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
             
             % Finite T loss
             Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
@@ -161,7 +166,7 @@ for tidx = 1:length(Theories)
             Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
             Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
             Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-            Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
+%            Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
             
             % Aux options
             Models(idx).Structures = Auto_Structure_Selection(Models(idx));

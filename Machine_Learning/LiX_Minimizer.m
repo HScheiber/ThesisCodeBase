@@ -23,7 +23,16 @@
 %% Inputs
 function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varargin)
 
-coupledconstraints = []; % No coupled constraints on the system
+% Initialize coupled constraints to -1, this indicates the constraints are satisfied by default
+% The first coupled constraint is for model volumes at 0 K that are either
+% larger than Settings.MaxModelVolume or smaller than Settings.MinModelVolume.
+% The second coupled constraint is for finite temperature simulations that
+% give NaN outputs. These are caused when 
+%   (1) a simulation fails 
+%   (2) a melting point cannot be found for the structure of interest 
+%   (3) liquid is amorphous at the experimental MP 
+%   (4) the liquid or solid converts to another structure at the experimental MP
+coupledconstraints = -ones(1,2);
 
 % Optional inputs
 p = inputParser;
@@ -971,7 +980,7 @@ if Settings.CheckBadFcn
     minima_U = U_MX.Total(valleys_idx);
     
     if isempty(minima_U) % If no well minimum exists in MX interaction
-        Loss_add = Loss_add + log(1 + Settings.BadFcnLossPenalty);
+        Loss_add = Loss_add + Settings.BadFcnLossPenalty;
     elseif isempty(maxima_U) % If no peak exists in MX interaction
         % Do nothing, this is normal for JC potential and some BH/TF
         % potentials
@@ -979,7 +988,7 @@ if Settings.CheckBadFcn
         % ensure peak - well height is greater than specified threshold
         Threshold = Settings.MinExpWallHeight; % kJ/mol
         dU = maxima_U - minima_U;
-        Loss_add = Loss_add + log(1 + max(Threshold - dU,0)*Settings.BadFcnLossPenalty/Threshold);
+        Loss_add = Loss_add + max(Threshold - dU,0)*Settings.BadFcnLossPenalty/Threshold;
     end
 %     plot(U_MX.r,U_MX.Total)
 %     hold on
@@ -1011,7 +1020,7 @@ if Settings.CheckBadFcn
             % like-like interactions
             Threshold = Settings.MaxRepWellDepth; % kJ/mol
             dU = maxima_U(2) - minima_U;
-            Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
+            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
         elseif length(maxima_U) == 1 && isempty(minima_U) % One peak, no valley (this is a normal case for TF and BH repulsive potentials)
             % Do nothing
         elseif length(maxima_U) == 1 && length(minima_U) == 1 % One peak visible + one valley in between, and (possibly) one hidden peak to the right
@@ -1023,11 +1032,11 @@ if Settings.CheckBadFcn
                 % Ensure valley depth is not greater than the threshold
                 dU = U.Total(end) - minima_U;
             end
-            Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
+            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
         elseif length(minima_U) == 1 % well minima is available but no peaks are visible, there must be a hidden peak to the right
             Threshold = Settings.MaxRepWellDepth; % kJ/mol
             dU = U.Total(end) - minima_U;
-            Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
+            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
         else
             % This should never be reached...
             warning('Possible issue with the potential!')
@@ -1040,12 +1049,12 @@ if ~isfield(Settings,'MinSkipLoss')
     Settings.MinSkipLoss = defSettings.MinSkipLoss;
 end
 
-if Loss_add >= Settings.MinSkipLoss
-    Loss = Loss_add;
-    UserData.Minimization_Data = Settings.Minimization_Data;
-    UserData.Finite_T_Data = Settings.Finite_T_Data;
-    return
-end
+% if Loss_add >= Settings.MinSkipLoss
+%     Loss = Loss_add;
+%     UserData.Minimization_Data = Settings.Minimization_Data;
+%     UserData.Finite_T_Data = Settings.Finite_T_Data;
+%     return
+% end
 
 %% Parallel Setup
 N = length(Settings.Structures);
@@ -1132,44 +1141,33 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Structures{idx} = Settings.Minimization_Data{idx}.Structure;
     end
     strmatch = strcmp(Settings.Finite_T_Data.Structure,Structures);
-    if any(strmatch)
-        
-%         LE_model = Settings.Minimization_Data{strmatch}.E;
-%         LE_exp = Settings.Finite_T_Data.Exp_Solid_LE;
-%         E_Model_Mismatch = abs((LE_model - LE_exp)/LE_exp);
-        
-        V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
-%         V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
-%         Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
-%         V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
-%         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+    V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
+    
+    if ~isfield(Settings,'MaxModelVolume')
+        defSettings = Initialize_LiX_BO_Settings;
+        Settings.MaxModelVolume = defSettings.MaxModelVolume;
+    end
 
-        if ~isfield(Settings,'MaxModelVolume')
-            defSettings = Initialize_LiX_BO_Settings;
-            Settings.MaxModelVolume = defSettings.MaxModelVolume;
-        end
-        
-        if V0_model > Settings.MaxModelVolume
-            Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
-            Loss_add_Vol = log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
-        elseif V0_model < Settings.MinModelVolume
-            Model_Mismatch = (Settings.MinModelVolume - V0_model)/Settings.MinModelVolume;
-            Loss_add_Vol = log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
-        else
-            Loss_add_Vol = 0;
-        end
-        
-        Loss_add = Loss_add + Loss_add_Vol;
-        if Loss_add_Vol >= Settings.MinSkipLoss && ~Settings.Therm_Prop_Override
-            Settings.skip_finite_T = true;
-        else
-            Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
-            Settings.Geometry.a = Settings.Minimization_Data{strmatch}.a;
-            Settings.Geometry.b = Settings.Minimization_Data{strmatch}.b;
-            Settings.Geometry.c = Settings.Minimization_Data{strmatch}.c;
-        end
+    if V0_model > Settings.MaxModelVolume
+        Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
+        coupledconstraints(1) = Model_Mismatch;
+        Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;
+    elseif V0_model < Settings.MinModelVolume
+        Model_Mismatch = (Settings.MinModelVolume - V0_model)/Settings.MinModelVolume;
+        coupledconstraints(1) = Model_Mismatch;
+        Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;
     else
-        Settings.Ref_Density = 1/(Settings.Finite_T_Data.Exp_Liquid_V_MP*(0.1^3)); % molecules / nm^3
+        Loss_add_Vol = 0;
+    end
+
+    Loss_add = Loss_add + Loss_add_Vol;
+    if Loss_add_Vol >= Settings.MinSkipLoss && ~Settings.Therm_Prop_Override
+        Settings.skip_finite_T = true;
+    else
+        Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
+        Settings.Geometry.a = Settings.Minimization_Data{strmatch}.a;
+        Settings.Geometry.b = Settings.Minimization_Data{strmatch}.b;
+        Settings.Geometry.c = Settings.Minimization_Data{strmatch}.c;
     end
 end
 
@@ -1216,6 +1214,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
         Settings.Finite_T_Data.MP = nan;
+        coupledconstraints(2) = 1;
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
         if Settings.Delete_Equil && isfolder(Settings.WorkDir)
@@ -1244,7 +1243,6 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.Liquid_DM_MP] > tol) ...
         && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
     
-
     [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
     Settings.WorkDir = [WorkDir '_LP'];
     
@@ -1297,6 +1295,10 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
                 warning(['Unable to remove directory: ' Settings.WorkDir])
             end
         end
+    end
+    
+    if isnan(Liq_Output.Liquid_H_MP)
+        coupledconstraints(2) = 1;
     end
     
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
@@ -1372,6 +1374,10 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         end
     end
     
+    if isnan(Sol_Output.Solid_H_MP)
+        coupledconstraints(2) = 1;
+    end
+    
     Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
     Settings.Finite_T_Data.Solid_H_MP = Sol_Output.Solid_H_MP;
     
@@ -1411,7 +1417,7 @@ end
 % variable, so we don't need to double count. Use Settings.skip_finite_T as
 % a switch to disable re-calculating loss from finite T data
 % Calculate Loss function from data
-Loss = LiX_Loss(Settings) + Loss_add;
+Loss = real(log1p(LiX_Loss(Settings) + Loss_add));
 UserData.Finite_T_Data = Settings.Finite_T_Data;
 UserData.Minimization_Data = Settings.Minimization_Data;
 

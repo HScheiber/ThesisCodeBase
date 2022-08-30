@@ -70,7 +70,7 @@
 
 %% Global Calculation settings
 clear;
-[home,project,computer,Slurm] = find_home;
+[home,project,computer,Slurm,~,~,~,~,~,~,scratch] = find_home;
 
 % Shared calculation parameters
 Shared_Settings = Initialize_LiX_BO_Settings;
@@ -85,7 +85,6 @@ Shared_Settings.JobSettings.Cores = 12; % Minimum number of cores to request for
 Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
 Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-Shared_Settings.MaxWarn = 2;
 Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
 Shared_Settings.Loss_Convergence = 1e-6;
@@ -1008,6 +1007,8 @@ for idx = 1:length(Models)
     
     % Generate and move to the submission directory
     submit_dir = fullfile(project,'Model_Building',Model.Salt,Model_Name_abrv);
+    Model.scratch_dir = fullfile(scratch,'Model_Building',Model.Salt,Model_Name_abrv);
+    Model.OuterDir = submit_dir;
     Batch_Template = strrep(Batch_Template,'##DIRECTORY##',submit_dir);
     Model.Diary_Loc = fullfile(submit_dir,[Model_Name '.log']);
     if ~exist(submit_dir, 'dir')

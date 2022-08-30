@@ -400,10 +400,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         end
     end
     
-    
-    
-    
-    
     if Run_Equilibration
         
         % Check for a checkpoint file
