@@ -22,7 +22,7 @@
 % When Model.Parallel_Struct_Min = true, this uses the parallel version of the subroutine Structure_Minimization (Note: each instance of gromacs is single-core in either mode)
 %% Inputs
 function tf = LiX_Constraint_Fcn(Settings,Param)
-
+timer = tic;
 if ~isfield(Settings,'MinSkipLoss')
     defSettings = Initialize_LiX_BO_Settings;
     Settings.MinSkipLoss = defSettings.MinSkipLoss;
@@ -501,7 +501,7 @@ for j = 1:2
 end
 
 tf = log1p(Loss) < Settings.MinSkipLoss;
-
+disp(['Time elapsed (s): ' num2str(toc(timer))])
 % Plot result to visualize
 % tf_num = double(tf);
 

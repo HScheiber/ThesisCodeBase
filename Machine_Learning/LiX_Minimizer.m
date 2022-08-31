@@ -49,17 +49,6 @@ if Settings.Parallel_LiX_Minimizer && Settings.Parallel_Struct_Min
     Settings.Parallel_Struct_Min = false;
 end
 
-% Maintain backwards compatibility, add defaults that may be missing to C6Damp
-% C6D = Init_C6Damping_Object;
-% C6D_n = fieldnames(C6D);
-% for idx = 1:length(C6D_n)
-%     if ~isfield(Model.C6Damp,C6D_n{idx})
-%         Model.C6Damp.(C6D_n{idx}) = C6D.(C6D_n{idx});
-%     end
-% end
-
-[Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
-
 % Potential Scaling
 if istable(Param) || isstruct(Param)
     if strcmp(Settings.Theory,'TF')
@@ -169,9 +158,9 @@ if istable(Param) || isstruct(Param)
                 sqrt_Q.I  = 5.533218150000000;
 
                 % Calculate Scaled C8 using recursion relation from D3 paper
-                C8.MM = 3.0*(Settings.S.D6D.MM*TF_MM.C/c6units)*sqrt_Q.(Metal)*sqrt_Q.(Metal)*c8units; % in kJ/mol nm^8
-                C8.XX = 3.0*(Settings.S.D6D.XX*TF_XX.C/c6units)*sqrt_Q.(Halide)*sqrt_Q.(Halide)*c8units; % in kJ/mol nm^8
-                C8.MX = 3.0*(Settings.S.D6D.MX*TF_MX.C/c6units)*sqrt_Q.(Metal)*sqrt_Q.(Halide)*c8units; % in kJ/mol nm^8
+                C8.MM = 3.0*(Settings.S.D6D.MM*TF_MM.C/c6units)*sqrt_Q.(Settings.Metal)*sqrt_Q.(Settings.Metal)*c8units; % in kJ/mol nm^8
+                C8.XX = 3.0*(Settings.S.D6D.XX*TF_XX.C/c6units)*sqrt_Q.(Settings.Halide)*sqrt_Q.(Settings.Halide)*c8units; % in kJ/mol nm^8
+                C8.MX = 3.0*(Settings.S.D6D.MX*TF_MX.C/c6units)*sqrt_Q.(Settings.Metal)*sqrt_Q.(Settings.Halide)*c8units; % in kJ/mol nm^8
 
                 % Update the scaling
                 Settings.S.D8D.MM = C8.MM/TF_MM.D;
@@ -558,9 +547,9 @@ else
                 sqrt_Q.I  = 5.533218150000000;
 
                 % Calculate Scaled C8 using recursion relation from D3 paper
-                C8.MM = 3.0*(Settings.S.D6D.MM*TF_MM.C/c6units)*sqrt_Q.(Metal)*sqrt_Q.(Metal)*c8units; % in kJ/mol nm^8
-                C8.XX = 3.0*(Settings.S.D6D.XX*TF_XX.C/c6units)*sqrt_Q.(Halide)*sqrt_Q.(Halide)*c8units; % in kJ/mol nm^8
-                C8.MX = 3.0*(Settings.S.D6D.MX*TF_MX.C/c6units)*sqrt_Q.(Metal)*sqrt_Q.(Halide)*c8units; % in kJ/mol nm^8
+                C8.MM = 3.0*(Settings.S.D6D.MM*TF_MM.C/c6units)*sqrt_Q.(Settings.Metal)*sqrt_Q.(Settings.Metal)*c8units; % in kJ/mol nm^8
+                C8.XX = 3.0*(Settings.S.D6D.XX*TF_XX.C/c6units)*sqrt_Q.(Settings.Halide)*sqrt_Q.(Settings.Halide)*c8units; % in kJ/mol nm^8
+                C8.MX = 3.0*(Settings.S.D6D.MX*TF_MX.C/c6units)*sqrt_Q.(Settings.Metal)*sqrt_Q.(Settings.Halide)*c8units; % in kJ/mol nm^8
 
                 % Update the scaling
                 Settings.S.D8D.MM = C8.MM/TF_MM.D;
@@ -958,7 +947,7 @@ if Settings.CheckBadFcn
     tl = Settings.Table_Length;
     ss = Settings.Table_StepSize;
     Settings.Table_Length = 10; % nm
-    Settings.Table_StepSize = 0.002;
+    Settings.Table_StepSize = 0.01;
     if strcmp(Settings.Theory,'BH')
         [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
             'Startpoint',0.01,'ReturnAsStructure',true);
@@ -981,14 +970,14 @@ if Settings.CheckBadFcn
     
     if isempty(minima_U) % If no well minimum exists in MX interaction
         Loss_add = Loss_add + Settings.BadFcnLossPenalty;
-    elseif isempty(maxima_U) % If no peak exists in MX interaction
-        % Do nothing, this is normal for JC potential and some BH/TF
-        % potentials
+    elseif isempty(maxima_U) % If no peak exists in MX interaction, but valley does, check well depth. 
+        % This is normal for JC potential and some BH/TF potentials
+        Loss_add = Loss_add + max(Settings.MaxAttWellDepth - minima_U,0)*Settings.BadFcnLossPenalty;
     else % Otherwise, a well minimum exists and at least one peak exists
-        % ensure peak - well height is greater than specified threshold
-        Threshold = Settings.MinExpWallHeight; % kJ/mol
+        % Penalize wells that are too shallow and wells that are too deep
         dU = maxima_U - minima_U;
-        Loss_add = Loss_add + max(Threshold - dU,0)*Settings.BadFcnLossPenalty/Threshold;
+        Loss_add = Loss_add + max(Settings.MinExpWallHeight - dU,0)*Settings.BadFcnLossPenalty;
+        Loss_add = Loss_add + max(Settings.MaxAttWellDepth - minima_U,0)*Settings.BadFcnLossPenalty;
     end
 %     plot(U_MX.r,U_MX.Total)
 %     hold on
@@ -1043,18 +1032,6 @@ if Settings.CheckBadFcn
         end
     end
 end
-
-if ~isfield(Settings,'MinSkipLoss')
-    defSettings = Initialize_LiX_BO_Settings;
-    Settings.MinSkipLoss = defSettings.MinSkipLoss;
-end
-
-% if Loss_add >= Settings.MinSkipLoss
-%     Loss = Loss_add;
-%     UserData.Minimization_Data = Settings.Minimization_Data;
-%     UserData.Finite_T_Data = Settings.Finite_T_Data;
-%     return
-% end
 
 %% Parallel Setup
 N = length(Settings.Structures);
