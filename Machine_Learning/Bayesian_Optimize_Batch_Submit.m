@@ -235,10 +235,10 @@ switch lower(computer)
         %% JC Models JI, JJ
         Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
-        Shared_Settings.JobSettings.MPI_Ranks = 3; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.JobSettings.OMP_Threads = 4; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-        Shared_Settings.JobSettings.dd = [1 1 3]; % Domain decomposition
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'JC'};
         Replicates = 1:5;
@@ -353,10 +353,10 @@ switch lower(computer)
         %% JC Models JL
         Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-        Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-        Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-        Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+        Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'JC'};
         Replicates = 1:5;
@@ -503,10 +503,10 @@ switch lower(computer)
         %% JC Models JN, JO, JP
         Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-        Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-        Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-        Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+        Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'JC'};
         Replicates = 1:5;
@@ -665,10 +665,10 @@ switch lower(computer)
         %% JC Models JH, JK
         Shared_Settings.JobSettings.N_Calc = 4; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
-        Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-        Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-        Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+        Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'JC'};
         Replicates = 1:5;
@@ -847,10 +847,10 @@ switch lower(computer)
         %% JC Models JH, JI, JJ, JK, [not JL], JM
         Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
         Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
-        Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-        Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-        Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+        Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'JC'};
         Replicates = 1:5;
