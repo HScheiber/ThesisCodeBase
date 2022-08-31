@@ -18,6 +18,7 @@ Settings.Fix_C8 = false; % Active for TF model only when NOT using SigmaEpsilon 
 Settings.Diary_Loc = '';
 
 % Parameter Ranges
+% Dispersion scaling mode
 Settings.SDMM_Range = [0 1000]; % Default range for MM dispersion scaling in JC model.
 Settings.SDXX_Range = [0 40]; % Default range for XX dispersion scaling in JC/BH model.
 Settings.SDMX_Range = [0 40]; % Default range for MX dispersion scaling in JC/BH model.
@@ -44,21 +45,39 @@ Settings.SRXX_Range = [0.1 50]; % Default range for XX repulsive prefactor scali
 Settings.SRMX_Range = [0.1 50]; % Default range for MX repulsive prefactor scaling in JC/BH model.
 
 % Exp-C6 or Exp-C6-C8: "sigma-epsilon" version parameters
-Settings.Sr0MM_Range = [0.1 0.4];  % [nm] Default range for MM r0 parameter
-Settings.Sr0XX_Range = [0.1 0.8]; % [nm] Default range for XX r0 parameter
-Settings.Sr0MX_Range = [0.1 0.8]; % [nm] Default range for MX r0 parameter
+% BH / TF models
+Settings.Sr0MM_Range = [0.1 0.5];  % [nm] Default range for MM r0 parameter (TF/BH)
+Settings.Sr0XX_Range = [0.1 0.8]; % [nm] Default range for XX r0 parameter (TF/BH)
+Settings.Sr0MX_Range = [0.1 0.8]; % [nm] Default range for MX r0 parameter (TF/BH)
 
-Settings.SepsMM_Range = [0 1000]; % [kJ/mol] Default range for MM epsilon parameter
-Settings.SepsXX_Range = [0 1000]; % [kJ/mol] Default range for XX epsilon parameter
-Settings.SepsMX_Range = [0 1000]; % [kJ/mol] Default range for MX epsilon parameter
+Settings.SepsMM_Range = [1e-4 1e12]; % [kJ/mol] Default range for MM epsilon parameter in TF models
+Settings.SepsXX_Range = [1e-4 1e12]; % [kJ/mol] Default range for XX epsilon parameter in TF models
+Settings.SepsMX_Range = [1e-4 1e12]; % [kJ/mol] Default range for MX epsilon parameter in TF models
+Settings.SepsMM_RangeBH = [0 400]; % [kJ/mol] Default range for MM epsilon parameter in BH models
+Settings.SepsXX_RangeBH = [0 400]; % [kJ/mol] Default range for XX epsilon parameter in BH models
+Settings.SepsMX_RangeBH = [0 400]; % [kJ/mol] Default range for MX epsilon parameter in BH models
 
-Settings.SgamMM_Range = [1 48/7]; % [Unitless] Default range for MM gamma parameter in TF models
-Settings.SgamXX_Range = [1 48/7]; % [Unitless] Default range for XX gamma parameter in TF models
-Settings.SgamMX_Range = [1 48/7]; % [Unitless] Default range for MX gamma parameter in TF models
-Settings.SgamMM_RangeBH = [6 80]; % [Unitless] Default range for MM gamma parameter in BH models
-Settings.SgamXX_RangeBH = [6 80]; % [Unitless] Default range for XX gamma parameter in BH models
-Settings.SgamMX_RangeBH = [6 80]; % [Unitless] Default range for MX gamma parameter in BH models
+% for TF model, gamma must remain in region bounded by (0,48/7] to remain valid
+% Large values of gamma increase well depth
+Settings.SgamMM_Range = [1e-8 6]; % [Unitless] Default range for MM gamma parameter in TF models
+Settings.SgamXX_Range = [1e-8 6]; % [Unitless] Default range for XX gamma parameter in TF models
+Settings.SgamMX_Range = [1e-8 6]; % [Unitless] Default range for MX gamma parameter in TF models
+% for BH model, gamma must remain in region bounded by [6 Inf] to remain valid
+Settings.SgamMM_RangeBH = [6 30]; % [Unitless] Default range for MM gamma parameter in BH models
+Settings.SgamXX_RangeBH = [6 30]; % [Unitless] Default range for XX gamma parameter in BH models
+Settings.SgamMX_RangeBH = [6 30]; % [Unitless] Default range for MX gamma parameter in BH models
 
+% JC model
+Settings.SsigmaMM_Range = [0.1 0.5];  % [nm] Default range for MM sigma parameter
+Settings.SsigmaXX_Range = [0.1 0.8]; % [nm] Default range for XX sigma parameter
+Settings.SsigmaMX_Range = [0.1 0.8]; % [nm] Default range for MX sigma parameter
+
+Settings.SepsMM_RangeJC = [0 400]; % [kJ/mol] Default range for MM epsilon parameter
+Settings.SepsXX_RangeJC = [0 400]; % [kJ/mol] Default range for XX epsilon parameter
+Settings.SepsMX_RangeJC = [0 400]; % [kJ/mol] Default range for MX epsilon parameter
+Settings.SepsMM2_RangeJC = [0 1000]; % [kJ/mol] Default range for extra MM epsilon parameter, if enabled
+
+% Charge
 Settings.Q_Range = [0.95 1.05]; % Default range for charge scaling. Only meaningful when Fix_Charge = false
 Settings.Q_value = 1.0; % Default value for the charge scale. Only meaningful when Fix_Charge = true
 
@@ -85,11 +104,12 @@ Settings.Additional_GAdjust_Ranges = {};
 % 6 = WY damping function (strongest damping)
 Settings.Extra_Properties = true; % calculate extra properties for the final computation
 
-% Loss options
+% Loss and constraint options
 Settings.Loss_Options = init_loss_options; % default loss options
 Settings.CheckBadFcn = true; % Switch to turn on or off the checking of pathological functions, adding a loss penalty for such functions
-Settings.MinExpWallHeight = 100; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
+Settings.MaxAttWellDepth = -3000; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
 Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.BadFcnLossPenalty = 1000; % Penalty to give when (1) the function shape is deemed pathological or (2) the optimized crystal volume is too small or large

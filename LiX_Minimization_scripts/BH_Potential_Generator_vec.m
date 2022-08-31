@@ -41,7 +41,7 @@ q.(Settings.Halide)= -Settings.S.Q; % atomic
 %% Calculate Pauling Coefficients beta: MX = +-   MM = ++     XX = --
 beta.MM = 1 + 2/valence.(Settings.Metal); % Unitless
 beta.XX = 1 - 2/valence.(Settings.Halide); % Unitless
-beta.MX = sqrt(beta.MM*beta.XX); % Unitless
+beta.MX = 1 + 1/valence.(Settings.Metal) - 1/valence.(Settings.Halide); % Unitless
 
 %% Calculate Repulsive Exponential Parameter alpha: MX = +-   MM = ++     XX = --
 alpha.MM = Settings.S.A.All.*Settings.S.A.MM./rho.(Settings.Salt); % nm^-1

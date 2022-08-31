@@ -520,7 +520,7 @@ r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 
 %% Calculate Pauling Coefficients beta: MX = +-   MM = ++     XX = --
 beta.MM = 1 + 2/valence.(Metal); % Unitless
-beta.MX = 1 + q.(Metal)/valence.(Metal) + q.(Halide)/valence.(Halide); % Unitless
+beta.MX = 1 + 1/valence.(Metal) - 1/valence.(Halide); % Unitless
 beta.XX = 1 - 2/valence.(Halide); % Unitless
 
 %% Calculate TF Repulsive Exponential Parameter alpha: MX = +-   MM = ++     XX = --

@@ -263,31 +263,31 @@ if istable(Param) || isstruct(Param)
             [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
             
             % Sigma scaling
-            Settings.S.S.MM = Param.Sigma_MM/MMParams.sigma;
-            Settings.S.S.XX = Param.Sigma_XX/XXParams.sigma;
+            Settings.S.S.MM = Param.sigma_MM/MMParams.sigma;
+            Settings.S.S.XX = Param.sigma_XX/XXParams.sigma;
             
             % Epsilon scaling
-            Settings.S.E.MM = Param.Epsilon_MM/MMParams.epsilon;
-            Settings.S.E.XX = Param.Epsilon_XX/XXParams.epsilon;
+            Settings.S.E.MM = Param.epsilon_MM/MMParams.epsilon;
+            Settings.S.E.XX = Param.epsilon_XX/XXParams.epsilon;
             
             % Default MX params
             def_S_MX = MXParams.sigma;
             def_E_MX = sMXParams.epsilon;
             
             if Settings.Additivity
-                Sigma_MX = (Param.Sigma_MM + Param.Sigma_XX)/2;
-                Epsilon_MX = sqrt(Param.Epsilon_MM*Param.Epsilon_XX);
+                Sigma_MX = (Param.sigma_MM + Param.sigma_XX)/2;
+                Epsilon_MX = sqrt(Param.epsilon_MM*Param.epsilon_XX);
                 
                 Settings.S.S.MX = Sigma_MX/def_S_MX;
                 Settings.S.E.MX = Epsilon_MX/def_E_MX;
                 
                 if Settings.Additional_MM_Disp
-                    Full_MM_Epsilon = Param.Epsilon_MM + Param.Epsilon_MM2;
+                    Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
                     Settings.S.E.MM = Full_MM_Epsilon/MMParams.epsilon;
                 end
             else
-                Settings.S.S.MX = Param.Sigma_MX/def_S_MX;
-                Settings.S.E.MX = Param.Epsilon_MX/def_E_MX;
+                Settings.S.S.MX = Param.sigma_MX/def_S_MX;
+                Settings.S.E.MX = Param.epsilon_MX/def_E_MX;
             end
         
         % Scaled dispersion/repulsion form

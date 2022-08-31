@@ -98,13 +98,13 @@ if strcmp(Settings.Theory,'TF')
         B_XX = 48.*epsilon_XX.*exp(gamma_XX)./(48 - 7*gamma_XX);
         B_MX = 48.*epsilon_MX.*exp(gamma_MX)./(48 - 7*gamma_MX);
 
-        C_MM = 4.*epsilon_MM.*gamma_MM.*(r0_MM^6)./(48 - 7.*gamma_MM);
-        C_XX = 4.*epsilon_XX.*gamma_XX.*(r0_XX^6)./(48 - 7.*gamma_XX);
-        C_MX = 4.*epsilon_MX.*gamma_MX.*(r0_MX^6)./(48 - 7.*gamma_MX);
+        C_MM = 4.*epsilon_MM.*gamma_MM.*(r0_MM.^6)./(48 - 7.*gamma_MM);
+        C_XX = 4.*epsilon_XX.*gamma_XX.*(r0_XX.^6)./(48 - 7.*gamma_XX);
+        C_MX = 4.*epsilon_MX.*gamma_MX.*(r0_MX.^6)./(48 - 7.*gamma_MX);
 
-        D_MM = 3.*epsilon_MM.*gamma_MM.*(r0_MM^8)./(48 - 7.*gamma_MM);
-        D_XX = 3.*epsilon_XX.*gamma_XX.*(r0_XX^8)./(48 - 7.*gamma_XX);
-        D_MX = 3.*epsilon_MX.*gamma_MX.*(r0_MX^8)./(48 - 7.*gamma_MX);
+        D_MM = 3.*epsilon_MM.*gamma_MM.*(r0_MM.^8)./(48 - 7.*gamma_MM);
+        D_XX = 3.*epsilon_XX.*gamma_XX.*(r0_XX.^8)./(48 - 7.*gamma_XX);
+        D_MX = 3.*epsilon_MX.*gamma_MX.*(r0_MX.^8)./(48 - 7.*gamma_MX);
 
         % Convert to scaling w.r.t. TF
         Settings.S.A.MM = alpha_MM./TF_MM.alpha;
@@ -278,31 +278,31 @@ elseif strcmp(Settings.Theory,'JC') % JC models
     if Settings.SigmaEpsilon
 
         % Sigma scaling
-        Settings.S.S.MM = Param.Sigma_MM./JC_MM.sigma;
-        Settings.S.S.XX = Param.Sigma_XX./JC_XX.sigma;
+        Settings.S.S.MM = Param.sigma_MM./JC_MM.sigma;
+        Settings.S.S.XX = Param.sigma_XX./JC_XX.sigma;
 
         % Epsilon scaling
-        Settings.S.E.MM = Param.Epsilon_MM./JC_MM.epsilon;
-        Settings.S.E.XX = Param.Epsilon_XX./JC_XX.epsilon;
+        Settings.S.E.MM = Param.epsilon_MM./JC_MM.epsilon;
+        Settings.S.E.XX = Param.epsilon_XX./JC_XX.epsilon;
 
         % Default MX params
         def_S_MX = JC_MX.sigma;
         def_E_MX = JC_MX.epsilon;
 
         if Settings.Additivity
-            Sigma_MX = (Param.Sigma_MM + Param.Sigma_XX)./2;
-            Epsilon_MX = sqrt(Param.Epsilon_MM.*Param.Epsilon_XX);
+            Sigma_MX = (Param.sigma_MM + Param.sigma_XX)./2;
+            Epsilon_MX = sqrt(Param.epsilon_MM.*Param.epsilon_XX);
 
             Settings.S.S.MX = Sigma_MX./def_S_MX;
             Settings.S.E.MX = Epsilon_MX./def_E_MX;
 
             if Settings.Additional_MM_Disp
-                Full_MM_Epsilon = Param.Epsilon_MM + Param.Epsilon_MM2;
+                Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
                 Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
             end
         else
-            Settings.S.S.MX = Param.Sigma_MX./def_S_MX;
-            Settings.S.E.MX = Param.Epsilon_MX./def_E_MX;
+            Settings.S.S.MX = Param.sigma_MX./def_S_MX;
+            Settings.S.E.MX = Param.epsilon_MX./def_E_MX;
         end
 
     % Scaled dispersion/repulsion form
@@ -357,12 +357,11 @@ elseif strcmp(Settings.Theory,'JC') % JC models
     end
 end
 
-% Calculate loss due to infeasible TF / BH models with no well minima (only works reliably in sigma-epsilon form)
+% Calculate loss due to infeasible models with no well minima (only works reliably for BH/TF models in sigma-epsilon form)
 if strcmp(Settings.Theory,'BH')
     U = BH_Potential_Generator_vec(Settings);
 elseif strcmp(Settings.Theory,'TF')
-    [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
-        'Startpoint',0.01,'ReturnAsStructure',true);
+    U = TF_Potential_Generator_vec(Settings);
 elseif strcmp(Settings.Theory,'JC')
     U = JC_Potential_Generator_vec(Settings);
 end
@@ -374,29 +373,39 @@ valleys_idx = islocalmin(U.MX,2);
 Num_peaks = sum(peaks_idx,2);
 Num_valleys = sum(valleys_idx,2);
 
-no_valley_idx = Num_valleys == 0; % Potentials that contain no minimum
-well_idx = find((Num_valleys > 0) & (Num_peaks > 0)); % Potentials with both a max and min, indicating a well is present
-
-peak_with_well = peaks_idx(well_idx,:);
-valley_with_well = valleys_idx(well_idx,:);
+nv_idx = Num_valleys == 0;                        % Potentials that contain no valley
+ovnp_idx = (Num_valleys == 1) & (Num_peaks == 0); % Potentials with 1 valley and no peak
+ovop_idx = (Num_valleys == 1) & (Num_peaks == 1); % Potentials with 1 peak and 1 valley
 
 % If no well minimum exists in MX interaction, add a loss penalty
-Loss(no_valley_idx) = Loss(no_valley_idx) + Settings.BadFcnLossPenalty;
+Loss(nv_idx) = Loss(nv_idx) + Settings.BadFcnLossPenalty;
 
-% If no peak exists in MX interaction, do nothing. 
+% If no peak exists in MX interaction, but valley does, check well depth. 
 % This is normal for JC potential and some BH/TF potentials
+U_MX_ovnp_set = U.MX(ovnp_idx,:);
+ov_idx = sum( cumprod(valleys_idx(ovnp_idx,:) == 0, 2), 2) + 1;
+ovl_idx = sub2ind(size(U_MX_ovnp_set),(1:numel(ov_idx)).',ov_idx);
+U_min = U_MX_ovnp_set(ovl_idx);
+Loss(ovnp_idx) = Loss(ovnp_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Settings.BadFcnLossPenalty;
 
 % If both a peak and minimum exist, find the well depth
-U_MX_well = U.MX(well_idx,:)';
-dU = U_MX_well(peak_with_well') - U_MX_well(valley_with_well');
-Loss(well_idx) = Loss(well_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty;
+U_MX_ovop_set = U.MX(ovop_idx,:);
+op_idx = sum( cumprod(peaks_idx(ovop_idx,:) == 0, 2), 2)  + 1;
+opl_idx = sub2ind(size(U_MX_ovop_set),(1:numel(op_idx)).',op_idx);
+ov_idx = sum( cumprod(valleys_idx(ovop_idx,:) == 0, 2), 2) + 1;
+ovl_idx = sub2ind(size(U_MX_ovop_set),(1:numel(ov_idx)).',ov_idx);
+dU = U_MX_ovop_set(opl_idx) - U_MX_ovop_set(ovl_idx);
+U_min = U_MX_ovop_set(ovl_idx);
+% Penalize wells that are too shallow and wells that are too deep
+Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty; % too shallow
+Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Settings.BadFcnLossPenalty; % too deep
 
-%         idx = 1097;
-%         plot(U.r,U.MX(idx,:))
-%         hold on
-%         scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
-%         scatter(U.r(valleys_idx(idx,:)),U.MX(idx,valleys_idx(idx,:)))
-%         ylim([-1000 1000])
+% idx = 9983;
+% plot(U.r,U.MX(idx,:))
+% hold on
+% scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
+% scatter(U.r(valleys_idx(idx,:)),U.MX(idx,valleys_idx(idx,:)))
+% ylim([-1000 1000])
 
 %% Grab the peaks and valleys of the MM/XX potentials
 YY = {'MM' 'XX'};
@@ -422,20 +431,18 @@ for j = 1:2
     % One peak, no valley: This is a normal case for TF and BH
     % repulsive potentials, check to ensure the peak height is at
     % least Settings.MinExpWallHeight
-    opnv_set = peaks_idx(opnv_idx,:);
     U_jj_opnv = U.(jj)(opnv_idx,:)';
-    dU = U_jj_opnv(opnv_set');
+    dU = U_jj_opnv(peaks_idx(opnv_idx,:)');
     Loss(opnv_idx) = Loss(opnv_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty;
-
+    
     % two peaks are visible implies one valley in between them: 
     % Penalize any model with a non-zero well depth greater than Settings.MaxRepWellDepth
-    tpov_set = peaks_idx(tpov_idx,:);
     U_jj_tpov_set = U.(jj)(tpov_idx,:);
-    sp_idx = length(U.r) - sum( cumprod(fliplr(tpov_set) == 0, 2), 2);
+    sp_idx = length(U.r) - sum( cumprod(fliplr(peaks_idx(tpov_idx,:)) == 0, 2), 2);
     spl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(sp_idx)).',sp_idx);
-    mv_idx = sum( cumprod(valleys_idx(tpov_idx,:) == 0, 2), 2) + 1;
-    mvl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(mv_idx)).',mv_idx);
-    dU = U_jj_tpov_set(spl_idx) - U_jj_tpov_set(mvl_idx);
+    ov_idx = sum( cumprod(valleys_idx(tpov_idx,:) == 0, 2), 2) + 1;
+    ovl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(ov_idx)).',ov_idx);
+    dU = U_jj_tpov_set(spl_idx) - U_jj_tpov_set(ovl_idx);
     Loss(tpov_idx) = Loss(tpov_idx) + max(dU - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
 
     % One peak visible + one valley, and (possibly) one hidden peak to the right
@@ -454,9 +461,9 @@ for j = 1:2
 
     % Valley closer set: use peak_U - valley_U
     U_jj_opovc_set = U_jj_opov_set(ovcc_idx,:);
-    opc_idx = op_idx(ovcc_idx);
+    opc_idx = op_idx(ovcc_idx,:);
     opcl_idx = sub2ind(size(U_jj_opovc_set),(1:numel(opc_idx)).',opc_idx);
-    ovc_idx = ov_idx(ovcc_idx);
+    ovc_idx = ov_idx(ovcc_idx,:);
     ovcl_idx = sub2ind(size(U_jj_opovc_set),(1:numel(ovc_idx)).',ovc_idx);
     dUc = U_jj_opovc_set(opcl_idx) - U_jj_opovc_set(ovcl_idx);
     Lossn(ovcc_idx) =  max(dUc - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
@@ -495,4 +502,22 @@ end
 
 tf = log1p(Loss) < Settings.MinSkipLoss;
 
+% Plot result to visualize
+tf_num = double(tf);
+
+% 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
+% 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
+
+
+ax1 = 'sigma_MM';
+ax2 = 'sigma_XX';
+ax3 = 'epsilon_XX';
+
+scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
+%set(gca, 'YScale', 'log')
+xlabel(ax1);
+ylabel(ax2);
+zlabel(ax3);
+
+clear;
 end
