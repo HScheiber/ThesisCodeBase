@@ -483,6 +483,12 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
                 %Settings.QECompressibility = Settings.QECompressibility_init;
                 Settings.MDP.dt = Settings.MDP.dt/2;
                 Settings.Output_Coords = Settings.Output_Coords*2;
+                if isfile(cpt_file)
+                    delete(cpt_file)
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file)
+                end
                 Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
                 return
             else

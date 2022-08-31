@@ -751,6 +751,12 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 end
                 Settings.MDP.dt = Settings.MDP.dt/2;
                 Settings.Output_Coords = Settings.Output_Coords*2;
+                if isfile(cpt_file)
+                    delete(cpt_file);
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file);
+                end
                 Output = Calc_Liquid_Properties_at_MP(Settings);
                 return
             else
@@ -933,20 +939,43 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             catch me
                 disp(me.message)
             end
-            if Settings.Verbose
-                disp(outp)
-                disp(['(2/2) Liquid Dynamics Failed! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+            
+            WorkDir = Settings.WorkDir;
+            Settings = Inp_Settings;
+            Settings.WorkDir = WorkDir;
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
+                if Settings.Verbose
+                    disp(['Liquid dynamics failed. Restarting with reduced time step. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')])
+                end
+                Settings.MDP.dt = Settings.MDP.dt/2;
+                Settings.Output_Coords = Settings.Output_Coords*2;
+                
+                if isfile(cpt_file) 
+                    delete(cpt_file)
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file)
+                end
+                Output = Calc_Liquid_Properties_at_MP(Settings);
+                return
+            else
+                if Settings.Verbose
+                    disp(['Liquid dynamics failed. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')])
+                    disp('Model may be completely unstable!')
+                    disp(['WorkDir: ' WorkDir])
+                    disp(outp)
+                end
+                Output.Liquid_V_MP = nan;
+                Output.Liquid_H_MP = nan;
+                Output.Liquid_DM_MP = nan;
+                Output.Liquid_DX_MP = nan;
+                save(Output_Properties_File,'Output');
+                diary off
+                if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+                    diary(Settings.Diary_Loc)
+                end
+                return
             end
-            Output.Liquid_V_MP = nan;
-            Output.Liquid_H_MP = nan;
-            Output.Liquid_DM_MP = nan;
-            Output.Liquid_DX_MP = nan;
-            save(Output_Properties_File,'Output');
-            diary off
-            if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-                diary(Settings.Diary_Loc)
-            end
-            return
         end
     else
         if Settings.Verbose

@@ -123,17 +123,6 @@ else
         end
     end
     Settings = Inp_Settings;
-%     if ~isfield(Settings,'QECompressibility_init')
-%         Settings.QECompressibility_init = Settings.QECompressibility;
-%     end
-%     if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-%         if Settings.Verbose
-%             disp('Equilibration failed. Retrying with stiffer compressibility.')
-%         end
-%         Settings.QECompressibility = Settings.QECompressibility/2;
-%         save(fullfile(Directory,'TempJobInfo.mat'),'Settings');
-%         Output = MD_PreEquilibrate(Directory);
-%         return
 	if Settings.MDP.dt/2 >= Settings.MinTimeStep
         if Settings.Verbose
             disp('Equilibration failed. Reducing time step.')
