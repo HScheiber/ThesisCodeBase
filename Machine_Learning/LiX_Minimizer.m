@@ -23,11 +23,7 @@
 %% Inputs
 function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varargin)
 
-% Initialize coupled constraints to -1, this indicates the constraints are satisfied by default
-% The first coupled constraint is for model volumes at 0 K that are either
-% larger than Settings.MaxModelVolume or smaller than Settings.MinModelVolume.
-%
-% The second coupled constraint is for finite temperature simulations that
+% The coupled constraint is for finite temperature simulations that
 % give NaN outputs, or for Structure_Minimization calculations that are not feasible. 
 % These are caused when 
 %   (1) The lattice params of a structure are too large or too small
@@ -36,7 +32,7 @@ function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varar
 %   (4) A melting point cannot be found for the structure of interest 
 %   (5) The liquid is amorphous at the experimental MP 
 %   (6) The liquid or solid converts to another structure at the experimental MP
-coupledconstraints = -ones(1,2);
+coupledconstraints = -1;
 
 % Optional inputs
 p = inputParser;
@@ -1132,13 +1128,13 @@ end
 % This catches Structure_Minimization calculations that produce a result
 % outside of the allowed energy or volume bounds
 if Structure_Min_Calc_Fail && ~Settings.Therm_Prop_Override
-    coupledconstraints(2) = 1;
+    coupledconstraints = 1;
     Loss = real(log1p(Loss_add + Settings.BadFcnLossPenalty));
     UserData.Minimization_Data = Settings.Minimization_Data;
     UserData.Finite_T_Data = Settings.Finite_T_Data;
     return
 elseif Structure_Min_Calc_Fail && Settings.Therm_Prop_Override
-    coupledconstraints(2) = 1;
+    coupledconstraints = 1;
     Loss_add = Loss_add + Settings.BadFcnLossPenalty;
 end
 
@@ -1174,18 +1170,16 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
 
     if V0_model > Settings.MaxModelVolume
         Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
-        coupledconstraints(1) = Model_Mismatch;
         Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;
     elseif V0_model < Settings.MinModelVolume
         Model_Mismatch = (Settings.MinModelVolume - V0_model)/Settings.MinModelVolume;
-        coupledconstraints(1) = Model_Mismatch;
         Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;
     else
         Loss_add_Vol = 0;
     end
 
     Loss_add = Loss_add + Loss_add_Vol;
-    if Loss_add_Vol >= Settings.MinSkipLoss && ~Settings.Therm_Prop_Override
+    if real(log1p(Loss_add)) >= Settings.MinSkipLoss && ~Settings.Therm_Prop_Override
         Settings.skip_finite_T = true;
     else
         Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
@@ -1238,7 +1232,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
         Settings.Finite_T_Data.MP = nan;
-        coupledconstraints(2) = 1;
+        coupledconstraints = 1;
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
         if Settings.Delete_Equil && isfolder(Settings.WorkDir)
@@ -1322,7 +1316,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     end
     
     if isnan(Liq_Output.Liquid_H_MP)
-        coupledconstraints(2) = 1;
+        coupledconstraints = 1;
     end
     
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
@@ -1399,7 +1393,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     end
     
     if isnan(Sol_Output.Solid_H_MP)
-        coupledconstraints(2) = 1;
+        coupledconstraints = 1;
     end
     
     Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
