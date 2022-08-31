@@ -130,7 +130,7 @@ Shared_Settings.MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of
 Shared_Settings.MDP.Fourier_Spacing = 0.12;
 Shared_Settings.MDP.VerletBT = -1;
 
-Shared_Settings.Verbose = false;
+Shared_Settings.Verbose = true;
 
 idx = 0;
 
