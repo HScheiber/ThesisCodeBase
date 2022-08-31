@@ -323,7 +323,7 @@ if istable(Param) || isstruct(Param)
             
             % Default MX params
             def_S_MX = MXParams.sigma;
-            def_E_MX = sMXParams.epsilon;
+            def_E_MX = MXParams.epsilon;
             
             if Settings.Additivity
                 Sigma_MX = (Param.Sigma_MM + Param.Sigma_XX)/2;
