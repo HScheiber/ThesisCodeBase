@@ -476,7 +476,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Settings = Inp_Settings;
             Settings.SuperCellFile = SuperCellFile;
             Settings.WorkDir = WorkDir;
-            if Settings.MDP.dt > 1e-4
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Solid Equilibration failed. Reducing time step.')
                 end

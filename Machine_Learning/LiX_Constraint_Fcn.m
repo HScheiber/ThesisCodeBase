@@ -21,15 +21,15 @@
 % are the same)
 % When Model.Parallel_Struct_Min = true, this uses the parallel version of the subroutine Structure_Minimization (Note: each instance of gromacs is single-core in either mode)
 %% Inputs
-function tf = LiX_Constraint_Fcn(Input_Settings,Params)
+function tf = LiX_Constraint_Fcn(Settings,Param)
 
-if ~isfield(Input_Settings,'MinSkipLoss')
+if ~isfield(Settings,'MinSkipLoss')
     defSettings = Initialize_LiX_BO_Settings;
-    Input_Settings.MinSkipLoss = defSettings.MinSkipLoss;
+    Settings.MinSkipLoss = defSettings.MinSkipLoss;
 end
 
-Input_Settings.Table_Length = 10; % nm
-Input_Settings.Table_StepSize = 0.01;
+Settings.Table_Length = 10; % nm
+Settings.Table_StepSize = 0.01;
 
 % Conversion factors
 Bohr_nm = 0.0529177; % a_0 - > Angstrom
@@ -51,741 +51,217 @@ sqrt_Q.Br = 4.590896470000000;
 sqrt_Q.I  = 5.533218150000000;
 
 PotSettings = Initialize_MD_Settings;
-PotSettings.Salt = Input_Settings.Salt;
+PotSettings.Salt = Settings.Salt;
 [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(PotSettings);
 [BH_MX,BH_MM,BH_XX] = BH_Potential_Parameters(PotSettings);
 [TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(PotSettings);
 
 % Param will always be a table.
-tf = true(size(Params,1),1);
+N_par = size(Param,1);
+Loss = zeros(N_par,1);
+% Potential Scaling
+if strcmp(Settings.Theory,'TF')
 
-if size(Params,1) > 1
-    disp('Searching for initial feasible points...')
-    warning('off','MATLAB:mir_warning_maybe_uninitialized_temporary')
-    parfor jdx = 1:size(Params,1)
-        Param = Params(jdx,:);
-        Settings = Input_Settings;
-        % Potential Scaling
-        if strcmp(Settings.Theory,'TF')
+    % Loose form of exp-C6-C8 model
+    if Settings.SigmaEpsilon
 
-            % Loose form of exp-C6-C8 model
-            if Settings.SigmaEpsilon
+        % Default model parameters: all length-scale units are nm,
+        % energy scale units are kJ/mol
 
-                % Default model parameters: all length-scale units are nm,
-                % energy scale units are kJ/mol
+        % Input parameters
+        r0_MM = Param.r0_MM; % nm
+        r0_XX = Param.r0_XX; % nm
 
-                % Input parameters
-                r0_MM = Param.r0_MM; % nm
-                r0_XX = Param.r0_XX; % nm
+        epsilon_MM = Param.epsilon_MM; % kJ/mol
+        epsilon_XX = Param.epsilon_XX; % kJ/mol
 
-                epsilon_MM = Param.epsilon_MM; % kJ/mol
-                epsilon_XX = Param.epsilon_XX; % kJ/mol
+        gamma_MX = Param.gamma_MX; % Unitless
 
-                gamma_MX = Param.gamma_MX; % Unitless
-
-                if Settings.Additivity
-                    r0_MX = (r0_MM + r0_XX)./2; % nm
-                    epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
-                    gamma_MM = gamma_MX; % Unitless
-                    gamma_XX = gamma_MX; % Unitless
-                else
-                    r0_MX = Param.r0_MX; % nm
-                    epsilon_MX = Param.epsilon_MX; % kJ/mol
-                    gamma_MM = Param.gamma_MM; % Unitless
-                    gamma_XX = Param.gamma_XX; % Unitless
-                end
-
-                % Convert to Condensed form
-                alpha_MM = gamma_MM./r0_MM;
-                alpha_XX = gamma_XX./r0_XX;
-                alpha_MX = gamma_MX./r0_MX;
-
-                B_MM = 48.*epsilon_MM.*exp(gamma_MM)./(48 - 7*gamma_MM);
-                B_XX = 48.*epsilon_XX.*exp(gamma_XX)./(48 - 7*gamma_XX);
-                B_MX = 48.*epsilon_MX.*exp(gamma_MX)./(48 - 7*gamma_MX);
-
-                C_MM = 4.*epsilon_MM.*gamma_MM.*(r0_MM^6)./(48 - 7.*gamma_MM);
-                C_XX = 4.*epsilon_XX.*gamma_XX.*(r0_XX^6)./(48 - 7.*gamma_XX);
-                C_MX = 4.*epsilon_MX.*gamma_MX.*(r0_MX^6)./(48 - 7.*gamma_MX);
-
-                D_MM = 3.*epsilon_MM.*gamma_MM.*(r0_MM^8)./(48 - 7.*gamma_MM);
-                D_XX = 3.*epsilon_XX.*gamma_XX.*(r0_XX^8)./(48 - 7.*gamma_XX);
-                D_MX = 3.*epsilon_MX.*gamma_MX.*(r0_MX^8)./(48 - 7.*gamma_MX);
-
-                % Convert to scaling w.r.t. TF
-                Settings.S.A.MM = alpha_MM./TF_MM.alpha;
-                Settings.S.A.XX = alpha_XX./TF_XX.alpha;
-                Settings.S.A.MX = alpha_MX./TF_MX.alpha;
-
-                Settings.S.R.MM = B_MM./TF_MM.B;
-                Settings.S.R.XX = B_XX./TF_XX.B;
-                Settings.S.R.MX = B_MX./TF_MX.B;
-
-                Settings.S.D6D.MM = C_MM./TF_MM.C;
-                Settings.S.D6D.XX = C_XX./TF_XX.C;
-                Settings.S.D6D.MX = C_MX./TF_MX.C;
-
-                Settings.S.D8D.MM = D_MM./TF_MM.D;
-                Settings.S.D8D.XX = D_XX./TF_XX.D;
-                Settings.S.D8D.MX = D_MX./TF_MX.D;
-
-                % Scaling Coulombic Charge
-                if Settings.Fix_Charge
-                    Settings.S.Q = Settings.Q_value;
-                else
-                    Settings.S.Q = Param.SQ;
-                end
-
-            % Tight form of exp-C6-C8 model
-            else
-
-                % 1/R6 Dispersion (TF only)
-                Settings.S.D6D.MM = Param.SD6MM;
-                Settings.S.D6D.XX = Param.SD6XX;
-                Settings.S.D6D.MX = Param.SD6MX;
-
-                % 1/R8 Dispersion (TF only)
-                if Settings.Fix_C8
-                    % Calculate value of C8 using recursive relations
-
-                    % Calculate Scaled C8 using recursion relation from D3 paper
-                    C8_MM = 3.0.*(Settings.S.D6D.MM.*TF_MM.C./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Metal).*c8units; % in kJ/mol nm^8
-                    C8_XX = 3.0.*(Settings.S.D6D.XX.*TF_XX.C./c6units).*sqrt_Q.(Settings.Halide).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
-                    C8_MX = 3.0.*(Settings.S.D6D.MX.*TF_MX.C./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
-
-                    % Update the scaling
-                    Settings.S.D8D.MM = C8_MM./TF_MM.D;
-                    Settings.S.D8D.XX = C8_XX./TF_XX.D;
-                    Settings.S.D8D.MX = C8_MX./TF_MX.D;
-                else
-                    Settings.S.D8D.MM = Param.SD8MM;
-                    Settings.S.D8D.XX = Param.SD8XX;
-                    Settings.S.D8D.MX = Param.SD8MX;
-                end
-
-                % Alpha (TF exponential steepness repulsive parameter)
-                if ~Settings.Fix_Alpha
-                    Settings.S.A.MM = Param.SAMM;
-                    Settings.S.A.XX = Param.SAXX;
-                    Settings.S.A.MX = Param.SAMX;
-                end
-
-                % Repulsive wall prefactor
-                Settings.S.R.MM = Param.SRMM;
-                Settings.S.R.XX = Param.SRXX;
-                Settings.S.R.MX = Param.SRMX;
-
-                % Scaling Coulombic Charge
-                if Settings.Fix_Charge
-                    Settings.S.Q = Settings.Q_value;
-                else
-                    Settings.S.Q = Param.SQ;
-                end
-            end
-
-        elseif strcmp(Settings.Theory,'BH')
-
-            % Loose form of exp-C6 model
-            if Settings.SigmaEpsilon
-
-                % Input parameters
-                r0_MM = Param.r0_MM; % nm
-                r0_XX = Param.r0_XX; % nm
-
-                epsilon_MM = Param.epsilon_MM; % kJ/mol
-                epsilon_XX = Param.epsilon_XX; % kJ/mol
-
-                gamma_MX = Param.gamma_MX; % Unitless
-
-                if Settings.Additivity
-                    r0_MX = (r0_MM + r0_XX)./2; % nm
-                    epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
-                    gamma_MM = gamma_MX; % Unitless
-                    gamma_XX = gamma_MX; % Unitless
-                else
-                    r0_MX = Param.r0_MX; % nm
-                    epsilon_MX = Param.epsilon_MX; % kJ/mol
-                    gamma_MM = Param.gamma_MM; % Unitless
-                    gamma_XX = Param.gamma_XX; % Unitless
-                end
-
-                % Convert to Condensed form
-                alpha_MM = gamma_MM./r0_MM;
-                alpha_XX = gamma_XX./r0_XX;
-                alpha_MX = gamma_MX./r0_MX;
-
-                B_MM = 6.*epsilon_MM.*exp(gamma_MM)./(gamma_MM - 6);
-                B_XX = 6.*epsilon_XX.*exp(gamma_XX)./(gamma_XX - 6);
-                B_MX = 6.*epsilon_MX.*exp(gamma_MX)./(gamma_MX - 6);
-
-                C_MM = epsilon_MM.*gamma_MM.*(r0_MM.^6)./(gamma_MM - 6);
-                C_XX = epsilon_XX.*gamma_XX.*(r0_XX.^6)./(gamma_XX - 6);
-                C_MX = epsilon_MX.*gamma_MX.*(r0_MX.^6)./(gamma_MX - 6);
-
-                % Convert to scaling w.r.t. default BH
-                Settings.S.A.MM = alpha_MM./BH_MM.alpha;
-                Settings.S.A.XX = alpha_XX./BH_XX.alpha;
-                Settings.S.A.MX = alpha_MX./BH_MX.alpha;
-
-                Settings.S.R.MM = B_MM./BH_MM.B;
-                Settings.S.R.XX = B_XX./BH_XX.B;
-                Settings.S.R.MX = B_MX./BH_MX.B;
-
-                Settings.S.D.MM = C_MM./BH_MM.C;
-                Settings.S.D.XX = C_XX./BH_XX.C;
-                Settings.S.D.MX = C_MX./BH_MX.C;
-
-                % Scaling Coulombic Charge
-                if Settings.Fix_Charge
-                    Settings.S.Q = Settings.Q_value;
-                else
-                    Settings.S.Q = Param.SQ;
-                end
-
-            % Tight form of the exp-C6 model
-            else 
-                % Dispersion
-                Settings.S.D.MM = Param.SDMM;
-                Settings.S.D.XX = Param.SDXX;
-
-                % Repulsion
-                Settings.S.R.MM = Param.SRMM;
-                Settings.S.R.XX = Param.SRXX;
-
-                if Settings.Additivity
-                    Settings.S.D.MX = sqrt(Settings.S.D.MM.*Settings.S.D.XX);
-                    Settings.S.R.MX = sqrt(Settings.S.R.MM.*Settings.S.R.XX);
-
-                    if Settings.Additional_MM_Disp
-                        Settings.S.D.MM = Settings.S.D.MM + Param.SDMM2;
-                    end
-                else
-                    Settings.S.D.MX = Param.SDMX;
-                    Settings.S.R.MX = Param.SRMX;
-                end
-                % Alpha (exponential steepness repulsive parameter)
-                if ~Settings.Fix_Alpha
-                    Settings.S.A.MM = Param.SAMM;
-                    Settings.S.A.XX = Param.SAXX;
-                    Settings.S.A.MX = Param.SAMX;
-                end
-
-                % Scaling Coulombic Charge
-                if Settings.Fix_Charge
-                    Settings.S.Q = Settings.Q_value;
-                else
-                    Settings.S.Q = Param.SQ;
-                end
-            end
-
-        elseif strcmp(Settings.Theory,'JC') % JC models
-
-            % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
-            if Settings.SigmaEpsilon
-
-                % Sigma scaling
-                Settings.S.S.MM = Param.Sigma_MM./JC_MM.sigma;
-                Settings.S.S.XX = Param.Sigma_XX./JC_XX.sigma;
-
-                % Epsilon scaling
-                Settings.S.E.MM = Param.Epsilon_MM./JC_MM.epsilon;
-                Settings.S.E.XX = Param.Epsilon_XX./JC_XX.epsilon;
-
-                % Default MX params
-                def_S_MX = JC_MX.sigma;
-                def_E_MX = sMXParams.epsilon;
-
-                if Settings.Additivity
-                    Sigma_MX = (Param.Sigma_MM + Param.Sigma_XX)./2;
-                    Epsilon_MX = sqrt(Param.Epsilon_MM.*Param.Epsilon_XX);
-
-                    Settings.S.S.MX = Sigma_MX./def_S_MX;
-                    Settings.S.E.MX = Epsilon_MX./def_E_MX;
-
-                    if Settings.Additional_MM_Disp
-                        Full_MM_Epsilon = Param.Epsilon_MM + Param.Epsilon_MM2;
-                        Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
-                    end
-                else
-                    Settings.S.S.MX = Param.Sigma_MX./def_S_MX;
-                    Settings.S.E.MX = Param.Epsilon_MX./def_E_MX;
-                end
-
-            % Scaled dispersion/repulsion form
-            else
-                % Dispersion
-                Settings.S.D.MM = Param.SDMM;
-                Settings.S.D.XX = Param.SDXX;
-
-                % Repulsion
-                Settings.S.R.MM = Param.SRMM;
-                Settings.S.R.XX = Param.SRXX;
-
-                if Settings.Additivity
-
-                    % Unscaled
-                    MX_Epsilon = JC_MX.epsilon;
-                    MX_Sigma   = JC_MX.sigma;
-
-                    MX_R = 4.*MX_Epsilon.*MX_Sigma.^12;
-                    MX_D = 4.*MX_Epsilon.*MX_Sigma.^6;
-
-                    % Scaled
-                    MM_Epsilon = JC_MM.epsilon.*(Settings.S.D.MM^2).*(1./Settings.S.R.MM);
-                    MM_Sigma = JC_MM.sigma.*(1./(Settings.S.D.MM.^(1/6))).*(Settings.S.R.MM.^(1/6));
-
-                    XX_Epsilon = JC_XX.epsilon.*(Settings.S.D.XX.^2).*(1./Settings.S.R.XX);
-                    XX_Sigma = JC_XX.sigma.*(1./(Settings.S.D.XX.^(1/6))).*(Settings.S.R.XX.^(1/6));
-
-                    MX_Epsilon = sqrt(MM_Epsilon.*XX_Epsilon);
-                    MX_Sigma   = (MM_Sigma + XX_Sigma)./2;
-
-                    MX_R_scaled = 4.*MX_Epsilon*MX_Sigma.^12;
-                    MX_D_scaled = 4.*MX_Epsilon*MX_Sigma.^6;
-
-                    Settings.S.D.MX = MX_D_scaled./MX_D;
-                    Settings.S.R.MX = MX_R_scaled./MX_R;
-
-                    if Settings.Additional_MM_Disp
-                        Settings.S.D.MM = Settings.S.D.MM + Param.SDMM2;
-                    end
-                else
-                    Settings.S.D.MX = Param.SDMX;
-                    Settings.S.R.MX = Param.SRMX;
-                end
-            end
-
-            % Scaling Coulombic Charge
-            if Settings.Fix_Charge
-                Settings.S.Q = Settings.Q_value;
-            else
-                Settings.S.Q = Param.SQ;
-            end
+        if Settings.Additivity
+            r0_MX = (r0_MM + r0_XX)./2; % nm
+            epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
+            gamma_MM = gamma_MX; % Unitless
+            gamma_XX = gamma_MX; % Unitless
+        else
+            r0_MX = Param.r0_MX; % nm
+            epsilon_MX = Param.epsilon_MX; % kJ/mol
+            gamma_MM = Param.gamma_MM; % Unitless
+            gamma_XX = Param.gamma_XX; % Unitless
         end
 
-        % Perturb the potential with Gaussians
-        if ~isempty(Settings.Additional_GAdjust)
-            mx = 1;
-            mm = 1;
-            xx = 1;
-            for idx = 1:length(Settings.Additional_GAdjust)
-                int = [Settings.Additional_GAdjust{idx} '_' num2str(idx)];
-                switch int
-                    case ['MM' '_' num2str(idx)]
-                        Settings.GAdjust_MM(mm,1) = Param.(['GA_' int]);
-                        Settings.GAdjust_MM(mm,2) = Param.(['GB_' int]);
-                        Settings.GAdjust_MM(mm,3) = Param.(['GC_' int]);
-                        mm = mm+1;
-                    case ['XX' '_' num2str(idx)]
-                        Settings.GAdjust_XX(xx,1) = Param.(['GA_' int]);
-                        Settings.GAdjust_XX(xx,2) = Param.(['GB_' int]);
-                        Settings.GAdjust_XX(xx,3) = Param.(['GC_' int]);
-                        xx = xx+1;
-                    case ['MX' '_' num2str(idx)]
-                        Settings.GAdjust_MX(mx,1) = Param.(['GA_' int]);
-                        Settings.GAdjust_MX(mx,2) = Param.(['GB_' int]);
-                        Settings.GAdjust_MX(mx,3) = Param.(['GC_' int]);
-                        mx = mx+1;
-                end
-            end
+        % Convert to Condensed form
+        alpha_MM = gamma_MM./r0_MM;
+        alpha_XX = gamma_XX./r0_XX;
+        alpha_MX = gamma_MX./r0_MX;
+
+        B_MM = 48.*epsilon_MM.*exp(gamma_MM)./(48 - 7*gamma_MM);
+        B_XX = 48.*epsilon_XX.*exp(gamma_XX)./(48 - 7*gamma_XX);
+        B_MX = 48.*epsilon_MX.*exp(gamma_MX)./(48 - 7*gamma_MX);
+
+        C_MM = 4.*epsilon_MM.*gamma_MM.*(r0_MM^6)./(48 - 7.*gamma_MM);
+        C_XX = 4.*epsilon_XX.*gamma_XX.*(r0_XX^6)./(48 - 7.*gamma_XX);
+        C_MX = 4.*epsilon_MX.*gamma_MX.*(r0_MX^6)./(48 - 7.*gamma_MX);
+
+        D_MM = 3.*epsilon_MM.*gamma_MM.*(r0_MM^8)./(48 - 7.*gamma_MM);
+        D_XX = 3.*epsilon_XX.*gamma_XX.*(r0_XX^8)./(48 - 7.*gamma_XX);
+        D_MX = 3.*epsilon_MX.*gamma_MX.*(r0_MX^8)./(48 - 7.*gamma_MX);
+
+        % Convert to scaling w.r.t. TF
+        Settings.S.A.MM = alpha_MM./TF_MM.alpha;
+        Settings.S.A.XX = alpha_XX./TF_XX.alpha;
+        Settings.S.A.MX = alpha_MX./TF_MX.alpha;
+
+        Settings.S.R.MM = B_MM./TF_MM.B;
+        Settings.S.R.XX = B_XX./TF_XX.B;
+        Settings.S.R.MX = B_MX./TF_MX.B;
+
+        Settings.S.D6D.MM = C_MM./TF_MM.C;
+        Settings.S.D6D.XX = C_XX./TF_XX.C;
+        Settings.S.D6D.MX = C_MX./TF_MX.C;
+
+        Settings.S.D8D.MM = D_MM./TF_MM.D;
+        Settings.S.D8D.XX = D_XX./TF_XX.D;
+        Settings.S.D8D.MX = D_MX./TF_MX.D;
+
+        % Scaling Coulombic Charge
+        if Settings.Fix_Charge
+            Settings.S.Q = Settings.Q_value;
+        else
+            Settings.S.Q = Param.SQ;
         end
 
-        % Additional functions
-        if Settings.Additional_Function.MM.N >= 0 && ~isempty(Settings.Additional_Function.MM.Range)
-            Settings.S.N.MM.Scale = Param.SNMM;
-            Settings.S.N.MM.Value = Settings.Additional_Function.MM.N;
+    % Tight form of exp-C6-C8 model
+    else
+
+        % 1/R6 Dispersion (TF only)
+        Settings.S.D6D.MM = Param.SD6MM;
+        Settings.S.D6D.XX = Param.SD6XX;
+        Settings.S.D6D.MX = Param.SD6MX;
+
+        % 1/R8 Dispersion (TF only)
+        if Settings.Fix_C8
+            % Calculate value of C8 using recursive relations
+
+            % Calculate Scaled C8 using recursion relation from D3 paper
+            C8_MM = 3.0.*(Settings.S.D6D.MM.*TF_MM.C./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Metal).*c8units; % in kJ/mol nm^8
+            C8_XX = 3.0.*(Settings.S.D6D.XX.*TF_XX.C./c6units).*sqrt_Q.(Settings.Halide).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
+            C8_MX = 3.0.*(Settings.S.D6D.MX.*TF_MX.C./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
+
+            % Update the scaling
+            Settings.S.D8D.MM = C8_MM./TF_MM.D;
+            Settings.S.D8D.XX = C8_XX./TF_XX.D;
+            Settings.S.D8D.MX = C8_MX./TF_MX.D;
+        else
+            Settings.S.D8D.MM = Param.SD8MM;
+            Settings.S.D8D.XX = Param.SD8XX;
+            Settings.S.D8D.MX = Param.SD8MX;
         end
-        if Settings.Additional_Function.XX.N >= 0 && ~isempty(Settings.Additional_Function.XX.Range)
-            Settings.S.N.XX.Scale = Param.SNXX;
-            Settings.S.N.XX.Value = Settings.Additional_Function.XX.N;
-        end
-        if Settings.Additional_Function.MX.N >= 0 && ~isempty(Settings.Additional_Function.MX.Range)
-            Settings.S.N.MX.Scale = Param.SNMX;
-            Settings.S.N.MX.Value = Settings.Additional_Function.MX.N;
-        end
 
-        % Calculate loss due to infeasible TF / BH models with no well minima (only works reliably in sigma-epsilon form)
-        Loss = 0;
-        if strcmp(Settings.Theory,'BH')
-            [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
-                'Startpoint',0.01,'ReturnAsStructure',true);
-        elseif strcmp(Settings.Theory,'TF')
-            [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
-                'Startpoint',0.01,'ReturnAsStructure',true);
-        elseif strcmp(Settings.Theory,'JC')
-            [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,...
-                'Startpoint',0.01,'ReturnAsStructure',true);
+        % Alpha (TF exponential steepness repulsive parameter)
+        if ~Settings.Fix_Alpha
+            Settings.S.A.MM = Param.SAMM;
+            Settings.S.A.XX = Param.SAXX;
+            Settings.S.A.MX = Param.SAMX;
         end
 
-        %% Grab the peaks and valleys of the MX attractive potential
-        peaks_idx = islocalmax(U_MX.Total);
-        valleys_idx = islocalmin(U_MX.Total);
+        % Repulsive wall prefactor
+        Settings.S.R.MM = Param.SRMM;
+        Settings.S.R.XX = Param.SRXX;
+        Settings.S.R.MX = Param.SRMX;
 
-        maxima_U = U_MX.Total(peaks_idx);
-        minima_U = U_MX.Total(valleys_idx);
-
-        if isempty(minima_U) % If no well minimum exists in MX interaction
-            Loss = Loss + Settings.BadFcnLossPenalty;
-        elseif isempty(maxima_U) % If no peak exists in MX interaction
-            % Do nothing, this is normal for JC potential and some BH/TF
-            % potentials
-        else % Otherwise, a well minimum exists and at least one peak exists
-            % ensure peak - well height is greater than specified threshold
-            Threshold = Settings.MinExpWallHeight; % kJ/mol
-            dU = maxima_U - minima_U;
-            Loss = Loss + max(Threshold - dU,0)*Settings.BadFcnLossPenalty/Threshold;
-        end
-    %     plot(U_MX.r,U_MX.Total)
-    %     hold on
-    %     scatter(U_MX.r(peaks_idx),U_MX.Total(peaks_idx))
-    %     scatter(U_MX.r(valleys_idx),U_MX.Total(valleys_idx))
-    %     ylim([-1000 1000])
-
-        %% Grab the peaks and valleys of the MM/XX potentials
-        Us = [U_MM,U_XX];
-        for udx = 1:2
-            U = Us(udx);
-
-            peaks_idx = islocalmax(U.Total);
-            valleys_idx = islocalmin(U.Total);
-
-            maxima_U = U.Total(peaks_idx);
-            minima_U = U.Total(valleys_idx);
-
-            maxima_r = U.r(peaks_idx);
-            minima_r = U.r(valleys_idx);
-
-    %         plot(U.r,U.Total)
-    %         hold on
-    %         scatter(U.r(peaks_idx),U.Total(peaks_idx))
-    %         scatter(U.r(valleys_idx),U.Total(valleys_idx))
-    %         ylim([-1000 1000])
-
-            if isempty(maxima_U) % No peak exists
-                % Do nothing, this is normal for JC and sometimes BH/TF
-            elseif length(maxima_U) > 1 % two peaks are visible + one valley in between them
-                % Penalize any model with a non-zero well depth between
-                % like-like interactions
-                Threshold = Settings.MaxRepWellDepth; % kJ/mol
-                dU = maxima_U(2) - minima_U;
-                Loss = Loss + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
-            elseif length(maxima_U) == 1 && isempty(minima_U) % One peak, no valley (this is a normal case for TF and BH repulsive potentials)
-                % Do nothing
-            elseif length(maxima_U) == 1 && length(minima_U) == 1 % One peak visible + one valley in between, and (possibly) one hidden peak to the right
-                Threshold = Settings.MaxRepWellDepth; % kJ/mol
-                if minima_r < maxima_r
-                    dU = maxima_U - minima_U;
-                else
-                    % Case of hidden peak to the right
-                    % Ensure valley depth is not greater than the threshold
-                    dU = U.Total(end) - minima_U;
-                end
-                Loss = Loss + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
-            elseif length(minima_U) == 1 % well minima is available but no peaks are visible, there must be a hidden peak to the right
-                Threshold = Settings.MaxRepWellDepth; % kJ/mol
-                dU = U.Total(end) - minima_U;
-                Loss = Loss + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
-            else
-                % This should never be reached...
-                warning('Possible issue with the potential!')
-            end
-        end
-        if log1p(Loss) >= Settings.MinSkipLoss
-            tf(jdx) = false;
+        % Scaling Coulombic Charge
+        if Settings.Fix_Charge
+            Settings.S.Q = Settings.Q_value;
+        else
+            Settings.S.Q = Param.SQ;
         end
     end
-    disp([num2str(sum(tf)) ' feasible points found in initial search.'])
-else
-    Param = Params;
-    Settings = Input_Settings;
-    % Potential Scaling
-    if strcmp(Settings.Theory,'TF')
 
-        % Loose form of exp-C6-C8 model
-        if Settings.SigmaEpsilon
+elseif strcmp(Settings.Theory,'BH')
 
-            % Default model parameters: all length-scale units are nm,
-            % energy scale units are kJ/mol
-
-            % Input parameters
-            r0_MM = Param.r0_MM; % nm
-            r0_XX = Param.r0_XX; % nm
-
-            epsilon_MM = Param.epsilon_MM; % kJ/mol
-            epsilon_XX = Param.epsilon_XX; % kJ/mol
-
-            gamma_MX = Param.gamma_MX; % Unitless
-
-            if Settings.Additivity
-                r0_MX = (r0_MM + r0_XX)./2; % nm
-                epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
-                gamma_MM = gamma_MX; % Unitless
-                gamma_XX = gamma_MX; % Unitless
-            else
-                r0_MX = Param.r0_MX; % nm
-                epsilon_MX = Param.epsilon_MX; % kJ/mol
-                gamma_MM = Param.gamma_MM; % Unitless
-                gamma_XX = Param.gamma_XX; % Unitless
-            end
-
-            % Convert to Condensed form
-            alpha_MM = gamma_MM./r0_MM;
-            alpha_XX = gamma_XX./r0_XX;
-            alpha_MX = gamma_MX./r0_MX;
-
-            B_MM = 48.*epsilon_MM.*exp(gamma_MM)./(48 - 7*gamma_MM);
-            B_XX = 48.*epsilon_XX.*exp(gamma_XX)./(48 - 7*gamma_XX);
-            B_MX = 48.*epsilon_MX.*exp(gamma_MX)./(48 - 7*gamma_MX);
-
-            C_MM = 4.*epsilon_MM.*gamma_MM.*(r0_MM^6)./(48 - 7.*gamma_MM);
-            C_XX = 4.*epsilon_XX.*gamma_XX.*(r0_XX^6)./(48 - 7.*gamma_XX);
-            C_MX = 4.*epsilon_MX.*gamma_MX.*(r0_MX^6)./(48 - 7.*gamma_MX);
-
-            D_MM = 3.*epsilon_MM.*gamma_MM.*(r0_MM^8)./(48 - 7.*gamma_MM);
-            D_XX = 3.*epsilon_XX.*gamma_XX.*(r0_XX^8)./(48 - 7.*gamma_XX);
-            D_MX = 3.*epsilon_MX.*gamma_MX.*(r0_MX^8)./(48 - 7.*gamma_MX);
-
-            % Convert to scaling w.r.t. TF
-            Settings.S.A.MM = alpha_MM./TF_MM.alpha;
-            Settings.S.A.XX = alpha_XX./TF_XX.alpha;
-            Settings.S.A.MX = alpha_MX./TF_MX.alpha;
-
-            Settings.S.R.MM = B_MM./TF_MM.B;
-            Settings.S.R.XX = B_XX./TF_XX.B;
-            Settings.S.R.MX = B_MX./TF_MX.B;
-
-            Settings.S.D6D.MM = C_MM./TF_MM.C;
-            Settings.S.D6D.XX = C_XX./TF_XX.C;
-            Settings.S.D6D.MX = C_MX./TF_MX.C;
-
-            Settings.S.D8D.MM = D_MM./TF_MM.D;
-            Settings.S.D8D.XX = D_XX./TF_XX.D;
-            Settings.S.D8D.MX = D_MX./TF_MX.D;
-
-            % Scaling Coulombic Charge
-            if Settings.Fix_Charge
-                Settings.S.Q = Settings.Q_value;
-            else
-                Settings.S.Q = Param.SQ;
-            end
-
-        % Tight form of exp-C6-C8 model
+    % Loose form of exp-C6 model
+    if Settings.SigmaEpsilon
+        
+        % Input parameters
+        r0_MM = Param.r0_MM; % nm
+        r0_XX = Param.r0_XX; % nm
+        
+        epsilon_MM = Param.epsilon_MM; % kJ/mol
+        epsilon_XX = Param.epsilon_XX; % kJ/mol
+        
+        gamma_MX = Param.gamma_MX; % Unitless
+        
+        if Settings.Additivity
+            r0_MX = (r0_MM + r0_XX)./2; % nm
+            epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
+            gamma_MM = gamma_MX; % Unitless
+            gamma_XX = gamma_MX; % Unitless
         else
+            r0_MX = Param.r0_MX; % nm
+            epsilon_MX = Param.epsilon_MX; % kJ/mol
+            gamma_MM = Param.gamma_MM; % Unitless
+            gamma_XX = Param.gamma_XX; % Unitless
+        end
+        
+        % Convert to Condensed form
+        alpha_MM = gamma_MM./r0_MM;
+        alpha_XX = gamma_XX./r0_XX;
+        alpha_MX = gamma_MX./r0_MX;
+        
+        B_MM = 6.*epsilon_MM.*exp(gamma_MM)./(gamma_MM - 6);
+        B_XX = 6.*epsilon_XX.*exp(gamma_XX)./(gamma_XX - 6);
+        B_MX = 6.*epsilon_MX.*exp(gamma_MX)./(gamma_MX - 6);
+        
+        C_MM = epsilon_MM.*gamma_MM.*(r0_MM.^6)./(gamma_MM - 6);
+        C_XX = epsilon_XX.*gamma_XX.*(r0_XX.^6)./(gamma_XX - 6);
+        C_MX = epsilon_MX.*gamma_MX.*(r0_MX.^6)./(gamma_MX - 6);
+        
+        % Convert to scaling w.r.t. default BH
+        Settings.S.A.MM = alpha_MM./BH_MM.alpha;
+        Settings.S.A.XX = alpha_XX./BH_XX.alpha;
+        Settings.S.A.MX = alpha_MX./BH_MX.alpha;
+        
+        Settings.S.R.MM = B_MM./BH_MM.B;
+        Settings.S.R.XX = B_XX./BH_XX.B;
+        Settings.S.R.MX = B_MX./BH_MX.B;
+        
+        Settings.S.D.MM = C_MM./BH_MM.C;
+        Settings.S.D.XX = C_XX./BH_XX.C;
+        Settings.S.D.MX = C_MX./BH_MX.C;
+        
+        % Scaling Coulombic Charge
+        if Settings.Fix_Charge
+            Settings.S.Q = Settings.Q_value;
+        else
+            Settings.S.Q = Param.SQ;
+        end
 
-            % 1/R6 Dispersion (TF only)
-            Settings.S.D6D.MM = Param.SD6MM;
-            Settings.S.D6D.XX = Param.SD6XX;
-            Settings.S.D6D.MX = Param.SD6MX;
+    % Tight form of the exp-C6 model
+    else 
+        % Dispersion
+        Settings.S.D.MM = Param.SDMM;
+        Settings.S.D.XX = Param.SDXX;
 
-            % 1/R8 Dispersion (TF only)
-            if Settings.Fix_C8
-                % Calculate value of C8 using recursive relations
+        % Repulsion
+        Settings.S.R.MM = Param.SRMM;
+        Settings.S.R.XX = Param.SRXX;
 
-                % Calculate Scaled C8 using recursion relation from D3 paper
-                C8_MM = 3.0.*(Settings.S.D6D.MM.*TF_MM.C./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Metal).*c8units; % in kJ/mol nm^8
-                C8_XX = 3.0.*(Settings.S.D6D.XX.*TF_XX.C./c6units).*sqrt_Q.(Settings.Halide).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
-                C8_MX = 3.0.*(Settings.S.D6D.MX.*TF_MX.C./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
+        if Settings.Additivity
+            Settings.S.D.MX = sqrt(Settings.S.D.MM.*Settings.S.D.XX);
+            Settings.S.R.MX = sqrt(Settings.S.R.MM.*Settings.S.R.XX);
 
-                % Update the scaling
-                Settings.S.D8D.MM = C8_MM./TF_MM.D;
-                Settings.S.D8D.XX = C8_XX./TF_XX.D;
-                Settings.S.D8D.MX = C8_MX./TF_MX.D;
-            else
-                Settings.S.D8D.MM = Param.SD8MM;
-                Settings.S.D8D.XX = Param.SD8XX;
-                Settings.S.D8D.MX = Param.SD8MX;
+            if Settings.Additional_MM_Disp
+                Settings.S.D.MM = Settings.S.D.MM + Param.SDMM2;
             end
-
-            % Alpha (TF exponential steepness repulsive parameter)
-            if ~Settings.Fix_Alpha
-                Settings.S.A.MM = Param.SAMM;
-                Settings.S.A.XX = Param.SAXX;
-                Settings.S.A.MX = Param.SAMX;
-            end
-
-            % Repulsive wall prefactor
-            Settings.S.R.MM = Param.SRMM;
-            Settings.S.R.XX = Param.SRXX;
+        else
+            Settings.S.D.MX = Param.SDMX;
             Settings.S.R.MX = Param.SRMX;
-
-            % Scaling Coulombic Charge
-            if Settings.Fix_Charge
-                Settings.S.Q = Settings.Q_value;
-            else
-                Settings.S.Q = Param.SQ;
-            end
         end
-
-    elseif strcmp(Settings.Theory,'BH')
-
-        % Loose form of exp-C6 model
-        if Settings.SigmaEpsilon
-
-            % Input parameters
-            r0_MM = Param.r0_MM; % nm
-            r0_XX = Param.r0_XX; % nm
-
-            epsilon_MM = Param.epsilon_MM; % kJ/mol
-            epsilon_XX = Param.epsilon_XX; % kJ/mol
-
-            gamma_MX = Param.gamma_MX; % Unitless
-
-            if Settings.Additivity
-                r0_MX = (r0_MM + r0_XX)./2; % nm
-                epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
-                gamma_MM = gamma_MX; % Unitless
-                gamma_XX = gamma_MX; % Unitless
-            else
-                r0_MX = Param.r0_MX; % nm
-                epsilon_MX = Param.epsilon_MX; % kJ/mol
-                gamma_MM = Param.gamma_MM; % Unitless
-                gamma_XX = Param.gamma_XX; % Unitless
-            end
-
-            % Convert to Condensed form
-            alpha_MM = gamma_MM./r0_MM;
-            alpha_XX = gamma_XX./r0_XX;
-            alpha_MX = gamma_MX./r0_MX;
-
-            B_MM = 6.*epsilon_MM.*exp(gamma_MM)./(gamma_MM - 6);
-            B_XX = 6.*epsilon_XX.*exp(gamma_XX)./(gamma_XX - 6);
-            B_MX = 6.*epsilon_MX.*exp(gamma_MX)./(gamma_MX - 6);
-
-            C_MM = epsilon_MM.*gamma_MM.*(r0_MM.^6)./(gamma_MM - 6);
-            C_XX = epsilon_XX.*gamma_XX.*(r0_XX.^6)./(gamma_XX - 6);
-            C_MX = epsilon_MX.*gamma_MX.*(r0_MX.^6)./(gamma_MX - 6);
-
-            % Convert to scaling w.r.t. default BH
-            Settings.S.A.MM = alpha_MM./BH_MM.alpha;
-            Settings.S.A.XX = alpha_XX./BH_XX.alpha;
-            Settings.S.A.MX = alpha_MX./BH_MX.alpha;
-
-            Settings.S.R.MM = B_MM./BH_MM.B;
-            Settings.S.R.XX = B_XX./BH_XX.B;
-            Settings.S.R.MX = B_MX./BH_MX.B;
-
-            Settings.S.D.MM = C_MM./BH_MM.C;
-            Settings.S.D.XX = C_XX./BH_XX.C;
-            Settings.S.D.MX = C_MX./BH_MX.C;
-
-            % Scaling Coulombic Charge
-            if Settings.Fix_Charge
-                Settings.S.Q = Settings.Q_value;
-            else
-                Settings.S.Q = Param.SQ;
-            end
-
-        % Tight form of the exp-C6 model
-        else 
-            % Dispersion
-            Settings.S.D.MM = Param.SDMM;
-            Settings.S.D.XX = Param.SDXX;
-
-            % Repulsion
-            Settings.S.R.MM = Param.SRMM;
-            Settings.S.R.XX = Param.SRXX;
-
-            if Settings.Additivity
-                Settings.S.D.MX = sqrt(Settings.S.D.MM.*Settings.S.D.XX);
-                Settings.S.R.MX = sqrt(Settings.S.R.MM.*Settings.S.R.XX);
-
-                if Settings.Additional_MM_Disp
-                    Settings.S.D.MM = Settings.S.D.MM + Param.SDMM2;
-                end
-            else
-                Settings.S.D.MX = Param.SDMX;
-                Settings.S.R.MX = Param.SRMX;
-            end
-            % Alpha (exponential steepness repulsive parameter)
-            if ~Settings.Fix_Alpha
-                Settings.S.A.MM = Param.SAMM;
-                Settings.S.A.XX = Param.SAXX;
-                Settings.S.A.MX = Param.SAMX;
-            end
-
-            % Scaling Coulombic Charge
-            if Settings.Fix_Charge
-                Settings.S.Q = Settings.Q_value;
-            else
-                Settings.S.Q = Param.SQ;
-            end
-        end
-
-    elseif strcmp(Settings.Theory,'JC') % JC models
-
-        % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
-        if Settings.SigmaEpsilon
-
-            % Sigma scaling
-            Settings.S.S.MM = Param.Sigma_MM./JC_MM.sigma;
-            Settings.S.S.XX = Param.Sigma_XX./JC_XX.sigma;
-
-            % Epsilon scaling
-            Settings.S.E.MM = Param.Epsilon_MM./JC_MM.epsilon;
-            Settings.S.E.XX = Param.Epsilon_XX./JC_XX.epsilon;
-
-            % Default MX params
-            def_S_MX = JC_MX.sigma;
-            def_E_MX = sMXParams.epsilon;
-
-            if Settings.Additivity
-                Sigma_MX = (Param.Sigma_MM + Param.Sigma_XX)./2;
-                Epsilon_MX = sqrt(Param.Epsilon_MM.*Param.Epsilon_XX);
-
-                Settings.S.S.MX = Sigma_MX./def_S_MX;
-                Settings.S.E.MX = Epsilon_MX./def_E_MX;
-
-                if Settings.Additional_MM_Disp
-                    Full_MM_Epsilon = Param.Epsilon_MM + Param.Epsilon_MM2;
-                    Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
-                end
-            else
-                Settings.S.S.MX = Param.Sigma_MX./def_S_MX;
-                Settings.S.E.MX = Param.Epsilon_MX./def_E_MX;
-            end
-
-        % Scaled dispersion/repulsion form
-        else
-            % Dispersion
-            Settings.S.D.MM = Param.SDMM;
-            Settings.S.D.XX = Param.SDXX;
-
-            % Repulsion
-            Settings.S.R.MM = Param.SRMM;
-            Settings.S.R.XX = Param.SRXX;
-
-            if Settings.Additivity
-
-                % Unscaled
-                MX_Epsilon = JC_MX.epsilon;
-                MX_Sigma   = JC_MX.sigma;
-
-                MX_R = 4.*MX_Epsilon.*MX_Sigma.^12;
-                MX_D = 4.*MX_Epsilon.*MX_Sigma.^6;
-
-                % Scaled
-                MM_Epsilon = JC_MM.epsilon.*(Settings.S.D.MM^2).*(1./Settings.S.R.MM);
-                MM_Sigma = JC_MM.sigma.*(1./(Settings.S.D.MM.^(1/6))).*(Settings.S.R.MM.^(1/6));
-
-                XX_Epsilon = JC_XX.epsilon.*(Settings.S.D.XX.^2).*(1./Settings.S.R.XX);
-                XX_Sigma = JC_XX.sigma.*(1./(Settings.S.D.XX.^(1/6))).*(Settings.S.R.XX.^(1/6));
-
-                MX_Epsilon = sqrt(MM_Epsilon.*XX_Epsilon);
-                MX_Sigma   = (MM_Sigma + XX_Sigma)./2;
-
-                MX_R_scaled = 4.*MX_Epsilon*MX_Sigma.^12;
-                MX_D_scaled = 4.*MX_Epsilon*MX_Sigma.^6;
-
-                Settings.S.D.MX = MX_D_scaled./MX_D;
-                Settings.S.R.MX = MX_R_scaled./MX_R;
-
-                if Settings.Additional_MM_Disp
-                    Settings.S.D.MM = Settings.S.D.MM + Param.SDMM2;
-                end
-            else
-                Settings.S.D.MX = Param.SDMX;
-                Settings.S.R.MX = Param.SRMX;
-            end
+        % Alpha (exponential steepness repulsive parameter)
+        if ~Settings.Fix_Alpha
+            Settings.S.A.MM = Param.SAMM;
+            Settings.S.A.XX = Param.SAXX;
+            Settings.S.A.MX = Param.SAMX;
         end
 
         % Scaling Coulombic Charge
@@ -796,136 +272,227 @@ else
         end
     end
 
-    % Perturb the potential with Gaussians
-    if ~isempty(Settings.Additional_GAdjust)
-        mx = 1;
-        mm = 1;
-        xx = 1;
-        for idx = 1:length(Settings.Additional_GAdjust)
-            int = [Settings.Additional_GAdjust{idx} '_' num2str(idx)];
-            switch int
-                case ['MM' '_' num2str(idx)]
-                    Settings.GAdjust_MM(mm,1) = Param.(['GA_' int]);
-                    Settings.GAdjust_MM(mm,2) = Param.(['GB_' int]);
-                    Settings.GAdjust_MM(mm,3) = Param.(['GC_' int]);
-                    mm = mm+1;
-                case ['XX' '_' num2str(idx)]
-                    Settings.GAdjust_XX(xx,1) = Param.(['GA_' int]);
-                    Settings.GAdjust_XX(xx,2) = Param.(['GB_' int]);
-                    Settings.GAdjust_XX(xx,3) = Param.(['GC_' int]);
-                    xx = xx+1;
-                case ['MX' '_' num2str(idx)]
-                    Settings.GAdjust_MX(mx,1) = Param.(['GA_' int]);
-                    Settings.GAdjust_MX(mx,2) = Param.(['GB_' int]);
-                    Settings.GAdjust_MX(mx,3) = Param.(['GC_' int]);
-                    mx = mx+1;
+elseif strcmp(Settings.Theory,'JC') % JC models
+
+    % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
+    if Settings.SigmaEpsilon
+
+        % Sigma scaling
+        Settings.S.S.MM = Param.Sigma_MM./JC_MM.sigma;
+        Settings.S.S.XX = Param.Sigma_XX./JC_XX.sigma;
+
+        % Epsilon scaling
+        Settings.S.E.MM = Param.Epsilon_MM./JC_MM.epsilon;
+        Settings.S.E.XX = Param.Epsilon_XX./JC_XX.epsilon;
+
+        % Default MX params
+        def_S_MX = JC_MX.sigma;
+        def_E_MX = JC_MX.epsilon;
+
+        if Settings.Additivity
+            Sigma_MX = (Param.Sigma_MM + Param.Sigma_XX)./2;
+            Epsilon_MX = sqrt(Param.Epsilon_MM.*Param.Epsilon_XX);
+
+            Settings.S.S.MX = Sigma_MX./def_S_MX;
+            Settings.S.E.MX = Epsilon_MX./def_E_MX;
+
+            if Settings.Additional_MM_Disp
+                Full_MM_Epsilon = Param.Epsilon_MM + Param.Epsilon_MM2;
+                Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
             end
-        end
-    end
-
-    % Additional functions
-    if Settings.Additional_Function.MM.N >= 0 && ~isempty(Settings.Additional_Function.MM.Range)
-        Settings.S.N.MM.Scale = Param.SNMM;
-        Settings.S.N.MM.Value = Settings.Additional_Function.MM.N;
-    end
-    if Settings.Additional_Function.XX.N >= 0 && ~isempty(Settings.Additional_Function.XX.Range)
-        Settings.S.N.XX.Scale = Param.SNXX;
-        Settings.S.N.XX.Value = Settings.Additional_Function.XX.N;
-    end
-    if Settings.Additional_Function.MX.N >= 0 && ~isempty(Settings.Additional_Function.MX.Range)
-        Settings.S.N.MX.Scale = Param.SNMX;
-        Settings.S.N.MX.Value = Settings.Additional_Function.MX.N;
-    end
-
-    % Calculate loss due to infeasible TF / BH models with no well minima (only works reliably in sigma-epsilon form)
-    Loss = 0;
-    if strcmp(Settings.Theory,'BH')
-        [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
-    elseif strcmp(Settings.Theory,'TF')
-        [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
-    elseif strcmp(Settings.Theory,'JC')
-        [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
-    end
-
-    %% Grab the peaks and valleys of the MX attractive potential
-    peaks_idx = islocalmax(U_MX.Total);
-    valleys_idx = islocalmin(U_MX.Total);
-
-    maxima_U = U_MX.Total(peaks_idx);
-    minima_U = U_MX.Total(valleys_idx);
-
-    if isempty(minima_U) % If no well minimum exists in MX interaction
-        Loss = Loss + Settings.BadFcnLossPenalty;
-    elseif isempty(maxima_U) % If no peak exists in MX interaction
-        % Do nothing, this is normal for JC potential and some BH/TF
-        % potentials
-    else % Otherwise, a well minimum exists and at least one peak exists
-        % ensure peak - well height is greater than specified threshold
-        Threshold = Settings.MinExpWallHeight; % kJ/mol
-        dU = maxima_U - minima_U;
-        Loss = Loss + max(Threshold - dU,0)*Settings.BadFcnLossPenalty/Threshold;
-    end
-%     plot(U_MX.r,U_MX.Total)
-%     hold on
-%     scatter(U_MX.r(peaks_idx),U_MX.Total(peaks_idx))
-%     scatter(U_MX.r(valleys_idx),U_MX.Total(valleys_idx))
-%     ylim([-1000 1000])
-
-    %% Grab the peaks and valleys of the MM/XX potentials
-    Us = [U_MM,U_XX];
-    for udx = 1:2
-        U = Us(udx);
-
-        peaks_idx = islocalmax(U.Total);
-        valleys_idx = islocalmin(U.Total);
-
-        maxima_U = U.Total(peaks_idx);
-        minima_U = U.Total(valleys_idx);
-
-        maxima_r = U.r(peaks_idx);
-        minima_r = U.r(valleys_idx);
-
-%         plot(U.r,U.Total)
-%         hold on
-%         scatter(U.r(peaks_idx),U.Total(peaks_idx))
-%         scatter(U.r(valleys_idx),U.Total(valleys_idx))
-%         ylim([-1000 1000])
-
-        if isempty(maxima_U) % No peak exists
-            % Do nothing, this is normal for JC and sometimes BH/TF
-        elseif length(maxima_U) > 1 % two peaks are visible + one valley in between them
-            % Penalize any model with a non-zero well depth between
-            % like-like interactions
-            Threshold = Settings.MaxRepWellDepth; % kJ/mol
-            dU = maxima_U(2) - minima_U;
-            Loss = Loss + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
-        elseif length(maxima_U) == 1 && isempty(minima_U) % One peak, no valley (this is a normal case for TF and BH repulsive potentials)
-            % Do nothing
-        elseif length(maxima_U) == 1 && length(minima_U) == 1 % One peak visible + one valley in between, and (possibly) one hidden peak to the right
-            Threshold = Settings.MaxRepWellDepth; % kJ/mol
-            if minima_r < maxima_r
-                dU = maxima_U - minima_U;
-            else
-                % Case of hidden peak to the right
-                % Ensure valley depth is not greater than the threshold
-                dU = U.Total(end) - minima_U;
-            end
-            Loss = Loss + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
-        elseif length(minima_U) == 1 % well minima is available but no peaks are visible, there must be a hidden peak to the right
-            Threshold = Settings.MaxRepWellDepth; % kJ/mol
-            dU = U.Total(end) - minima_U;
-            Loss = Loss + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
         else
-            % This should never be reached...
-            warning('Possible issue with the potential!')
+            Settings.S.S.MX = Param.Sigma_MX./def_S_MX;
+            Settings.S.E.MX = Param.Epsilon_MX./def_E_MX;
+        end
+
+    % Scaled dispersion/repulsion form
+    else
+        % Dispersion
+        Settings.S.D.MM = Param.SDMM;
+        Settings.S.D.XX = Param.SDXX;
+
+        % Repulsion
+        Settings.S.R.MM = Param.SRMM;
+        Settings.S.R.XX = Param.SRXX;
+
+        if Settings.Additivity
+
+            % Unscaled
+            MX_Epsilon = JC_MX.epsilon;
+            MX_Sigma   = JC_MX.sigma;
+
+            MX_R = 4.*MX_Epsilon.*MX_Sigma.^12;
+            MX_D = 4.*MX_Epsilon.*MX_Sigma.^6;
+
+            % Scaled
+            MM_Epsilon = JC_MM.epsilon.*(Settings.S.D.MM.^2).*(1./Settings.S.R.MM);
+            MM_Sigma = JC_MM.sigma.*(1./(Settings.S.D.MM.^(1/6))).*(Settings.S.R.MM.^(1/6));
+
+            XX_Epsilon = JC_XX.epsilon.*(Settings.S.D.XX.^2).*(1./Settings.S.R.XX);
+            XX_Sigma = JC_XX.sigma.*(1./(Settings.S.D.XX.^(1/6))).*(Settings.S.R.XX.^(1/6));
+
+            MX_Epsilon = sqrt(MM_Epsilon.*XX_Epsilon);
+            MX_Sigma   = (MM_Sigma + XX_Sigma)./2;
+
+            MX_R_scaled = 4.*MX_Epsilon.*MX_Sigma.^12;
+            MX_D_scaled = 4.*MX_Epsilon.*MX_Sigma.^6;
+
+            Settings.S.D.MX = MX_D_scaled./MX_D;
+            Settings.S.R.MX = MX_R_scaled./MX_R;
+
+            if Settings.Additional_MM_Disp
+                Settings.S.D.MM = Settings.S.D.MM + Param.SDMM2;
+            end
+        else
+            Settings.S.D.MX = Param.SDMX;
+            Settings.S.R.MX = Param.SRMX;
         end
     end
-    if log1p(Loss) >= Settings.MinSkipLoss
-        tf = false;
+
+    % Scaling Coulombic Charge
+    if Settings.Fix_Charge
+        Settings.S.Q = Settings.Q_value;
+    else
+        Settings.S.Q = Param.SQ;
     end
 end
+
+% Calculate loss due to infeasible TF / BH models with no well minima (only works reliably in sigma-epsilon form)
+if strcmp(Settings.Theory,'BH')
+    U = BH_Potential_Generator_vec(Settings);
+elseif strcmp(Settings.Theory,'TF')
+    [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
+        'Startpoint',0.01,'ReturnAsStructure',true);
+elseif strcmp(Settings.Theory,'JC')
+    U = JC_Potential_Generator_vec(Settings);
+end
+
+%% Grab the peaks and valleys of the MX attractive potential
+peaks_idx = islocalmax(U.MX,2);
+valleys_idx = islocalmin(U.MX,2);
+
+Num_peaks = sum(peaks_idx,2);
+Num_valleys = sum(valleys_idx,2);
+
+no_valley_idx = Num_valleys == 0; % Potentials that contain no minimum
+well_idx = find((Num_valleys > 0) & (Num_peaks > 0)); % Potentials with both a max and min, indicating a well is present
+
+peak_with_well = peaks_idx(well_idx,:);
+valley_with_well = valleys_idx(well_idx,:);
+
+% If no well minimum exists in MX interaction, add a loss penalty
+Loss(no_valley_idx) = Loss(no_valley_idx) + Settings.BadFcnLossPenalty;
+
+% If no peak exists in MX interaction, do nothing. 
+% This is normal for JC potential and some BH/TF potentials
+
+% If both a peak and minimum exist, find the well depth
+U_MX_well = U.MX(well_idx,:)';
+dU = U_MX_well(peak_with_well') - U_MX_well(valley_with_well');
+Loss(well_idx) = Loss(well_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty;
+
+%         idx = 1097;
+%         plot(U.r,U.MX(idx,:))
+%         hold on
+%         scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
+%         scatter(U.r(valleys_idx(idx,:)),U.MX(idx,valleys_idx(idx,:)))
+%         ylim([-1000 1000])
+
+%% Grab the peaks and valleys of the MM/XX potentials
+YY = {'MM' 'XX'};
+for j = 1:2
+    jj = YY{j};
+
+    peaks_idx = islocalmax(U.(jj),2);
+    valleys_idx = islocalmin(U.(jj),2);
+
+    Num_peaks = sum(peaks_idx,2);
+    Num_valleys = sum(valleys_idx,2);
+
+    % 5 possible cases
+    %npnv_idx = (Num_peaks == 0) & (Num_valleys == 0); % Potentials that contain no peaks and no valleys
+    opnv_idx = (Num_peaks == 1) & (Num_valleys == 0); % Potentials that contain one peak and no valleys
+    tpov_idx = (Num_peaks == 2);                      % Potentials that countain 2 peaks and one valley
+    opov_idx = (Num_peaks == 1) & (Num_valleys == 1); % Potentials that contain one peak and one valley
+    npov_idx = (Num_peaks == 0) & (Num_valleys == 1); % Potentials that contain no peaks and one valley
+
+    % No peak and no valley exists: Do nothing, this is normal for JC and sometimes BH/TF
+    %npnv_idx;
+
+    % One peak, no valley: This is a normal case for TF and BH
+    % repulsive potentials, check to ensure the peak height is at
+    % least Settings.MinExpWallHeight
+    opnv_set = peaks_idx(opnv_idx,:);
+    U_jj_opnv = U.(jj)(opnv_idx,:)';
+    dU = U_jj_opnv(opnv_set');
+    Loss(opnv_idx) = Loss(opnv_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty;
+
+    % two peaks are visible implies one valley in between them: 
+    % Penalize any model with a non-zero well depth greater than Settings.MaxRepWellDepth
+    tpov_set = peaks_idx(tpov_idx,:);
+    U_jj_tpov_set = U.(jj)(tpov_idx,:);
+    sp_idx = length(U.r) - sum( cumprod(fliplr(tpov_set) == 0, 2), 2);
+    spl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(sp_idx)).',sp_idx);
+    mv_idx = sum( cumprod(valleys_idx(tpov_idx,:) == 0, 2), 2) + 1;
+    mvl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(mv_idx)).',mv_idx);
+    dU = U_jj_tpov_set(spl_idx) - U_jj_tpov_set(mvl_idx);
+    Loss(tpov_idx) = Loss(tpov_idx) + max(dU - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
+
+    % One peak visible + one valley, and (possibly) one hidden peak to the right
+    % In this case, check if the valley is closer-in than the peak
+    % If the valley is closer-in, there is no hidden peak, use dU = peak_U - valley_U
+    % If the peak is closer-in, there is a second hidden peak to the right, use dU = U(end) - valley_U
+    opov_set = peaks_idx(opov_idx,:);
+    U_jj_opov_set = U.(jj)(opov_idx,:);
+
+    op_idx = sum(cumprod(opov_set == 0, 2), 2) + 1;
+    ov_idx = sum(cumprod(valleys_idx(opov_idx,:) == 0, 2), 2) + 1;
+
+    % split into two subsets
+    ovcc_idx = (ov_idx < op_idx);
+    Lossn = zeros(size(ovcc_idx));
+
+    % Valley closer set: use peak_U - valley_U
+    U_jj_opovc_set = U_jj_opov_set(ovcc_idx,:);
+    opc_idx = op_idx(ovcc_idx);
+    opcl_idx = sub2ind(size(U_jj_opovc_set),(1:numel(opc_idx)).',opc_idx);
+    ovc_idx = ov_idx(ovcc_idx);
+    ovcl_idx = sub2ind(size(U_jj_opovc_set),(1:numel(ovc_idx)).',ovc_idx);
+    dUc = U_jj_opovc_set(opcl_idx) - U_jj_opovc_set(ovcl_idx);
+    Lossn(ovcc_idx) =  max(dUc - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
+
+    % Valley further set: use U(end) - valley_U
+    U_jj_opovf_set = U_jj_opov_set(~ovcc_idx,:);
+    opf_idx = repmat(length(U.r),sum(~ovcc_idx),1); % set the "peak" to the furthest possible place
+    opfl_idx = sub2ind(size(U_jj_opovf_set),(1:numel(opf_idx)).',opf_idx);
+    ovf_idx = ov_idx(~ovcc_idx);
+    ovfl_idx = sub2ind(size(U_jj_opovf_set),(1:numel(ovf_idx)).',ovf_idx);
+    dUf = U_jj_opovf_set(opfl_idx) - U_jj_opovf_set(ovfl_idx);
+    Lossn(~ovcc_idx) =  max(dUf - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
+
+    Loss(opov_idx) = Loss(opov_idx) + Lossn;
+
+    % No peak + one valley: there must be a hidden peak to the right
+    % use dU = U(end) - valley_U
+    U_jj_npov_set = U.(jj)(npov_idx,:);
+    ov_idx = sum(cumprod(valleys_idx(npov_idx,:) == 0, 2), 2) + 1;
+    ovl_idx = sub2ind(size(U_jj_npov_set),(1:numel(ov_idx)).',ov_idx);
+    op_idx = repmat(length(U.r),sum(npov_idx),1); % set the "peak" to the furthest possible place
+    opl_idx = sub2ind(size(U_jj_npov_set),(1:numel(op_idx)).',op_idx);
+    dU = U_jj_npov_set(opl_idx) - U_jj_npov_set(ovl_idx);
+    Loss(npov_idx) = Loss(npov_idx) +  max(dU - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
+
+%             idxes = find(Loss > 0);
+%             for jdx = 1:100
+%                 idx=idxes(jdx);
+%                 hold on
+%                 plot(U.r,U.(jj)(idx,:))
+%                 scatter(U.r(peaks_idx(idx,:)),U.(jj)(idx,peaks_idx(idx,:)))
+%                 scatter(U.r(valleys_idx(idx,:)),U.(jj)(idx,valleys_idx(idx,:)))
+%             end
+%             ylim([-1000 1000])
+end
+
+tf = log1p(Loss) < Settings.MinSkipLoss;
 
 end

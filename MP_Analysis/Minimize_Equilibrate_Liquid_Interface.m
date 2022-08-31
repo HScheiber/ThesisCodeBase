@@ -412,7 +412,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         end
         
         Settings = Inp_Settings;
-        if Settings.MDP.dt > 1e-4
+        if Settings.MDP.dt/2 >= Settings.MinTimeStep
             if Settings.Verbose
                 disp('Equilibration failed. Reducing time step.')
             end

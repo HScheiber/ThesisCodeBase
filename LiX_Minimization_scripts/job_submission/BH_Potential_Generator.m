@@ -101,7 +101,6 @@ Param.Br.epsilon = (0.0269586)*kJ_per_kcal; % kJ/mol
 Param.I.sigma = (2.919*nm_per_Ang)*(2^(5/6)); % nm
 Param.I.epsilon = (0.0427845)*kJ_per_kcal; % kJ/mol
 
-
 %% Parameter: q (charge)
 q.Li =  Settings.S.Q; % atomic
 q.Na =  Settings.S.Q; % atomic
@@ -173,10 +172,9 @@ rho.CsI = 0.291*nm_per_Ang; % nm THIS IS ESTIMATED
 b = (0.338e-12)*kj_per_erg*NA; % kJ/mol
 
 %% Calculate Pauling Coefficients beta: MX = +-   MM = ++     XX = --
-beta.MM = 1 + 2*q.(Metal)/valence.(Metal); % Unitless
-beta.XX = 1 + 2*q.(Halide)/valence.(Halide); % Unitless
-beta.MX = sqrt(beta.MM*beta.XX); % Unitless
-
+beta.MM = 1 + 2/valence.(Metal);   % Unitless
+beta.XX = 1 - 2/valence.(Halide); % Unitless
+beta.MX = sqrt(beta.MM*beta.XX);             % Unitless
 
 %% Calculate TF Repulsive Exponential Parameter alpha: MX = +-   MM = ++     XX = --
 alpha.MM = Settings.S.A.All*Settings.S.A.MM/rho.(Settings.Salt); % nm^-1

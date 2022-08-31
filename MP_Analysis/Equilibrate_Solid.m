@@ -179,7 +179,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
             Settings.Cutoff_Buffer = Settings.Cutoff_Buffer.*1.25;
             Output = Equilibrate_Solid(Settings);
             return
-        elseif Settings.MDP.dt > 1e-4
+        elseif Settings.MDP.dt/2 >= Settings.MinTimeStep
             if Settings.Verbose
                 disp('Equilibration failed. Reducing time step.')
             end

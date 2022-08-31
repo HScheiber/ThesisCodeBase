@@ -745,7 +745,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             WorkDir = Settings.WorkDir;
             Settings = Inp_Settings;
             Settings.WorkDir = WorkDir;
-            if Settings.MDP.dt > 1e-4
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Liquid Equilibration failed. Reducing time step.')
                 end

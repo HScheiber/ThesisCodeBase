@@ -7,9 +7,9 @@
 % Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
-Theory = 'BH';
-Basenum = 'J';
-Midnum = 'G';
+Theory = 'JC';
+Basenum = 'E';
+Midnum = 'P';
 savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
 
@@ -39,7 +39,7 @@ volume_ylim = [-8 20];
 loss_ylog = true;
 
 % Other parameters
-show_as_percent_error = false; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
+show_as_percent_error = true; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
 % Calculates error in lattice energy with respect to experimental lattice energies when available
 Target_Experimental_Energies = true; 
 % Calculates error in lattice parameters, volumes, and densities with respect to experimental lattice parameters when available

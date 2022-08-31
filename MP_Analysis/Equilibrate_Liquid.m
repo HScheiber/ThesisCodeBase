@@ -398,7 +398,7 @@ function Output = Equilibrate_Liquid(Settings)
 %             Settings.QECompressibility = Settings.QECompressibility/2;
 %             Output = Equilibrate_Liquid(Settings);
 %             return
-        if Settings.MDP.dt > 1e-4
+        if Settings.MDP.dt/2 >= Settings.MinTimeStep
             if Settings.Verbose
                 disp('Equilibration failed. Reducing time step.')
             end

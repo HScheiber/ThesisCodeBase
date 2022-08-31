@@ -127,17 +127,17 @@ function params = bayesopt_params(Model)
         
     else % JC models
         if Model.SigmaEpsilon
-            SDMM = optimizableVariable('Sigma_MM',[0.04,0.2],'Type','real'); % Units: nm
+            SDMM = optimizableVariable('Sigma_MM',[0.1,0.4],'Type','real'); % Units: nm
             SDXX = optimizableVariable('Sigma_XX',[0.1,0.8],'Type','real'); % Units: nm
-            SDMX = optimizableVariable('Sigma_MX',[0.07,0.5],'Type','real'); % Units: nm
+            SDMX = optimizableVariable('Sigma_MX',[0.1,0.8],'Type','real'); % Units: nm
             
             if contained_in_cell('MM',Model.Additional_GAdjust) || (Model.Additivity && Model.Additional_MM_Disp)
                 SRMM = optimizableVariable('Epsilon_MM',[0,10],'Type','real'); % Units: kJ/mol
             else
-                SRMM = optimizableVariable('Epsilon_MM',[0,1e6],'Type','real'); % Units: kJ/mol
+                SRMM = optimizableVariable('Epsilon_MM',[0,1000],'Type','real'); % Units: kJ/mol
             end
-            SRXX = optimizableVariable('Epsilon_XX',[0,5],'Type','real'); % Units: kJ/mol
-            SRMX = optimizableVariable('Epsilon_MX',[0,5],'Type','real'); % Units: kJ/mol
+            SRXX = optimizableVariable('Epsilon_XX',[0,1000],'Type','real'); % Units: kJ/mol
+            SRMX = optimizableVariable('Epsilon_MX',[0,1000],'Type','real'); % Units: kJ/mol
             
             SDMM2= optimizableVariable('Epsilon_MM2',[0,1e6],'Type','real'); % Units: kJ/mol
             

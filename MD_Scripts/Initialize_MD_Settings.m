@@ -273,5 +273,6 @@ Settings.Liquid_Equilibrate_Time = 25; % ps
 Settings.Solid_Test_Time = 30; % ps
 Settings.Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MinTimeStep = 0.00025; % [ps] minimum time step
 
 end
