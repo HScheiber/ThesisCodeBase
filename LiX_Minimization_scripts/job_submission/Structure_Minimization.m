@@ -55,7 +55,7 @@ switch lower(Settings.Structure)
         Lattice_param_LBab = 2.2; % Angstroms, lower bound on the possible lattice parameter
         Lattice_param_LBc = 2.2; % Angstroms, lower bound on the possible lattice parameter
 end
-Lattice_param_UB = 15; % Angstroms, upper bound on the possible lattice parameter
+Lattice_param_UB = 20; % Angstroms, upper bound on the possible lattice parameter
 Settings.Longest_Cutoff = max([Settings.MinMDP.RList_Cutoff Settings.MinMDP.RCoulomb_Cutoff Settings.MinMDP.RVDW_Cutoff]);
 Settings.Table_Length = Settings.Longest_Cutoff + 1.01; % nm. This should be at least equal rc+1 where rc is the largest cutoff
 
@@ -508,7 +508,8 @@ end
 
 fun = @(x)Calculate_Crystal_Energy(x,Settings);
 conv_fun = @(x,optimValues,state)check_conv(x,optimValues,state,...
-    Settings.MinMDP.Gradient_Tol_RMS,Settings.MinMDP.Gradient_Tol_Max);
+    Settings.MinMDP.Gradient_Tol_RMS,Settings.MinMDP.Gradient_Tol_Max,...
+    Settings.MinMDP.E_Unphys);
 
 if strcmp(Settings.Theory,'HS')
 %        Use a gradient-free approach for HS model due to the discontinuity
@@ -517,6 +518,7 @@ if strcmp(Settings.Theory,'HS')
 
     [lattice_params,E] = fminsearch(fun,x0,optionsNM);
     Gradient = nan;
+    calc_failed = false;
 %         options = optimoptions(@patternsearch,'Display',display_option,'MaxIterations',Settings.MinMDP.MaxCycles,...
 %             'UseParallel',Settings.MinMDP.Parallel_Min,'UseVectorized',false,'PlotFcn',[],...
 %             'InitialMeshSize',1e-6,'StepTolerance',1e-8,'FunctionTolerance',1e-8,...
@@ -532,8 +534,18 @@ else
         'UseParallel',Settings.MinMDP.Parallel_Min,'MaxIterations',Settings.MinMDP.MaxCycles,'FiniteDifferenceStepSize',h,...
         'StepTolerance',1e-10,'FunctionTolerance',1e-6,'FiniteDifferenceType','forward',...
         'MaxFunctionEvaluations',400);
-
-    [lattice_params,E,~,~,~,Gradient,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
+    
+    [lattice_params,E,exitflag,~,~,Gradient,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
+    
+    % Failed to produce a reasonable answer
+    if any(exitflag == [0 -2]) || ...
+            any( abs(lattice_params - lb) < sqrt(eps) ) || ...
+            any( abs(lattice_params - ub) < sqrt(eps) ) || ...
+            E < Settings.MinMDP.E_Unphys
+        calc_failed = true;
+    else
+        calc_failed = false;
+    end
 end
 
 for idx = 1:N_DOF
@@ -605,6 +617,7 @@ Output.E = E;
 Output.Salt = Settings.Salt;
 Output.Structure = Settings.Structure;
 Output.Model = Settings.Theory;
+Output.CalcFail = calc_failed;
 
 if Settings.MinMDP.Verbose
     Settings.Geometry.a = Output.a;

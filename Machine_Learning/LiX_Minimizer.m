@@ -26,12 +26,16 @@ function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varar
 % Initialize coupled constraints to -1, this indicates the constraints are satisfied by default
 % The first coupled constraint is for model volumes at 0 K that are either
 % larger than Settings.MaxModelVolume or smaller than Settings.MinModelVolume.
+%
 % The second coupled constraint is for finite temperature simulations that
-% give NaN outputs. These are caused when 
-%   (1) a simulation fails 
-%   (2) a melting point cannot be found for the structure of interest 
-%   (3) liquid is amorphous at the experimental MP 
-%   (4) the liquid or solid converts to another structure at the experimental MP
+% give NaN outputs, or for Structure_Minimization calculations that are not feasible. 
+% These are caused when 
+%   (1) The lattice params of a structure are too large or too small
+%   (2) The lattice energy of a structure is lower than Settings.MinMDP.E_Unphys
+%   (3) A finite-T simulation fails 
+%   (4) A melting point cannot be found for the structure of interest 
+%   (5) The liquid is amorphous at the experimental MP 
+%   (6) The liquid or solid converts to another structure at the experimental MP
 coupledconstraints = -ones(1,2);
 
 % Optional inputs
@@ -1058,6 +1062,7 @@ end
 
 %% Parallel Setup
 N = length(Settings.Structures);
+Structure_Min_Calc_Fail = false;
 if Settings.Parallel_LiX_Minimizer
     % Set up matlab parallel features
     Parcores = feature('numcores');
@@ -1108,6 +1113,9 @@ if Settings.Parallel_LiX_Minimizer
     % Collect outputs into cell array
     for idx = 1:N
         Settings.Minimization_Data{idx} = f(idx).fetchOutputs;
+        if Settings.Minimization_Data{idx}.CalcFail
+            Structure_Min_Calc_Fail = true;
+        end
     end
 %% Serial mode    
 else
@@ -1115,7 +1123,23 @@ else
         Settings.Structure = Settings.Structures{idx};
         Settings.Minimization_Data{idx} = Structure_Minimization(Settings,...
             'Extra_Properties',Extra_Properties);
+        if Settings.Minimization_Data{idx}.CalcFail
+            Structure_Min_Calc_Fail = true;
+        end
     end
+end
+
+% This catches Structure_Minimization calculations that produce a result
+% outside of the allowed energy or volume bounds
+if Structure_Min_Calc_Fail && ~Settings.Therm_Prop_Override
+    coupledconstraints(2) = 1;
+    Loss = real(log1p(Loss_add + Settings.BadFcnLossPenalty));
+    UserData.Minimization_Data = Settings.Minimization_Data;
+    UserData.Finite_T_Data = Settings.Finite_T_Data;
+    return
+elseif Structure_Min_Calc_Fail && Settings.Therm_Prop_Override
+    coupledconstraints(2) = 1;
+    Loss_add = Loss_add + Settings.BadFcnLossPenalty;
 end
 
 % Initialize Finite T Data structure and update Settings

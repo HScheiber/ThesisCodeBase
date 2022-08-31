@@ -132,7 +132,6 @@ Shared_Settings.MDP.VerletBT = -1;
 
 Shared_Settings.Verbose = false;
 
-
 idx = 0;
 
 %% BH Model (MP Test) XZ
