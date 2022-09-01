@@ -50,7 +50,7 @@ if isfile(Output_Properties_File)
     try
         Output = load(Output_Properties_File).Output;
         if Settings.MinMDP.Verbose
-            disp('Calculation previously completed, successfully loaded output.')
+            disp([Settings.Salt ' ' Model ' ' Settings.Structure ' minimization previously completed, successfully loaded output.'])
         end
         return
     catch
