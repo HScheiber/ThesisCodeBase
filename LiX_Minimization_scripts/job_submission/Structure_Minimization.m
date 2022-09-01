@@ -29,7 +29,7 @@ end
 if Scratch_output_files
     % Keep the model name short
     Model = Settings.Theory;
-    WorkDir = GetMDWorkdir(Settings,varargin);
+    WorkDir = GetMDWorkdir(Settings);
     Settings.WorkDir = fullfile([WorkDir '_OP'],Settings.Structure);
 else
     % Use systematic name
@@ -522,7 +522,6 @@ end
 
 fun = @(x)Calculate_Crystal_Energy(x,Settings);
 conv_fun = @(x,optimValues,state)check_conv(x,optimValues,state,...
-    Settings.MinMDP.Gradient_Tol_RMS,Settings.MinMDP.Gradient_Tol_Max,...
     Settings.MinMDP.E_Unphys);
 
 if strcmp(Settings.Theory,'HS')
@@ -544,7 +543,8 @@ if strcmp(Settings.Theory,'HS')
 %         Gradient = nan;
 else
     options = optimoptions(@fmincon,'Display',display_option,'Algorithm','active-set',...
-        'DiffMaxChange',max(h),'OptimalityTolerance',0,'OutputFcn',conv_fun,'ObjectiveLimit',Settings.MinMDP.E_Unphys,...
+        'DiffMaxChange',max(h),'OptimalityTolerance',Settings.MinMDP.Gradient_Tol_Max,...
+        'OutputFcn',conv_fun,'ObjectiveLimit',Settings.MinMDP.E_Unphys,...
         'UseParallel',Settings.MinMDP.Parallel_Min,'MaxIterations',Settings.MinMDP.MaxCycles,'FiniteDifferenceStepSize',h,...
         'StepTolerance',1e-10,'FunctionTolerance',1e-6,'FiniteDifferenceType','forward',...
         'MaxFunctionEvaluations',400);

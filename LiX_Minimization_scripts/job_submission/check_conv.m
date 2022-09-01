@@ -1,13 +1,12 @@
-function stop = check_conv(~,optimValues,state,Gradient_Tol_RMS,Gradient_Tol_Max,E_Unphys)
+function stop = check_conv(~,optimValues,state,E_Unphys)
 
 switch state
     case 'iter'
-        if ( rms(optimValues.gradient) < Gradient_Tol_RMS ) && max(abs(optimValues.gradient)) < Gradient_Tol_Max ...
-                ||  optimValues.fval < E_Unphys
+        if optimValues.fval < E_Unphys
             stop = true;
-        else
+       else
             stop = false;
-        end
+       end
     otherwise
         stop = false;
 end
