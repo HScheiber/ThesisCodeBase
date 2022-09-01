@@ -135,8 +135,8 @@ Shared_Settings.Verbose = true;
 idx = 0;
 
 %% BH Model (MP Test) XZ
-Salts = {'LiBr'};
-Theories = {'TF'};
+Salts = {'NaCl'};
+Theories = {'BH'};
 Replicates = 1;
 
 for tidx = 1:length(Theories)

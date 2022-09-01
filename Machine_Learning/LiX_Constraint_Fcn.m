@@ -495,7 +495,7 @@ for j = 1:2
 %             ylim([-1000 1000])
 end
 
-tf = log1p(Loss) < Settings.MinSkipLoss;
+tf = log1p(Loss) < sqrt(eps);
 
 %Plot result to visualize
 %tf_num = double(tf);
