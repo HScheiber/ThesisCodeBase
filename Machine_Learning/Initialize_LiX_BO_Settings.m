@@ -16,7 +16,6 @@ Settings.Additional_Function = Init_Additional_Function; % Adding additional fun
 Settings.Fix_Alpha = false; % Active for TF and BH models only when NOT using SigmaEpsilon form. When active, the value of exponential repulsion parameter, which is related to compressibility, is fixed to its default
 Settings.Fix_C8 = false; % Active for TF model only when NOT using SigmaEpsilon form. When active, the value of C8 is fixed by the value of C6, and is no longer a free parameter
 Settings.Diary_Loc = '';
-[~,~,~,~,~,~,~,~,~,~,Settings.scratch_dir] = find_home;
 
 % Parameter Ranges
 % Dispersion scaling mode

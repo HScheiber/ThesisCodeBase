@@ -211,7 +211,7 @@ Settings.Table_StepSize = 0.0005; % nm, suitable for double precision
 
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,...
     Settings.BO_Models,Settings.qsub,Settings.passlog,Settings.pipe,...
-    Settings.wsl,Settings.MLModelDir] = find_home;
+    Settings.wsl,Settings.MLModelDir,Settings.scratch_dir] = find_home;
 Settings.Project_Directory_Name = 'Melting_Point_Studies'; % Name of project directory to contain job within the main project folder
 
 %% Settings for melting point calculations
