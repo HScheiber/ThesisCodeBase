@@ -656,6 +656,8 @@ end
 
 % Delete the calculation directory
 if Scratch_output_files
+    rmdir(Settings.WorkDir,'s');
+    mkdir(Settings.WorkDir);
     save(Output_Properties_File,'Output');
 end
 
