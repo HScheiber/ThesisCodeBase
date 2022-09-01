@@ -106,6 +106,7 @@ Settings.Extra_Properties = true; % calculate extra properties for the final com
 
 % Loss and constraint options
 Settings.Loss_Options = init_loss_options; % default loss options
+Settings.UseCoupledConstraint = false; % Turns on coupled constraints
 Settings.CheckBadFcn = true; % Switch to turn on or off the checking of pathological functions, adding a loss penalty for such functions
 Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied

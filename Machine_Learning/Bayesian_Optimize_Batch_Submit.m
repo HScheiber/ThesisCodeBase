@@ -295,6 +295,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.UseCoupledConstraint = false;
            
         %% JC/BH Models: KA, KB, KC on NaCl
         Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 

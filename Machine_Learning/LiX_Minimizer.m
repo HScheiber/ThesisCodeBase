@@ -32,7 +32,11 @@ function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varar
 %   (4) A melting point cannot be found for the structure of interest 
 %   (5) The liquid is amorphous at the experimental MP 
 %   (6) The liquid or solid converts to another structure at the experimental MP
-coupledconstraints = []; %-1;
+if Settings.UseCoupledConstraint
+    coupledconstraints = -1;
+else
+    coupledconstraints = [];
+end
 
 % Optional inputs
 p = inputParser;
@@ -1105,14 +1109,22 @@ end
 % This catches Structure_Minimization calculations that produce a result
 % outside of the allowed energy or volume bounds
 if Structure_Min_Calc_Fail && ~Settings.Therm_Prop_Override
-    %coupledconstraints = 1;
-    Loss = real(log1p(Loss_add + Settings.BadFcnLossPenalty));
+    if Settings.UseCoupledConstraint
+        coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+        Loss = nan;
+    else
+        Loss = real(log1p(Loss_add + Settings.BadFcnLossPenalty));
+    end
     UserData.Minimization_Data = Settings.Minimization_Data;
     UserData.Finite_T_Data = Settings.Finite_T_Data;
     return
 elseif Structure_Min_Calc_Fail && Settings.Therm_Prop_Override
-    %coupledconstraints = 1;
-    Loss_add = Loss_add + Settings.BadFcnLossPenalty;
+    if Settings.UseCoupledConstraint
+        coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+        Loss_add = nan;
+    else
+        Loss_add = Loss_add + Settings.BadFcnLossPenalty;
+    end
 end
 
 % Initialize Finite T Data structure and update Settings
@@ -1148,9 +1160,15 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
     if V0_model > Settings.MaxModelVolume
         Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
         Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;
+        if Settings.UseCoupledConstraint
+            coupledconstraints = real(log1p(Loss_add_Vol));
+        end
     elseif V0_model < Settings.MinModelVolume
         Model_Mismatch = (Settings.MinModelVolume - V0_model)/Settings.MinModelVolume;
         Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;
+        if Settings.UseCoupledConstraint
+            coupledconstraints = real(log1p(Loss_add_Vol));
+        end
     else
         Loss_add_Vol = 0;
     end
@@ -1209,7 +1227,10 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
         Settings.Finite_T_Data.MP = nan;
-        %coupledconstraints = 1;
+        if Settings.UseCoupledConstraint
+            coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+            Loss_add = nan;
+        end
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
         if Settings.Delete_Equil && isfolder(Settings.WorkDir)
@@ -1292,9 +1313,10 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         end
     end
     
-%     if isnan(Liq_Output.Liquid_H_MP)
-%         coupledconstraints = 1;
-%     end
+    if isnan(Liq_Output.Liquid_H_MP) && Settings.UseCoupledConstraint
+        coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+        Loss_add = nan;
+    end
     
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
     Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
@@ -1369,9 +1391,10 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         end
     end
     
-%     if isnan(Sol_Output.Solid_H_MP)
-%         coupledconstraints = 1;
-%     end
+    if isnan(Sol_Output.Solid_H_MP) && Settings.UseCoupledConstraint
+        coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+        Loss_add = nan;
+    end
     
     Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
     Settings.Finite_T_Data.Solid_H_MP = Sol_Output.Solid_H_MP;
