@@ -18,10 +18,10 @@ Settings.OuterDir = pwd;
 %Settings.ScaleInitialLiqDensity = 0.8;
 %Settings.MDP.dt = 0.001;
 %Settings.Output_Coords = 100;
-Settings.Delete_Equil = false;
+%Settings.Delete_Equil = false;
 Settings.Verbose = true;
 Settings.Diary_Loc = '';
-Settings.CheckAmorphousHalide = true;
+%Settings.CheckAmorphousHalide = true;
 % Calc_Liquid_Properties_at_MP(Settings)
 % Calc_Solid_Properties_at_MP(Settings)
 % Settings.Equilibrate_Liquid = 20;

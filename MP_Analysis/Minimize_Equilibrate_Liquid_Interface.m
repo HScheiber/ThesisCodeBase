@@ -630,7 +630,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                 ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
             [~,~] = system(msd_command);
             outp = fileread(MSD_Log_File);
-            Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+            Diff_txt = regexp(outp,['D\[ *' Settings.Metal '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
             if ~isempty(Diff_txt)
                 Diff_const = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
             else

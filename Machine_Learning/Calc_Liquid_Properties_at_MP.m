@@ -1053,7 +1053,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     [~,~] = system(msd_command);
     outp = fileread(MSD_Log_File);
     try
-        Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+        Diff_txt = regexp(outp,['D\[ *' Settings.Metal '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
         Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
     catch
         if isfield(Settings,'Retry') && Settings.Retry
@@ -1102,7 +1102,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
         [~,~] = system(msd_command);
         outp = fileread(MSD_Log_File);
-        Diff_txt = regexp(outp,['D\[ *' Settings.Halide '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+        Diff_txt = regexp(outp,['D\[ *' Settings.Halide '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
         Output.Liquid_DX_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
         
         if Output.Liquid_DX_MP <= Settings.AmorphousDiffThreshold
