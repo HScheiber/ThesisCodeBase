@@ -507,6 +507,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
                 return
             end
         end
+    else
+        TPR_File = fullfile(Settings.WorkDir,'Equil_Sol.tpr');
+        Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
     end
     
     % Check to ensure system remained in the correct solid structure
