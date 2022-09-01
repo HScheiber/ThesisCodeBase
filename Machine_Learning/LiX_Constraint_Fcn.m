@@ -23,11 +23,6 @@
 %% Inputs
 function tf = LiX_Constraint_Fcn(Settings,Param)
 
-if ~isfield(Settings,'MinSkipLoss')
-    defSettings = Initialize_LiX_BO_Settings;
-    Settings.MinSkipLoss = defSettings.MinSkipLoss;
-end
-
 Settings.Table_Length = 10; % nm
 Settings.Table_StepSize = 0.01;
 
@@ -500,23 +495,23 @@ for j = 1:2
 %             ylim([-1000 1000])
 end
 
-tf = log1p(Loss) < Settings.MinSkipLoss;
+tf = log1p(Loss) < sqrt(eps);
 
-% Plot result to visualize
-% tf_num = double(tf);
+%Plot result to visualize
+%tf_num = double(tf);
 
 % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
 % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
 
-% ax1 = 'sigma_MM';
-% ax2 = 'sigma_XX';
-% ax3 = 'epsilon_XX';
+% ax1 = 'r0_MM';
+% ax2 = 'epsilon_MM';
+% ax3 = 'gamma_MX';
 % 
 % scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
-% %set(gca, 'YScale', 'log')
+% set(gca, 'YScale', 'log')
 % xlabel(ax1);
 % ylabel(ax2);
 % zlabel(ax3);
-% 
-% clear;
+
+%clear;
 end

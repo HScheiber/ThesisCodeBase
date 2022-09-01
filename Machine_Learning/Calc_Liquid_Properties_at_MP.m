@@ -19,9 +19,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
-    if ~isfield(Settings,'CheckAmorphousHalide')
-        Settings.CheckAmorphousHalide = false; % default
-    end
     
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
@@ -66,8 +63,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Volume = L^3; % Volume in nm^3
         nmol_liquid = round(Volume*Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
         
-        if nmol_liquid < Settings.N_atoms % Enforce a minimum of [Settings.N_atoms] atoms
-            nmol_liquid = Settings.N_atoms;
+        if nmol_liquid < Settings.N_atoms/2 % Enforce a minimum of [Settings.N_atoms] atoms
+            nmol_liquid = Settings.N_atoms/2;
             Volume = nmol_liquid/(Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
             L = Volume^(1/3);
         end

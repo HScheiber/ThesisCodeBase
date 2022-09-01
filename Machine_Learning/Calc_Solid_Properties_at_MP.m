@@ -84,7 +84,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         % Calculate number of formula units
         nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
         
-        while nmol_solid < Settings.N_atoms % Enforce a minimum of [Settings.N_atoms] atoms
+        while nmol_solid < Settings.N_atoms/2 % Enforce a minimum of [Settings.N_atoms] atoms
             La = La*1.1;
             Lb = Lb*1.1;
             Lc = Lc*1.1;
