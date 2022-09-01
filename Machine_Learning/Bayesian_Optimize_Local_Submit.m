@@ -131,6 +131,7 @@ Shared_Settings.MDP.Fourier_Spacing = 0.12;
 Shared_Settings.MDP.VerletBT = -1;
 
 Shared_Settings.Verbose = true;
+Shared_Settings.UseCoupledConstraint = true;
 
 idx = 0;
 
