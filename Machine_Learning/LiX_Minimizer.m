@@ -32,6 +32,11 @@ function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varar
 %   (4) A melting point cannot be found for the structure of interest 
 %   (5) The liquid is amorphous at the experimental MP 
 %   (6) The liquid or solid converts to another structure at the experimental MP
+
+if ~isfield(Settings,'UseCoupledConstraint')
+    Settings.UseCoupledConstraint = false;
+end
+
 if Settings.UseCoupledConstraint
     coupledconstraints = -1;
 else
