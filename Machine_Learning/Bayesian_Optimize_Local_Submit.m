@@ -136,7 +136,7 @@ idx = 0;
 
 %% BH Model (MP Test) XZ
 Salts = {'LiBr'};
-Theories = {'JC'};
+Theories = {'TF'};
 Replicates = 1;
 
 for tidx = 1:length(Theories)

@@ -22,11 +22,6 @@
 % When Model.Parallel_Struct_Min = true, this uses the parallel version of the subroutine Structure_Minimization (Note: each instance of gromacs is single-core in either mode)
 %% Inputs
 function tf = LiX_Constraint_Fcn(Settings,Param)
-timer = tic;
-if ~isfield(Settings,'MinSkipLoss')
-    defSettings = Initialize_LiX_BO_Settings;
-    Settings.MinSkipLoss = defSettings.MinSkipLoss;
-end
 
 Settings.Table_Length = 10; % nm
 Settings.Table_StepSize = 0.01;
@@ -501,22 +496,22 @@ for j = 1:2
 end
 
 tf = log1p(Loss) < Settings.MinSkipLoss;
-disp(['Time elapsed (s): ' num2str(toc(timer))])
-% Plot result to visualize
-% tf_num = double(tf);
+
+%Plot result to visualize
+%tf_num = double(tf);
 
 % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
 % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
 
-% ax1 = 'sigma_MM';
-% ax2 = 'sigma_XX';
-% ax3 = 'epsilon_XX';
+% ax1 = 'r0_MM';
+% ax2 = 'epsilon_MM';
+% ax3 = 'gamma_MX';
 % 
 % scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
-% %set(gca, 'YScale', 'log')
+% set(gca, 'YScale', 'log')
 % xlabel(ax1);
 % ylabel(ax2);
 % zlabel(ax3);
-% 
-% clear;
+
+%clear;
 end
