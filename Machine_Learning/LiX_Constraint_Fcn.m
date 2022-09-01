@@ -1,26 +1,3 @@
-% Damp_Types:
-% 0 = no (default) damping. This is default of JC model.
-% 1 = BJ/rational damping (same as in D3(BJ))
-% 2 = Tang Damping (Essentially removes dispersion in JC)
-% 3 = MMDRE Damping function (Very weak damping, damps mainly at mid range)
-% 4 = PAMoC Damping function (fairly weak damping, damps mainly at mid range)
-% 5 = EHFSK Damping function (strong damping)
-% 6 = WY damping function (strongest damping)
-
-% TF Parameter sets for C6/C8 coefficients
-% 0 = default TF Parameters
-% 1 = D3 values
-% 2 = Best literature values available
-% 3 = D4 with C6 and C8 generated on the fly
-
-% GAdjust are N x 3 arrays of gaussian parameters
-% (i , 1) is the Gaussian height of the ith adjustment (may be negative or
-% positive)
-% (i , 2) is the center point of the ith Gaussian (should be positive)
-% (i , 3) is the standard deviation or width (negative and positive values
-% are the same)
-% When Model.Parallel_Struct_Min = true, this uses the parallel version of the subroutine Structure_Minimization (Note: each instance of gromacs is single-core in either mode)
-%% Inputs
 function tf = LiX_Constraint_Fcn(Settings,Param)
 
 Settings.Table_Length = 10; % nm
