@@ -7,16 +7,59 @@ p.FunctionName = 'Structure_Minimization';
 addOptional(p,'Continuation',[])
 addOptional(p,'Extra_Properties',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'N_atoms',100,@(x)validateattributes(x,{'numeric'},{'nonempty'}))
-addOptional(p,'Delete_output_files',true,@(x)validateattributes(x,{'logical'},{'nonempty'}))
+addOptional(p,'Scratch_output_files',true,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Find_Min_Params',true,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 addOptional(p,'Find_Similar_Params',true,@(x)validateattributes(x,{'logical'},{'nonempty'}))
 parse(p,varargin{:});
 
 Extra_Properties = p.Results.Extra_Properties; % Gathers components of energy at the end in addition to the total energy.
-Delete_output_files = p.Results.Delete_output_files; % When true: runs calculation in a temp folder and deletes the calculation folder when finished
+Scratch_output_files = p.Results.Scratch_output_files; % When true: runs calculation in a temp folder and deletes the calculation folder when finished
 N_atoms = p.Results.N_atoms; % Minimum number of atoms to include in super cell
 Find_Min_Params = p.Results.Find_Min_Params; % When true, finds lowest energy parameters for IC based on Data_Types. When false, uses input IC
 Find_Similar_Params = p.Results.Find_Similar_Params; % When true, finds lowest energy parameters for IC if possible, but if no data is available, also looks for the same IC with non-scaled model
+
+% Type of optimization limited to Cellopt
+if Settings.MinMDP.Maintain_Symmetry
+    OptTxt = 'CELLOPT';
+else
+    OptTxt = 'CELLOPT_SG1';
+end
+
+% Update Directory
+if Scratch_output_files
+    % Keep the model name short
+    Model = Settings.Theory;
+    WorkDir = GetMDWorkdir(Settings,varargin);
+    Settings.WorkDir = fullfile([WorkDir '_OP'],Settings.Structure);
+else
+    % Use systematic name
+    Model = ModelName(Settings);
+    Settings.WorkDir = fullfile(Settings.project,...
+        Settings.Project_Directory_Name,Settings.Salt,...
+        Settings.Structure,Model,OptTxt);
+end
+
+Output_Properties_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
+
+% Create directory if it does not exist
+if ~isfolder(Settings.WorkDir)
+    mkdir(Settings.WorkDir)    
+end
+
+if isfile(Output_Properties_File)
+    try
+        Output = load(Output_Properties_File).Output;
+        if Settings.MinMDP.Verbose
+            disp('Calculation previously completed, successfully loaded output.')
+        end
+        return
+    catch
+        if Settings.MinMDP.Verbose
+            disp('Failed to load previously completed output file, restarting calculation')
+        end
+        delete(Output_Properties_File);
+    end
+end
 
 if isfield(Settings,'Parallel_LiX_Minimizer') && Settings.Parallel_LiX_Minimizer
     gmx_serial = true;
@@ -93,9 +136,6 @@ elseif ~Settings.Use_Conv_cell
     [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
 end
 
-% Generate name for model with current scaling parameters
-Model = ModelName(Settings);
-
 % Find minimum lattice parameter for this
 % salt/structure/model (or use initial ones)
 if ~isempty(p.Results.Continuation)
@@ -105,11 +145,6 @@ if ~isempty(p.Results.Continuation)
 elseif Find_Min_Params
     [Settings,~] = FindMinLatticeParam(Settings,...
         'Find_Similar_Params',Find_Similar_Params);
-end
-
-if Delete_output_files
-    % Keep the model name short
-    Model = Settings.Theory;
 end
 
 % Load topology template location
@@ -135,13 +170,6 @@ Settings.MDP_Template = fileread(MDP_Template_file);
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##NSTEPS##',pad(num2str(Settings.MinMDP.nsteps_point),18));
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##INTEGR##',pad(Settings.MinMDP.point_integrator,18));
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##TIMEST##',pad(num2str(Settings.MinMDP.dt),18));
-
-% Determine type of optimization
-OptTxt = 'CELLOPT';
-
-if ~Settings.MinMDP.Maintain_Symmetry
-    OptTxt = [OptTxt '_SG1'];
-end
 
 % Boolean: check if parameters can be input into JC without a table;
 Table_Req = IsGmxTableRequired(Settings);
@@ -289,20 +317,6 @@ Settings.Topology_Template = strrep(Settings.Topology_Template,'##GEOM##',Settin
 
 % Update File Base Name
 Settings.FileBase = [Settings.Salt '_' Label '_' Model '_' OptTxt];
-
-% Update Directory
-if Delete_output_files
-    Settings.WorkDir = tempname;
-else
-    Settings.WorkDir = fullfile(Settings.project,...
-        Settings.Project_Directory_Name,Settings.Salt,...
-        Settings.Structure,Model,OptTxt);
-end
-
-% Create directory if it does not exist
-if ~exist(Settings.WorkDir,'dir')
-    mkdir(Settings.WorkDir)
-end
 
 % Update Topology and MDP files
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##COULOMB##',pad('PME',18));
@@ -640,10 +654,9 @@ if Settings.MinMDP.Verbose
     disp(num2str(Gradient','%5.4E  '))
 end
 
-
 % Delete the calculation directory
-if Delete_output_files
-    rmdir(Settings.WorkDir,'s')
+if Scratch_output_files
+    save(Output_Properties_File,'Output');
 end
 
 % Return environmental variables back if changed, turn off parallel pool
@@ -653,7 +666,6 @@ if gmx_serial
     setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
     setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
     setenv('KMP_AFFINITY',env.KMP_AFFINITY);
-    %delete(gcp('nocreate'));
 end
 
 end

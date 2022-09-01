@@ -1396,7 +1396,7 @@ if Settings.Therm_Prop_Override
     dirFlags = [files.isdir];
     subFolders = files(dirFlags);
     subFolderNames = {subFolders(3:end).name};
-    prev_calcs = subFolderNames(cellfun(@(x) ~isempty(x),regexp(subFolderNames,'.+?_[S|M|L]P','once')));
+    prev_calcs = subFolderNames(cellfun(@(x) ~isempty(x),regexp(subFolderNames,'.+?_[S|M|L|O]P','once')));
     for idx = 1:length(prev_calcs)
         try
             rmdir(fullfile(Settings.OuterDir,prev_calcs{idx}),'s')
