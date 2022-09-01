@@ -87,7 +87,7 @@ Shared_Settings.Verbose = false;
 Shared_Settings.SigmaEpsilon = true;
 
 % Shared job settings
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
 Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
 Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.JobSettings.Nodes = 0; % Minimum number of cores to request for calculation.
@@ -290,7 +290,7 @@ switch lower(computer)
     otherwise % Place jobs here for later assignment
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 200;
-        Shared_Settings.Max_Secondary_Iterations = 100;
+        Shared_Settings.Max_Secondary_Iterations = 50;
         Shared_Settings.Max_Local_Iterations = 50;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
