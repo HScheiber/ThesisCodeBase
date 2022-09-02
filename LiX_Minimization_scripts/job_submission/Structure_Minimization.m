@@ -32,6 +32,7 @@ if Scratch_output_files
     WorkDir = GetMDWorkdir(Settings);
     Settings.WorkDir = fullfile([WorkDir '_OP'],Settings.Structure);
     Settings.MinMDP.Verbose = true;
+    Diary_File = fullfile(Settings.WorkDir,'Calc_Diary.log');
     diary off
     diary(Diary_File)
 else
@@ -43,7 +44,6 @@ else
 end
 
 Input_File = fullfile(Settings.WorkDir,'Calc_Input.mat');
-Diary_File = fullfile(Settings.WorkDir,'Calc_Diary.log');
 Output_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
 
 % Create directory if it does not exist
