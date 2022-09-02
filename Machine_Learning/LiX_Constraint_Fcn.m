@@ -487,6 +487,7 @@ tf = log1p(Loss) < sqrt(eps);
 % scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
 % if strcmp(Settings.Theory,'TF')
 %     set(gca, 'YScale', 'log')
+%     set(gca, 'ZScale', 'log')
 % end
 % xlabel(ax1);
 % ylabel(ax2);
