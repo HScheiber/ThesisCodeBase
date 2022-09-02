@@ -59,9 +59,9 @@ Settings.SepsMX_RangeBH = [0 400]; % [kJ/mol] Default range for MX epsilon param
 
 % for TF model, gamma must remain in region bounded by (0,48/7] to remain valid
 % Large values of gamma increase well depth
-Settings.SgamMM_Range = [1e-8 6]; % [Unitless] Default range for MM gamma parameter in TF models
-Settings.SgamXX_Range = [1e-8 6]; % [Unitless] Default range for XX gamma parameter in TF models
-Settings.SgamMX_Range = [1e-8 6]; % [Unitless] Default range for MX gamma parameter in TF models
+Settings.SgamMM_Range = [0.09 6]; % [Unitless] Default range for MM gamma parameter in TF models
+Settings.SgamXX_Range = [0.09 6]; % [Unitless] Default range for XX gamma parameter in TF models
+Settings.SgamMX_Range = [0.09 6]; % [Unitless] Default range for MX gamma parameter in TF models
 % for BH model, gamma must remain in region bounded by [6 Inf] to remain valid
 Settings.SgamMM_RangeBH = [6 30]; % [Unitless] Default range for MM gamma parameter in BH models
 Settings.SgamXX_RangeBH = [6 30]; % [Unitless] Default range for XX gamma parameter in BH models
