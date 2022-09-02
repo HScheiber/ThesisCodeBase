@@ -31,6 +31,9 @@ if Scratch_output_files
     Model = Settings.Theory;
     WorkDir = GetMDWorkdir(Settings);
     Settings.WorkDir = fullfile([WorkDir '_OP'],Settings.Structure);
+    Settings.MinMDP.Verbose = true;
+    diary off
+    diary(Diary_File)
 else
     % Use systematic name
     Model = ModelName(Settings);
@@ -39,16 +42,18 @@ else
         Settings.Structure,Model,OptTxt);
 end
 
-Output_Properties_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
+Input_File = fullfile(Settings.WorkDir,'Calc_Input.mat');
+Diary_File = fullfile(Settings.WorkDir,'Calc_Diary.log');
+Output_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
 
 % Create directory if it does not exist
 if ~isfolder(Settings.WorkDir)
     mkdir(Settings.WorkDir)    
 end
 
-if isfile(Output_Properties_File)
+if isfile(Output_File)
     try
-        Output = load(Output_Properties_File).Output;
+        Output = load(Output_File).Output;
         if Settings.MinMDP.Verbose
             disp([Settings.Salt ' ' Model ' ' Settings.Structure ' minimization previously completed, successfully loaded output.'])
         end
@@ -57,7 +62,7 @@ if isfile(Output_Properties_File)
         if Settings.MinMDP.Verbose
             disp('Failed to load previously completed output file, restarting calculation')
         end
-        delete(Output_Properties_File);
+        delete(Output_File);
     end
 end
 
@@ -656,9 +661,37 @@ end
 
 % Delete the calculation directory
 if Scratch_output_files
-    rmdir(Settings.WorkDir,'s');
-    mkdir(Settings.WorkDir);
-    save(Output_Properties_File,'Output');
+    % Get a list of all files in this folder.
+    files = dir(Settings.WorkDir);
+    dirFlags = [files.isdir];
+    subFolders = files(dirFlags);
+    subFolders = subFolders(3:end); % exclude . and ..
+    subFiles = files(~dirFlags);
+    for idx = 1:length(subFolders)
+        try
+            rmdir(fullfile(subFolders(idx).folder,subFolders(idx).name),'s');
+        catch
+            continue
+        end
+    end
+    for idx = 1:length(subFiles)
+        switch subFiles(idx).name
+            case {'Calc_Input.mat' 'Calc_Diary.log' 'Calc_Output.mat'}
+                continue
+            otherwise
+                try
+                    delete(fullfile(subFiles(idx).folder,subFiles(idx).name));
+                catch
+                    continue
+                end
+        end
+    end
+    save(Input_File,'Settings');
+    save(Output_File,'Output');
+    diary off
+    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+        diary(Settings.Diary_Loc)
+    end
 end
 
 % Return environmental variables back if changed, turn off parallel pool
