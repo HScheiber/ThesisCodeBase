@@ -110,6 +110,7 @@ Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed dept
 Shared_Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
 Shared_Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
 Shared_Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
+Shared_Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
 
 % Non-MP Finite T calculation settings
 Shared_Settings.Liquid_Test_Time = 200; % ps. simulation time to sample the liquid for enthalpy / MSD calculations
@@ -194,6 +195,7 @@ switch lower(computer)
         Shared_Settings.Parallel_LiX_Minimizer = false;
         Shared_Settings.UseCoupledConstraint = false;
         Shared_Settings.CheckAmorphousLiquid = true; % Set this to false
+        Shared_Settings.MinMDP.E_Unphys = -3000; % [kJ/mol] Unphysical energy cutoff
         
         %% JC/BH Models: KA, KB, KC on NaCl
         Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
