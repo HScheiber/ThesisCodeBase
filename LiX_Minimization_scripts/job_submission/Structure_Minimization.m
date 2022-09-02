@@ -30,10 +30,10 @@ if Scratch_output_files
     % Keep the model name short
     Model = Settings.Theory;
     WorkDir = GetMDWorkdir(Settings);
+    Settings.WorkDir = fullfile([WorkDir '_OP'],Settings.Structure);
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)    
     end
-    Settings.WorkDir = fullfile([WorkDir '_OP'],Settings.Structure);
     Settings.MinMDP.Verbose = true;
     Diary_File = fullfile(Settings.WorkDir,'Calc_Diary.log');
     diary off
