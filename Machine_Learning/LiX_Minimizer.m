@@ -67,8 +67,9 @@ if istable(Param) || isstruct(Param)
                                                     
             % Default model parameters: all length-scale units are nm,
             % energy scale units are kJ/mol
-            
-            [defTFMX,defTFMM,defTFXX] = TF_Potential_Parameters(Settings.Salt,Init_Scaling_Object);
+            PotSettings = Initialize_MD_Settings;
+            PotSettings.Salt = Settings.Salt;
+            [defTFMX,defTFMM,defTFXX] = TF_Potential_Parameters(PotSettings);
             
             % Input parameters
             r0_MM = Param.r0_MM; % nm
@@ -145,7 +146,9 @@ if istable(Param) || isstruct(Param)
                 % Calculate value of C8 using recursive relations
 
                 % Default TF params: C in units of kJ/mol nm^6, D in units of kJ/mol nm^8
-                [TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(Settings.Salt,Init_Scaling_Object);
+                PotSettings = Initialize_MD_Settings;
+                PotSettings.Salt = Settings.Salt;
+                [TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(PotSettings);
 
                 % Conversion factors
                 Bohr_nm = 0.0529177; % a_0 - > Angstrom
@@ -209,7 +212,6 @@ if istable(Param) || isstruct(Param)
             % Default model parameters: all length-scale units are nm, energy scale units are kJ/mol
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [defBHMX,defBHMM,defBHXX] = BH_Potential_Parameters(PotSettings);
             
             % Input parameters
@@ -308,7 +310,6 @@ if istable(Param) || isstruct(Param)
         if Settings.SigmaEpsilon
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
             
             % Sigma scaling
@@ -352,7 +353,6 @@ if istable(Param) || isstruct(Param)
             if Settings.Additivity
                 PotSettings = Initialize_MD_Settings;
                 PotSettings.Salt = Settings.Salt;
-                PotSettings.S = Init_Scaling_Object;
                 [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
 
                 % Unscaled
@@ -447,7 +447,6 @@ else
             % energy scale units are kJ/mol
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [defTFMX,defTFMM,defTFXX] = TF_Potential_Parameters(PotSettings);
             
             % Input parameters
@@ -533,7 +532,6 @@ else
                 % Default TF params: C in units of kJ/mol nm^6, D in units of kJ/mol nm^8
                 PotSettings = Initialize_MD_Settings;
                 PotSettings.Salt = Settings.Salt;
-                PotSettings.S = Init_Scaling_Object;
                 [TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(PotSettings);
 
                 % Conversion factors
@@ -603,7 +601,6 @@ else
             % Default model parameters: all length-scale units are nm, energy scale units are kJ/mol
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [defBHMX,defBHMM,defBHXX] = BH_Potential_Parameters(PotSettings);
             
             % Input parameters
@@ -745,7 +742,6 @@ else
             % Default JC params
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
             def_S_MX = MXParams.sigma;
             def_E_MX = MXParams.epsilon;
@@ -823,7 +819,6 @@ else
                 
                 PotSettings = Initialize_MD_Settings;
                 PotSettings.Salt = Settings.Salt;
-                PotSettings.S = Init_Scaling_Object;
                 [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
                 
                 % Unscaled
