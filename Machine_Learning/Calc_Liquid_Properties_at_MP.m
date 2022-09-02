@@ -636,7 +636,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     MDP_Template_sv = MDP_Template;
     
     % Ensure fast equilibration with Berendsen barostat + small time constant
-    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
+    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
     MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
     MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad('isotropic',18));
     MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(tau_p),18));
@@ -853,7 +853,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         end
         
         MD_nsteps = Settings.Liquid_Test_Time/Settings.MDP.dt;
-        MDP_Template = regexprep(MDP_Template_sv,'(nstenergy += *)(.+?)( *);','$11$3;');
+        MDP_Template = regexprep(MDP_Template_sv,'(nstenergy += *)(.+?)( *);','$1100$3;');
         MDP_Template = regexprep(MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(MD_nsteps) '$3;']);
         xyz_out = num2str(0.1 / Settings.MDP.dt); % Output coords every 0.1 ps
         MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);',['$1' xyz_out '$3;']);
@@ -1047,9 +1047,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     %% MSD Calculation to check
     MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd.xvg');
     MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd.log');
-    msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(Dynamics_TRR_File) ...   
-        ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
-        ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+    msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+        ' msd -f ' windows2unix(Dynamics_TRR_File)         ' -s ' windows2unix(TPR_File) ...
+        ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
+        ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.Liquid_Test_Time) ...
+        ' -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
     [~,~] = system(msd_command);
     outp = fileread(MSD_Log_File);
     try
@@ -1097,9 +1099,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     if Settings.CheckAmorphousLiquid && Settings.CheckAmorphousHalide
         MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.xvg');
         MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.log');
-        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(Dynamics_TRR_File) ...   
+        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  ...
+            strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(Dynamics_TRR_File) ...   
             ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
-            ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+            ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.Liquid_Test_Time) ...
+            ' -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
         [~,~] = system(msd_command);
         outp = fileread(MSD_Log_File);
         Diff_txt = regexp(outp,['D\[ *' Settings.Halide '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');

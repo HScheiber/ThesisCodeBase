@@ -344,7 +344,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     MDP_Template = strrep(MDP_Template,'##HAL##',pad(Settings.Halide,3));
     
     % Ensure fast equilibration with Berendsen barostat + small time constant
-    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
+    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
     MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
     MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad(isotropy,18));
     MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(tau_p),18));

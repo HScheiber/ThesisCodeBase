@@ -42,7 +42,7 @@ Target_P = regexprep(num2str(Settings.Target_P),' +',' ');
 
 % Ensure fast equilibration with Berendsen barostat + small time constant
 MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
-MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
+MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
 MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
 MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);',['$1' Settings.Isotropy '$3;']);
 MDP_Template = regexprep(MDP_Template,'(tau-p += *)(.+?)( *);',['$1 ' num2str(tau_p) '$3;']);

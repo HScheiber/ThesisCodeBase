@@ -115,6 +115,7 @@ Shared_Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume p
 Shared_Settings.Liquid_Test_Time = 200; % ps. simulation time to sample the liquid for enthalpy / MSD calculations
 Shared_Settings.Liquid_Equilibrate_Time = 25; % ps. time spent relaxing the liquid for enthalpy / MSD calculations
 Shared_Settings.Solid_Test_Time = 50; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
+Shared_Settings.CheckAmorphousLiquid = false; % When this is on, calculations that are deemed amorphous solid receive extra loss penalty
 
 % MP-specific calculation settings
 Shared_Settings.c_over_a = 2;
@@ -183,8 +184,6 @@ switch lower(computer)
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
         
-
-        
     case 'narval'
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 200;
@@ -194,6 +193,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
         Shared_Settings.UseCoupledConstraint = false;
+        Shared_Settings.CheckAmorphousLiquid = true; % Set this to false
         
         %% JC/BH Models: KA, KB, KC on NaCl
         Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
@@ -208,8 +208,8 @@ switch lower(computer)
                 Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
                 Shared_Settings.JobSettings.dd = []; % Domain decomposition
             else
-                Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+                Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+                Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
                 Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
                 Shared_Settings.JobSettings.dd = []; % Domain decomposition
             end

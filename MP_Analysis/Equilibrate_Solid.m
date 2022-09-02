@@ -88,8 +88,8 @@ function Output = Equilibrate_Solid(Settings,varargin)
     
     % Ensure fast equilibration with Berendsen barostat + small time constant
     MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
-    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
-    MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$11$3;');
+    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
+    MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$1100$3;');
     MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);',['$1' num2str(round(0.1/Settings.MDP.dt)) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
     MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);',['$1' isotropy '$3;']);
