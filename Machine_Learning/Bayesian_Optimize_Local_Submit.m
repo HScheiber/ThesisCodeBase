@@ -110,6 +110,7 @@ Shared_Settings.InitialMeshSize = 20;
 Shared_Settings.MeshSizeMultiplier = 5;
 Shared_Settings.QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
 Shared_Settings.ScaleInitialLiqDensity = 0.8;
+Shared_Settings.CheckAmorphousLiquid = false;
 
 % Barostat Options
 Shared_Settings.Isotropy = 'semiisotropic';
@@ -130,7 +131,7 @@ Shared_Settings.MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of
 Shared_Settings.MDP.Fourier_Spacing = 0.12;
 Shared_Settings.MDP.VerletBT = -1;
 
-Shared_Settings.Verbose = true;
+Shared_Settings.Verbose = false;
 Shared_Settings.UseCoupledConstraint = true;
 
 idx = 0;
