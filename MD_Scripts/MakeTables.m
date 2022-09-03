@@ -47,10 +47,9 @@ function TableFile_MX = MakeTables(Settings,varargin)
             add_wall = false;
         elseif isempty(peak_r) || isempty(inflex_r)
             add_wall = false;
-        elseif length(inflex_r) == 1
-            add_wall = true;
         else
-            inflex_r = inflex_r(end-1);
+            inflex_r(inflex_r < peak_r) = [];
+            inflex_r = inflex_r(1);
             add_wall = true;
         end
         
@@ -59,20 +58,20 @@ function TableFile_MX = MakeTables(Settings,varargin)
             below_peak_idx = (U.r < inflex_r);
             r = U.r(below_peak_idx); % nm
             D = 1e-15; % prefactor
-
+            
             fwall = D./(r.^12) - D./(inflex_r.^12);
             dfwall = 12*D./(r.^13); % Wall -derivative
-
+            
             % Kill the attractive interaction beyond the peak
             g_at_valley = U.g(U.r == inflex_r);
             N_belowpeak = sum(below_peak_idx);
             U.g(below_peak_idx) = repmat(g_at_valley,1,N_belowpeak);
             U.dg(below_peak_idx) = zeros(1,N_belowpeak);
-
+            
             % Remove infinity at 0
             fwall(1) = fwall(2);
             dfwall(1) = 0;
-
+            
             % Add this repulsion to the repulsive part of the function
             U.h(U.r < inflex_r) = U.h(U.r < inflex_r) + fwall;
             U.dh(U.r < inflex_r) = U.dh(U.r < inflex_r) + dfwall;
@@ -91,10 +90,10 @@ function TableFile_MX = MakeTables(Settings,varargin)
 %             U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
 %         end
 %         hold on
-%         plot(U.r,U.Total)
-%         scatter(inflex_r,U.Total(U.r == inflex_r))
+%         plot(U.r.*10,U.Total)
+%         scatter(inflex_r.*10,U.Total(U.r == inflex_r))
 %         ylim([-1000 1000])
-
+        
         % Output into gromacs format
         Uo = [U.r ; U.f0 ; U.df0 ; U.g ; U.dg ; U.h ; U.dh];
         U_out = deblank( sprintf(['%16.10e   %16.10e %16.10e   %16.10e %16.10e   %16.10e %16.10e' newline],Uo(:)) );
