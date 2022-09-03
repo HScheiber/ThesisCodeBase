@@ -606,22 +606,22 @@ if Settings.MinMDP.Maintain_Symmetry
 end
 
 % Restart the calculation from the fixed point without the added wall to ensure the energy is correct
-% if AddRepWall
-%     if Settings.MinMDP.Verbose
-%         disp('Rerunning minimization without additional repulsive wall.')
-%     end
-%     % Restore env variables
-%     setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
-%     setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
-%     setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
-%     setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
-%     setenv('KMP_AFFINITY',env.KMP_AFFINITY);
-%     
-%     abc = [Settings.Geometry.a Settings.Geometry.b Settings.Geometry.c];
-%     Output = Structure_Minimization(Settings,'Continuation',abc,...
-%         'Extra_Properties',Extra_Properties,'N_atoms',N_atoms);
-%     return
-% end
+if AddRepWall
+    if Settings.MinMDP.Verbose
+        disp('Rerunning minimization without additional repulsive wall.')
+    end
+    % Restore env variables
+    setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
+    setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
+    setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
+    setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
+    setenv('KMP_AFFINITY',env.KMP_AFFINITY);
+    
+    abc = [Settings.Geometry.a Settings.Geometry.b Settings.Geometry.c];
+    Output = Structure_Minimization(Settings,'Continuation',abc,...
+        'Extra_Properties',Extra_Properties,'N_atoms',N_atoms);
+    return
+end
 
 % Uses an additional energy calculation to grab things like the coulomb metal-metal
 % component of the total energy, the lenndard-jones energy, etc
