@@ -39,13 +39,14 @@ function TableFile_MX = MakeTables(Settings,varargin)
         U = Us(idx);
         peaks_idx = [false islocalmax(U.Total(2:end))];
         peak_r = U.r(peaks_idx);
+        if numel(peak_r) > 1
+            peak_r = peak_r(1);
+        end
         
         inflex_idx = [false islocalmax(U.dTotal(2:end)) | islocalmin(U.dTotal(2:end))];
         inflex_r = U.r(inflex_idx);
         
-        if isempty(peak_r) % Ensure peak exists
-            add_wall = false;
-        elseif isempty(peak_r) || isempty(inflex_r)
+        if isempty(peak_r) || isempty(inflex_r) % Ensure peak exists
             add_wall = false;
         else
             inflex_r(inflex_r < peak_r) = [];

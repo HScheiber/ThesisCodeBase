@@ -135,8 +135,8 @@ Settings.MinMDP.Maintain_Symmetry = true; % maintains cell symmetry when true
 Settings.MinMDP.emtol = 0.088439; %1e-3 [kJ mol-1 nm-1] The position minimization is converged (per cycle) when the maximum force is smaller than this value
 Settings.MinMDP.MaxCycles = 100; % Maximum number of optimization cycles.
 Settings.MinMDP.Energy_Tol = 1; % kJ/mol. Convergence criteria 1: must have change in energy between cycles is less than this value
-Settings.MinMDP.Gradient_Tol_RMS = 1e-2; %kJ/(mol A) Convergence criteria 2: must have RMS cell parameter gradient less than this value for convergence
-Settings.MinMDP.Gradient_Tol_Max = 1e-2; %kJ/(mol A) Convergence criteria 3: must have maximum cell parameter gradient less than this value for convergence
+Settings.MinMDP.Gradient_Tol_RMS = 1e-3; %kJ/(mol A) Convergence criteria 2: must have RMS cell parameter gradient less than this value for convergence
+Settings.MinMDP.Gradient_Tol_Max = 1e-3; %kJ/(mol A) Convergence criteria 3: must have maximum cell parameter gradient less than this value for convergence
 Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] unphysical energy cutoff
 Settings.MinMDP.nsteps_point = 0; % Number of steps to perform before ending (should be 0 for single point energy calculations)
 Settings.MinMDP.point_integrator = 'md'; % What type of calculation is run for single point energy calculations (steep = energy min, md = molecular dynamics)
