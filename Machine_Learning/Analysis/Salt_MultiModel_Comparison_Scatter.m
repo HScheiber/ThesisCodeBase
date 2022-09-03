@@ -5,11 +5,10 @@
 %% Analysis Parameters:
 
 % Data options
-Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-Molar_masses = [25.939 42.394 86.845 133.85];  % g/mol
-Theory = 'JC';
-Basenum = 'E';
-Midnum = 'P';
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'};
+Theory = 'BH';
+Basenum = 'K';
+Midnum = 'C';
 savefile = false; % switch to save the final plots to file
 filename = ['Target_Compare_' Theory '_' Basenum  Midnum '.png'];
 
@@ -39,7 +38,7 @@ volume_ylim = [-8 20];
 loss_ylog = true;
 
 % Other parameters
-show_as_percent_error = true; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
+show_as_percent_error = false; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
 % Calculates error in lattice energy with respect to experimental lattice energies when available
 Target_Experimental_Energies = true; 
 % Calculates error in lattice parameters, volumes, and densities with respect to experimental lattice parameters when available
@@ -54,6 +53,11 @@ shift_CsCl_RLE = false;
 
 %% Script begins
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
+Exp = Load_Experimental_Data;
+Molar_masses = nan(1,length(Salts));
+for idx = 1:length(Salts)
+    Molar_masses(idx) = Exp.(Salts{idx}).MM; % g / mol
+end
 
 % Find reps of models
 Models = cell(1,length(Salts));
@@ -147,7 +151,7 @@ Exp_DM_MP = nan(N_Salts,N_Models);
 
 
 % Plot color scheme
-Colours = cbrewer('qual','Set3',N_Salts);
+Colours = cbrewer('qual','Set3',min(N_Salts,5));
 %Colours = [0 0 0; cbrewer('qual','Paired',N_Models)];
 
 Geometry = struct;
@@ -459,7 +463,7 @@ elseif plot_finite_T_data
     Liquid_V_MP = Liquid_V_MP - Exp_Liquid_V_MP;
     Solid_V_MP = Solid_V_MP - Exp_Solid_V_MP;
     MP = MP - Exp_MP;
-    Liquid_DM_MP = Liquid_DM_MP - Exp_DM_MP;
+    Liquid_DM_MP = (Liquid_DM_MP - Exp_DM_MP).*1e5;
 end
 
 if BestOnly
@@ -559,9 +563,9 @@ else
         '[\AA]' ...
         '[\AA]' ...
         '[$(c/a)$]' ...
-        '[g cm$^{-3}$]' ...
+        'g cm$^{-3}$]' ...
         '[$\AA^{3}$ / formula unit]'};
-    MP_ylabs = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[cm$^{2}$s$^{-1}$]'};
+    MP_ylabs = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$10^{-5}$ cm$^{2}$s$^{-1}$]'};
 end
 
 % Create figure and axis
@@ -586,11 +590,11 @@ for idx = 1:length(all_y)
         p = bar(axobj,bar_y,'FaceColor','flat','Visible','on','BarWidth',1,...
             'LineWidth',2);
         
-        xpos = zeros(N_Salts,N_Models);
+        xpos = zeros(N_Models,N_Salts);
         for kdx = 1:N_Salts
             for mdx = 1:N_Models
-                xpos(:,mdx) = p(mdx).XEndPoints';
-                scatter(axobj,xpos(kdx,mdx),bar_y(kdx,mdx),100,'MarkerEdgeColor','k',...
+                xpos(mdx,kdx) = p(mdx).XEndPoints(kdx);
+                scatter(axobj,xpos(mdx,kdx),bar_y(kdx,mdx),100,'MarkerEdgeColor','k',...
                     'MarkerFaceColor',Colours(kdx,:),'linewidth',2,'marker',markers{mdx});
             end
         end
@@ -667,8 +671,8 @@ for idx = 1:length(all_y)
                     ylabel(cur_ax, MP_ylabs{jdx},'Fontsize',fs-1,'Interpreter','latex')
                 end
             else
-                set(cur_ax,'YMinorTick','on','FontSize',fs-1);
-                ylabel(cur_ax, MP_ylabs{jdx},'Fontsize',fs-1,'Interpreter','latex')
+                set(cur_ax,'YMinorTick','on','FontSize',fs-3);
+                ylabel(cur_ax, MP_ylabs{jdx},'Fontsize',fs-3,'Interpreter','latex')
             end
             
             cylim = ylim(cur_ax);
@@ -839,15 +843,12 @@ end
 title(t, Title_txt,'Fontsize',fs+5,'Interpreter','latex')
 xticklabels(axobj,strrep(strrep(Structures,'FiveFive','5-5'),'BetaBeO','$\beta$-BeO'))
 
-h(1) = plot(t.Children(1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', 'LiF',...
-    'MarkerFaceColor',Colours(1,:),'linewidth',2,'Color','k');
-h(2) = plot(t.Children(1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', 'LiCl',...
-    'MarkerFaceColor',Colours(2,:),'linewidth',2,'Color','k');
-h(3) = plot(t.Children(1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', 'LiBr',...
-    'MarkerFaceColor',Colours(3,:),'linewidth',2,'Color','k');
-h(4) = plot(t.Children(1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', 'LiI',...
-    'MarkerFaceColor',Colours(4,:),'linewidth',2,'Color','k');
-h(5) = plot(t.Children(1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', 'DFT',...
+h = gobjects(length(Salts)+1,1);
+for idx = 1:length(Salts)
+    h(idx) = plot(t.Children(1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', Salts{idx},...
+        'MarkerFaceColor',Colours(idx,:),'linewidth',2,'Color','k');
+end
+h(end) = plot(t.Children(1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', 'DFT',...
     'MarkerFaceColor','w','linewidth',2,'Color','r');
 
 

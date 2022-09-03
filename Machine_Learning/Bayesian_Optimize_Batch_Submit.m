@@ -193,30 +193,20 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.UseCoupledConstraint = false;
-        Shared_Settings.CheckAmorphousLiquid = true; % Set this to false
-        Shared_Settings.MinMDP.E_Unphys = -3000; % [kJ/mol] Unphysical energy cutoff
+        Shared_Settings.UseCoupledConstraint = true;
+        Shared_Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
         Shared_Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
+        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
         
-        %% JC/BH Models: KA, KB, KC on NaCl
+        %% JC/BH Models: KA, KB, KC, KC, KD on NaCl
         Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
         Theories = {'JC' 'BH'};
         Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
-            
-            if strncmp(Theory,'JC',2)
-                Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-                Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-                Shared_Settings.JobSettings.dd = []; % Domain decomposition
-            else
-                Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-                Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-                Shared_Settings.JobSettings.dd = []; % Domain decomposition
-            end
-
             for sidx = 1:length(Salts)
                 Salt = Salts{sidx};
 
@@ -278,6 +268,38 @@ switch lower(computer)
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
+                    
+                    %% Model KD
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['KD' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = false;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model KE
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['KE' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = false;
                 end
             end
         end
