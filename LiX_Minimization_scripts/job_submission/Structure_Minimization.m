@@ -610,6 +610,13 @@ if AddRepWall
     if Settings.MinMDP.Verbose
         disp('Rerunning minimization without additional repulsive wall.')
     end
+    % Restore env variables
+    setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
+    setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
+    setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
+    setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
+    setenv('KMP_AFFINITY',env.KMP_AFFINITY);
+    
     abc = [Settings.Geometry.a Settings.Geometry.b Settings.Geometry.c];
     Output = Structure_Minimization(Settings,'Continuation',abc,...
         'Extra_Properties',Extra_Properties,'N_atoms',N_atoms);
