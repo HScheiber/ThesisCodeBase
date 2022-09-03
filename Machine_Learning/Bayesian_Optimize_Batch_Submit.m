@@ -206,13 +206,13 @@ switch lower(computer)
             Theory = Theories{tidx};
             
             if strncmp(Theory,'JC',2)
-                Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+                Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+                Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
                 Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
                 Shared_Settings.JobSettings.dd = []; % Domain decomposition
             else
-                Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+                Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+                Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
                 Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
                 Shared_Settings.JobSettings.dd = []; % Domain decomposition
             end
