@@ -1,4 +1,11 @@
-function TableFile_MX = MakeTables(Settings)
+function TableFile_MX = MakeTables(Settings,varargin)
+
+    p = inputParser;
+    p.FunctionName = 'MakeTables';
+    addOptional(p,'MDP_Minimize',false)
+    parse(p,varargin{:});
+    MDP_Minimize = p.Results.MDP_Minimize; % Gathers components of energy at the end in addition to the total energy.
+
     [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
     
     switch Settings.Theory(1:2)
@@ -15,13 +22,13 @@ function TableFile_MX = MakeTables(Settings)
             end
             
             [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,...
-                'ReturnAsStructure','true');
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
         case 'TF'
             [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
-                'ReturnAsStructure','true');
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
         case 'BH'
             [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
-                'ReturnAsStructure','true');
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
     end
 
     % Find function minimum
@@ -71,7 +78,7 @@ function TableFile_MX = MakeTables(Settings)
             U.dh(U.r < inflex_r) = U.dh(U.r < inflex_r) + dfwall;
         end
         
-        % Testing
+%         % Testing
 %         nm_per_m = 1e+9; % nm per m
 %         NA = 6.0221409e23; % Molecules per mole
 %         e_c = 1.60217662e-19; % Elementary charge in Coulombs
@@ -83,9 +90,10 @@ function TableFile_MX = MakeTables(Settings)
 %         else
 %             U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
 %         end
+%         hold on
 %         plot(U.r,U.Total)
+%         scatter(inflex_r,U.Total(U.r == inflex_r))
 %         ylim([-1000 1000])
-
 
         % Output into gromacs format
         Uo = [U.r ; U.f0 ; U.df0 ; U.g ; U.dg ; U.h ; U.dh];

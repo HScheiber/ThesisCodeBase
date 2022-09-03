@@ -178,8 +178,8 @@ idx=0;
 switch lower(computer)
     case 'cedar'
         %% Shared_Settings
-        Shared_Settings.Max_Bayesian_Iterations = 100;
-        Shared_Settings.Max_Secondary_Iterations = 20;
+        Shared_Settings.Max_Bayesian_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 50;
         Shared_Settings.Max_Local_Iterations = 10;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
@@ -189,7 +189,7 @@ switch lower(computer)
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 200;
         Shared_Settings.Max_Secondary_Iterations = 100;
-        Shared_Settings.Max_Local_Iterations = 20;
+        Shared_Settings.Max_Local_Iterations = 10;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;

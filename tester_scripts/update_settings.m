@@ -7,6 +7,7 @@ Settings.JobSettings.npme = [];
 
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
     Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
+Settings.scratch_dir = pwd;
 [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.MLModelDir] = MD_Batch_Template(Settings.JobSettings);
 %[WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
 Settings.WorkDir = pwd;
