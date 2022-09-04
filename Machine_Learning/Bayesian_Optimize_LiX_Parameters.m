@@ -720,7 +720,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         end
                     end
                 else
-                    x0 = results.XAtMinObjective{:,:};
+                    [~,midx] = min(results.ObjectiveTrace);
+                    x0 = results.XTrace{midx,:};
                     init_meshsize = 0.1;
                     max_iter = Model.Max_Local_Iterations;
                 end
