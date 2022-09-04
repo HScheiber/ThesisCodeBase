@@ -84,7 +84,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         % Calculate number of formula units
         nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
         
-        while nmol_solid < Settings.N_atoms % Enforce a minimum of [Settings.N_atoms] atoms
+        while nmol_solid < Settings.N_atoms/2 % Enforce a minimum of [Settings.N_atoms] atoms
             La = La*1.1;
             Lb = Lb*1.1;
             Lc = Lc*1.1;
@@ -344,7 +344,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     MDP_Template = strrep(MDP_Template,'##HAL##',pad(Settings.Halide,3));
     
     % Ensure fast equilibration with Berendsen barostat + small time constant
-    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
+    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
     MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
     MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad(isotropy,18));
     MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(tau_p),18));
@@ -399,10 +399,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             end
         end
     end
-    
-    
-    
-    
     
     if Run_Equilibration
         
@@ -480,13 +476,19 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Settings = Inp_Settings;
             Settings.SuperCellFile = SuperCellFile;
             Settings.WorkDir = WorkDir;
-            if Settings.MDP.dt > 1e-4
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Solid Equilibration failed. Reducing time step.')
                 end
                 %Settings.QECompressibility = Settings.QECompressibility_init;
                 Settings.MDP.dt = Settings.MDP.dt/2;
                 Settings.Output_Coords = Settings.Output_Coords*2;
+                if isfile(cpt_file)
+                    delete(cpt_file)
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file)
+                end
                 Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',true);
                 return
             else
@@ -505,6 +507,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
                 return
             end
         end
+    else
+        TPR_File = fullfile(Settings.WorkDir,'Equil_Sol.tpr');
+        Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
     end
     
     % Check to ensure system remained in the correct solid structure

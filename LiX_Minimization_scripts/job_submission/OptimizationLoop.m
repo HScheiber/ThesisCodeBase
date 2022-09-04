@@ -1,7 +1,7 @@
 function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoop(Settings,varargin)
 
     p = inputParser;
-    p.FunctionName = 'Structure_Minimization';
+    p.FunctionName = 'OptimizationLoop';
     addOptional(p,'Extra_Properties',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
     parse(p,varargin{:});
     Extra_Properties = p.Results.Extra_Properties;

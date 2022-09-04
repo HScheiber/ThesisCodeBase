@@ -7,7 +7,7 @@ if ~isfolder(destination_folder)
     mkdir(destination_folder);
 end
 
-Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'};
 for idx = 1:length(Salts)
     Salt = Salts{idx};
     

@@ -19,9 +19,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     if ~isfolder(Settings.WorkDir)
         mkdir(Settings.WorkDir)
     end
-    if ~isfield(Settings,'CheckAmorphousHalide')
-        Settings.CheckAmorphousHalide = false; % default
-    end
     
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
@@ -66,8 +63,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Volume = L^3; % Volume in nm^3
         nmol_liquid = round(Volume*Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
         
-        if nmol_liquid < Settings.N_atoms % Enforce a minimum of [Settings.N_atoms] atoms
-            nmol_liquid = Settings.N_atoms;
+        if nmol_liquid < Settings.N_atoms/2 % Enforce a minimum of [Settings.N_atoms] atoms
+            nmol_liquid = Settings.N_atoms/2;
             Volume = nmol_liquid/(Settings.Ref_Density*Settings.ScaleInitialLiqDensity);
             L = Volume^(1/3);
         end
@@ -349,7 +346,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             mdrun_command = [Settings.gmx_loc ' mdrun -s ' windows2unix(TPR_File) ...
                 ' -o ' windows2unix(Minimization_TRR_File) ' -g ' windows2unix(Log_File) ...
                 ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Minimized_Geom_File) ...
-                ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq'))];
+                ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq')) ' -ntmpi 1'];
             
             if Table_Req || strncmp(Settings.Theory,'BH',2)
                 mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
@@ -639,7 +636,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     MDP_Template_sv = MDP_Template;
     
     % Ensure fast equilibration with Berendsen barostat + small time constant
-    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
+    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
     MDP_Template = strrep(MDP_Template,'##BAROSTAT##',pad('Berendsen',18));
     MDP_Template = strrep(MDP_Template,'##ISOTROPY##',pad('isotropic',18));
     MDP_Template = strrep(MDP_Template,'##PTIMECONST##',pad(num2str(tau_p),18));
@@ -745,12 +742,18 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             WorkDir = Settings.WorkDir;
             Settings = Inp_Settings;
             Settings.WorkDir = WorkDir;
-            if Settings.MDP.dt > 1e-4
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Liquid Equilibration failed. Reducing time step.')
                 end
                 Settings.MDP.dt = Settings.MDP.dt/2;
                 Settings.Output_Coords = Settings.Output_Coords*2;
+                if isfile(cpt_file)
+                    delete(cpt_file);
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file);
+                end
                 Output = Calc_Liquid_Properties_at_MP(Settings);
                 return
             else
@@ -850,7 +853,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         end
         
         MD_nsteps = Settings.Liquid_Test_Time/Settings.MDP.dt;
-        MDP_Template = regexprep(MDP_Template_sv,'(nstenergy += *)(.+?)( *);','$11$3;');
+        MDP_Template = regexprep(MDP_Template_sv,'(nstenergy += *)(.+?)( *);','$1100$3;');
         MDP_Template = regexprep(MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(MD_nsteps) '$3;']);
         xyz_out = num2str(0.1 / Settings.MDP.dt); % Output coords every 0.1 ps
         MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);',['$1' xyz_out '$3;']);
@@ -933,20 +936,43 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             catch me
                 disp(me.message)
             end
-            if Settings.Verbose
-                disp(outp)
-                disp(['(2/2) Liquid Dynamics Failed! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
+            
+            WorkDir = Settings.WorkDir;
+            Settings = Inp_Settings;
+            Settings.WorkDir = WorkDir;
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
+                if Settings.Verbose
+                    disp(['Liquid dynamics failed. Restarting with reduced time step. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')])
+                end
+                Settings.MDP.dt = Settings.MDP.dt/2;
+                Settings.Output_Coords = Settings.Output_Coords*2;
+                
+                if isfile(cpt_file) 
+                    delete(cpt_file)
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file)
+                end
+                Output = Calc_Liquid_Properties_at_MP(Settings);
+                return
+            else
+                if Settings.Verbose
+                    disp(['Liquid dynamics failed. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')])
+                    disp('Model may be completely unstable!')
+                    disp(['WorkDir: ' WorkDir])
+                    disp(outp)
+                end
+                Output.Liquid_V_MP = nan;
+                Output.Liquid_H_MP = nan;
+                Output.Liquid_DM_MP = nan;
+                Output.Liquid_DX_MP = nan;
+                save(Output_Properties_File,'Output');
+                diary off
+                if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+                    diary(Settings.Diary_Loc)
+                end
+                return
             end
-            Output.Liquid_V_MP = nan;
-            Output.Liquid_H_MP = nan;
-            Output.Liquid_DM_MP = nan;
-            Output.Liquid_DX_MP = nan;
-            save(Output_Properties_File,'Output');
-            diary off
-            if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-                diary(Settings.Diary_Loc)
-            end
-            return
         end
     else
         if Settings.Verbose
@@ -1021,13 +1047,15 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     %% MSD Calculation to check
     MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd.xvg');
     MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd.log');
-    msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(Dynamics_TRR_File) ...   
-        ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
-        ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+    msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+        ' msd -f ' windows2unix(Dynamics_TRR_File)         ' -s ' windows2unix(TPR_File) ...
+        ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
+        ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.Liquid_Test_Time) ...
+        ' -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
     [~,~] = system(msd_command);
     outp = fileread(MSD_Log_File);
     try
-        Diff_txt = regexp(outp,['D\[ *' Settings.Metal '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+        Diff_txt = regexp(outp,['D\[ *' Settings.Metal '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
         Output.Liquid_DM_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
     catch
         if isfield(Settings,'Retry') && Settings.Retry
@@ -1071,12 +1099,14 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     if Settings.CheckAmorphousLiquid && Settings.CheckAmorphousHalide
         MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.xvg');
         MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.log');
-        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(Dynamics_TRR_File) ...   
+        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  ...
+            strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(Dynamics_TRR_File) ...   
             ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
-            ' -trestart 0.1 -beginfit 1 -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+            ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.Liquid_Test_Time) ...
+            ' -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
         [~,~] = system(msd_command);
         outp = fileread(MSD_Log_File);
-        Diff_txt = regexp(outp,['D\[ *' Settings.Halide '] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+'],'tokens','once');
+        Diff_txt = regexp(outp,['D\[ *' Settings.Halide '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
         Output.Liquid_DX_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
         
         if Output.Liquid_DX_MP <= Settings.AmorphousDiffThreshold

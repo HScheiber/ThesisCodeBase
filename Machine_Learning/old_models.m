@@ -6355,3 +6355,494 @@ for tidx = 1:length(Theories)
         end
     end
 end
+%% BH Models JH, JI, JJ, JK, [not JL], JM
+Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
+Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
+Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'BH'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model BH: JH
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JH' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.MP  = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model BH: JI
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JI' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.MP  = 2;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model BH: JJ
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JJ' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.MP  = 2;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model BH: JK
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JK' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.MP  = 2;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+
+            %% Model BH: JM
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JM' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.MP  = 2;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = false;
+
+        end
+    end
+end
+%% JC Models JH, JI, JJ, JK, [not JL], JM
+Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
+Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
+Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'JC'};
+Replicates = 1:5;
+
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model JC: JH
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JH' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.MP  = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model JC: JI
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JI' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.MP  = 2;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model JC: JJ
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JJ' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.MP  = 2;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model JC: JK
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JK' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.MP  = 2;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+
+            %% Model JC: JM
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JM' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.MP  = 2;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = false;
+        end
+    end
+end
+%% BH Models JL
+Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'BH'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model BH: JL
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JL' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+        end
+    end
+end
+%% JC Models JL
+Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'JC'};
+Replicates = 1:5;
+
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model JC: JL
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JL' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+        end
+    end
+end
+%% BH Models JN, JO, JP
+Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'BH'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model BH: JN
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JN' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            %% Model BH: JO
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JO' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+            %% Model BH: JP
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JP' Rep];
+
+            Models(idx).CheckAmorphousHalide = true; % check to make sure halide ion is properly mobile in the liquid
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = true;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+        end
+    end
+end
+%% JC Models JN, JO, JP
+Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+Theories = {'JC'};
+Replicates = 1:5;
+
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model JC: JN
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JN' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+            %% Model JC: JO
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JO' Rep];
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+            %% Model JC: JP
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['JP' Rep];
+
+            Models(idx).CheckAmorphousHalide = true; % check to make sure halide ion is properly mobile in the liquid
+
+            % Loss
+            Models(idx).Loss_Options.Rocksalt.LE = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).SigmaEpsilon = false;
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+        end
+    end
+end

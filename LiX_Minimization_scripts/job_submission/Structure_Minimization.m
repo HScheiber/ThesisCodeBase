@@ -29,26 +29,32 @@ end
 if Scratch_output_files
     % Keep the model name short
     Model = Settings.Theory;
-    WorkDir = GetMDWorkdir(Settings,varargin);
+    WorkDir = GetMDWorkdir(Settings);
     Settings.WorkDir = fullfile([WorkDir '_OP'],Settings.Structure);
+    if ~isfolder(Settings.WorkDir)
+        mkdir(Settings.WorkDir)    
+    end
+    Settings.MinMDP.Verbose = true;
+    Diary_File = fullfile(Settings.WorkDir,'Calc_Diary.log');
+    diary off
+    diary(Diary_File)
 else
     % Use systematic name
     Model = ModelName(Settings);
     Settings.WorkDir = fullfile(Settings.project,...
         Settings.Project_Directory_Name,Settings.Salt,...
         Settings.Structure,Model,OptTxt);
+    if ~isfolder(Settings.WorkDir)
+        mkdir(Settings.WorkDir)    
+    end
 end
 
-Output_Properties_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
+Input_File = fullfile(Settings.WorkDir,'Calc_Input.mat');
+Output_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
 
-% Create directory if it does not exist
-if ~isfolder(Settings.WorkDir)
-    mkdir(Settings.WorkDir)    
-end
-
-if isfile(Output_Properties_File)
+if isfile(Output_File)
     try
-        Output = load(Output_Properties_File).Output;
+        Output = load(Output_File).Output;
         if Settings.MinMDP.Verbose
             disp([Settings.Salt ' ' Model ' ' Settings.Structure ' minimization previously completed, successfully loaded output.'])
         end
@@ -57,7 +63,7 @@ if isfile(Output_Properties_File)
         if Settings.MinMDP.Verbose
             disp('Failed to load previously completed output file, restarting calculation')
         end
-        delete(Output_Properties_File);
+        delete(Output_File);
     end
 end
 
@@ -142,9 +148,16 @@ if ~isempty(p.Results.Continuation)
     Settings.Geometry.a = p.Results.Continuation(1);
     Settings.Geometry.b = p.Results.Continuation(2);
     Settings.Geometry.c = p.Results.Continuation(3);
+    AddRepWall = false;
 elseif Find_Min_Params
     [Settings,~] = FindMinLatticeParam(Settings,...
         'Find_Similar_Params',Find_Similar_Params);
+    switch Settings.Theory(1:2)
+        case {'JC' 'HS'}
+            AddRepWall = false;
+        otherwise
+            AddRepWall = true;
+    end
 end
 
 % Load topology template location
@@ -171,7 +184,7 @@ Settings.MDP_Template = strrep(Settings.MDP_Template,'##NSTEPS##',pad(num2str(Se
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##INTEGR##',pad(Settings.MinMDP.point_integrator,18));
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##TIMEST##',pad(num2str(Settings.MinMDP.dt),18));
 
-% Boolean: check if parameters can be input into JC without a table;
+% Boolean: check if parameters can be input in without a table;
 Table_Req = IsGmxTableRequired(Settings);
 
 % Get current label
@@ -324,7 +337,39 @@ Settings.MDP_Template = strrep(Settings.MDP_Template,'##FOURIER##',pad(num2str(S
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##PMEORDER##',pad(num2str(Settings.MinMDP.PME_Order),18));
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##EWALDTOL##',pad(num2str(Settings.MinMDP.Ewald_rtol),18));
 
-if Table_Req
+if AddRepWall
+    Table_Req = true;
+    
+    if Settings.MinMDP.Verbose
+        disp('Running initial minimization with added repulsive wall.')
+    end
+    
+    % Define the function type as 1 (needed for custom functions)
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##NBFUNC##','1');
+
+    % Define the combination rules (Lorenz-berthelot)
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##COMBR##','1');
+
+    % Define all the parameters as 1.0 (already included in potentials)
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',pad('1.0',10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',pad('1.0',10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',pad('1.0',10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##','1.0');
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##','1.0');
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##','1.0');
+    
+    Settings.JobName = [Settings.Salt '_' Model];
+    Settings.TableFile_MX = MakeTables(Settings,'MDP_Minimize',true);
+    
+	% Modify the MDP file
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWTYPE##',pad('user',18));
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWMOD##',pad('none',18));
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##CUTOFF##',pad('group',18));
+    Settings.MDP_Template = regexprep(Settings.MDP_Template,'ewald-rtol-lj.+?\n','');
+    Settings.MDP_Template = regexprep(Settings.MDP_Template,'lj-pme-comb-rule.+?\n','');
+    Settings.MDP_Template = regexprep(Settings.MDP_Template,'verlet-buffer-tolerance.+?\n','');
+    
+elseif Table_Req
     
     % Define the function type as 1 (needed for custom functions)
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##NBFUNC##','1');
@@ -522,7 +567,6 @@ end
 
 fun = @(x)Calculate_Crystal_Energy(x,Settings);
 conv_fun = @(x,optimValues,state)check_conv(x,optimValues,state,...
-    Settings.MinMDP.Gradient_Tol_RMS,Settings.MinMDP.Gradient_Tol_Max,...
     Settings.MinMDP.E_Unphys);
 
 if strcmp(Settings.Theory,'HS')
@@ -533,21 +577,13 @@ if strcmp(Settings.Theory,'HS')
     [lattice_params,E] = fminsearch(fun,x0,optionsNM);
     Gradient = nan;
     calc_failed = false;
-%         options = optimoptions(@patternsearch,'Display',display_option,'MaxIterations',Settings.MinMDP.MaxCycles,...
-%             'UseParallel',Settings.MinMDP.Parallel_Min,'UseVectorized',false,'PlotFcn',[],...
-%             'InitialMeshSize',1e-6,'StepTolerance',1e-8,'FunctionTolerance',1e-8,...
-%             'PollOrderAlgorithm','Success','Cache','off','UseCompletePoll',false,...
-%             'PollMethod','GPSPositiveBasisNp1','MaxMeshSize',0.2,'MeshContractionFactor',0.1,...
-%             'AccelerateMesh',false,'MeshTolerance',1e-10);
-% 
-%         [lattice_params,E_opt_param] = patternsearch(fun,x0,[],[],[],[],[],[],[],options);
-%         Gradient = nan;
 else
     options = optimoptions(@fmincon,'Display',display_option,'Algorithm','active-set',...
-        'DiffMaxChange',max(h),'OptimalityTolerance',0,'OutputFcn',conv_fun,'ObjectiveLimit',Settings.MinMDP.E_Unphys,...
-        'UseParallel',Settings.MinMDP.Parallel_Min,'MaxIterations',Settings.MinMDP.MaxCycles,'FiniteDifferenceStepSize',h,...
-        'StepTolerance',1e-10,'FunctionTolerance',1e-6,'FiniteDifferenceType','forward',...
-        'MaxFunctionEvaluations',400);
+        'DiffMaxChange',max(h),'OptimalityTolerance',Settings.MinMDP.Gradient_Tol_Max,...
+        'OutputFcn',conv_fun,'ObjectiveLimit',Settings.MinMDP.E_Unphys,...
+        'UseParallel',Settings.MinMDP.Parallel_Min,'MaxIterations',Settings.MinMDP.MaxCycles,...
+        'FiniteDifferenceStepSize',h,'StepTolerance',0,'FunctionTolerance',0,...
+        'FiniteDifferenceType','forward','MaxFunctionEvaluations',100);
     
     [lattice_params,E,exitflag,~,~,Gradient,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
     
@@ -567,6 +603,24 @@ for idx = 1:N_DOF
 end
 if Settings.MinMDP.Maintain_Symmetry
     [Settings.Geometry] = SymmetryAdapt(Settings.Geometry,Settings.Structure);
+end
+
+% Restart the calculation from the fixed point without the added wall to ensure the energy is correct
+if AddRepWall
+    if Settings.MinMDP.Verbose
+        disp('Rerunning minimization without additional repulsive wall.')
+    end
+    % Restore env variables
+    setenv('OMP_NUM_THREADS',env.OMP_NUM_THREADS);
+    setenv('GMX_PME_NUM_THREADS',env.GMX_PME_NUM_THREADS);
+    setenv('GMX_PME_NTHREADS',env.GMX_PME_NTHREADS);
+    setenv('GMX_OPENMP_MAX_THREADS',env.GMX_OPENMP_MAX_THREADS);
+    setenv('KMP_AFFINITY',env.KMP_AFFINITY);
+    
+    abc = [Settings.Geometry.a Settings.Geometry.b Settings.Geometry.c];
+    Output = Structure_Minimization(Settings,'Continuation',abc,...
+        'Extra_Properties',Extra_Properties,'N_atoms',N_atoms);
+    return
 end
 
 % Uses an additional energy calculation to grab things like the coulomb metal-metal
@@ -656,9 +710,37 @@ end
 
 % Delete the calculation directory
 if Scratch_output_files
-    rmdir(Settings.WorkDir,'s');
-    mkdir(Settings.WorkDir);
-    save(Output_Properties_File,'Output');
+    % Get a list of all files in this folder.
+    files = dir(Settings.WorkDir);
+    dirFlags = [files.isdir];
+    subFolders = files(dirFlags);
+    subFolders = subFolders(3:end); % exclude . and ..
+    subFiles = files(~dirFlags);
+    for idx = 1:length(subFolders)
+        try
+            rmdir(fullfile(subFolders(idx).folder,subFolders(idx).name),'s');
+        catch
+            continue
+        end
+    end
+    for idx = 1:length(subFiles)
+        switch subFiles(idx).name
+            case {'Calc_Input.mat' 'Calc_Diary.log' 'Calc_Output.mat'}
+                continue
+            otherwise
+                try
+                    delete(fullfile(subFiles(idx).folder,subFiles(idx).name));
+                catch
+                    continue
+                end
+        end
+    end
+    save(Input_File,'Settings');
+    save(Output_File,'Output');
+    diary off
+    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+        diary(Settings.Diary_Loc)
+    end
 end
 
 % Return environmental variables back if changed, turn off parallel pool

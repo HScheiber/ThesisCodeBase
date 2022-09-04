@@ -241,6 +241,4 @@ function Loss = LiX_Loss(Settings)
             Loss = Loss + rel_er;
         end
     end
-    
-    Loss = real(log1p(Loss));
 end

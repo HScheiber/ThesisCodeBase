@@ -42,7 +42,7 @@ Target_P = regexprep(num2str(Settings.Target_P),' +',' ');
 
 % Ensure fast equilibration with Berendsen barostat + small time constant
 MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
-MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
+MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
 MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
 MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);',['$1' Settings.Isotropy '$3;']);
 MDP_Template = regexprep(MDP_Template,'(tau-p += *)(.+?)( *);',['$1 ' num2str(tau_p) '$3;']);
@@ -123,18 +123,7 @@ else
         end
     end
     Settings = Inp_Settings;
-%     if ~isfield(Settings,'QECompressibility_init')
-%         Settings.QECompressibility_init = Settings.QECompressibility;
-%     end
-%     if Settings.QECompressibility > 1e-8 % Retry until compressibility is very tight
-%         if Settings.Verbose
-%             disp('Equilibration failed. Retrying with stiffer compressibility.')
-%         end
-%         Settings.QECompressibility = Settings.QECompressibility/2;
-%         save(fullfile(Directory,'TempJobInfo.mat'),'Settings');
-%         Output = MD_PreEquilibrate(Directory);
-%         return
-	if Settings.MDP.dt > 1e-4
+	if Settings.MDP.dt/2 >= Settings.MinTimeStep
         if Settings.Verbose
             disp('Equilibration failed. Reducing time step.')
         end

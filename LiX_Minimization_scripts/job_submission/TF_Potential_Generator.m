@@ -519,9 +519,9 @@ b = (0.338e-12)*kj_per_erg*NA; % kJ/mol
 r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 
 %% Calculate Pauling Coefficients beta: MX = +-   MM = ++     XX = --
-beta.MM = 1 + 2*q.(Metal)/valence.(Metal); % Unitless
-beta.MX = 1 + q.(Metal)/valence.(Metal) + q.(Halide)/valence.(Halide); % Unitless
-beta.XX = 1 + 2*q.(Halide)/valence.(Halide); % Unitless
+beta.MM = 1 + 2/valence.(Metal); % Unitless
+beta.MX = 1 + 1/valence.(Metal) - 1/valence.(Halide); % Unitless
+beta.XX = 1 - 2/valence.(Halide); % Unitless
 
 %% Calculate TF Repulsive Exponential Parameter alpha: MX = +-   MM = ++     XX = --
 alpha.MM = Settings.S.A.All*Settings.S.A.MM/rho.(Settings.Salt); % nm^-1

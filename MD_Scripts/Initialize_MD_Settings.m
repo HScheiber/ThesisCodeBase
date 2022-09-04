@@ -135,9 +135,9 @@ Settings.MinMDP.Maintain_Symmetry = true; % maintains cell symmetry when true
 Settings.MinMDP.emtol = 0.088439; %1e-3 [kJ mol-1 nm-1] The position minimization is converged (per cycle) when the maximum force is smaller than this value
 Settings.MinMDP.MaxCycles = 100; % Maximum number of optimization cycles.
 Settings.MinMDP.Energy_Tol = 1; % kJ/mol. Convergence criteria 1: must have change in energy between cycles is less than this value
-Settings.MinMDP.Gradient_Tol_RMS = 0.5; %kJ/(mol A) Convergence criteria 2: must have RMS cell parameter gradient less than this value for convergence
-Settings.MinMDP.Gradient_Tol_Max = 0.75; %kJ/(mol A) Convergence criteria 3: must have maximum cell parameter gradient less than this value for convergence
-Settings.MinMDP.E_Unphys = -3000; % unphysical energy cutoff
+Settings.MinMDP.Gradient_Tol_RMS = 1e-2; %kJ/(mol A) Convergence criteria 2: must have RMS cell parameter gradient less than this value for convergence
+Settings.MinMDP.Gradient_Tol_Max = 1e-2; %kJ/(mol A) Convergence criteria 3: must have maximum cell parameter gradient less than this value for convergence
+Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] unphysical energy cutoff
 Settings.MinMDP.nsteps_point = 0; % Number of steps to perform before ending (should be 0 for single point energy calculations)
 Settings.MinMDP.point_integrator = 'md'; % What type of calculation is run for single point energy calculations (steep = energy min, md = molecular dynamics)
 Settings.MinMDP.dt = 0.001; % Time step in ps for md type calculations
@@ -201,7 +201,7 @@ Settings.Delete_Equil = true; % Deletes the equilibration folder, if it exists, 
 Settings.Delete_outputs = false; % delete stde and stdo after job finishes
 Settings.Delete_subms = false; % delete subm scripts after job finishes
 Settings.Delete_cpt = true; % delete all but one last checkpoint after job finishes
-Settings.MaxWarn = 1; % Maximum allowed warnings for gmx grompp
+Settings.MaxWarn = 2; % Maximum allowed warnings for gmx grompp
 
 %% Topology settings
 Settings.Top_gen_pairs = 'no'; % Automatically generate pairs
@@ -211,7 +211,7 @@ Settings.Table_StepSize = 0.0005; % nm, suitable for double precision
 
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,...
     Settings.BO_Models,Settings.qsub,Settings.passlog,Settings.pipe,...
-    Settings.wsl,Settings.MLModelDir] = find_home;
+    Settings.wsl,Settings.MLModelDir,Settings.scratch_dir] = find_home;
 Settings.Project_Directory_Name = 'Melting_Point_Studies'; % Name of project directory to contain job within the main project folder
 
 %% Settings for melting point calculations
@@ -228,8 +228,6 @@ Settings.StepTolerance = 0; % K, tolerence for the melting point step size
 Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
 Settings.FinalDensityProfile = true; % Set to true to run a final density profile along the Z-dimension
 Settings.Delete_T_History = false; % deletes the intermediate temperature check files when true
-Settings.Equilibrate_Solid = 0; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Settings.Equilibrate_Liquid = 0; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.MinInterfaceWidth = 0.075; % [nm] +- distance from the solid-liquid interface within which to minimize
 Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing
 Settings.QECompressibility = 1e-6; % Compressibility used during the rapid-equilibration stages
@@ -273,6 +271,8 @@ Settings.C6_Damp = Init_C6Damping_Object;
 Settings.Liquid_Test_Time = 100; % ps
 Settings.Liquid_Equilibrate_Time = 25; % ps
 Settings.Solid_Test_Time = 30; % ps
-
+Settings.Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MinTimeStep = 0.00025; % [ps] minimum time step
 
 end

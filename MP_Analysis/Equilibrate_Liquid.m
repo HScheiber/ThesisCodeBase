@@ -315,7 +315,7 @@ function Output = Equilibrate_Liquid(Settings)
 
     % Ensure fast equilibration with Berendsen barostat + small time constant
     MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
-    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$11$3;');
+    MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
     MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
     MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);','$1isotropic$3;');
     MDP_Template = regexprep(MDP_Template,'(tau-p += *)(.+?)( *);',['$1 ' num2str(tau_p) '$3;']);
@@ -398,7 +398,7 @@ function Output = Equilibrate_Liquid(Settings)
 %             Settings.QECompressibility = Settings.QECompressibility/2;
 %             Output = Equilibrate_Liquid(Settings);
 %             return
-        if Settings.MDP.dt > 1e-4
+        if Settings.MDP.dt/2 >= Settings.MinTimeStep
             if Settings.Verbose
                 disp('Equilibration failed. Reducing time step.')
             end

@@ -18,7 +18,7 @@ if isfield(Settings,'initial_opt_type')
     Hashobj.GAdjust_MX = Settings.GAdjust_MX;
     Hashobj.GAdjust_XX = Settings.GAdjust_XX;
     
-    WorkDir = fullfile(pwd,DataHash(Hashobj));
+    WorkDir = fullfile(Settings.scratch_dir,DataHash(Hashobj));
     JobName = 'Test_MP';
     Full_Model_Name = Settings.Model;
     return

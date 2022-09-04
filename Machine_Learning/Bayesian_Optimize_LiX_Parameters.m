@@ -15,7 +15,9 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     % Disable an annoying warning
     warning('off','stats:classreg:learning:impl:GPImpl:GPImpl:SigmaMustBeGreaterThanSigmaLowerBound');
     
-    Model.OuterDir = pwd;
+    if ~isfield(Model,'OuterDir')
+        Model.OuterDir = pwd;
+    end
     Intermediate_BO_file = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat');
     Intermediate_BO_backup = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat.PREV');
     Intermediate_Fullopt_file = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat');
@@ -35,7 +37,23 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     if Finite_T_Calc
         Deterministic = false; % Thermal properties are not deterministic
     else
-        Deterministic = true; % Lattice energies are deterministic
+        Deterministic = true; % Lattice energy calculations are deterministic
+    end
+    
+    if ~isfield(Model,'UseCoupledConstraint')
+        Model.UseCoupledConstraint = false;
+    end
+    
+    if Model.UseCoupledConstraint
+        NumCC = 1;
+        if Finite_T_Calc
+            CCDet = false;
+        else
+            CCDet = true;
+        end
+    else
+        NumCC = 0;
+        CCDet = [];
     end
     
     %% Display input summary on first iteration
@@ -194,7 +212,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
 
     fun = @(x)LiX_Minimizer(Model,x);
-
+    constraint_fun = @(x)LiX_Constraint_Fcn(Model,x);
+    
     % Set up parallel features
     if Model.Parallel_Bayesopt
         PrefCores = feature('numcores');
@@ -346,7 +365,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         'MaxObjectiveEvaluations',remaining_evals,...
                         'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
                         'GPActiveSetSize',Model.Max_Bayesian_Iterations,...
-                        'KernelFunction',Model.KernelFunction);
+                        'KernelFunction',Model.KernelFunction,'XConstraintFcn',constraint_fun,...
+                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
                 else
                     results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
                         'ExplorationRatio',Model.ExplorationRatio,'PlotFcn',plotopt,...
@@ -354,7 +374,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         'ParallelMethod','clipped-model-prediction',...
                         'MaxObjectiveEvaluations',remaining_evals,...
                         'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                        'GPActiveSetSize',Model.Max_Bayesian_Iterations);
+                        'GPActiveSetSize',Model.Max_Bayesian_Iterations,'XConstraintFcn',constraint_fun,...
+                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
                 end
                 % Save results
                 save(Results_filename,'results')                
@@ -375,7 +396,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                     'MaxObjectiveEvaluations',Model.Max_Bayesian_Iterations,'NumSeedPoints',seed_points,...
                     'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
                     'GPActiveSetSize',Model.Max_Bayesian_Iterations,...
-                    'KernelFunction',Model.KernelFunction);
+                    'KernelFunction',Model.KernelFunction,'XConstraintFcn',constraint_fun,...
+                    'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
                 
             case 'surrogateopt'
                 if Model.ShowPlots
@@ -461,16 +483,17 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                     'MaxObjectiveEvaluations',remaining_evals,...
                     'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
                     'GPActiveSetSize',Model.Max_Secondary_Iterations + Model.Max_Bayesian_Iterations,...
-                    'KernelFunction',Model.SecondaryKernelFunction);
+                    'KernelFunction',Model.SecondaryKernelFunction,'XConstraintFcn',constraint_fun,...
+                    'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
             else
                 results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
                     'PlotFcn',plotopt,'ExplorationRatio',Model.ExplorationRatio_Secondary,...
                     'AcquisitionFunctionName',Model.Secondary_Acquisition_Function,'Verbose',1,...
-                    'ParallelMethod','clipped-model-prediction',...
-                    'MaxObjectiveEvaluations',remaining_evals,...
+                    'ParallelMethod','clipped-model-prediction','MaxObjectiveEvaluations',remaining_evals,...
                     'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                    'GPActiveSetSize',Model.Max_Secondary_Iterations + Model.Max_Bayesian_Iterations);
-                
+                    'GPActiveSetSize',Model.Max_Secondary_Iterations + Model.Max_Bayesian_Iterations,...
+                    'XConstraintFcn',constraint_fun,...
+                    'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
             end
         else
             results = BayesoptResults;

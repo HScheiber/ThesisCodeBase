@@ -47,152 +47,155 @@
 
 %% Set up fixed settings
 clear;
+delete all
 
 % Shared calculation parameters
-Shared_Settings = Initialize_LiX_BO_Settings;
-Shared_Settings.Max_Bayesian_Iterations = 400;
-Shared_Settings.Max_Secondary_Iterations = 100;
-Shared_Settings.MaxFunEvals = 100; % Only applies to the 'fminsearchbnd' method
-Shared_Settings.Loss_Convergence = 1e-6;
-Shared_Settings.Param_Convergence = 1e-3;
-Shared_Settings.Parallel_Bayesopt = false;
-Shared_Settings.Parallel_Struct_Min = true;
-Shared_Settings.Parallel_LiX_Minimizer = false;
-Shared_Settings.final_opt_type = 'fminsearchbnd'; % One of 'none', 'patternsearch', 'fminsearch', 'fminsearchbnd', or fmincon (uses gradients!)
-Shared_Settings.switch_final_opt = false;
-Shared_Settings.JobSettings.Cores = 8;
-Shared_Settings.JobSettings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 4]; % Domain decomposition
-Shared_Settings.Cutoff_Buffer = 1.2; % This affects Structure_Minimization as well as other aspects of code
-Shared_Settings.MaxWarn = 2;
-Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
-Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
+Settings = Initialize_LiX_BO_Settings;
+Settings.Project_Directory_Name = 'Model_Building';
+Settings.Verbose = false;
+Settings.UseCoupledConstraint = true;
+Settings.SigmaEpsilon = true;
 
+% Job settings
+Settings.JobSettings.Cores = 8; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Settings.JobSettings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Settings.JobSettings.npme = []; % Number of rank assigned to PME
+Settings.JobSettings.dd = [1 2 4]; % Domain decomposition
 
-% MP / Finite T Settings
-Shared_Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
-Shared_Settings.MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number of atoms (1,inf) of liquid/solid required to establish a phase change
-Shared_Settings.Optimizer = 'MPSearcher';
-Shared_Settings.lb = 0; % K, lower bound on MP search
-Shared_Settings.ub = 2200; % K, upper bound on MP search
-Shared_Settings.BracketThreshold = 5; % [K] Sets the target bracket for the melting point
-Shared_Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearcher algorithm
-Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
-Shared_Settings.Liquid_Fraction = 0.50;
-Shared_Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
-Shared_Settings.Liquid_Test_Time = 100; % ps. simulation time to sample the liquid for enthalpy / MSD calculations
-Shared_Settings.Liquid_Equilibrate_Time = 25; % ps. time spent relaxing the liquid for enthalpy / MSD calculations
-Shared_Settings.Solid_Test_Time = 30; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
-Shared_Settings.Delete_Equil = false; % switch to delete temporary calculation folders for finite T calcs
+% Bayesian Optimization Stopping Criteria
+Settings.Max_Bayesian_Iterations = 100;
+Settings.Max_Secondary_Iterations = 100;
 
-% More Finite T setings
-Shared_Settings.Manual_Box = false; % When set to true, rather than setting the number of atoms in a box, user sets the a, b, and c dimensions of the box
-Shared_Settings.MDP.RVDW_Cutoff = 1.00; % nm
-Shared_Settings.MDP.RCoulomb_Cutoff = 1.1; % nm
-Shared_Settings.MDP.RList_Cutoff = 1.1; % nm
-Shared_Settings.Cutoff_Buffer = 1.20;
-Shared_Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
-Shared_Settings.c_over_a = 2;
-Shared_Settings.N_atoms = 2000;
-Shared_Settings.BracketThreshold = 5; % K
-Shared_Settings.MinStepSize = 0.25;
-Shared_Settings.MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
-Shared_Settings.MeltFreezeThreshold = 0.25;
-Shared_Settings.Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Shared_Settings.Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
-Shared_Settings.PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
-Shared_Settings.InitialMeshSize = 20;
-Shared_Settings.MeshSizeMultiplier = 5;
-Shared_Settings.QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
-Shared_Settings.ScaleInitialLiqDensity = 0.8;
+% Local optimization settings convergence settings
+Settings.Loss_Convergence = 1e-6;
+Settings.Param_Convergence = 1e-3;
+Settings.switch_final_opt = false;
+Settings.Max_Local_Iterations = 10;
+Settings.final_opt_type = 'fminsearchbnd';
+
+% Parallel Settings
+Settings.Parallel_Bayesopt = false;
+Settings.Parallel_Struct_Min = true;
+Settings.Parallel_LiX_Minimizer = false;
+
+% Bayesian optimization constraints
+Settings.MinSkipLoss = 2; % Minimum loss value required before skipping further computation
+Settings.BadFcnLossPenalty = 1000; % Penalty to give bad potentials
+Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
+Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
+Settings.MaxAttWellDepth = -1000; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
+Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
+Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
+Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
+
+% Non-MP Finite T calculation settings
+Settings.Liquid_Test_Time = 200; % ps. simulation time to sample the liquid for enthalpy / MSD calculations
+Settings.Liquid_Equilibrate_Time = 25; % ps. time spent relaxing the liquid for enthalpy / MSD calculations
+Settings.Solid_Test_Time = 50; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
+Settings.CheckAmorphousLiquid = false; % When this is on, calculations that are deemed amorphous solid receive extra loss penalty
+
+% MP-specific calculation settings
+Settings.c_over_a = 2;
+Settings.MaxCheckTime = 5000; % ps. Max time for MP simulation points
+Settings.BracketThreshold = 10; % [K] Sets the target bracket for the melting point
+Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearcher algorithm
+Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
+Settings.Liquid_Fraction = 0.50;
+Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
+Settings.Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
+Settings.InitialMeshSize = 100; % Initial step size for MP calcs
+Settings.MeshSizeMultiplier = 2;
+Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
+Settings.MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number of atoms (1,inf) of liquid/solid required to establish a phase change
+Settings.Optimizer = 'MPSearcher';
+Settings.lb = 0; % K, lower bound on MP search
+Settings.ub = 2200; % K, upper bound on MP search
+
+% Shared Finite T calculation Settings
+Settings.QECompressibility = 1e-7; % sets the compressibility during the system preparation stages
+Settings.ScaleInitialLiqDensity = 0.8; % Sets the scale of liquid density
+Settings.CheckAmorphousHalide = false; 
+Settings.AmorphousDiffThreshold = 1e-6; % [cm^2/s] this sets the diffusion threshold for amorphous vs liquid
+Settings.Delete_Equil = false; % switch to delete temporary calculation folders for finite T calcs
+Settings.Manual_Box = false; % When set to true, rather than setting the number of atoms in a box, user sets the a, b, and c dimensions of the box
+Settings.MDP.RVDW_Cutoff = 1.00; % nm
+Settings.MDP.RCoulomb_Cutoff = 1.1; % nm
+Settings.MDP.RList_Cutoff = 1.1; % nm
+Settings.Cutoff_Buffer = 1.20;
+Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
+Settings.N_atoms = 2000;
 
 % Barostat Options
-Shared_Settings.Isotropy = 'semiisotropic';
-Shared_Settings.Target_P = [1 1]; % Bar
-Shared_Settings.Barostat = 'Parrinello-Rahman'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
-Shared_Settings.Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
-Shared_Settings.Nstpcouple = Get_nstcouple(Shared_Settings.Time_Constant_P,Shared_Settings.MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
-Shared_Settings.ScaleCompressibility = 1;
+Settings.Isotropy = 'semiisotropic';
+Settings.Target_P = [1 1]; % Bar
+Settings.Barostat = 'Parrinello-Rahman'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
+Settings.Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
+Settings.Nstpcouple = Get_nstcouple(Settings.Time_Constant_P,Settings.MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
+Settings.ScaleCompressibility = 1;
 
 % Thermostat Options
-Shared_Settings.Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'nose-hoover' (set NO for NVE)
-Shared_Settings.Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
-Shared_Settings.Nsttcouple = Get_nstcouple(Shared_Settings.Time_Constant_T,Shared_Settings.MDP.dt); %[ps] The frequency for coupling the temperature. 
+Settings.Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'nose-hoover' (set NO for NVE)
+Settings.Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
+Settings.Nsttcouple = Get_nstcouple(Settings.Time_Constant_T,Settings.MDP.dt); %[ps] The frequency for coupling the temperature. 
 
 % Ewald options
-Shared_Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
-Shared_Settings.MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of the Ewald-shifted direct potential at rcoulomb. Decreasing this will give a more accurate direct sum, but then you need more wave vectors for the reciprocal sum.
-Shared_Settings.MDP.Fourier_Spacing = 0.12;
-Shared_Settings.MDP.VerletBT = -1;
+Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
+Settings.MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of the Ewald-shifted direct potential at rcoulomb. Decreasing this will give a more accurate direct sum, but then you need more wave vectors for the reciprocal sum.
+Settings.MDP.Fourier_Spacing = 0.12;
+Settings.MDP.VerletBT = -1;
 
 idx = 0;
 
-%% BH Model (MP Test) XZ
-Salts = {'LiBr'};
-Theories = {'BH'};
-Replicates = 1;
+%% Test Model Particular parameter
+Settings.Salt = 'NaCl';
+Settings.Theory = 'BH';
+Settings.Trial_ID = 'XX1';
 
-for tidx = 1:length(Theories)
-    Theory = Theories{tidx};
-    
-    for sidx = 1:length(Salts)
-        Salt = Salts{sidx};
+% [T = 0] Loss options
+Settings.Loss_Options.Rocksalt.LE = 1;
+% Settings.Loss_Options.Rocksalt.a = 1;
+% Settings.Loss_Options.Wurtzite.RLE = 1;
 
-        for ridx = 1:length(Replicates)
-            Rep = num2str(Replicates(ridx));
+% [T = Tm] loss options
+Settings.Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+Settings.Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+Settings.Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+Settings.Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+Settings.Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+%            Settings.Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
 
-            %% Model BH: XZ
-            idx = idx+1;
-            Models(idx) = Shared_Settings;
-            Models(idx).Salt = Salt;
-            Models(idx).Theory = Theory;
-            Models(idx).Trial_ID = ['XX' Rep];
-            
-%             % T=0 Loss
-%             Models(idx).Loss_Options.Rocksalt.LE = 1;
-%             Models(idx).Loss_Options.Rocksalt.a = 1;
-%             Models(idx).Loss_Options.Wurtzite.RLE = 1;
-            
-            % Finite T loss
-            Models(idx).Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-            Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
-            Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
-            Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-            Models(idx).Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
-            
-            % Aux options
-            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-            Models(idx).SigmaEpsilon = true;
-            Models(idx).Fix_Charge = true;
-            Models(idx).Additivity = true;
-            
-        end
-    end
-end
+% Other loss options options
+Settings.Fix_Charge = true;
+Settings.Additivity = true;
 
-%% Submit jobs
-workdir = pwd;
-% Loop through all models and build their submission file
-for idx = 1:length(Models)
-    Model = Models(idx);
-    Calc_Name = [Model.Salt '_' Model.Theory '_Model_' Model.Trial_ID];
-    Calc_Dir = [workdir filesep Calc_Name];
-    Model.Diary_Loc = [Calc_Dir filesep Calc_Name '.log'];
-    
-    % Move to new directory
+% Auto structure selection
+Settings.Structures = Auto_Structure_Selection(Settings);
+
+%% Start job
+[home,project,computer,~,~,~,~,~,~,~,scratch] = find_home;
+Calc_Name = [Settings.Salt '_' Settings.Theory '_Model_' Settings.Trial_ID];
+Model_Name_abrv = [Settings.Theory '_Model_' Settings.Trial_ID];
+
+if contains(pwd,Calc_Name)
+    Calc_Dir = pwd;
+else
+    Calc_Dir = [pwd filesep Calc_Name];
     if ~isfolder(Calc_Dir)
         mkdir(Calc_Dir)
     end
     cd(Calc_Dir);
-    
-    % Turn diary on and submit job
-    diary(Model.Diary_Loc);
-    setenv('OMP_NUM_THREADS',num2str(Model.JobSettings.OMP_Threads))
-    Bayesian_Optimize_LiX_Parameters(Model)
-    diary('off')
-    close all % closes figures
 end
-cd(workdir);
+
+Settings.Diary_Loc = [Calc_Dir filesep Calc_Name '.log'];
+Settings.scratch_dir = fullfile(scratch,Settings.Project_Directory_Name,...
+    Settings.Salt,Model_Name_abrv);
+
+% Turn diary on and submit job
+diary(Settings.Diary_Loc);
+setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
+Bayesian_Optimize_LiX_Parameters(Settings)
+diary('off')
+close all % closes figures

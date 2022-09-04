@@ -387,7 +387,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 disp(me.message)
             end
             
-            if Settings.MDP.dt > 1e-4
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Simulation failed. Restarting with reduced time step.')
                 end
@@ -528,7 +528,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 disp(me.message)
             end
             
-            if Settings.MDP.dt > 1e-4
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Simulation failed. Restarting with reduced time step.')
                 end
@@ -736,7 +736,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             catch me
                 disp(me.message)
             end
-            if Settings.MDP.dt > 1e-4
+            if Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Simulation failed with inconclusive result. Restarting with reduced time step.')
                 end

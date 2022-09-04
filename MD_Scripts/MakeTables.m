@@ -1,4 +1,11 @@
-function TableFile_MX = MakeTables(Settings)
+function TableFile_MX = MakeTables(Settings,varargin)
+
+    p = inputParser;
+    p.FunctionName = 'MakeTables';
+    addOptional(p,'MDP_Minimize',false)
+    parse(p,varargin{:});
+    MDP_Minimize = p.Results.MDP_Minimize; % Gathers components of energy at the end in addition to the total energy.
+
     [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
     
     switch Settings.Theory(1:2)
@@ -15,13 +22,13 @@ function TableFile_MX = MakeTables(Settings)
             end
             
             [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,...
-                'ReturnAsStructure','true');
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
         case 'TF'
             [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
-                'ReturnAsStructure','true');
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
         case 'BH'
             [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
-                'ReturnAsStructure','true');
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
     end
 
     % Find function minimum
@@ -32,18 +39,18 @@ function TableFile_MX = MakeTables(Settings)
         U = Us(idx);
         peaks_idx = [false islocalmax(U.Total(2:end))];
         peak_r = U.r(peaks_idx);
+        if numel(peak_r) > 1
+            peak_r = peak_r(1);
+        end
         
         inflex_idx = [false islocalmax(U.dTotal(2:end)) | islocalmin(U.dTotal(2:end))];
         inflex_r = U.r(inflex_idx);
         
-        if isempty(peak_r) % Ensure peak exists
+        if isempty(peak_r) || isempty(inflex_r) % Ensure peak exists
             add_wall = false;
-        elseif isempty(peak_r) || isempty(inflex_r)
-            add_wall = false;
-        elseif length(inflex_r) == 1
-            add_wall = true;
         else
-            inflex_r = inflex_r(end-1);
+            inflex_r(inflex_r < peak_r) = [];
+            inflex_r = inflex_r(1);
             add_wall = true;
         end
         
@@ -52,26 +59,26 @@ function TableFile_MX = MakeTables(Settings)
             below_peak_idx = (U.r < inflex_r);
             r = U.r(below_peak_idx); % nm
             D = 1e-15; % prefactor
-
+            
             fwall = D./(r.^12) - D./(inflex_r.^12);
             dfwall = 12*D./(r.^13); % Wall -derivative
-
+            
             % Kill the attractive interaction beyond the peak
             g_at_valley = U.g(U.r == inflex_r);
             N_belowpeak = sum(below_peak_idx);
             U.g(below_peak_idx) = repmat(g_at_valley,1,N_belowpeak);
             U.dg(below_peak_idx) = zeros(1,N_belowpeak);
-
+            
             % Remove infinity at 0
             fwall(1) = fwall(2);
             dfwall(1) = 0;
-
+            
             % Add this repulsion to the repulsive part of the function
             U.h(U.r < inflex_r) = U.h(U.r < inflex_r) + fwall;
             U.dh(U.r < inflex_r) = U.dh(U.r < inflex_r) + dfwall;
         end
         
-        % Testing
+%         % Testing
 %         nm_per_m = 1e+9; % nm per m
 %         NA = 6.0221409e23; % Molecules per mole
 %         e_c = 1.60217662e-19; % Elementary charge in Coulombs
@@ -83,10 +90,11 @@ function TableFile_MX = MakeTables(Settings)
 %         else
 %             U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
 %         end
-%         plot(U.r,U.Total)
+%         hold on
+%         plot(U.r.*10,U.Total)
+%         scatter(inflex_r.*10,U.Total(U.r == inflex_r))
 %         ylim([-1000 1000])
-
-
+        
         % Output into gromacs format
         Uo = [U.r ; U.f0 ; U.df0 ; U.g ; U.dg ; U.h ; U.dh];
         U_out = deblank( sprintf(['%16.10e   %16.10e %16.10e   %16.10e %16.10e   %16.10e %16.10e' newline],Uo(:)) );

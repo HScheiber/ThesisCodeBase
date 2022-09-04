@@ -9,7 +9,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                               Temporal_Cutoff = 0,Voronoi = False, Qlm_Average = True,
                               Prob_Interfacial = None,Spatial_Reassignment = False,
                               Spatial_Interfacial = None,
-                              SaveTrajectoryAux = 0):
+                              SaveTrajectoryAux = 2):
     
     """
     Created on Fri Nov 20 18:54:17 2020
@@ -564,7 +564,6 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
     
     # Convert to predictions and convert back to time slices
     pred_class = np.array(np.split(np.argmax(predicted_prob, axis=1), num_traj_starts, axis=0))
-    
     logging.info('\nFinished Inferring Predictions.')
     
     # Applying various post-processing elements

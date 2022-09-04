@@ -1,7 +1,8 @@
-function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelModels] = find_home
+function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelModels,scratch] = find_home
     if ispc
         home = 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase';
         project = 'C:\Users\Hayden\Documents\Patey_Lab';
+        scratch = 'C:\Users\Hayden\Documents\Patey_Lab';
         BO_Models = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 		StrSelModels = 'C:\Users\Hayden\Documents\Patey_Lab\Machine_Learning_Structure_Finder\LiX_Structure_Selector_Optimization';
         computer = lower(getenv('COMPUTERNAME'));
@@ -24,6 +25,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
         if strcmp(server,'ced') || strcmp(server,'cdr')
             home = '/home/scheiber/ThesisCodeBase';     
             project = '/project/6001647/scheiber';
+            scratch = '/scratch/scheiber';
             BO_Models = '/home/scheiber/project/Model_Building/Completed';
             computer = 'cedar';
             slurm = true;
@@ -33,6 +35,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
             home = '/home/scheiber/ThesisCodeBase';     
             project = '/project/6001647/scheiber';
             computer = 'narval';
+            scratch = '/lustre07/scratch/scheiber';
             slurm = true;
             BO_Models = '/home/scheiber/project/Model_Building/Completed';
             qsub = 'sbatch';
@@ -41,6 +44,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
             home = '/home/haydensc/ThesisCodeBase';
             project = '/scratch/st-gpatey-1/haydensc';
             BO_Models = '/home/haydensc/project/BO_Models';
+            scratch = '/scratch/st-gpatey-1/haydensc';
             computer = 'sockeye';
             slurm = false;
             qsub = 'qsub';
@@ -48,6 +52,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
         elseif strcmp(server,'pat')
             home = '/home/user/ThesisCodeBase';
             project = '/home/user/project';
+            scratch = '/home/user/scratch';
             BO_Models = '/home/user/project/BO_Models';
             computer = 'patey';
             slurm = false;
@@ -56,6 +61,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
         elseif strcmp(server,'gra')
             home = '/home/scheiber/ThesisCodeBase';     
             project = '/project/6001647/scheiber';
+            scratch = '/scratch/scheiber';
             computer = 'graham';
             slurm = true;
             BO_Models = '/home/scheiber/project/Model_Building/Completed';
@@ -64,6 +70,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
         elseif strcmp(server,'sea')
             home = '/home/scheiber/ThesisCodeBase';     
             project = '/home/scheiber/project';
+            scratch = '/home/scheiber/scratch';
             computer = 'orcinus';
             slurm = false;
             BO_Models = '/home/scheiber/project/BO_Models';
@@ -72,6 +79,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
         else
             home = '/home/scheiber/ThesisCodeBase';
             project = '/project/6001647/scheiber';
+            scratch = '/scratch/scheiber';
             computer = lower(system('hostname'));
             slurm = true;
 			BO_Models = '/home/scheiber/project/BO_Models';

@@ -1,30 +1,33 @@
-clear;
+%clear;
 global sldr_h results X Y idx_X idx_Y input_table p full_opt_point ...
     full_opt_eval bayes_opt_eval bayes_opt_point bayes_opt_est_eval bayes_opt_est_point show_error
 % Analysis parameters
-Salt = 'LiI';
+Salt = 'LiBr';
 Theory = 'JC';
-Model = 'C5'; % C5squaredexponential
-Plot_X = 'SDXX'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
-Plot_Y = 'SRXX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+Model = 'XX1'; % C5squaredexponential
+Plot_X = 'Sigma_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+Plot_Y = 'Sigma_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+
 grid_density = 50; % Parameter to set the grid density
 fs = 24;
 show_error = false;
 
+Model_type = 'error'; % constraints, error, objective
 
 % Load data
-A = load(['C:\Users\Hayden\Documents\Patey_Lab\BO_Models\' Salt '_' Theory '_Model_' Model '_bayesopt.mat']);
-results = A.results;
-bayes_opt_eval = results.MinObjective;
-bayes_opt_point = table2array(results.XAtMinObjective);
+% A = load(['C:\Users\Hayden\Documents\Patey_Lab\BO_Models\' Salt '_' Theory '_Model_' Model '_bayesopt.mat']);
+% results = A.results;
+results = BayesoptResults;
+bayes_opt_eval = 0; %results.MinObjective;
+bayes_opt_point = table2array(results.NextPoint); %table2array(results.XAtMinObjective);
 
-bayes_opt_est_eval = results.MinEstimatedObjective;
-bayes_opt_est_point = table2array(results.XAtMinEstimatedObjective);
+bayes_opt_est_eval = 0; %results.MinEstimatedObjective;
+bayes_opt_est_point = table2array(results.NextPoint); %table2array(results.XAtMinEstimatedObjective);
 
 % Load best point
-A = load(['C:\Users\Hayden\Documents\Patey_Lab\BO_Models\' Salt '_' Theory '_Model_' Model '_fullopt.mat']);
-full_opt_point = A.full_opt_point;
-full_opt_eval = A.loss;
+%A = load(['C:\Users\Hayden\Documents\Patey_Lab\BO_Models\' Salt '_' Theory '_Model_' Model '_fullopt.mat']);
+full_opt_point = table2array(BayesoptResults.NextPoint); %A.full_opt_point;
+full_opt_eval = 0; %A.loss;
 
 % Variable names
 varnames = {results.VariableDescriptions.Name};
@@ -71,7 +74,14 @@ flat_input(:,idxs) = repmat(full_opt_point(idxs),length(flat_X),1);
 input_table = array2table(flat_input,'VariableNames',varnames);
 
 % Sample the model at the grid points
-[flat_Z,flat_C] = results.predictObjective(input_table);
+switch lower(Model_type)
+    case 'objective'
+        [flat_Z,flat_C] = results.predictObjective(input_table);
+    case 'error'
+        [flat_Z,flat_C] = results.predictError(input_table);
+    case 'constraints'
+        [flat_Z,flat_C] = results.predictConstraints(input_table);
+end
 
 % Reshape the model outputs to match the grids
 Z = reshape(flat_Z,size(X));
@@ -116,7 +126,7 @@ for idx = 1:N_vars_extra
     lims_Q = results.VariableDescriptions(idx_Q).Range;
     
     sldr_h(idx) = uicontrol(figh,'Style','Text','Units','Normalized','Position',textpos,...
-        'String',str,'FontSize',fs,'Tag',varnames_extra{idx});
+        'String',str,'FontSize',fs-4,'Tag',varnames_extra{idx});
     sldr_h(idx+N_vars_extra) = uicontrol(figh,'Units','Normalized','Style','Slider','Position',slidepos,...
         'String',str,'Value',x0,'Max',lims_Q(2),'Min',lims_Q(1),'FontSize',fs,...
         'Callback',@UpdatePlot,'UserData',[idx idx+N_vars_extra],...
@@ -182,6 +192,18 @@ function output = param_name_map(p_name,Salt)
             output = ['$S_N$[' Metal '-' Halide ']'];
         case 'SQ'
             output = '$S_Q$';
+        case 'Sigma_MM'
+            output = ['$\sigma$[' Metal '-' Metal ']'];
+        case 'Sigma_XX'
+            output = ['$\sigma$[' Halide '-' Halide ']'];
+        case 'Sigma_MX'
+            output = ['$\sigma$[' Metal '-' Halide ']'];
+        case 'Epsilon_MM'
+            output = ['$\varepsilon$[' Metal '-' Metal ']'];
+        case 'Epsilon_XX'
+            output = ['$\varepsilon$[' Halide '-' Halide ']'];
+        case 'Epsilon_MX'
+            output = ['$\varepsilon$[' Metal '-' Halide ']'];            
         otherwise
             output = p_name;
     end

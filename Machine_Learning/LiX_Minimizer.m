@@ -23,7 +23,25 @@
 %% Inputs
 function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varargin)
 
-coupledconstraints = []; % No coupled constraints on the system
+% The coupled constraint is for finite temperature simulations that
+% give NaN outputs, or for Structure_Minimization calculations that are not feasible. 
+% These are caused when 
+%   (1) The lattice params of a structure are too large or too small
+%   (2) The lattice energy of a structure is lower than Settings.MinMDP.E_Unphys
+%   (3) A finite-T simulation fails 
+%   (4) A melting point cannot be found for the structure of interest 
+%   (5) The liquid is amorphous at the experimental MP 
+%   (6) The liquid or solid converts to another structure at the experimental MP
+
+if ~isfield(Settings,'UseCoupledConstraint')
+    Settings.UseCoupledConstraint = false;
+end
+
+if Settings.UseCoupledConstraint
+    coupledconstraints = -1;
+else
+    coupledconstraints = [];
+end
 
 % Optional inputs
 p = inputParser;
@@ -40,17 +58,6 @@ if Settings.Parallel_LiX_Minimizer && Settings.Parallel_Struct_Min
     Settings.Parallel_Struct_Min = false;
 end
 
-% Maintain backwards compatibility, add defaults that may be missing to C6Damp
-% C6D = Init_C6Damping_Object;
-% C6D_n = fieldnames(C6D);
-% for idx = 1:length(C6D_n)
-%     if ~isfield(Model.C6Damp,C6D_n{idx})
-%         Model.C6Damp.(C6D_n{idx}) = C6D.(C6D_n{idx});
-%     end
-% end
-
-[Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
-
 % Potential Scaling
 if istable(Param) || isstruct(Param)
     if strcmp(Settings.Theory,'TF')
@@ -60,8 +67,9 @@ if istable(Param) || isstruct(Param)
                                                     
             % Default model parameters: all length-scale units are nm,
             % energy scale units are kJ/mol
-            
-            [defTFMX,defTFMM,defTFXX] = TF_Potential_Parameters(Settings.Salt,Init_Scaling_Object);
+            PotSettings = Initialize_MD_Settings;
+            PotSettings.Salt = Settings.Salt;
+            [defTFMX,defTFMM,defTFXX] = TF_Potential_Parameters(PotSettings);
             
             % Input parameters
             r0_MM = Param.r0_MM; % nm
@@ -138,7 +146,9 @@ if istable(Param) || isstruct(Param)
                 % Calculate value of C8 using recursive relations
 
                 % Default TF params: C in units of kJ/mol nm^6, D in units of kJ/mol nm^8
-                [TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(Settings.Salt,Init_Scaling_Object);
+                PotSettings = Initialize_MD_Settings;
+                PotSettings.Salt = Settings.Salt;
+                [TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(PotSettings);
 
                 % Conversion factors
                 Bohr_nm = 0.0529177; % a_0 - > Angstrom
@@ -160,9 +170,9 @@ if istable(Param) || isstruct(Param)
                 sqrt_Q.I  = 5.533218150000000;
 
                 % Calculate Scaled C8 using recursion relation from D3 paper
-                C8.MM = 3.0*(Settings.S.D6D.MM*TF_MM.C/c6units)*sqrt_Q.(Metal)*sqrt_Q.(Metal)*c8units; % in kJ/mol nm^8
-                C8.XX = 3.0*(Settings.S.D6D.XX*TF_XX.C/c6units)*sqrt_Q.(Halide)*sqrt_Q.(Halide)*c8units; % in kJ/mol nm^8
-                C8.MX = 3.0*(Settings.S.D6D.MX*TF_MX.C/c6units)*sqrt_Q.(Metal)*sqrt_Q.(Halide)*c8units; % in kJ/mol nm^8
+                C8.MM = 3.0*(Settings.S.D6D.MM*TF_MM.C/c6units)*sqrt_Q.(Settings.Metal)*sqrt_Q.(Settings.Metal)*c8units; % in kJ/mol nm^8
+                C8.XX = 3.0*(Settings.S.D6D.XX*TF_XX.C/c6units)*sqrt_Q.(Settings.Halide)*sqrt_Q.(Settings.Halide)*c8units; % in kJ/mol nm^8
+                C8.MX = 3.0*(Settings.S.D6D.MX*TF_MX.C/c6units)*sqrt_Q.(Settings.Metal)*sqrt_Q.(Settings.Halide)*c8units; % in kJ/mol nm^8
 
                 % Update the scaling
                 Settings.S.D8D.MM = C8.MM/TF_MM.D;
@@ -202,7 +212,6 @@ if istable(Param) || isstruct(Param)
             % Default model parameters: all length-scale units are nm, energy scale units are kJ/mol
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [defBHMX,defBHMM,defBHXX] = BH_Potential_Parameters(PotSettings);
             
             % Input parameters
@@ -301,35 +310,34 @@ if istable(Param) || isstruct(Param)
         if Settings.SigmaEpsilon
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
             
             % Sigma scaling
-            Settings.S.S.MM = Param.Sigma_MM/MMParams.sigma;
-            Settings.S.S.XX = Param.Sigma_XX/XXParams.sigma;
+            Settings.S.S.MM = Param.sigma_MM/MMParams.sigma;
+            Settings.S.S.XX = Param.sigma_XX/XXParams.sigma;
             
             % Epsilon scaling
-            Settings.S.E.MM = Param.Epsilon_MM/MMParams.epsilon;
-            Settings.S.E.XX = Param.Epsilon_XX/XXParams.epsilon;
+            Settings.S.E.MM = Param.epsilon_MM/MMParams.epsilon;
+            Settings.S.E.XX = Param.epsilon_XX/XXParams.epsilon;
             
             % Default MX params
             def_S_MX = MXParams.sigma;
-            def_E_MX = sMXParams.epsilon;
+            def_E_MX = MXParams.epsilon;
             
             if Settings.Additivity
-                Sigma_MX = (Param.Sigma_MM + Param.Sigma_XX)/2;
-                Epsilon_MX = sqrt(Param.Epsilon_MM*Param.Epsilon_XX);
+                Sigma_MX = (Param.sigma_MM + Param.sigma_XX)/2;
+                Epsilon_MX = sqrt(Param.epsilon_MM*Param.epsilon_XX);
                 
                 Settings.S.S.MX = Sigma_MX/def_S_MX;
                 Settings.S.E.MX = Epsilon_MX/def_E_MX;
                 
                 if Settings.Additional_MM_Disp
-                    Full_MM_Epsilon = Param.Epsilon_MM + Param.Epsilon_MM2;
+                    Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
                     Settings.S.E.MM = Full_MM_Epsilon/MMParams.epsilon;
                 end
             else
-                Settings.S.S.MX = Param.Sigma_MX/def_S_MX;
-                Settings.S.E.MX = Param.Epsilon_MX/def_E_MX;
+                Settings.S.S.MX = Param.sigma_MX/def_S_MX;
+                Settings.S.E.MX = Param.epsilon_MX/def_E_MX;
             end
         
         % Scaled dispersion/repulsion form
@@ -345,7 +353,6 @@ if istable(Param) || isstruct(Param)
             if Settings.Additivity
                 PotSettings = Initialize_MD_Settings;
                 PotSettings.Salt = Settings.Salt;
-                PotSettings.S = Init_Scaling_Object;
                 [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
 
                 % Unscaled
@@ -440,7 +447,6 @@ else
             % energy scale units are kJ/mol
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [defTFMX,defTFMM,defTFXX] = TF_Potential_Parameters(PotSettings);
             
             % Input parameters
@@ -526,7 +532,6 @@ else
                 % Default TF params: C in units of kJ/mol nm^6, D in units of kJ/mol nm^8
                 PotSettings = Initialize_MD_Settings;
                 PotSettings.Salt = Settings.Salt;
-                PotSettings.S = Init_Scaling_Object;
                 [TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(PotSettings);
 
                 % Conversion factors
@@ -549,9 +554,9 @@ else
                 sqrt_Q.I  = 5.533218150000000;
 
                 % Calculate Scaled C8 using recursion relation from D3 paper
-                C8.MM = 3.0*(Settings.S.D6D.MM*TF_MM.C/c6units)*sqrt_Q.(Metal)*sqrt_Q.(Metal)*c8units; % in kJ/mol nm^8
-                C8.XX = 3.0*(Settings.S.D6D.XX*TF_XX.C/c6units)*sqrt_Q.(Halide)*sqrt_Q.(Halide)*c8units; % in kJ/mol nm^8
-                C8.MX = 3.0*(Settings.S.D6D.MX*TF_MX.C/c6units)*sqrt_Q.(Metal)*sqrt_Q.(Halide)*c8units; % in kJ/mol nm^8
+                C8.MM = 3.0*(Settings.S.D6D.MM*TF_MM.C/c6units)*sqrt_Q.(Settings.Metal)*sqrt_Q.(Settings.Metal)*c8units; % in kJ/mol nm^8
+                C8.XX = 3.0*(Settings.S.D6D.XX*TF_XX.C/c6units)*sqrt_Q.(Settings.Halide)*sqrt_Q.(Settings.Halide)*c8units; % in kJ/mol nm^8
+                C8.MX = 3.0*(Settings.S.D6D.MX*TF_MX.C/c6units)*sqrt_Q.(Settings.Metal)*sqrt_Q.(Settings.Halide)*c8units; % in kJ/mol nm^8
 
                 % Update the scaling
                 Settings.S.D8D.MM = C8.MM/TF_MM.D;
@@ -596,7 +601,6 @@ else
             % Default model parameters: all length-scale units are nm, energy scale units are kJ/mol
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [defBHMX,defBHMM,defBHXX] = BH_Potential_Parameters(PotSettings);
             
             % Input parameters
@@ -738,7 +742,6 @@ else
             % Default JC params
             PotSettings = Initialize_MD_Settings;
             PotSettings.Salt = Settings.Salt;
-            PotSettings.S = Init_Scaling_Object;
             [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
             def_S_MX = MXParams.sigma;
             def_E_MX = MXParams.epsilon;
@@ -816,7 +819,6 @@ else
                 
                 PotSettings = Initialize_MD_Settings;
                 PotSettings.Salt = Settings.Salt;
-                PotSettings.S = Init_Scaling_Object;
                 [MXParams,MMParams,XXParams] = JC_Potential_Parameters(PotSettings);
                 
                 % Unscaled
@@ -949,7 +951,7 @@ if Settings.CheckBadFcn
     tl = Settings.Table_Length;
     ss = Settings.Table_StepSize;
     Settings.Table_Length = 10; % nm
-    Settings.Table_StepSize = 0.002;
+    Settings.Table_StepSize = 0.01;
     if strcmp(Settings.Theory,'BH')
         [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
             'Startpoint',0.01,'ReturnAsStructure',true);
@@ -971,15 +973,15 @@ if Settings.CheckBadFcn
     minima_U = U_MX.Total(valleys_idx);
     
     if isempty(minima_U) % If no well minimum exists in MX interaction
-        Loss_add = Loss_add + log(1 + Settings.BadFcnLossPenalty);
-    elseif isempty(maxima_U) % If no peak exists in MX interaction
-        % Do nothing, this is normal for JC potential and some BH/TF
-        % potentials
+        Loss_add = Loss_add + Settings.BadFcnLossPenalty;
+    elseif isempty(maxima_U) % If no peak exists in MX interaction, but valley does, check well depth. 
+        % This is normal for JC potential and some BH/TF potentials
+        Loss_add = Loss_add + max(Settings.MaxAttWellDepth - minima_U,0)*Settings.BadFcnLossPenalty;
     else % Otherwise, a well minimum exists and at least one peak exists
-        % ensure peak - well height is greater than specified threshold
-        Threshold = Settings.MinExpWallHeight; % kJ/mol
+        % Penalize wells that are too shallow and wells that are too deep
         dU = maxima_U - minima_U;
-        Loss_add = Loss_add + log(1 + max(Threshold - dU,0)*Settings.BadFcnLossPenalty/Threshold);
+        Loss_add = Loss_add + max(Settings.MinExpWallHeight - dU,0)*Settings.BadFcnLossPenalty;
+        Loss_add = Loss_add + max(Settings.MaxAttWellDepth - minima_U,0)*Settings.BadFcnLossPenalty;
     end
 %     plot(U_MX.r,U_MX.Total)
 %     hold on
@@ -1011,7 +1013,7 @@ if Settings.CheckBadFcn
             % like-like interactions
             Threshold = Settings.MaxRepWellDepth; % kJ/mol
             dU = maxima_U(2) - minima_U;
-            Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
+            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
         elseif length(maxima_U) == 1 && isempty(minima_U) % One peak, no valley (this is a normal case for TF and BH repulsive potentials)
             % Do nothing
         elseif length(maxima_U) == 1 && length(minima_U) == 1 % One peak visible + one valley in between, and (possibly) one hidden peak to the right
@@ -1023,11 +1025,11 @@ if Settings.CheckBadFcn
                 % Ensure valley depth is not greater than the threshold
                 dU = U.Total(end) - minima_U;
             end
-            Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
+            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
         elseif length(minima_U) == 1 % well minima is available but no peaks are visible, there must be a hidden peak to the right
             Threshold = Settings.MaxRepWellDepth; % kJ/mol
             dU = U.Total(end) - minima_U;
-            Loss_add = Loss_add + log(1 + max(dU - Threshold,0)*Settings.BadFcnLossPenalty);
+            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
         else
             % This should never be reached...
             warning('Possible issue with the potential!')
@@ -1035,20 +1037,9 @@ if Settings.CheckBadFcn
     end
 end
 
-if ~isfield(Settings,'MinSkipLoss')
-    defSettings = Initialize_LiX_BO_Settings;
-    Settings.MinSkipLoss = defSettings.MinSkipLoss;
-end
-
-if Loss_add >= Settings.MinSkipLoss
-    Loss = Loss_add;
-    UserData.Minimization_Data = Settings.Minimization_Data;
-    UserData.Finite_T_Data = Settings.Finite_T_Data;
-    return
-end
-
 %% Parallel Setup
 N = length(Settings.Structures);
+Structure_Min_Calc_Fail = false;
 if Settings.Parallel_LiX_Minimizer
     % Set up matlab parallel features
     Parcores = feature('numcores');
@@ -1099,6 +1090,9 @@ if Settings.Parallel_LiX_Minimizer
     % Collect outputs into cell array
     for idx = 1:N
         Settings.Minimization_Data{idx} = f(idx).fetchOutputs;
+        if Settings.Minimization_Data{idx}.CalcFail
+            Structure_Min_Calc_Fail = true;
+        end
     end
 %% Serial mode    
 else
@@ -1106,6 +1100,30 @@ else
         Settings.Structure = Settings.Structures{idx};
         Settings.Minimization_Data{idx} = Structure_Minimization(Settings,...
             'Extra_Properties',Extra_Properties);
+        if Settings.Minimization_Data{idx}.CalcFail
+            Structure_Min_Calc_Fail = true;
+        end
+    end
+end
+
+% This catches Structure_Minimization calculations that produce a result
+% outside of the allowed energy or volume bounds
+if Structure_Min_Calc_Fail && ~Settings.Therm_Prop_Override
+    if Settings.UseCoupledConstraint
+        coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+        Loss = nan;
+    else
+        Loss = real(log1p(Loss_add + Settings.BadFcnLossPenalty));
+    end
+    UserData.Minimization_Data = Settings.Minimization_Data;
+    UserData.Finite_T_Data = Settings.Finite_T_Data;
+    return
+elseif Structure_Min_Calc_Fail && Settings.Therm_Prop_Override
+    if Settings.UseCoupledConstraint
+        coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+        Loss_add = nan;
+    else
+        Loss_add = Loss_add + Settings.BadFcnLossPenalty;
     end
 end
 
@@ -1132,44 +1150,37 @@ if any([Settings.Loss_Options.Fusion_Enthalpy ...
         Structures{idx} = Settings.Minimization_Data{idx}.Structure;
     end
     strmatch = strcmp(Settings.Finite_T_Data.Structure,Structures);
-    if any(strmatch)
-        
-%         LE_model = Settings.Minimization_Data{strmatch}.E;
-%         LE_exp = Settings.Finite_T_Data.Exp_Solid_LE;
-%         E_Model_Mismatch = abs((LE_model - LE_exp)/LE_exp);
-        
-        V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
-%         V0_exp = Settings.Finite_T_Data.Exp_Solid_V0;
-%         Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
-%         V_Model_Mismatch = abs(V0_model - V0_exp)/V0_exp;
-%         Model_Mismatch = max(V_Model_Mismatch,E_Model_Mismatch);
+    V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
+    
+    if ~isfield(Settings,'MaxModelVolume')
+        defSettings = Initialize_LiX_BO_Settings;
+        Settings.MaxModelVolume = defSettings.MaxModelVolume;
+    end
 
-        if ~isfield(Settings,'MaxModelVolume')
-            defSettings = Initialize_LiX_BO_Settings;
-            Settings.MaxModelVolume = defSettings.MaxModelVolume;
+    if V0_model > Settings.MaxModelVolume
+        Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
+        Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;
+        if Settings.UseCoupledConstraint
+            coupledconstraints = real(log1p(Loss_add_Vol));
         end
-        
-        if V0_model > Settings.MaxModelVolume
-            Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
-            Loss_add_Vol = log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
-        elseif V0_model < Settings.MinModelVolume
-            Model_Mismatch = (Settings.MinModelVolume - V0_model)/Settings.MinModelVolume;
-            Loss_add_Vol = log(1 + Model_Mismatch*Settings.BadFcnLossPenalty);
-        else
-            Loss_add_Vol = 0;
-        end
-        
-        Loss_add = Loss_add + Loss_add_Vol;
-        if Loss_add_Vol >= Settings.MinSkipLoss && ~Settings.Therm_Prop_Override
-            Settings.skip_finite_T = true;
-        else
-            Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
-            Settings.Geometry.a = Settings.Minimization_Data{strmatch}.a;
-            Settings.Geometry.b = Settings.Minimization_Data{strmatch}.b;
-            Settings.Geometry.c = Settings.Minimization_Data{strmatch}.c;
+    elseif V0_model < Settings.MinModelVolume
+        Model_Mismatch = (Settings.MinModelVolume - V0_model)/Settings.MinModelVolume;
+        Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;
+        if Settings.UseCoupledConstraint
+            coupledconstraints = real(log1p(Loss_add_Vol));
         end
     else
-        Settings.Ref_Density = 1/(Settings.Finite_T_Data.Exp_Liquid_V_MP*(0.1^3)); % molecules / nm^3
+        Loss_add_Vol = 0;
+    end
+
+    Loss_add = Loss_add + Loss_add_Vol;
+    if real(log1p(Loss_add)) >= Settings.MinSkipLoss && ~Settings.Therm_Prop_Override
+        Settings.skip_finite_T = true;
+    else
+        Settings.Ref_Density = 1/(Settings.Minimization_Data{strmatch}.V*(0.1^3)); % molecules / nm^3
+        Settings.Geometry.a = Settings.Minimization_Data{strmatch}.a;
+        Settings.Geometry.b = Settings.Minimization_Data{strmatch}.b;
+        Settings.Geometry.c = Settings.Minimization_Data{strmatch}.c;
     end
 end
 
@@ -1216,6 +1227,10 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
         Settings.Finite_T_Data.MP = nan;
+        if Settings.UseCoupledConstraint
+            coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+            Loss_add = nan;
+        end
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
         if Settings.Delete_Equil && isfolder(Settings.WorkDir)
@@ -1244,7 +1259,6 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Settings.Loss_Options.Liquid_DM_MP] > tol) ...
         && ~Settings.skip_finite_T ) || Settings.Therm_Prop_Override
     
-
     [WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
     Settings.WorkDir = [WorkDir '_LP'];
     
@@ -1297,6 +1311,11 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
                 warning(['Unable to remove directory: ' Settings.WorkDir])
             end
         end
+    end
+    
+    if isnan(Liq_Output.Liquid_H_MP) && Settings.UseCoupledConstraint
+        coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+        Loss_add = nan;
     end
     
     Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
@@ -1372,6 +1391,11 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         end
     end
     
+    if isnan(Sol_Output.Solid_H_MP) && Settings.UseCoupledConstraint
+        coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+        Loss_add = nan;
+    end
+    
     Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
     Settings.Finite_T_Data.Solid_H_MP = Sol_Output.Solid_H_MP;
     
@@ -1395,7 +1419,7 @@ if Settings.Therm_Prop_Override
     dirFlags = [files.isdir];
     subFolders = files(dirFlags);
     subFolderNames = {subFolders(3:end).name};
-    prev_calcs = subFolderNames(cellfun(@(x) ~isempty(x),regexp(subFolderNames,'.+?_[S|M|L]P','once')));
+    prev_calcs = subFolderNames(cellfun(@(x) ~isempty(x),regexp(subFolderNames,'.+?_[S|M|L|O]P','once')));
     for idx = 1:length(prev_calcs)
         try
             rmdir(fullfile(Settings.OuterDir,prev_calcs{idx}),'s')
@@ -1411,7 +1435,7 @@ end
 % variable, so we don't need to double count. Use Settings.skip_finite_T as
 % a switch to disable re-calculating loss from finite T data
 % Calculate Loss function from data
-Loss = LiX_Loss(Settings) + Loss_add;
+Loss = real(log1p(LiX_Loss(Settings) + Loss_add));
 UserData.Finite_T_Data = Settings.Finite_T_Data;
 UserData.Minimization_Data = Settings.Minimization_Data;
 
