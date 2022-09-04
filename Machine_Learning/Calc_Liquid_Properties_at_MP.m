@@ -727,7 +727,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             disp(['(1/2) Begining Liquid Equilibration for ' num2str(Settings.Liquid_Equilibrate_Time) ' ps...'] )
         end
         mintimer = tic;
-        [state,~] = system(mdrun_command);
+        [state,mdrun_output] = system(mdrun_command);
         if state == 0
             if Settings.Verbose
                 disp(['(1/2) Liquid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
@@ -742,7 +742,29 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             WorkDir = Settings.WorkDir;
             Settings = Inp_Settings;
             Settings.WorkDir = WorkDir;
-            if Settings.MDP.dt/2 >= Settings.MinTimeStep
+            
+            if ~isempty(regexp(mdrun_output,'[box|cell] size','match','once'))
+                if Settings.Verbose
+                    disp('Equilibration failed due to shrinking box. Increasing box size.')
+                end
+                if isfile(cpt_file)
+                    delete(cpt_file)
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file)
+                end
+                if isfile(Equilibrated_Geom_File)
+                    delete(Equilibrated_Geom_File)
+                end
+                if isfile(Minimized_Geom_File)
+                    delete(Minimized_Geom_File)
+                end
+                % System shrunk too far, increase buffer size
+                Settings.Cutoff_Buffer = Settings.Cutoff_Buffer*1.25;
+                Settings.ScaleInitialLiqDensity = Settings.ScaleInitialLiqDensity*0.95;
+                Output = Calc_Liquid_Properties_at_MP(Settings);
+                return
+            elseif Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Liquid Equilibration failed. Reducing time step.')
                 end
@@ -899,7 +921,42 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             
             % Catch errors in grompp
             if state ~= 0
-                error(['Error running GROMPP. Problem command: ' newline FEquil_Grompp]);
+                grompp_output = readfile(GrompLog_File);
+                
+                if ~isempty(regexp(grompp_output,'[box|cell] size','match','once'))
+                    if Settings.Verbose
+                        disp('Box has shrunk too far, retrying with larger box size.');
+                    end
+                    if isfile(cpt_file)
+                        delete(cpt_file)
+                    end
+                    if isfile(prev_cpt_file)
+                        delete(prev_cpt_file)
+                    end
+                    if isfile(fullfile(Settings.WorkDir,'Equil_Liq.cpt'))
+                        delete(fullfile(Settings.WorkDir,'Equil_Liq.cpt'));
+                    end
+                    if isfile(fullfile(Settings.WorkDir,'Equil_Liq_prev.cpt'))
+                        delete(fullfile(Settings.WorkDir,'Equil_Liq_prev.cpt'))
+                    end
+                    if isfile(Equilibrated_Geom_File)
+                        delete(Equilibrated_Geom_File)
+                    end
+                    if isfile(Minimized_Geom_File)
+                        delete(Minimized_Geom_File)
+                    end
+                    
+                    WorkDir = Settings.WorkDir;
+                    Settings = Inp_Settings;
+                    Settings.WorkDir = WorkDir;
+                    Settings.Cutoff_Buffer = Settings.Cutoff_Buffer.*1.25;
+                    Settings.ScaleInitialLiqDensity = Settings.ScaleInitialLiqDensity*0.95;
+                    Output = Calc_Liquid_Properties_at_MP(Settings);
+                    return
+                    
+                else
+                    error(['Error running GROMPP. Problem command: ' newline FEquil_Grompp]);
+                end
             else
                 delete(GrompLog_File)
             end
@@ -924,7 +981,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             disp(['(2/2) Running liquid with realistic dynamics for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
         end
         mintimer = tic;
-        [state,outp] = system(mdrun_command);
+        [state,mdrun_output] = system(mdrun_command);
         if state == 0
             if Settings.Verbose
                 disp(['(2/2) Liquid dynamics simulation complete. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
@@ -940,7 +997,38 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             WorkDir = Settings.WorkDir;
             Settings = Inp_Settings;
             Settings.WorkDir = WorkDir;
-            if Settings.MDP.dt/2 >= Settings.MinTimeStep
+            if ~isempty(regexp(mdrun_output,'[box|cell] size','match','once'))
+                if Settings.Verbose
+                    disp('Equilibration failed due to shrinking box. Increasing box size.')
+                end
+                if isfile(cpt_file)
+                    delete(cpt_file)
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file)
+                end
+                if isfile(fullfile(Settings.WorkDir,'Equil_Liq.cpt'))
+                    delete(fullfile(Settings.WorkDir,'Equil_Liq.cpt'));
+                end
+                if isfile(fullfile(Settings.WorkDir,'Equil_Liq_prev.cpt'))
+                    delete(fullfile(Settings.WorkDir,'Equil_Liq_prev.cpt'))
+                end
+                if isfile(Equilibrated_Geom_File)
+                    delete(Equilibrated_Geom_File)
+                end
+                if isfile(Minimized_Geom_File)
+                    delete(Minimized_Geom_File)
+                end
+                if isfile(Final_Geom_File)
+                    delete(Final_Geom_File)
+                end
+                
+                % System shrunk too far, increase buffer size
+                Settings.Cutoff_Buffer = Settings.Cutoff_Buffer*1.25;
+                Settings.ScaleInitialLiqDensity = Settings.ScaleInitialLiqDensity*0.95;
+                Output = Calc_Liquid_Properties_at_MP(Settings);
+                return
+            elseif Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp(['Liquid dynamics failed. Restarting with reduced time step. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')])
                 end
@@ -960,7 +1048,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                     disp(['Liquid dynamics failed. Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')])
                     disp('Model may be completely unstable!')
                     disp(['WorkDir: ' WorkDir])
-                    disp(outp)
+                    disp(mdrun_output)
                 end
                 Output.Liquid_V_MP = nan;
                 Output.Liquid_H_MP = nan;

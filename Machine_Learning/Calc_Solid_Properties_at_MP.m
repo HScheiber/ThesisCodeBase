@@ -459,7 +459,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp(['Beginning Solid Equilibration for ' num2str(Settings.Solid_Test_Time) ' ps...'] )
         end
         mintimer = tic;
-        [state,~] = system(mdrun_command);
+        [state,mdrun_output] = system(mdrun_command);
         if state == 0
             if Settings.Verbose
                 disp(['Solid Successfully Equilibrated! Epalsed Time: ' datestr(seconds(toc(mintimer)),'HH:MM:SS')]);
@@ -476,7 +476,21 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Settings = Inp_Settings;
             Settings.SuperCellFile = SuperCellFile;
             Settings.WorkDir = WorkDir;
-            if Settings.MDP.dt/2 >= Settings.MinTimeStep
+            
+            if ~isempty(regexp(mdrun_output,'[box|cell] size','match','once'))
+                if Settings.Verbose
+                    disp('Equilibration failed due to shrinking box. Increasing box size.')
+                end
+                if isfile(cpt_file)
+                    delete(cpt_file)
+                end
+                if isfile(prev_cpt_file)
+                    delete(prev_cpt_file)
+                end
+                Settings.Cutoff_Buffer = Settings.Cutoff_Buffer*1.25;
+                Output = Calc_Solid_Properties_at_MP(Settings,'Skip_Cell_Construction',false);
+                return
+            elseif Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp('Solid Equilibration failed. Reducing time step.')
                 end
