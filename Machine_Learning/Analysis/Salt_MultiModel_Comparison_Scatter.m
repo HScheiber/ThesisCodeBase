@@ -850,8 +850,6 @@ for idx = 1:length(Salts)
 end
 h(end) = plot(t.Children(1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', 'DFT',...
     'MarkerFaceColor','w','linewidth',2,'Color','r');
-
-
 legh = legend(h,'Location','SouthOutside','Orientation','Horizontal',...
     'Interpreter','latex','Box','off','fontsize',fs,'NumColumns', N_Salts+1);
 %legh.Layout.Tile = 'East';

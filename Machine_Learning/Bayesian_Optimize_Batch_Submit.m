@@ -178,12 +178,102 @@ idx=0;
 switch lower(computer)
     case 'cedar'
         %% Shared_Settings
-        Shared_Settings.Max_Bayesian_Iterations = 200;
-        Shared_Settings.Max_Secondary_Iterations = 50;
-        Shared_Settings.Max_Local_Iterations = 10;
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Max_Bayesian_Iterations = 600;
+        Shared_Settings.Max_Secondary_Iterations = 200;
+        Shared_Settings.Max_Local_Iterations = 300;
+        Shared_Settings.Parallel_Bayesopt = true;
+        Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.UseCoupledConstraint = true;
+        Shared_Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
+        Shared_Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
+        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
+        
+        %% JC/BH Models: LA LB LC
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' };
+        Theories = {'JC' 'BH'};
+        Replicates = 1:5;
+        for tidx = 1:length(Theories)
+            Theory = Theories{tidx};
+            for sidx = 1:length(Salts)
+                Salt = Salts{sidx};
+
+                % Set initial MP temperature
+                Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+                for ridx = 1:length(Replicates)
+                    Rep = num2str(Replicates(ridx));
+
+                    %% Model KA
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['LA' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model LB
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['LB' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model LC
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['LC' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = false;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model LD
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['LD' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = false;
+                end
+            end
+        end
         
     case 'narval'
         %% Shared_Settings
