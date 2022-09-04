@@ -1415,14 +1415,14 @@ end
 
 % Delete previous calculations that did not complete
 if Settings.Therm_Prop_Override
-    files = dir(Settings.OuterDir);
+    files = dir(Settings.scratch_dir);
     dirFlags = [files.isdir];
     subFolders = files(dirFlags);
     subFolderNames = {subFolders(3:end).name};
     prev_calcs = subFolderNames(cellfun(@(x) ~isempty(x),regexp(subFolderNames,'.+?_[S|M|L|O]P','once')));
     for idx = 1:length(prev_calcs)
         try
-            rmdir(fullfile(Settings.OuterDir,prev_calcs{idx}),'s')
+            rmdir(fullfile(Settings.scratch_dir,prev_calcs{idx}),'s')
         catch
             if Settings.Verbose
                 disp(['Unable to remove failed calculation directory: ' fullfile(Settings.OuterDir,prev_calcs{idx})])
