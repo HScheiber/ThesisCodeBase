@@ -931,7 +931,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         is_melted = is_melted_sol | is_melted_liq
         
         alt_fraction = 1 - (liq_fraction + ref_fraction)
-        is_frozen_alt = alt_fraction >= RefChangeThreshold
+        is_frozen_alt = (alt_fraction >= RefChangeThreshold) & (alt_fraction > ref_fraction)
         
         # Check slope of last $SlopeCheckBegin% of trajectory
         if CheckFullTrajectory:
