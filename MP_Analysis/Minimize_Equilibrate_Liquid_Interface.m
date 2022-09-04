@@ -471,18 +471,13 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         'ML_TimeStep',0,...
         'SaveTrajectory',true,...
         'SavePredictionsImage',true));
-    Sol_Fraction = PyOut{4};
     Liq_Fraction = PyOut{5};
     
     if Liq_Fraction < (1 - Settings.MeltFreezeThreshold)
         if Settings.Verbose
             disp('Detected Liquid Phase change.')
         end
-        if (1-Liq_Fraction-Sol_Fraction) >= Settings.MeltFreezeThreshold
-            Output.StructureChange = true;
-        else
-            Output.LiquidFroze = true;
-        end
+        Output.LiquidFroze = true;
         Output.Aborted = true;
         TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
         [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
@@ -587,18 +582,13 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             'ML_TimeStep',0,...
             'SaveTrajectory',true,...
             'SavePredictionsImage',true));
-        Sol_Fraction = PyOut{4};
         Liq_Fraction = PyOut{5};
 
         if Liq_Fraction < (1 - Settings.MeltFreezeThreshold)
             if Settings.Verbose
                 disp('Detected Liquid Phase change.')
             end
-            if (1-Liq_Fraction-Sol_Fraction) >= Settings.MeltFreezeThreshold
-                Output.StructureChange = true;
-            else
-                Output.LiquidFroze = true;
-            end
+            Output.LiquidFroze = true;
             Output.Aborted = true;
             TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
             [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
@@ -690,18 +680,14 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
                 'ML_TimeStep',0,...
                 'SaveTrajectory',true,...
                 'SavePredictionsImage',true));
-            Sol_Fraction = PyOut{4};
             Liq_Fraction = PyOut{5};
 
             if Liq_Fraction < (1 - Settings.MeltFreezeThreshold)
                 if Settings.Verbose
                     disp('Detected Liquid Phase change.')
                 end
-                if (1-Liq_Fraction-Sol_Fraction) >= Settings.MeltFreezeThreshold
-                    Output.StructureChange = true;
-                else
-                    Output.LiquidFroze = true;
-                end
+
+                Output.LiquidFroze = true;
                 Output.Aborted = true;
                 TDir = fullfile(strrep(MinDir,[filesep 'Minimization'],''),['T_' num2str(Settings.Target_T,'%.4f')]);
                 [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ^| xargs rm']);
