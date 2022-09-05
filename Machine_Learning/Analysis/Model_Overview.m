@@ -1,8 +1,8 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; % 'NaCl'
-Theory = 'JC';
-ModelID = 'LA';
+Theory = 'BH';
+ModelID = 'LC';
 Reps = [1:5];
 savefile = true; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures';
@@ -155,7 +155,7 @@ for idx = 1:N_Salts
             % Load data
             try
                 data = load(dat_file).full_data;
-                Bayesopt_model = functions(data.bayesopt_results.ObjectiveFcn).workspace{1}.Model;
+                Bayesopt_model = data.Settings;
                 Bayesopt_Loss_Options = Bayesopt_model.Loss_Options;
                 data_found = true;
                 break
@@ -204,7 +204,11 @@ if N_MinPlot_Rows
             try
                 data = load(dat_file).full_data;
                 Minimization_Data = data.Minimization_Data;
-                Total_loss(idx,iidx) = data.loss;
+                
+                optimvals = [data.secondary_result.optimValues];
+                Total_loss(idx,iidx) = min([optimvals.fval]);
+                
+%                 Total_loss(idx,iidx) = data.loss;
             catch
                 disp(['Could not obtain crystal minimization data for: ' Salt ', ' Theory ', Model ' Model '.']);
                 continue
@@ -413,12 +417,13 @@ if N_Salts > 1
 
             % Gather data
             plot_data = squeeze(Total_loss(idx,:));
+            expon = floor(log10(max(plot_data)));
 
-            p = bar(axobj_loss(idx),1:N_Models,plot_data,'FaceColor',Colours(idx,:),'Visible','on','BarWidth',1,...
+            p = bar(axobj_loss(idx),1:N_Models,plot_data./(10.^expon),'FaceColor',Colours(idx,:),'Visible','on','BarWidth',1,...
                 'LineWidth',2);
             for mdx = 1:N_Models
                 xpos = p.XEndPoints(mdx);
-                scatter(axobj_loss(idx),xpos,plot_data(mdx),100,'MarkerEdgeColor','k',...
+                scatter(axobj_loss(idx),xpos,plot_data(mdx)./(10.^expon),100,'MarkerEdgeColor','k',...
                     'MarkerFaceColor',Colours(idx,:),'linewidth',2,'marker',markers{mdx});
             end
 
@@ -430,13 +435,15 @@ if N_Salts > 1
             axobj_loss(idx).XAxis.TickLength = [0,0];
             ylim(axobj_loss(idx),'padded')
             sgtitle(loss_panel,['Minimized Objective Function: ' Theory ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
-                'Fontsize',fs,'Interpreter','latex')
-            if idx == 1
-                ylabel(axobj_loss(idx), '$f(\mathbf{x})$','Fontsize',fs,'Interpreter','latex')
-            end
+                'Fontsize',fs-2,'Interpreter','latex')
+%             if idx == 1
+%                 ylabel(axobj_loss(idx), '$f(\mathbf{x}_{0})$','Fontsize',fs,'Interpreter','latex')
+%             end
             xlim(axobj_loss(idx),[0 N_Models+1])
-            set(axobj_loss(idx), 'YTickMode', 'auto')
-            set(axobj_loss(idx),'xminorgrid','off','yminorgrid','on')
+            set(axobj_loss(idx), 'YTickMode', 'auto');
+            set(axobj_loss(idx),'xminorgrid','off','yminorgrid','on');
+            axobj_loss(idx).YAxis.Exponent = 0;
+            ylabel(axobj_loss(idx), ['$f\left(\mathbf{x}_{0}\right)/10^{' num2str(expon) '}$'],'Fontsize',fs-4,'Interpreter','latex')
         end
     else
         FTdrop = 0;
@@ -468,7 +475,7 @@ if N_Salts > 1
             % Plot data
             plot(axobj_ft(idx),xx,salt_ave,'--k','linewidth',2);
             for jdx = 1:N_Models
-                yy = plot_data(jdx,:);
+                yy = plot_data(:,jdx);
                 scatter(axobj_ft(idx),xx,yy,100,Colours(xx,:),'filled','MarkerEdgeColor','k',...
                     'linewidth',1,'marker',markers{jdx});
             end
@@ -540,7 +547,7 @@ if N_Salts > 1
                 end
 
                 for kdx = 1:N_Models
-                    yy = plot_data(kdx,:);
+                    yy = plot_data(:,kdx);
                     scatter(axobj_min(idx,jdx),xx,yy,100,Colours(xx,:),'filled','MarkerEdgeColor','k',...
                         'linewidth',1,'marker',markers{kdx});
                 end
@@ -600,12 +607,6 @@ if N_Salts > 1
             'Interpreter','latex','Box','off','fontsize',fs,'NumColumns', N_Salts+1);
     end
 else
-    
-    
-    
-    
-    
-    
     % Generate plotting panels
     xx = 1:N_Models;
     row_height = 1/N_Rows;

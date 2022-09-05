@@ -74,9 +74,9 @@ clear;
 
 % Some options
 skip_models = [];
-check_complete = true; % Checks if job is already completed, skips completed jobs
+check_complete = false; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs
-continue_completed = false; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
+continue_completed = true; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
 
 % Shared calculation parameters
 Shared_Settings = Initialize_LiX_BO_Settings;
@@ -180,7 +180,9 @@ switch lower(computer)
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 600;
         Shared_Settings.Max_Secondary_Iterations = 200;
-        Shared_Settings.Max_Local_Iterations = 300;
+        Shared_Settings.Max_Local_Iterations = 1000;
+        Shared_Settings.switch_final_opt = true;
+        
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
@@ -578,10 +580,21 @@ for idx = 1:length(Models)
         obs = dir(['*Model_' Model.Trial_ID '*fullopt.mat']);
         if ~isempty(obs)
             disp([Model_Name ': Job already completed. Continuing completed Job.'])
-            
             src = fullfile(obs.folder,obs.name);
             dest = fullfile(obs.folder,strrep(obs.name,'fullopt','oldopt'));
             movefile(src,dest);
+        end
+        obs = dir(['*Model_' Model.Trial_ID '*final_point.mat']); 
+        if ~isempty(obs)
+            src = fullfile(obs.folder,obs.name);
+            dest = fullfile(obs.folder,strrep(obs.name,'fullopt','oldopt'));
+            movefile(src,dest);
+        end
+        
+        BPT_Folder = fullfile(submit_dir,'BestPoint_Thermal');
+        BPT_New = fullfile(submit_dir,'OldPoint_Thermal');
+        if isfolder(BPT_Folder)
+            movefile(BPT_Folder,BPT_New)
         end
     end
     
