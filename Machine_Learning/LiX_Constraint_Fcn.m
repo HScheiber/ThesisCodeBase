@@ -480,18 +480,23 @@ tf = log1p(Loss) < sqrt(eps);
 % % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
 % % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
 % 
-% ax1 = 'r0_MM';
-% ax2 = 'epsilon_MM';
-% ax3 = 'gamma_MX';
+% ax1 = 'epsilon_MM';
+% ax2 = 'epsilon_XX';
+% %ax3 = 'gamma_MX';
 % 
-% scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
+% %scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
+% scatter(Param.(ax1),Param.(ax2),100,tf_num,'filled')
 % if strcmp(Settings.Theory,'TF')
 %     set(gca, 'YScale', 'log')
 %     set(gca, 'ZScale', 'log')
 % end
-% xlabel(ax1);
-% ylabel(ax2);
-% zlabel(ax3);
+% 
+% fs=24;
+% xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
+% ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
+% set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
+% 
+% %zlabel(ax3);
 % 
 % clear;
 end
