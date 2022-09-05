@@ -87,7 +87,7 @@ Shared_Settings.Verbose = false;
 Shared_Settings.SigmaEpsilon = true;
 
 % Shared job settings
-Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
+Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
 Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
 Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.JobSettings.Nodes = 0; % Minimum number of cores to request for calculation.
