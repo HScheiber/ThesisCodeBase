@@ -587,7 +587,7 @@ for idx = 1:length(Models)
         obs = dir(['*Model_' Model.Trial_ID '*final_point.mat']); 
         if ~isempty(obs)
             src = fullfile(obs.folder,obs.name);
-            dest = fullfile(obs.folder,strrep(obs.name,'fullopt','oldopt'));
+            dest = fullfile(obs.folder,strrep(obs.name,'final_point','old_finp'));
             movefile(src,dest);
         end
         
