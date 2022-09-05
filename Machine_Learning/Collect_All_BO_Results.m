@@ -130,8 +130,4 @@ for idx = 1:length(Salts)
         end
     end
 end
-
-function mySave(filenm, full_data)
-    save(filenm, 'full_data');
-end
 end
