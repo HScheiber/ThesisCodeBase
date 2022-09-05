@@ -17,8 +17,8 @@ for idx = 1:length(Salts)
     files = files(diridx);
     Models = files(~ismember({files.name},{'.','..'}));
     
-    parfor jdx = 1:length(Models)
-    %for jdx = 1:length(Models)
+    %parfor jdx = 1:length(Models)
+    for jdx = 1:length(Models)
         warning('off','MATLAB:class:InvalidSuperClass')
         warning('off','MATLAB:load:classNotFound')
         warning('off','MATLAB:load:classError')
