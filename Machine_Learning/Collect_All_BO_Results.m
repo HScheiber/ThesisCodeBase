@@ -41,7 +41,7 @@ for idx = 1:length(Salts)
                 full_data = fullopt_dat;
                 if isfile(inpfile)
                     input_model = load(inpfile,'-mat');
-                    full_data.Input = input_model.model;
+                    full_data.Settings = input_model.Model;
                 end
                 full_data.secondary_result = fullopt_hist_dat.intermediate_data;
                 full_data.bayesopt_results = bayesopt_dat.results;
