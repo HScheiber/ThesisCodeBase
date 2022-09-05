@@ -3,6 +3,8 @@ function Collect_All_BO_Results(varargin)
 
 if nargin > 0
     parallel = varargin{1};
+else
+    parallel = false;
 end
 
 proj_dir = '/home/scheiber/project/Model_Building';
