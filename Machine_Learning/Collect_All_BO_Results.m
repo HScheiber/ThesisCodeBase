@@ -17,26 +17,32 @@ for idx = 1:length(Salts)
     files = files(diridx);
     Models = files(~ismember({files.name},{'.','..'}));
     
-    %parfor jdx = 1:length(Models)
-    for jdx = 1:length(Models)
+    parfor jdx = 1:length(Models)
+    %for jdx = 1:length(Models)
         warning('off','MATLAB:class:InvalidSuperClass')
         warning('off','MATLAB:load:classNotFound')
         warning('off','MATLAB:load:classError')
         Model_Name = Models(jdx).name;
         Current_Model_dir = fullfile(Models(jdx).folder,Model_Name);
-
+        
+        inpfile = fullfile(Current_Model_dir,[Salt '_' Model_Name '.inp']);
         fullopt = dir([Current_Model_dir filesep Salt '_' Model_Name '_fullopt.mat']);
         fullopt_history = dir([Current_Model_dir filesep 'intermediate_secondary_opt.mat']);
         bayesopt = dir([Current_Model_dir filesep Salt '_' Model_Name '_bayesopt.mat']);
         destfile = fullfile(destination_folder,Salt,[Salt '_' Model_Name '_data.mat']);
+        
         
         if ~isempty(fullopt) && ~isfile(destfile)
             try
                 fullopt_dat = load(fullfile(Current_Model_dir,fullopt.name));
                 fullopt_hist_dat = load(fullfile(Current_Model_dir,fullopt_history.name));
                 bayesopt_dat = load(fullfile(Current_Model_dir,bayesopt.name));
-
+                
                 full_data = fullopt_dat;
+                if isfile(inpfile)
+                    input_model = load(inpfile,'-mat');
+                    full_data.Input = input_model.model;
+                end
                 full_data.secondary_result = fullopt_hist_dat.intermediate_data;
                 full_data.bayesopt_results = bayesopt_dat.results;
                 if ~isfield(full_data,'Finite_T_Data')

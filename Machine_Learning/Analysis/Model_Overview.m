@@ -1,7 +1,7 @@
 clear; %#ok<*UNRCH>
 %% Data options
-Salts = {'NaCl'};
-Theory = 'JA';
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; % 'NaCl'
+Theory = 'JC';
 ModelID = 'LA';
 Reps = [1:5];
 savefile = true; % switch to save the final plots to file
