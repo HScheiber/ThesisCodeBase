@@ -60,7 +60,7 @@ for idx = 1:length(Salts)
                 disp('Skipping model')
             end
         elseif isfile(destfile)
-            disp([Salt ' ' Model_Name ': Job Already Copied.'])
+            %disp([Salt ' ' Model_Name ': Job Already Copied.'])
         else
             disp([Salt ' ' Model_Name ': Job Not Complete!'])
         end

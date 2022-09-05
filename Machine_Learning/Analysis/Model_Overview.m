@@ -1,9 +1,9 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'NaCl'};
-Theory = 'BH';
-ModelID = 'KA';
-Reps = [1:3 5];
+Theory = 'JA';
+ModelID = 'LA';
+Reps = [1:5];
 savefile = true; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures';
 
@@ -169,7 +169,7 @@ for idx = 1:N_Salts
     end
 end
 if ~data_found
-    warning(['Unable to load targets for ' Theory ' Model ' ModelID])
+    error(['Unable to load targets for ' Theory ' Model ' ModelID])
 end
 
 if isfield(Bayesopt_model,'Fix_Charge') && ~Bayesopt_model.Fix_Charge
