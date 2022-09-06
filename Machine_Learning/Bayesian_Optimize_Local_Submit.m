@@ -47,7 +47,7 @@
 
 %% Set up fixed settings
 clear;
-delete all
+close all
 
 % Shared calculation parameters
 Settings = Initialize_LiX_BO_Settings;

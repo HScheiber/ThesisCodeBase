@@ -6,15 +6,16 @@ Settings.Liquid_Fraction = 0.50; % Only meaninful when Liquid_Interface = true. 
 Settings.Equilibrate_Liquid = 20; % ps
 Settings.Equilibrate_Solid = 15; % ps
 Settings.PreEquilibration = 0.3; % ps
-Settings.JobSettings.MPI_Ranks = 2;
-Settings.JobSettings.OMP_Threads = 4;
+Settings.JobSettings.MPI_Ranks = 8;
+Settings.JobSettings.OMP_Threads = 1;
 setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
 
 Settings.Skip_Minimization = false;
-Settings.Theory = 'JC'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
+Settings.Theory = 'TF'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
+Settings.S.D8D.All = 0;
 Settings.Salt = 'NaCl'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
 Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'
-Settings.RefStructure = 'Liquid'; % Reference structure used for determination of melting or freezing (usually liquid)
+Settings.RefStructure = 'Rocksalt'; % Reference structure used for determination of melting or freezing (usually liquid)
 Settings.Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
 Settings.JobID = 'Test'; % An ID that is tacked onto the folder name of all current jobs
 Settings.N_atoms = 2000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
@@ -32,7 +33,7 @@ Settings.Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be
 Settings.Nstpcouple = Get_nstcouple(Settings.Time_Constant_P,Settings.MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
 
 % Thermostat Options
-T0 = 200; %BestKnownMP(Settings);
+T0 = BestKnownMP(Settings);
 Settings.Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'v-rescale' (set NO for NVE)
 Settings.Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
 Settings.Nsttcouple = Get_nstcouple(Settings.Time_Constant_T,Settings.MDP.dt); %[ps] The frequency for coupling the temperature. 
