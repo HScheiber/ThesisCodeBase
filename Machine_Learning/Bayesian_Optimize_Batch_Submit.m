@@ -87,7 +87,7 @@ Shared_Settings.Verbose = false;
 Shared_Settings.SigmaEpsilon = true;
 
 % Shared job settings
-Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
+Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
 Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
 Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.JobSettings.Nodes = 0; % Minimum number of cores to request for calculation.
@@ -107,7 +107,7 @@ Shared_Settings.MinSkipLoss = 2; % Minimum loss value required before skipping f
 Shared_Settings.BadFcnLossPenalty = 1000; % Penalty to give bad potentials
 Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Shared_Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
-Shared_Settings.MaxAttWellDepth = -1000; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
+Shared_Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
 Shared_Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
 Shared_Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
 Shared_Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
@@ -180,7 +180,9 @@ switch lower(computer)
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 600;
         Shared_Settings.Max_Secondary_Iterations = 200;
-        Shared_Settings.Max_Local_Iterations = 300;
+        Shared_Settings.Max_Local_Iterations = 1000;
+        Shared_Settings.switch_final_opt = true;
+        
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
@@ -275,11 +277,10 @@ switch lower(computer)
             end
         end
         
-    case 'narval'
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 200;
         Shared_Settings.Max_Secondary_Iterations = 100;
-        Shared_Settings.Max_Local_Iterations = 10;
+        Shared_Settings.Max_Local_Iterations = 100;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
@@ -291,7 +292,76 @@ switch lower(computer)
         Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = []; % Domain decomposition
         
-        %% JC/BH Models: KA, KB, KC, KC, KD on NaCl
+        %% NaCl - TF Model: KB and KF
+        Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
+        Theories = {'TF'};
+        Replicates = 1:5;
+        for tidx = 1:length(Theories)
+            Theory = Theories{tidx};
+            for sidx = 1:length(Salts)
+                Salt = Salts{sidx};
+
+                % Set initial MP temperature
+                Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+                for ridx = 1:length(Replicates)
+                    Rep = num2str(Replicates(ridx));
+
+                    %% Model KB
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['KB' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model KF
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['KF' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 2;
+                    Models(idx).Loss_Options.Rocksalt.a  = 2;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                end
+            end
+        end
+        
+    case 'narval'
+        %% Shared_Settings
+        Shared_Settings.Max_Bayesian_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 100;
+        Shared_Settings.Max_Local_Iterations = 50;
+        Shared_Settings.Parallel_Bayesopt = false;
+        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.UseCoupledConstraint = true;
+        Shared_Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
+        Shared_Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
+        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
+        
+        %% NaCl - JC/BH Models: KA, KB, KC, KD, KE on NaCl
         Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
         Theories = {'JC' 'BH'};
         Replicates = 1:5;
@@ -390,6 +460,72 @@ switch lower(computer)
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = false;
+                end
+            end
+        end
+        
+        
+        %% Shared_Settings
+        Shared_Settings.Max_Bayesian_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 100;
+        Shared_Settings.Max_Local_Iterations = 50;
+        Shared_Settings.Parallel_Bayesopt = false;
+        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.UseCoupledConstraint = true;
+        Shared_Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
+        Shared_Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
+        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
+        Shared_Settings.JobSettings.dd = []; % Domain decomposition
+        %% LiX - JC/BH Models: KA, KE
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' };
+        Theories = {'JC' 'BH'};
+        Replicates = 1:5;
+        for tidx = 1:length(Theories)
+            Theory = Theories{tidx};
+            for sidx = 1:length(Salts)
+                Salt = Salts{sidx};
+
+                % Set initial MP temperature
+                Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+                for ridx = 1:length(Replicates)
+                    Rep = num2str(Replicates(ridx));
+
+                    %% Model KA
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['KA' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model KE
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['KE' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Wurtzite.RLE = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
                 end
             end
         end
@@ -578,10 +714,21 @@ for idx = 1:length(Models)
         obs = dir(['*Model_' Model.Trial_ID '*fullopt.mat']);
         if ~isempty(obs)
             disp([Model_Name ': Job already completed. Continuing completed Job.'])
-            
             src = fullfile(obs.folder,obs.name);
             dest = fullfile(obs.folder,strrep(obs.name,'fullopt','oldopt'));
             movefile(src,dest);
+        end
+        obs = dir(['*Model_' Model.Trial_ID '*final_point.mat']); 
+        if ~isempty(obs)
+            src = fullfile(obs.folder,obs.name);
+            dest = fullfile(obs.folder,strrep(obs.name,'final_point','old_finp'));
+            movefile(src,dest);
+        end
+        
+        BPT_Folder = fullfile(submit_dir,'BestPoint_Thermal');
+        BPT_New = fullfile(submit_dir,'OldPoint_Thermal');
+        if isfolder(BPT_Folder)
+            movefile(BPT_Folder,BPT_New)
         end
     end
     

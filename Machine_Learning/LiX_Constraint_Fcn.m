@@ -60,7 +60,17 @@ if strcmp(Settings.Theory,'TF')
             gamma_MM = Param.gamma_MM; % Unitless
             gamma_XX = Param.gamma_XX; % Unitless
         end
-
+        
+        if gamma_MX > 48/7
+            epsilon_MX = -epsilon_MX;
+        end
+        if gamma_MM > 48/7
+            epsilon_MM = -epsilon_MM;
+        end
+        if gamma_XX > 48/7
+            epsilon_XX = -epsilon_XX;
+        end
+        
         % Convert to Condensed form
         alpha_MM = gamma_MM./r0_MM;
         alpha_XX = gamma_XX./r0_XX;
@@ -173,6 +183,16 @@ elseif strcmp(Settings.Theory,'BH')
             epsilon_MX = Param.epsilon_MX; % kJ/mol
             gamma_MM = Param.gamma_MM; % Unitless
             gamma_XX = Param.gamma_XX; % Unitless
+        end
+        
+        if gamma_MX < 6
+            epsilon_MX = -epsilon_MX;
+        end
+        if gamma_MM < 6
+            epsilon_MM = -epsilon_MM;
+        end
+        if gamma_XX < 6
+            epsilon_XX = -epsilon_XX;
         end
         
         % Convert to Condensed form
@@ -341,6 +361,7 @@ end
 %% Grab the peaks and valleys of the MX attractive potential
 peaks_idx = islocalmax(U.MX,2);
 valleys_idx = islocalmin(U.MX,2);
+r = repmat(U.r,size(U.MX,1),1);
 
 Num_peaks = sum(peaks_idx,2);
 Num_valleys = sum(valleys_idx,2);
@@ -359,6 +380,10 @@ ov_idx = sum( cumprod(valleys_idx(ovnp_idx,:) == 0, 2), 2) + 1;
 ovl_idx = sub2ind(size(U_MX_ovnp_set),(1:numel(ov_idx)).',ov_idx);
 U_min = U_MX_ovnp_set(ovl_idx);
 Loss(ovnp_idx) = Loss(ovnp_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Settings.BadFcnLossPenalty;
+% Also check well location
+r_ovnp_set = r(ovl_idx);
+Loss(ovnp_idx) = Loss(ovnp_idx) + max(r_ovnp_set - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty;
+Loss(ovnp_idx) = Loss(ovnp_idx) + max((Settings.MinMXWellR/10) - r_ovnp_set,0).*Settings.BadFcnLossPenalty;
 
 % If both a peak and minimum exist, find the well depth
 U_MX_ovop_set = U.MX(ovop_idx,:);
@@ -371,8 +396,12 @@ U_min = U_MX_ovop_set(ovl_idx);
 % Penalize wells that are too shallow and wells that are too deep
 Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty; % too shallow
 Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Settings.BadFcnLossPenalty; % too deep
+% Also check well location
+r_ovop_set = r(ovl_idx);
+Loss(ovop_idx) = Loss(ovop_idx) + max(r_ovop_set - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty;
+Loss(ovop_idx) = Loss(ovop_idx) + max((Settings.MinMXWellR/10) - r_ovop_set,0).*Settings.BadFcnLossPenalty;
 
-% idx = 9983;
+% idx = 9999;
 % plot(U.r,U.MX(idx,:))
 % hold on
 % scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
@@ -481,17 +510,24 @@ tf = log1p(Loss) < sqrt(eps);
 % % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
 % 
 % ax1 = 'r0_MM';
-% ax2 = 'epsilon_MM';
+% ax2 = 'r0_XX';
 % ax3 = 'gamma_MX';
 % 
 % scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
-% if strcmp(Settings.Theory,'TF')
-%     set(gca, 'YScale', 'log')
-%     set(gca, 'ZScale', 'log')
+% %scatter(Param.(ax1),Param.(ax2),100,tf_num,'filled')
+% if any(strcmp(Settings.Theory,{'TF' 'BH'}))
+% %     set(gca, 'XScale', 'log')
+% %     set(gca, 'YScale', 'log')
+%     %set(gca, 'ZScale', 'log')
 % end
-% xlabel(ax1);
-% ylabel(ax2);
-% zlabel(ax3);
+% 
+% fs=24;
+% % xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
+% % ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
+% xlabel(ax1,'fontsize',fs);
+% ylabel(ax2,'fontsize',fs);
+% zlabel(ax3,'fontsize',fs);
+% set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
 % 
 % clear;
 end

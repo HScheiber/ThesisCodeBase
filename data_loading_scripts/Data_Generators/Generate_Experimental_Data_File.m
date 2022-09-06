@@ -446,7 +446,6 @@ Experiment.CsCl.Liquid.DM_mp	= nan;
 Experiment.CsBr.Liquid.DM_mp	= nan;
 Experiment.CsI.Liquid.DM_mp     = nan;
 
-
 %% Additional data: Molar masses, Entropies of fusion, Redundant Geometric Data
 % Elemental Molar masses
 % Unit: g / mol

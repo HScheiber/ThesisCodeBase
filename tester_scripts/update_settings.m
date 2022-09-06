@@ -31,9 +31,11 @@ Settings.Diary_Loc = '';
 % Settings.Liquid_Test_Time = 100; % ps
 % Settings.Liquid_Equilibrate_Time = 25; % ps
 Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
+Settings.Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]);
 %[Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings);
 
-Output = Calc_Liquid_Properties_at_MP(Settings);
+OutputLiq = Calc_Liquid_Properties_at_MP(Settings);
+OutputSol = Calc_Solid_Properties_at_MP(Settings);
 
 
 Settings.MinMDP.Verbose = true;

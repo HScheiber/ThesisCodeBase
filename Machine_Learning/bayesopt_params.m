@@ -4,20 +4,39 @@ function params = bayesopt_params(Model)
         SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
         
         if Model.SigmaEpsilon
-            % r_0
-            Sr0MM = optimizableVariable('r0_MM',Model.Sr0MM_Range,'Type','real'); % Units: nm
-            Sr0XX = optimizableVariable('r0_XX',Model.Sr0XX_Range,'Type','real'); % Units: nm
-            Sr0MX = optimizableVariable('r0_MX',Model.Sr0MX_Range,'Type','real'); % Units: nm
+            if Model.InnerRange % For TF model, inner range is when gamma is [0, 48/7]
+                % r_0
+                Sr0MM = optimizableVariable('r0_MM',[0 1],'Type','real'); % Units: nm
+                Sr0XX = optimizableVariable('r0_XX',[0 1],'Type','real'); % Units: nm
+                Sr0MX = optimizableVariable('r0_MX',[0 1],'Type','real'); % Units: nm
+                
+                % epsilon
+                SepsilonMM = optimizableVariable('epsilon_MM',[1e-4 1e12],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonXX = optimizableVariable('epsilon_XX',[1e-4 1e12],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonMX = optimizableVariable('epsilon_MX',[1e-4 1e12],'Type','real','Transform','log'); % Units: kJ/mol
+                
+                % gamma
+                SgammaMM = optimizableVariable('gamma_MM',[0.09 6],'Type','real'); % Units: kJ/mol
+                SgammaXX = optimizableVariable('gamma_XX',[0.09 6],'Type','real'); % Units: kJ/mol
+                SgammaMX = optimizableVariable('gamma_MX',[0.09 6],'Type','real'); % Units: kJ/mol
             
-            % epsilon
-            SepsilonMM = optimizableVariable('epsilon_MM',Model.SepsMM_Range,'Type','real','Transform','log'); % Units: kJ/mol
-            SepsilonXX = optimizableVariable('epsilon_XX',Model.SepsXX_Range,'Type','real','Transform','log'); % Units: kJ/mol
-            SepsilonMX = optimizableVariable('epsilon_MX',Model.SepsMX_Range,'Type','real','Transform','log'); % Units: kJ/mol
+            else
+                % r_0
+                Sr0MM = optimizableVariable('r0_MM',[0 1],'Type','real'); % Units: nm
+                Sr0XX = optimizableVariable('r0_XX',[0 1],'Type','real'); % Units: nm
+                Sr0MX = optimizableVariable('r0_MX',[0 1],'Type','real'); % Units: nm
+                
+                % epsilon
+                SepsilonMM = optimizableVariable('epsilon_MM',[0 400],'Type','real'); % Units: kJ/mol
+                SepsilonXX = optimizableVariable('epsilon_XX',[0 400],'Type','real'); % Units: kJ/mol
+                SepsilonMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
+                
+                % gamma
+                SgammaMM = optimizableVariable('gamma_MM',[48/7 30],'Type','real'); % Units: kJ/mol
+                SgammaXX = optimizableVariable('gamma_XX',[48/7 30],'Type','real'); % Units: kJ/mol
+                SgammaMX = optimizableVariable('gamma_MX',[48/7 30],'Type','real'); % Units: kJ/mol
+            end
             
-            % gamma
-            SgammaMM = optimizableVariable('gamma_MM',Model.SgamMM_Range,'Type','real','Transform','log'); % Units: kJ/mol
-            SgammaXX = optimizableVariable('gamma_XX',Model.SgamXX_Range,'Type','real','Transform','log'); % Units: kJ/mol
-            SgammaMX = optimizableVariable('gamma_MX',Model.SgamMX_Range,'Type','real','Transform','log'); % Units: kJ/mol
             
             if Model.Additivity
                 params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
@@ -26,24 +45,24 @@ function params = bayesopt_params(Model)
             end
         else
             % C6 dispersion parameters
-            SD6MM = optimizableVariable('SD6MM',Model.SD6MM_Range,'Type','real');
-            SD6XX = optimizableVariable('SD6XX',Model.SD6XX_Range,'Type','real');
-            SD6MX = optimizableVariable('SD6MX',Model.SD6MX_Range,'Type','real');
+            SD6MM = optimizableVariable('SD6MM',[0 1000],'Type','real');
+            SD6XX = optimizableVariable('SD6XX',[0 1000],'Type','real');
+            SD6MX = optimizableVariable('SD6MX',[0 1000],'Type','real');
             
             % C8 dispersion parameters
-            SD8MM = optimizableVariable('SD8MM',Model.SD8MM_Range,'Type','real');
-            SD8XX = optimizableVariable('SD8XX',Model.SD8XX_Range,'Type','real');
-            SD8MX = optimizableVariable('SD8MX',Model.SD8MX_Range,'Type','real');
+            SD8MM = optimizableVariable('SD8MM',[0 1000],'Type','real');
+            SD8XX = optimizableVariable('SD8XX',[0 1000],'Type','real');
+            SD8MX = optimizableVariable('SD8MX',[0 1000],'Type','real');
             
             % Alpha exponential parameters
-            SAMM = optimizableVariable('SAMM',Model.SAMM_Range,'Type','real');
-            SAXX = optimizableVariable('SAXX',Model.SAXX_Range,'Type','real');
-            SAMX = optimizableVariable('SAMX',Model.SAMX_Range,'Type','real');
+            SAMM = optimizableVariable('SAMM',[0.1 10],'Type','real');
+            SAXX = optimizableVariable('SAXX',[0.1 10],'Type','real');
+            SAMX = optimizableVariable('SAMX',[0.1 10],'Type','real');
             
             % Repulsive wall prefactors
-            SRMM = optimizableVariable('SRMM',Model.SRTFMM_Range,'Type','real');
-            SRXX = optimizableVariable('SRXX',Model.SRTFXX_Range,'Type','real');
-            SRMX = optimizableVariable('SRMX',Model.SRTFMX_Range,'Type','real');
+            SRMM = optimizableVariable('SRMM',[0.1 50],'Type','real');
+            SRXX = optimizableVariable('SRXX',[0.1 50],'Type','real');
+            SRMX = optimizableVariable('SRMX',[0.1 50],'Type','real');
             
             if Model.Fix_C8
                 params = [SD6MM,SD6XX,SD6MX];
@@ -66,21 +85,38 @@ function params = bayesopt_params(Model)
         SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
         
         if Model.SigmaEpsilon
-            % r_0
-            Sr0MM = optimizableVariable('r0_MM',Model.Sr0MM_Range,'Type','real'); % Units: nm
-            Sr0XX = optimizableVariable('r0_XX',Model.Sr0XX_Range,'Type','real'); % Units: nm
-            Sr0MX = optimizableVariable('r0_MX',Model.Sr0MX_Range,'Type','real'); % Units: nm
-            
-            % epsilon
-            SepsilonMM = optimizableVariable('epsilon_MM',Model.SepsMM_RangeBH,'Type','real'); % Units: kJ/mol
-            SepsilonXX = optimizableVariable('epsilon_XX',Model.SepsXX_RangeBH,'Type','real'); % Units: kJ/mol
-            SepsilonMX = optimizableVariable('epsilon_MX',Model.SepsMX_RangeBH,'Type','real'); % Units: kJ/mol
-            
-            % gamma
-            SgammaMM = optimizableVariable('gamma_MM',Model.SgamMM_RangeBH,'Type','real'); % Units: kJ/mol
-            SgammaXX = optimizableVariable('gamma_XX',Model.SgamXX_RangeBH,'Type','real'); % Units: kJ/mol
-            SgammaMX = optimizableVariable('gamma_MX',Model.SgamMX_RangeBH,'Type','real'); % Units: kJ/mol
-            
+            if Model.InnerRange % For BH model, inner range is when gamma is [0, 6]
+
+                % r_0
+                Sr0MM = optimizableVariable('r0_MM',[0 1],'Type','real'); % Units: nm
+                Sr0XX = optimizableVariable('r0_XX',[0 1],'Type','real'); % Units: nm
+                Sr0MX = optimizableVariable('r0_MX',[0 1],'Type','real'); % Units: nm
+
+                % epsilon
+                SepsilonMM = optimizableVariable('epsilon_MM',[1 1e13],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonXX = optimizableVariable('epsilon_XX',[1 1e13],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonMX = optimizableVariable('epsilon_MX',[1 1e13],'Type','real','Transform','log'); % Units: kJ/mol
+
+                % gamma
+                SgammaMM = optimizableVariable('gamma_MM',[0 6],'Type','real'); % Units: kJ/mol
+                SgammaXX = optimizableVariable('gamma_XX',[0 6],'Type','real'); % Units: kJ/mol
+                SgammaMX = optimizableVariable('gamma_MX',[0 6],'Type','real'); % Units: kJ/mol
+            else
+                % r_0
+                Sr0MM = optimizableVariable('r0_MM',[0.1 1],'Type','real'); % Units: nm
+                Sr0XX = optimizableVariable('r0_XX',[0.1 1],'Type','real'); % Units: nm
+                Sr0MX = optimizableVariable('r0_MX',[0.1 1],'Type','real'); % Units: nm
+
+                % epsilon
+                SepsilonMM = optimizableVariable('epsilon_MM',[0 400],'Type','real'); % Units: kJ/mol
+                SepsilonXX = optimizableVariable('epsilon_XX',[0 400],'Type','real'); % Units: kJ/mol
+                SepsilonMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
+
+                % gamma
+                SgammaMM = optimizableVariable('gamma_MM',[6 100],'Type','real'); % Units: kJ/mol
+                SgammaXX = optimizableVariable('gamma_XX',[6 100],'Type','real'); % Units: kJ/mol
+                SgammaMX = optimizableVariable('gamma_MX',[6 100],'Type','real'); % Units: kJ/mol
+            end
             if Model.Additivity
                 params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
             else
@@ -91,20 +127,20 @@ function params = bayesopt_params(Model)
                 params = [params,SQ];
             end
         else
-            SDMM = optimizableVariable('SDMM',Model.SDMM_Range,'Type','real');
-            SDXX = optimizableVariable('SDXX',Model.SDXX_Range,'Type','real');
-            SDMX = optimizableVariable('SDMX',Model.SDMX_Range,'Type','real');
+            SDMM = optimizableVariable('SDMM',[0 1000],'Type','real');
+            SDXX = optimizableVariable('SDXX',[0 40],'Type','real');
+            SDMX = optimizableVariable('SDMX',[0 40],'Type','real');
 
-            SRMM = optimizableVariable('SRMM',Model.SRMM_Range,'Type','real');
-            SRXX = optimizableVariable('SRXX',Model.SRXX_Range,'Type','real');
-            SRMX = optimizableVariable('SRMX',Model.SRMX_Range,'Type','real');
+            SRMM = optimizableVariable('SRMM',[0.1 50],'Type','real');
+            SRXX = optimizableVariable('SRXX',[0.1 50],'Type','real');
+            SRMX = optimizableVariable('SRMX',[0.1 50],'Type','real');
 
-            SDMM2= optimizableVariable('SDMM2',Model.SDMM2_Range,'Type','real');
+            SDMM2= optimizableVariable('SDMM2',[0 1000],'Type','real');
 
             % Alpha exponential parameters
-            SAMM = optimizableVariable('SAMM',Model.SAMM_Range,'Type','real');
-            SAXX = optimizableVariable('SAXX',Model.SAXX_Range,'Type','real');
-            SAMX = optimizableVariable('SAMX',Model.SAMX_Range,'Type','real');
+            SAMM = optimizableVariable('SAMM',[0.1 10],'Type','real');
+            SAXX = optimizableVariable('SAXX',[0.1 10],'Type','real');
+            SAMX = optimizableVariable('SAMX',[0.1 10],'Type','real');
 
             if Model.Additivity
                 params = [SDMM,SDXX,SRMM,SRXX];
@@ -127,26 +163,26 @@ function params = bayesopt_params(Model)
         
     else % JC models
         if Model.SigmaEpsilon
-            SDMM = optimizableVariable('sigma_MM',Model.SsigmaMM_Range,'Type','real'); % Units: nm
-            SDXX = optimizableVariable('sigma_XX',Model.SsigmaXX_Range,'Type','real'); % Units: nm
-            SDMX = optimizableVariable('sigma_MX',Model.SsigmaMX_Range,'Type','real'); % Units: nm
+            SDMM = optimizableVariable('sigma_MM',[0.05 1],'Type','real'); % Units: nm
+            SDXX = optimizableVariable('sigma_XX',[0.05 1],'Type','real'); % Units: nm
+            SDMX = optimizableVariable('sigma_MX',[0.05 1],'Type','real'); % Units: nm
             
-            SRMM = optimizableVariable('epsilon_MM',Model.SepsMM_RangeJC,'Type','real'); % Units: kJ/mol
-            SRXX = optimizableVariable('epsilon_XX',Model.SepsXX_RangeJC,'Type','real'); % Units: kJ/mol
-            SRMX = optimizableVariable('epsilon_MX',Model.SepsMX_RangeJC,'Type','real'); % Units: kJ/mol
+            SRMM = optimizableVariable('epsilon_MM',[0 400],'Type','real'); % Units: kJ/mol
+            SRXX = optimizableVariable('epsilon_XX',[0 400],'Type','real'); % Units: kJ/mol
+            SRMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
             
-            SDMM2= optimizableVariable('epsilon_MM2',Model.SepsMM2_RangeJC,'Type','real'); % Units: kJ/mol
+            SDMM2= optimizableVariable('epsilon_MM2',[0 1000],'Type','real'); % Units: kJ/mol
             
         else
-            SDMM = optimizableVariable('SDMM',Model.SDMM_Range,'Type','real');
-            SDXX = optimizableVariable('SDXX',Model.SDXX_Range,'Type','real');
-            SDMX = optimizableVariable('SDMX',Model.SDMX_Range,'Type','real');
+            SDMM = optimizableVariable('SDMM',[0 1000],'Type','real');
+            SDXX = optimizableVariable('SDXX',[0 40],'Type','real');
+            SDMX = optimizableVariable('SDMX',[0 40],'Type','real');
             
-            SRMM = optimizableVariable('SRMM',Model.SRMM_Range,'Type','real');
-            SRXX = optimizableVariable('SRXX',Model.SRXX_Range,'Type','real');
-            SRMX = optimizableVariable('SRMX',Model.SRMX_Range,'Type','real');
+            SRMM = optimizableVariable('SRMM',[0.1 50],'Type','real');
+            SRXX = optimizableVariable('SRXX',[0.1 50],'Type','real');
+            SRMX = optimizableVariable('SRMX',[0.1 50],'Type','real');
 
-            SDMM2= optimizableVariable('SDMM2',Model.SDMM2_Range,'Type','real');
+            SDMM2= optimizableVariable('SDMM2',[0 1000],'Type','real');
         end
         
         if Model.Fix_Charge

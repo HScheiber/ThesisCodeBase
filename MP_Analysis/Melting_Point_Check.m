@@ -373,11 +373,11 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             Melted = logical(PyOut{2});
             Froze_alt = logical(PyOut{6});
             IsNotComplete = ~Froze && ~Melted;
-            ext_idx = str2double(cpt_number{1}) + 1; % increment step
         catch
             IsNotComplete = true;
             Froze_alt = false;
         end
+        ext_idx = str2double(cpt_number{1}) + 1; % increment step
         
         if IsNotComplete && ~Froze_alt && errcode ~= 0
             
@@ -711,17 +711,17 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             Froze = logical(PyOut{1});
             Melted = logical(PyOut{2});
             Froze_alt = logical(PyOut{6});
-            
-            % Update and increment
             IsNotComplete = ~Froze && ~Melted;
-            CheckPoint_File = Checkpoint_File_idx;
-            Structure_Out_File = Structure_Out_File_idx;
-            Traj_Conf_File = Traj_Conf_File_idx;
-            ext_idx = ext_idx+1;
+
         catch
             IsNotComplete = true;
             Froze_alt = false;
         end
+        % Update and increment
+        CheckPoint_File = Checkpoint_File_idx;
+        Structure_Out_File = Structure_Out_File_idx;
+        Traj_Conf_File = Traj_Conf_File_idx;
+        ext_idx = ext_idx+1;
         
 %         % Delete previous cpt and tpr files
 %         if Settings.Delete_Backups
@@ -801,7 +801,8 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         'ML_TimeStep',0,...
         'T_Ref',T_dat.T_ref,...
         'T',T,...
-        'TimePerFrame',10));
+        'TimePerFrame',10,...
+        'SaveTrajectoryAux',2));
     if Settings.Verbose
         disp(['Completed trajectory check. Time elapsed: ' ...
             datestr(seconds(toc(CheckStructureTimer)),'HH:MM:SS')])

@@ -2,10 +2,10 @@
 
 %% Analysis Parameters
 fs = 24;
-Salt = 'LiI';
-Theory = 'JC';
-Basenum = 'J';
-Midnum = 'C';
+Salt = 'NaCl';
+Theory = 'BH';
+Basenum = 'K';
+Midnum = 'A';
 min_iter = 1; % Set the first iterations to show, set to 1 for all numbers
 max_iter = Inf; % Set the max to show, set to Inf for all numbers
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
@@ -168,7 +168,7 @@ for idx = 1:N_Plots
     end
     
     title(axobj, titles{idx},'Fontsize',fs,'Interpreter','latex')
-    ylabel(axobj, yaxislabel{idx},'Fontsize',fs-4,'Interpreter','latex')
+    %ylabel(axobj, yaxislabel{idx},'Fontsize',fs-4,'Interpreter','latex')
 end
 
 xlabel(axobj, 'Optimization Iteration','Fontsize',fs,'Interpreter','latex')
@@ -230,6 +230,13 @@ function output = param_name_map(p_name,Salt)
             output = ['$\epsilon$[' Halide '-' Halide '] [kJ mol$^{-1}$]'];
         case 'epsilon_MX'
             output = ['$\epsilon$[' Metal '-' Halide '] [kJ mol$^{-1}$]'];
+            
+        case 'sigma_MM'
+            output = ['$\sigma$[' Metal '-' Metal '] [nm]'];
+        case 'sigma_XX'
+            output = ['$\sigma$[' Halide '-' Halide '] [nm]'];
+        case 'sigma_MX'
+            output = ['$\sigma$[' Metal '-' Halide '] [nm]'];
             
         otherwise
             output = p_name;

@@ -189,9 +189,9 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'D:\Example_Nucleations\LiI\ExampleNuc_L_TF_NPT'
-Salt = 'LiI'
-SystemName = 'ExampleNuc_L_TF_NPT'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\Test_MP'
+Salt = 'NaCl'
+SystemName = 'Test_MP'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
@@ -199,11 +199,11 @@ SavePredictions=False
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=1000
+TimePerFrame=10
 FileType='gro'
 Verbose=True
-StartPoint = 19400
-EndPoint = 20400
+StartPoint = None
+EndPoint = None
 Version = 2
 SaveDir = None
 InMemory = False
@@ -215,8 +215,8 @@ Spatial_Reassignment = False
 Spatial_Interfacial = None
 SaveTrajectoryAux = 2
 LoadFeatures = True
-T = None
-T_Ref = None
+T = 1275.1680
+T_Ref = 1275.1680
 RefChangeThreshold = 0.25
 CheckFullTrajectory = True
 
