@@ -85,6 +85,7 @@ Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immedi
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Shared_Settings.Verbose = false;
 Shared_Settings.SigmaEpsilon = true;
+Shared_Settings.InnerRange = true; % Sets domain of BH/TF
 
 % Shared job settings
 Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
@@ -193,6 +194,7 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = []; % Domain decomposition
+        Shared_Settings.InnerRange = true; % Sets domain of BH
         
         %% JC/BH Models: LA LB LC
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' };
@@ -291,6 +293,7 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = []; % Domain decomposition
+        Shared_Settings.InnerRange = false; % Sets domain of BH
         
         %% NaCl - TF Model: KB and KF
         Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
@@ -360,6 +363,7 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = []; % Domain decomposition
+        Shared_Settings.InnerRange = true; % Sets domain of BH
         
         %% NaCl - JC/BH Models: KA, KB, KC, KD, KE on NaCl
         Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
@@ -464,7 +468,6 @@ switch lower(computer)
             end
         end
         
-        
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 200;
         Shared_Settings.Max_Secondary_Iterations = 100;
@@ -479,6 +482,8 @@ switch lower(computer)
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
         Shared_Settings.JobSettings.dd = []; % Domain decomposition
+        Shared_Settings.InnerRange = true; % Sets domain of BH
+        
         %% LiX - JC/BH Models: KA, KE
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' };
         Theories = {'JC' 'BH'};

@@ -1,6 +1,9 @@
 function params = bayesopt_params(Model)
-
+    
     if strcmp(Model.Theory,'TF')
+        if ~isfield(Model,'InnerRange')
+            Model.InnerRange = true;
+        end
         SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
         
         if Model.SigmaEpsilon
@@ -82,6 +85,9 @@ function params = bayesopt_params(Model)
         end
         
     elseif strcmp(Model.Theory,'BH')
+        if ~isfield(Model,'InnerRange')
+            Model.InnerRange = false;
+        end
         SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
         
         if Model.SigmaEpsilon
