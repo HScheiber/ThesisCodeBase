@@ -2,8 +2,8 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'NaCl'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BH';
-ModelID = 'KB';
-Reps = [1:5];
+ModelID = 'KE';
+Reps = [1:2 4:5];
 savefile = true; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures';
 
