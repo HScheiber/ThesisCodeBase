@@ -199,6 +199,16 @@ if strcmp(Settings.Theory,'TF')
             gamma_MX = Param(9); % Unitless
             pidx = 9;
         end
+        
+        if gamma_MX > 48/7
+            epsilon_MX = -epsilon_MX;
+        end
+        if gamma_MM > 48/7
+            epsilon_MM = -epsilon_MM;
+        end
+        if gamma_XX > 48/7
+            epsilon_XX = -epsilon_XX;
+        end
 
         % Convert to Condensed form
         alpha_MM = gamma_MM/r0_MM;
@@ -360,6 +370,16 @@ elseif strcmp(Settings.Theory,'BH') % Buckingham model
             gamma_XX = Param(8); % Unitless
             gamma_MX = Param(9); % Unitless
             pidx = 9;
+        end
+        
+        if gamma_MX < 6
+            epsilon_MX = -epsilon_MX;
+        end
+        if gamma_MM < 6
+            epsilon_MM = -epsilon_MM;
+        end
+        if gamma_XX < 6
+            epsilon_XX = -epsilon_XX;
         end
 
         % Convert to Condensed form

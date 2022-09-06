@@ -1029,6 +1029,16 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 pidx = 9;
             end
             
+            if gamma_MX > 48/7
+                epsilon_MX = -epsilon_MX;
+            end
+            if gamma_MM > 48/7
+                epsilon_MM = -epsilon_MM;
+            end
+            if gamma_XX > 48/7
+                epsilon_XX = -epsilon_XX;
+            end
+            
             % Convert to Condensed form
             alpha_MM = gamma_MM/r0_MM;
             alpha_XX = gamma_XX/r0_XX;
@@ -1184,6 +1194,16 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 gamma_XX = full_opt_point(8); % Unitless
                 gamma_MX = full_opt_point(9); % Unitless
                 pidx = 9;
+            end
+            
+            if gamma_MX < 6
+                epsilon_MX = -epsilon_MX;
+            end
+            if gamma_MM < 6
+                epsilon_MM = -epsilon_MM;
+            end
+            if gamma_XX < 6
+                epsilon_XX = -epsilon_XX;
             end
             
             % Convert to Condensed form

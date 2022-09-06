@@ -151,7 +151,8 @@ idx = 0;
 
 %% Test Model Particular parameter
 Settings.Salt = 'NaCl';
-Settings.Theory = 'BH';
+Settings.Theory = 'JC';
+Settings.InnerRange = false;
 Settings.Trial_ID = 'XX1';
 
 % [T = 0] Loss options

@@ -11,76 +11,16 @@ Settings.Restart_Calculation = true; % restart the calculation from where it lef
 Settings.Fix_Charge = false; % When true, fixes coulombic charges at 1
 Settings.Additivity = false; % Only applies to JC model. When true, use combining rules
 Settings.Additional_MM_Disp = false; % When Additivity is activated with the JC model, tacks on an additional non-additive metal-metal interaction
-Settings.SigmaEpsilon = false; % For the JC model, recasts the search space in terms of sigma/epsilon rather than dispersion/repulsion
+Settings.SigmaEpsilon = false; % For all models, recasts the search space in terms of sigma/epsilon rather than dispersion/repulsion
+Settings.InnerRange = false; % When SigmaEpislon is on, use this to set the TF/BH inner gamma range vs outer gamma range
 Settings.Additional_Function = Init_Additional_Function; % Adding additional function options
 Settings.Fix_Alpha = false; % Active for TF and BH models only when NOT using SigmaEpsilon form. When active, the value of exponential repulsion parameter, which is related to compressibility, is fixed to its default
 Settings.Fix_C8 = false; % Active for TF model only when NOT using SigmaEpsilon form. When active, the value of C8 is fixed by the value of C6, and is no longer a free parameter
 Settings.Diary_Loc = '';
 
-% Parameter Ranges
-% Dispersion scaling mode
-Settings.SDMM_Range = [0 1000]; % Default range for MM dispersion scaling in JC model.
-Settings.SDXX_Range = [0 40]; % Default range for XX dispersion scaling in JC/BH model.
-Settings.SDMX_Range = [0 40]; % Default range for MX dispersion scaling in JC/BH model.
-Settings.SDMM2_Range = [0 1000]; % Default range for MM dispersion scaling in JC model. Only used when Additional_MM_Disp = true
-
-Settings.SD6MM_Range = [0 1000]; % Default range for C6 MM dispersion scaling in TF model.
-Settings.SD6XX_Range = [0 10]; % Default range for C6 XX dispersion scaling in TF model.
-Settings.SD6MX_Range = [0 100]; % Default range for C6 MX dispersion scaling in TF model.
-
-Settings.SD8MM_Range = [0 1000]; % Default range for C8 MM dispersion scaling in TF model.
-Settings.SD8XX_Range = [0 20]; % Default range for C8 XX dispersion scaling in TF model.
-Settings.SD8MX_Range = [0 200]; % Default range for C8 MX dispersion scaling in TF model.
-
-Settings.SRTFMM_Range = [0.1 500]; % Default range for MM repulsive prefactor scaling in TF model.
-Settings.SRTFXX_Range = [0.1 20]; % Default range for XX repulsive prefactor scaling in TF model.
-Settings.SRTFMX_Range = [0.1 20]; % Default range for MX repulsive prefactor scaling in TF model.
-
-Settings.SAMM_Range = [0.1 10]; % Default range for MM repulsive exponent scaling in TF model.
-Settings.SAXX_Range = [0.1 5]; % Default range for XX repulsive exponent scaling in TF model.
-Settings.SAMX_Range = [0.1 5]; % Default range for MX repulsive prefactor scaling in TF model.
-
-Settings.SRMM_Range = [0.1 50]; % Default range for MM repulsive prefactor scaling in JC/BH model.
-Settings.SRXX_Range = [0.1 50]; % Default range for XX repulsive prefactor scaling in JC/BH model.
-Settings.SRMX_Range = [0.1 50]; % Default range for MX repulsive prefactor scaling in JC/BH model.
-
-% Exp-C6 or Exp-C6-C8: "sigma-epsilon" version parameters
-% BH / TF models
-Settings.Sr0MM_Range = [0.1 0.5];  % [nm] Default range for MM r0 parameter (TF/BH)
-Settings.Sr0XX_Range = [0.1 0.8]; % [nm] Default range for XX r0 parameter (TF/BH)
-Settings.Sr0MX_Range = [0.1 0.8]; % [nm] Default range for MX r0 parameter (TF/BH)
-
-Settings.SepsMM_Range = [1e-4 1e12]; % [kJ/mol] Default range for MM epsilon parameter in TF models
-Settings.SepsXX_Range = [1e-4 1e12]; % [kJ/mol] Default range for XX epsilon parameter in TF models
-Settings.SepsMX_Range = [1e-4 1e12]; % [kJ/mol] Default range for MX epsilon parameter in TF models
-Settings.SepsMM_RangeBH = [0 400]; % [kJ/mol] Default range for MM epsilon parameter in BH models
-Settings.SepsXX_RangeBH = [0 400]; % [kJ/mol] Default range for XX epsilon parameter in BH models
-Settings.SepsMX_RangeBH = [0 400]; % [kJ/mol] Default range for MX epsilon parameter in BH models
-
-% for TF model, gamma must remain in region bounded by (0,48/7] to remain valid
-% Large values of gamma increase well depth
-Settings.SgamMM_Range = [0.09 6]; % [Unitless] Default range for MM gamma parameter in TF models
-Settings.SgamXX_Range = [0.09 6]; % [Unitless] Default range for XX gamma parameter in TF models
-Settings.SgamMX_Range = [0.09 6]; % [Unitless] Default range for MX gamma parameter in TF models
-% for BH model, gamma must remain in region bounded by [6 Inf] to remain valid
-Settings.SgamMM_RangeBH = [6 30]; % [Unitless] Default range for MM gamma parameter in BH models
-Settings.SgamXX_RangeBH = [6 30]; % [Unitless] Default range for XX gamma parameter in BH models
-Settings.SgamMX_RangeBH = [6 30]; % [Unitless] Default range for MX gamma parameter in BH models
-
-% JC model
-Settings.SsigmaMM_Range = [0.1 0.5];  % [nm] Default range for MM sigma parameter
-Settings.SsigmaXX_Range = [0.1 0.8]; % [nm] Default range for XX sigma parameter
-Settings.SsigmaMX_Range = [0.1 0.8]; % [nm] Default range for MX sigma parameter
-
-Settings.SepsMM_RangeJC = [0 400]; % [kJ/mol] Default range for MM epsilon parameter
-Settings.SepsXX_RangeJC = [0 400]; % [kJ/mol] Default range for XX epsilon parameter
-Settings.SepsMX_RangeJC = [0 400]; % [kJ/mol] Default range for MX epsilon parameter
-Settings.SepsMM2_RangeJC = [0 1000]; % [kJ/mol] Default range for extra MM epsilon parameter, if enabled
-
 % Charge
 Settings.Q_Range = [0.95 1.05]; % Default range for charge scaling. Only meaningful when Fix_Charge = false
 Settings.Q_value = 1.0; % Default value for the charge scale. Only meaningful when Fix_Charge = true
-
 
 % Additional_GAdjust options: 'MM' 'MX' 'XX'
 % Introduces additional inverted Gaussians with 3 additional parameters each. 
@@ -113,6 +53,8 @@ Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a 
 Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
 Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
+Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
+Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
 Settings.BadFcnLossPenalty = 1000; % Penalty to give when (1) the function shape is deemed pathological or (2) the optimized crystal volume is too small or large
 Settings.MinSkipLoss = 2; % Minimum loss value required before skipping further computation
 

@@ -42,6 +42,16 @@ if istable(Param) || isstruct(Param)
                 gamma_XX = Param.gamma_XX; % Unitless
             end
             
+            if gamma_MX > 48/7
+                epsilon_MX = -epsilon_MX;
+            end
+            if gamma_MM > 48/7
+                epsilon_MM = -epsilon_MM;
+            end
+            if gamma_XX > 48/7
+                epsilon_XX = -epsilon_XX;
+            end
+            
             % Convert to Condensed form
             alpha_MM = gamma_MM/r0_MM;
             alpha_XX = gamma_XX/r0_XX;
@@ -182,6 +192,16 @@ if istable(Param) || isstruct(Param)
                 epsilon_MX = Param.epsilon_MX; % kJ/mol
                 gamma_MM = Param.gamma_MM; % Unitless
                 gamma_XX = Param.gamma_XX; % Unitless
+            end
+            
+            if gamma_MX < 6
+                epsilon_MX = -epsilon_MX;
+            end
+            if gamma_MM < 6
+                epsilon_MM = -epsilon_MM;
+            end
+            if gamma_XX < 6
+                epsilon_XX = -epsilon_XX;
             end
             
             % Convert to Condensed form
@@ -429,6 +449,16 @@ else
                 pidx = 9;
             end
             
+            if gamma_MX > 48/7
+                epsilon_MX = -epsilon_MX;
+            end
+            if gamma_MM > 48/7
+                epsilon_MM = -epsilon_MM;
+            end
+            if gamma_XX > 48/7
+                epsilon_XX = -epsilon_XX;
+            end
+            
             % Convert to Condensed form
             alpha_MM = gamma_MM/r0_MM;
             alpha_XX = gamma_XX/r0_XX;
@@ -583,6 +613,16 @@ else
                 gamma_XX = Param(8); % Unitless
                 gamma_MX = Param(9); % Unitless
                 pidx = 9;
+            end
+            
+            if gamma_MX < 6
+                epsilon_MX = -epsilon_MX;
+            end
+            if gamma_MM < 6
+                epsilon_MM = -epsilon_MM;
+            end
+            if gamma_XX < 6
+                epsilon_XX = -epsilon_XX;
             end
             
             % Convert to Condensed form
