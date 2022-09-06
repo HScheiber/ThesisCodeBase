@@ -3,6 +3,11 @@ function tf = LiX_Constraint_Fcn(Settings,Param)
 Settings.Table_Length = 10; % nm
 Settings.Table_StepSize = 0.01;
 
+if ~isfield(Settings,'MaxMXWellR')
+    Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
+    Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
+end
+
 % Conversion factors
 Bohr_nm = 0.0529177; % a_0 - > Angstrom
 c6conv = 1e-3/2625.4999/((0.052917726)^6); % J/mol nm^6 - > au (from sourcecode)
