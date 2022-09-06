@@ -566,7 +566,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         if SaveTrajectoryAux > 0:
             Certainty_ts = np.split(np.amax(predicted_prob, axis=1,keepdims=True), num_traj_starts, axis=0)
             Probs_ts = np.split(predicted_prob, num_traj_starts, axis=0)
-            aux_dat = np.concatenate((Certainty_ts,Probs_ts), axis=2)[:,:,0:SaveTrajectoryAux]
+            aux_dat = np.concatenate((Certainty_ts,Probs_ts), axis=2)[:,:,0:int(SaveTrajectoryAux)]
         else:
             aux_dat = [None] * num_traj_starts
         
