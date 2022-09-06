@@ -1,8 +1,8 @@
 clear; %#ok<*UNRCH>
 %% Data options
-Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
+Salts = {'NaCl'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BH';
-ModelID = 'LA';
+ModelID = 'KB';
 Reps = [1:5];
 savefile = true; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures';
@@ -36,7 +36,7 @@ MinPlotIdxes = [plot_LE plot_RLE plot_a plot_c plot_ac plot_volume plot_density]
 MinPlotTypes = MinPlotTypes(MinPlotIdxes);
 FiniteTTypes = {'MP' 'dH' 'dV' 'LiqV' 'SolV' 'DM'};
 MP_Titles = {'MP Er.' '$\Delta H_{\mathrm{Fus.}}$ Er.' '$\Delta V_{\mathrm{Fus.}}$ Er.' ...
-    '$V_{\mathrm{Liq.}}$($T_{m}$) Er.' '$V_{\mathrm{Sol.}}$($T_{m}$) Er.' 'D$_{\mathrm{Li}}$($T_{m}$) Er.'};
+    '$V_{\mathrm{Liq.}}$($T_{m}$) Er.' '$V_{\mathrm{Sol.}}$($T_{m}$) Er.' 'D$_{\mathrm{M}^{+}}$($T_{m}$) Er.'};
 FT_Loss_Names = {'MP' 'Fusion_Enthalpy' 'MP_Volume_Change' 'Liquid_MP_Volume' 'Solid_MP_Volume' 'Liquid_DM_MP'};
 
 if show_as_percent_error
@@ -392,9 +392,14 @@ end
 % Gen figure
 figh = figure('WindowState','maximized','NumberTitle','off',...
     'Name','','Visible','On');
-mainpanelh = uipanel(figh,'BorderType','none',...
-    'Position',[0 0 1 1]);
-
+switch Theory
+    case 'JC'
+        PubTheoryName = 'CLJ';
+    case 'BH'
+        PubTheoryName = 'CBH';
+    case 'TF'
+        PubTheoryName = 'CBHM';
+end
 
 if N_Salts > 1
     % Generate plotting panels
@@ -402,9 +407,10 @@ if N_Salts > 1
     row_height = 1/N_Rows;
     MinPlot_Frac = N_MinPlot_Rows/N_Rows;
     if plot_loss
-        loss_panel = uipanel(mainpanelh,'FontSize',fs,...
+        loss_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
-            'Position',[0 1-row_height 1 row_height]); % [left bottom width height]
+            'Position',[0 1-row_height 1 row_height],...
+            'AutoResizeChildren','off'); % [left bottom width height]
         FTdrop = row_height;
         axobj_loss = gobjects(N_Salts,1);
 
@@ -441,7 +447,7 @@ if N_Salts > 1
             xticklabels(axobj_loss(idx),[])
             axobj_loss(idx).XAxis.TickLength = [0,0];
             ylim(axobj_loss(idx),'padded')
-            sgtitle(loss_panel,['Minimized Objective Function: ' Theory ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
+            sgtitle(loss_panel,['Minimized Objective Function: ' PubTheoryName ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
                 'Fontsize',fs-2,'Interpreter','latex')
 %             if idx == 1
 %                 ylabel(axobj_loss(idx), '$f(\mathbf{x}_{0})$','Fontsize',fs,'Interpreter','latex')
@@ -457,9 +463,10 @@ if N_Salts > 1
     end
 
     if plot_finite_T_data
-        finite_T_panel = uipanel(mainpanelh,'FontSize',fs,...
+        finite_T_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
-            'Position',[0 1-row_height-FTdrop 1 row_height]); % [left bottom width height]
+            'Position',[0 1-row_height-FTdrop 1 row_height],...
+            'AutoResizeChildren','off'); % [left bottom width height]
         axobj_ft = gobjects(N_FiniteTTypes,1);
 
         ww0 = 1 - 0.05;
@@ -512,9 +519,10 @@ if N_Salts > 1
     end
 
     if N_MinPlot_Rows > 0
-        min_panel = uipanel(mainpanelh,'FontSize',fs,...
+        min_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
-            'Position',[0 0 1 MinPlot_Frac]); % [left bottom width height]
+            'Position',[0 0 1 MinPlot_Frac],...
+            'AutoResizeChildren','off'); % [left bottom width height]
 
         % Some widths and heights
         bbz = 1 - bbbuffer;
@@ -619,9 +627,10 @@ else
     row_height = 1/N_Rows;
     MinPlot_Frac = N_MinPlot_Rows/N_Rows;
     if plot_loss
-        loss_panel = uipanel(mainpanelh,'FontSize',fs,...
+        loss_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
-            'Position',[0 1-row_height 1 row_height]); % [left bottom width height]
+            'Position',[0 1-row_height 1 row_height],...
+            'AutoResizeChildren','off'); % [left bottom width height]
         FTdrop = row_height;
         
         axobj_loss = subplot('Position',[0.1 0.05 0.8 0.65],...
@@ -644,9 +653,9 @@ else
         xticklabels(axobj_loss,[])
         axobj_loss.XAxis.TickLength = [0,0];
         ylim(axobj_loss,'padded')
-        sgtitle(loss_panel,['Minimized Objective Function: ' Theory ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
+        sgtitle(loss_panel,['Minimized Objective Function: ' Salts{1} ' ' PubTheoryName ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
             'Fontsize',fs,'Interpreter','latex')
-        ylabel(axobj_loss, '$f(\mathbf{x})$','Fontsize',fs,'Interpreter','latex')
+        ylabel(axobj_loss, '$f(\mathbf{x}_{0})$','Fontsize',fs,'Interpreter','latex')
         xlim(axobj_loss,[0 N_Models+1])
         set(axobj_loss, 'YTickMode', 'auto')
         set(axobj_loss,'xminorgrid','off','yminorgrid','on')
@@ -655,9 +664,10 @@ else
     end
 
     if plot_finite_T_data
-        finite_T_panel = uipanel(mainpanelh,'FontSize',fs,...
+        finite_T_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
-            'Position',[0 1-row_height-FTdrop 1 row_height]); % [left bottom width height]
+            'Position',[0 1-row_height-FTdrop 1 row_height],...
+            'AutoResizeChildren','off'); % [left bottom width height]
         axobj_ft = gobjects(N_FiniteTTypes,1);
 
         ww0 = 1 - 0.05;
@@ -709,9 +719,10 @@ else
     end
 
     if N_MinPlot_Rows > 0
-        min_panel = uipanel(mainpanelh,'FontSize',fs,...
+        min_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
-            'Position',[0 0 1 MinPlot_Frac]); % [left bottom width height]
+            'Position',[0 0 1 MinPlot_Frac],...
+            'AutoResizeChildren','off'); % [left bottom width height]
 
         % Some widths and heights
         bbbuffer = 0.08;
@@ -800,9 +811,20 @@ else
 end
 
 if savefile
-    filename = ['Model_Overview_' Theory '_Model_' ModelID '.pdf'];
+    
     %set(mainpanelh,'renderer','opengl')
     %saveas(figh,filename,'pdf')
     %print(mainpanelh,filename,'-bestfit')
-    exportgraphics(mainpanelh,fullfile(saveloc,filename))
+%    exportgraphics(mainpanelh,fullfile(saveloc,filename))
+    
+%     figh.PaperPositionMode='manual';
+%     figh.PaperUnits ='normalized';
+%     figh.PaperPosition = [0 0 1 1];
+%     exportgraphics(mainpanelh,filename)
+    %exportapp(figh,filename)
+    filename = ['Model_Overview_' Theory '_Model_' ModelID '.eps'];
+    %hgexport(figh,fullfile(saveloc,filename))
+    print(figh,fullfile(saveloc,filename),'-deps','-noui')
+    filename = ['Model_Overview_' Theory '_Model_' ModelID '.png'];
+    print(figh,fullfile(saveloc,filename),'-dpng','-r0','-noui')
 end

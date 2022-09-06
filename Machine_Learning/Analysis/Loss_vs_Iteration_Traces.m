@@ -3,7 +3,7 @@
 %% Analysis Parameters
 fs = 24;
 Salt = 'NaCl';
-Theory = 'JC';
+Theory = 'BH';
 Basenum = 'K';
 Midnum = 'A';
 min_iter = 1; % Set the first iterations to show, set to 1 for all numbers
