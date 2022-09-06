@@ -151,20 +151,20 @@ idx = 0;
 
 %% Test Model Particular parameter
 Settings.Salt = 'NaCl';
-Settings.Theory = 'JC';
-Settings.InnerRange = false;
+Settings.Theory = 'BH';
+Settings.InnerRange = true;
 Settings.Trial_ID = 'XX1';
 
 % [T = 0] Loss options
 Settings.Loss_Options.Rocksalt.LE = 1;
-% Settings.Loss_Options.Rocksalt.a = 1;
-% Settings.Loss_Options.Wurtzite.RLE = 1;
+Settings.Loss_Options.Rocksalt.a = 1;
+Settings.Loss_Options.Wurtzite.RLE = 1;
 
 % [T = Tm] loss options
 Settings.Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-Settings.Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
-Settings.Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
-Settings.Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+%Settings.Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+%Settings.Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+%Settings.Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
 Settings.Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
 %            Settings.Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
 
