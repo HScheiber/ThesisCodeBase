@@ -49,9 +49,7 @@ else
     end
 end
 
-Input_File = fullfile(Settings.WorkDir,'Calc_Input.mat');
 Output_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
-
 if isfile(Output_File)
     try
         Output = load(Output_File).Output;
@@ -66,6 +64,8 @@ if isfile(Output_File)
         delete(Output_File);
     end
 end
+Input_File = fullfile(Settings.WorkDir,'Calc_Input.mat');
+save(Input_File,'Settings');
 
 if isfield(Settings,'Parallel_LiX_Minimizer') && Settings.Parallel_LiX_Minimizer
     gmx_serial = true;
@@ -748,7 +748,6 @@ if Scratch_output_files
                 end
         end
     end
-    save(Input_File,'Settings');
     save(Output_File,'Output');
     diary off
     if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
