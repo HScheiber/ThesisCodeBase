@@ -1096,6 +1096,13 @@ if Settings.CheckBadFcn
             % This should never be reached...
             warning('Possible issue with the potential!')
         end
+        
+        if any(U.Total >= Settings.MinExpWallHeight)
+            r_above = U.r(U.Total >= Settings.MinExpWallHeight);
+            r_wall = r_above(end);
+            Loss_add = Loss_add + max(r_wall - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % wall too far
+            Loss_add = Loss_add + max((Settings.MinMXWellR/10) - r_wall,0).*Settings.BadFcnLossPenalty; % wall too close
+        end
     end
 end
 
