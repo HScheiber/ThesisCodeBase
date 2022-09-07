@@ -46,11 +46,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     if Model.UseCoupledConstraint
         NumCC = 1;
-        if Finite_T_Calc
-            CCDet = false;
-        else
-            CCDet = true;
-        end
+        CCDet = true;
     else
         NumCC = 0;
         CCDet = [];
