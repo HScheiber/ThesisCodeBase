@@ -36,6 +36,10 @@ function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varar
 if ~isfield(Settings,'UseCoupledConstraint')
     Settings.UseCoupledConstraint = false;
 end
+if ~isfield(Settings,'MaxMXWellR')
+    Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
+    Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
+end
 
 if Settings.UseCoupledConstraint
     coupledconstraints = -1;
