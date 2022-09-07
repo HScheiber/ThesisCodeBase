@@ -913,7 +913,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             
             % Catch errors in grompp
             if state ~= 0
-                grompp_output = readfile(GrompLog_File);
+                grompp_output = fileread(GrompLog_File);
                 
                 if ~isempty(regexp(grompp_output,'[box|cell] size','match','once'))
                     if Settings.Verbose

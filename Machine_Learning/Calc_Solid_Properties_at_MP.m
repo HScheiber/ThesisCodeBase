@@ -585,6 +585,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     if Settings.Verbose
         disp('*** Equilibration of Solid Complete ***')
     end
+    cleanup_folder(Settings,Output_File,Output)
     
     % Clean up the calculation directory
     % Get a list of all files in this folder.
