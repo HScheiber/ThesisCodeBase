@@ -62,8 +62,20 @@ if Settings.Parallel_LiX_Minimizer && Settings.Parallel_Struct_Min
     Settings.Parallel_Struct_Min = false;
 end
 
+Settings.Minimization_Data = Initialize_Minimization_Data(Settings);
+Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
+
+
+
 % Potential Scaling
 if istable(Param) || isstruct(Param)
+    if any(isinf(Param{:,:}))
+        Loss = nan;
+        UserData.Finite_T_Data = Settings.Finite_T_Data;
+        UserData.Minimization_Data = Settings.Minimization_Data;
+        return
+    end
+    
     if strcmp(Settings.Theory,'TF')
         
         % Loose form of exp-C6-C8 model
@@ -462,6 +474,13 @@ if istable(Param) || isstruct(Param)
     
 % When not in table form
 else
+    if any(isinf(Param(:)))
+        Loss = nan;
+        UserData.Finite_T_Data = Settings.Finite_T_Data;
+        UserData.Minimization_Data = Settings.Minimization_Data;
+        return
+    end
+    
     if strcmp(Settings.Theory,'TF')
         
         % Loose form of exp-C6-C8 model
@@ -985,12 +1004,9 @@ else
     
 end
 
-Settings.Minimization_Data = Initialize_Minimization_Data(Settings);
-Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
-
 % Calculate loss due to infeasible TF / BH models with no well minima (only works reliably in sigma-epsilon form)
 Loss_add = 0;
-if Settings.CheckBadFcn
+if Settings.CheckBadFcn  
     tl = Settings.Table_Length;
     ss = Settings.Table_StepSize;
     Settings.Table_Length = 10; % nm

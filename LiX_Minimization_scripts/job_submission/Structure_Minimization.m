@@ -569,8 +569,6 @@ fun = @(x)Calculate_Crystal_Energy(x,Settings);
 conv_fun = @(x,optimValues,state)check_conv(x,optimValues,state,...
     Settings.MinMDP.E_Unphys);
 
-
-
 if strcmp(Settings.Theory,'HS')
 %        Use a gradient-free approach for HS model due to the discontinuity
     optionsNM = optimset('Display',display_option,'MaxIter',Settings.MinMDP.MaxCycles,...
