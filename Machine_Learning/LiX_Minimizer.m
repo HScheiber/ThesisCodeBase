@@ -1097,6 +1097,7 @@ if Settings.CheckBadFcn
             warning('Possible issue with the potential!')
         end
         
+        % Check that the repulsive wall is not too far out or close in
         if any(U.Total >= Settings.MinExpWallHeight)
             r_above = U.r(U.Total >= Settings.MinExpWallHeight);
             r_wall = r_above(end);
