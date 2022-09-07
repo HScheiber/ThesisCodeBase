@@ -701,12 +701,167 @@ switch lower(computer)
         
     case 'graham'
         %% Shared_Settings
-        Shared_Settings.Max_Bayesian_Iterations = 100;
-        Shared_Settings.Max_Secondary_Iterations = 20;
-        Shared_Settings.Max_Local_Iterations = 10;
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Max_Bayesian_Iterations = 600;
+        Shared_Settings.Max_Secondary_Iterations = 200;
+        Shared_Settings.Max_Local_Iterations = 1000;
+        Shared_Settings.switch_final_opt = true;
+        Shared_Settings.Parallel_Bayesopt = true;
+        Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.UseCoupledConstraint = true;
+        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Shared_Settings.InnerRange = true; % Sets domain of BH
+        
+        %% BH Models: NA NB NC ND NE NF NG (inner range - targets on crystals)
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+        Theories = {'BH'};
+        Replicates = 1:5;
+        for tidx = 1:length(Theories)
+            Theory = Theories{tidx};
+            for sidx = 1:length(Salts)
+                Salt = Salts{sidx};
+
+                % Set initial MP temperature
+                Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+                for ridx = 1:length(Replicates)
+                    Rep = num2str(Replicates(ridx));
+
+                    %% Model NA
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['NA' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model NB
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['NB' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model NC
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['NC' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = false;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model ND
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['ND' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = false;
+                    
+                    
+                    %% Model NE
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['NE' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    Models(idx).Loss_Options.NiAs.RLE  = 1;
+                    Models(idx).Loss_Options.AntiNiAs.RLE  = 1;
+                    Models(idx).Loss_Options.BetaBeO.RLE  = 1;
+                    Models(idx).Loss_Options.Sphalerite.RLE  = 1;
+                    Models(idx).Loss_Options.FiveFive.RLE  = 1;
+                    Models(idx).Loss_Options.CsCl.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model NF
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['NF' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    Models(idx).Loss_Options.NiAs.RLE  = 1;
+                    Models(idx).Loss_Options.AntiNiAs.RLE  = 1;
+                    Models(idx).Loss_Options.BetaBeO.RLE  = 1;
+                    Models(idx).Loss_Options.Sphalerite.RLE  = 1;
+                    Models(idx).Loss_Options.FiveFive.RLE  = 1;
+                    Models(idx).Loss_Options.CsCl.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = false;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model NG
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['NG' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    Models(idx).Loss_Options.NiAs.RLE  = 1;
+                    Models(idx).Loss_Options.AntiNiAs.RLE  = 1;
+                    Models(idx).Loss_Options.BetaBeO.RLE  = 1;
+                    Models(idx).Loss_Options.Sphalerite.RLE  = 1;
+                    Models(idx).Loss_Options.FiveFive.RLE  = 1;
+                    Models(idx).Loss_Options.CsCl.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = false;
+                end
+            end
+        end
         
     otherwise % Place jobs here for later assignment
         %% Shared_Settings
