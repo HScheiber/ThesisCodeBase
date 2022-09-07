@@ -443,7 +443,7 @@ for j = 1:2
     % two peaks are visible implies one valley in between them: 
     % Penalize any model with a non-zero well depth greater than Settings.MaxRepWellDepth
     U_jj_tpov_set = U.(jj)(tpov_idx,:);
-    sp_idx = length(U.r) - sum( cumprod(fliplr(peaks_idx(tpov_idx,:)) == 0, 2), 2); % second peak
+    sp_idx = size(U.r,2) - sum( cumprod(fliplr(peaks_idx(tpov_idx,:)) == 0, 2), 2); % second peak
     spl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(sp_idx)).',sp_idx);
     fp_idx = sum( cumprod(peaks_idx(tpov_idx,:) == 0, 2), 2) + 1; % first peak
     fpl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(fp_idx)).',fp_idx);
@@ -509,7 +509,18 @@ for j = 1:2
     opl_idx = sub2ind(size(U_jj_npov_set),(1:numel(op_idx)).',op_idx);
     dU = U_jj_npov_set(opl_idx) - U_jj_npov_set(ovl_idx); % Peak height
     Loss(npov_idx) = Loss(npov_idx) +  max(dU - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty; % valley exists
-
+    
+    % For all functions, ensure the repulsive wall is not too far out
+    walls_idx = any(U.(jj) >= Settings.MinExpWallHeight,2);
+    U_jj_rw_set = U.(jj)(walls_idx,:);
+    r_jj_rw_set = r(walls_idx,:);
+    walls_set = U_jj_rw_set >= Settings.MinExpWallHeight;
+    rw_idx = size(U_jj_rw_set,2) - sum( cumprod(fliplr(walls_set(:,:)) == 0, 2), 2); % where the wall reaches min height
+    rwl_idx = sub2ind(size(U_jj_rw_set),(1:numel(rw_idx)).',rw_idx);
+    r_wall = r_jj_rw_set(rwl_idx);
+    Loss(walls_idx) = Loss(walls_idx) + max(r_wall - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % wall too far
+    Loss(walls_idx) = Loss(walls_idx) + max((Settings.MinMXWellR/10) - r_wall,0).*Settings.BadFcnLossPenalty; % wall too close
+    
 %     % Loss = zeros(N_par,1);
 %     idxes = find(Loss > 0);
 %     for jdx = 1:min(numel(idxes),10)
@@ -520,36 +531,35 @@ for j = 1:2
 %         scatter(U.r(valleys_idx(idx,:)),U.(jj)(idx,valleys_idx(idx,:)))
 %     end
 %     ylim([-1000 1000])
-
 end
 
 tf = log1p(Loss) < sqrt(eps);
 
-% % Plot result to visualize
-% tf_num = double(tf);
-% 
-% % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
-% % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
-% 
-% ax1 = 'sigma_MM';
-% ax2 = 'sigma_XX';
-% ax3 = 'epsilon_XX';
-% 
-% scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
-% %scatter(Param.(ax1),Param.(ax2),100,tf_num,'filled')
-% if any(strcmp(Settings.Theory,{'TF' 'BH'}))
-% %     set(gca, 'XScale', 'log')
-% %     set(gca, 'YScale', 'log')
-%     %set(gca, 'ZScale', 'log')
-% end
-% 
-% fs=24;
-% % xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
-% % ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
-% xlabel(ax1,'fontsize',fs);
-% ylabel(ax2,'fontsize',fs);
-% zlabel(ax3,'fontsize',fs);
-% set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
-% 
-% clear;
+% Plot result to visualize
+tf_num = double(tf);
+
+% 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
+% 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
+
+ax1 = 'epsilon_MM';
+ax2 = 'epsilon_XX';
+ax3 = 'gamma_MX';
+
+scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
+%scatter(Param.(ax1),Param.(ax2),100,tf_num,'filled')
+if any(strcmp(Settings.Theory,{'TF' 'BH'}))
+    set(gca, 'XScale', 'log')
+    set(gca, 'YScale', 'log')
+    %set(gca, 'ZScale', 'log')
+end
+
+fs=24;
+% xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
+% ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
+xlabel(ax1,'fontsize',fs);
+ylabel(ax2,'fontsize',fs);
+zlabel(ax3,'fontsize',fs);
+set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
+
+clear;
 end

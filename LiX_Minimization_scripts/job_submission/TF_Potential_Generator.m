@@ -1058,6 +1058,12 @@ if Plotswitch
             h{3} = plot(r.*10,U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-50 10];
             ttxt = 'Derivative of Repulsive Potential';
+        case 'coulomb'
+            h{1} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.f,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.f,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(r.*10,k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.f,'Color','g','LineWidth',lw,'Linestyle','-');
+            yl = [-600 1000];
+            ttxt = 'Coulomb Potential';
     end
     
     title(['Plot of ' ttxt ' for ' Settings.Salt ' TF Model'],...

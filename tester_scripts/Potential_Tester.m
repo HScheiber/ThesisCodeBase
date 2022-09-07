@@ -25,7 +25,7 @@ Settings = Initialize_MD_Settings;
 Startpoint = 0;
 Settings.Table_Length = 4.01;
 Settings.Table_StepSize = 0.0005;
-Settings.Salt = 'LiF';
+Settings.Salt = 'LiI';
 Settings.Structure = 'Rocksalt';
 Settings.Theory = 'TF';
 Settings.JobName = 'Test';
@@ -40,7 +40,7 @@ Settings.MDP.Maintain_Symmetry = true;
 % Allowed plot types: 'full', 'full-derivative','lj', 'lj-derivative',
 % 'dispersion', 'dispersion-derivative', 'repulsive',
 % 'repulsive-derivative'
-PlotType = 'full';
+PlotType = 'coulomb';
 plot_PES = true;
 Calc_energy = false;
 save_table = false;
