@@ -721,7 +721,7 @@ if Settings.MinMDP.Verbose
     disp(num2str(Gradient','%5.4E  '))
 end
 
-% Delete the calculation directory
+% Clean up the calculation directory
 if Scratch_output_files
     % Get a list of all files in this folder.
     files = dir(Settings.WorkDir);

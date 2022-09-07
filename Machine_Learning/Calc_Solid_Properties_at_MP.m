@@ -18,20 +18,21 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
     
-    Output_Properties_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
-    if isfile(Output_Properties_File)
+    Output_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
+    if isfile(Output_File)
         try
-            Output = load(Output_Properties_File).Output;
+            Output = load(Output_File).Output;
             diary off
             return
         catch
             if Settings.Verbose
                 disp('Failed to load previously completed output, restarting calculation')
             end
-            delete(Output_Properties_File);
+            delete(Output_File);
         end
     end
-    save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
+    Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
+    save(Input_File,'Settings')
     
     if Settings.Verbose
         disp('*** Separate Equilibration of Solid Selected ***')
@@ -513,11 +514,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
                 end
                 Output.Solid_V_MP = nan;
                 Output.Solid_H_MP = nan;
-                diary off
-                if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-                    diary(Settings.Diary_Loc)
-                end
-                save(Output_Properties_File,'Output');
+                cleanup_folder(Settings,Output_File,Output)
                 return
             end
         end
@@ -545,11 +542,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         end
         Output.Solid_V_MP = nan;
         Output.Solid_H_MP = nan;
-        save(Output_Properties_File,'Output');
-        diary off
-        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-            diary(Settings.Diary_Loc)
-        end
+        cleanup_folder(Settings,Output_File,Output)
         return
     end
     
@@ -590,11 +583,40 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
 %     V = mean((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
 %     stdevV = std((10^3).*Data(timesteps/2:end,2)./nmol_solid) % A^3/molecule
     if Settings.Verbose
-        disp('*** Separate Equilibration of Solid Complete ***')
+        disp('*** Equilibration of Solid Complete ***')
     end
-    save(Output_Properties_File,'Output');
-    diary off
-    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-        diary(Settings.Diary_Loc)
+    
+    % Clean up the calculation directory
+    % Get a list of all files in this folder.
+    function cleanup_folder(Settings,Output_File,Output)
+        files = dir(Settings.WorkDir);
+        dirFlags = [files.isdir];
+        subFolders = files(dirFlags);
+        subFolders = subFolders(3:end); % exclude . and ..
+        subFiles = files(~dirFlags);
+        for idx = 1:length(subFolders)
+            try
+                rmdir(fullfile(subFolders(idx).folder,subFolders(idx).name),'s');
+            catch
+                continue
+            end
+        end
+        for idx = 1:length(subFiles)
+            switch subFiles(idx).name
+                case {'Calc_Settings.mat' 'Calculation_diary.log' 'Calc_Output.mat'}
+                    continue
+                otherwise
+                    try
+                        delete(fullfile(subFiles(idx).folder,subFiles(idx).name));
+                    catch
+                        continue
+                    end
+            end
+        end
+        save(Output_File,'Output');
+        diary off
+        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+            diary(Settings.Diary_Loc)
+        end
     end
 end

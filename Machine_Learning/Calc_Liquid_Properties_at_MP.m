@@ -23,22 +23,22 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     diary off
     diary(fullfile(Settings.WorkDir,'Calculation_diary.log'))
     
-    Output_Properties_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
-    if isfile(Output_Properties_File)
+    Output_File = fullfile(Settings.WorkDir,'Calc_Output.mat');
+    if isfile(Output_File)
         try
-            Output = load(Output_Properties_File).Output;
+            Output = load(Output_File).Output;
             diary off
             return
         catch
             if Settings.Verbose
                 disp('Failed to load previously completed output, restarting calculation')
             end
-            delete(Output_Properties_File);
+            delete(Output_File);
         end
     end
-    
     % Save calculation settings
-    save(fullfile(Settings.WorkDir,'Calc_Settings.mat'),'Settings')
+    Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
+    save(Input_File,'Settings')
     
     % Check for previous minimization calculation    
     Minimization_TRR_File = fullfile(Settings.WorkDir,'Prep_Liq.trr'); % mMinimizaion started
@@ -788,11 +788,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 Output.Liquid_H_MP = nan;
                 Output.Liquid_DM_MP = nan;
                 Output.Liquid_DX_MP = nan;
-                save(Output_Properties_File,'Output');
-                diary off
-                if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-                    diary(Settings.Diary_Loc)
-                end
+                cleanup_folder(Settings,Output_File,Output)
                 return
             end
         end
@@ -829,11 +825,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
         Output.Liquid_DX_MP = nan;
-        save(Output_Properties_File,'Output');
-        diary off
-        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-            diary(Settings.Diary_Loc)
-        end
+        cleanup_folder(Settings,Output_File,Output)
         return
     end
     
@@ -1054,11 +1046,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 Output.Liquid_H_MP = nan;
                 Output.Liquid_DM_MP = nan;
                 Output.Liquid_DX_MP = nan;
-                save(Output_Properties_File,'Output');
-                diary off
-                if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-                    diary(Settings.Diary_Loc)
-                end
+                cleanup_folder(Settings,Output_File,Output)
                 return
             end
         end
@@ -1091,11 +1079,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_H_MP = nan;
         Output.Liquid_DM_MP = nan;
         Output.Liquid_DX_MP = nan;
-        save(Output_Properties_File,'Output');
-        diary off
-        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-            diary(Settings.Diary_Loc)
-        end
+        cleanup_folder(Settings,Output_File,Output)
         return
     end
     
@@ -1176,7 +1160,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Output.Liquid_V_MP = nan;
         Output.Liquid_H_MP = nan;
         Output.Liquid_DX_MP = nan;
-        save(Output_Properties_File,'Output');
+        save(Output_File,'Output');
         diary off
         if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
             diary(Settings.Diary_Loc)
@@ -1203,7 +1187,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             end
             Output.Liquid_V_MP = nan;
             Output.Liquid_H_MP = nan;
-            save(Output_Properties_File,'Output');
+            save(Output_File,'Output');
             diary off
             if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
                 diary(Settings.Diary_Loc)
@@ -1220,10 +1204,39 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     if Settings.Verbose
         disp('*** Separate Equilibration of Liquid Complete ***')
     end
-    save(Output_Properties_File,'Output');
-    diary off
-    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-        diary(Settings.Diary_Loc)
+    cleanup_folder(Settings,Output_File,Output)
+    
+    % Clean up the calculation directory
+    % Get a list of all files in this folder.
+    function cleanup_folder(Settings,Output_File,Output)
+        files = dir(Settings.WorkDir);
+        dirFlags = [files.isdir];
+        subFolders = files(dirFlags);
+        subFolders = subFolders(3:end); % exclude . and ..
+        subFiles = files(~dirFlags);
+        for idx = 1:length(subFolders)
+            try
+                rmdir(fullfile(subFolders(idx).folder,subFolders(idx).name),'s');
+            catch
+                continue
+            end
+        end
+        for idx = 1:length(subFiles)
+            switch subFiles(idx).name
+                case {'Calc_Settings.mat' 'Calculation_diary.log' 'Calc_Output.mat'}
+                    continue
+                otherwise
+                    try
+                        delete(fullfile(subFiles(idx).folder,subFiles(idx).name));
+                    catch
+                        continue
+                    end
+            end
+        end
+        save(Output_File,'Output');
+        diary off
+        if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+            diary(Settings.Diary_Loc)
+        end
     end
-
 end
