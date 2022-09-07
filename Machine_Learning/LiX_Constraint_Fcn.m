@@ -66,15 +66,9 @@ if strcmp(Settings.Theory,'TF')
             gamma_XX = Param.gamma_XX; % Unitless
         end
         
-        if gamma_MX > 48/7
-            epsilon_MX = -epsilon_MX;
-        end
-        if gamma_MM > 48/7
-            epsilon_MM = -epsilon_MM;
-        end
-        if gamma_XX > 48/7
-            epsilon_XX = -epsilon_XX;
-        end
+        epsilon_MX(gamma_MX > 48/7) = -epsilon_MX(gamma_MX > 48/7);
+        epsilon_MM(gamma_MM > 48/7) = -epsilon_MM(gamma_MM > 48/7);
+        epsilon_XX(gamma_XX > 48/7) = -epsilon_XX(gamma_XX > 48/7);
         
         % Convert to Condensed form
         alpha_MM = gamma_MM./r0_MM;
@@ -190,15 +184,9 @@ elseif strcmp(Settings.Theory,'BH')
             gamma_XX = Param.gamma_XX; % Unitless
         end
         
-        if gamma_MX < 6
-            epsilon_MX = -epsilon_MX;
-        end
-        if gamma_MM < 6
-            epsilon_MM = -epsilon_MM;
-        end
-        if gamma_XX < 6
-            epsilon_XX = -epsilon_XX;
-        end
+        epsilon_MX(gamma_MX < 6) = -epsilon_MX(gamma_MX < 6);
+        epsilon_MM(gamma_MM < 6) = -epsilon_MM(gamma_MM < 6);
+        epsilon_XX(gamma_XX < 6) = -epsilon_XX(gamma_XX < 6);
         
         % Convert to Condensed form
         alpha_MM = gamma_MM./r0_MM;
@@ -381,36 +369,43 @@ Loss(nv_idx) = Loss(nv_idx) + Settings.BadFcnLossPenalty;
 % If no peak exists in MX interaction, but valley does, check well depth. 
 % This is normal for JC potential and some BH/TF potentials
 U_MX_ovnp_set = U.MX(ovnp_idx,:);
+r_ovnp_set = r(ovnp_idx,:);
 ov_idx = sum( cumprod(valleys_idx(ovnp_idx,:) == 0, 2), 2) + 1;
 ovl_idx = sub2ind(size(U_MX_ovnp_set),(1:numel(ov_idx)).',ov_idx);
 U_min = U_MX_ovnp_set(ovl_idx);
-Loss(ovnp_idx) = Loss(ovnp_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Settings.BadFcnLossPenalty;
+Loss(ovnp_idx) = Loss(ovnp_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Settings.BadFcnLossPenalty; % valley too deep
 % Also check well location
-r_ovnp_set = r(ovl_idx);
-Loss(ovnp_idx) = Loss(ovnp_idx) + max(r_ovnp_set - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty;
-Loss(ovnp_idx) = Loss(ovnp_idx) + max((Settings.MinMXWellR/10) - r_ovnp_set,0).*Settings.BadFcnLossPenalty;
+r_min = r_ovnp_set(ovl_idx);
+Loss(ovnp_idx) = Loss(ovnp_idx) + max(r_min - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % valley too far out
+Loss(ovnp_idx) = Loss(ovnp_idx) + max((Settings.MinMXWellR/10) - r_min,0).*Settings.BadFcnLossPenalty; % valley too close in
 
 % If both a peak and minimum exist, find the well depth
 U_MX_ovop_set = U.MX(ovop_idx,:);
+r_ovop_set = r(ovop_idx,:);
 op_idx = sum( cumprod(peaks_idx(ovop_idx,:) == 0, 2), 2)  + 1;
 opl_idx = sub2ind(size(U_MX_ovop_set),(1:numel(op_idx)).',op_idx);
 ov_idx = sum( cumprod(valleys_idx(ovop_idx,:) == 0, 2), 2) + 1;
 ovl_idx = sub2ind(size(U_MX_ovop_set),(1:numel(ov_idx)).',ov_idx);
 dU = U_MX_ovop_set(opl_idx) - U_MX_ovop_set(ovl_idx);
 U_min = U_MX_ovop_set(ovl_idx);
-% Penalize wells that are too shallow and wells that are too deep
-Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty; % too shallow
-Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Settings.BadFcnLossPenalty; % too deep
-% Also check well location
-r_ovop_set = r(ovl_idx);
-Loss(ovop_idx) = Loss(ovop_idx) + max(r_ovop_set - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty;
-Loss(ovop_idx) = Loss(ovop_idx) + max((Settings.MinMXWellR/10) - r_ovop_set,0).*Settings.BadFcnLossPenalty;
+% Penalize walls that are too small and valleys that are too deep
+Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty; % repulsive wall too low
+Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Settings.BadFcnLossPenalty; % valley too deep
+% Also check valley location
+r_min = r_ovop_set(ovl_idx);
+Loss(ovop_idx) = Loss(ovop_idx) + max(r_min - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % valley too far
+Loss(ovop_idx) = Loss(ovop_idx) + max((Settings.MinMXWellR/10) - r_min,0).*Settings.BadFcnLossPenalty; % valley too close
 
-% idx = 9999;
-% plot(U.r,U.MX(idx,:))
-% hold on
-% scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
-% scatter(U.r(valleys_idx(idx,:)),U.MX(idx,valleys_idx(idx,:)))
+
+% % Loss = zeros(N_par,1);
+% idxes = find(Loss > 0);
+% for jdx = 1:min(numel(idxes),10)
+%     idx = idxes(jdx);
+%     plot(U.r,U.MX(idx,:))
+%     hold on
+%     scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
+%     scatter(U.r(valleys_idx(idx,:)),U.MX(idx,valleys_idx(idx,:)))
+% end
 % ylim([-1000 1000])
 
 %% Grab the peaks and valleys of the MM/XX potentials
@@ -432,24 +427,34 @@ for j = 1:2
     npov_idx = (Num_peaks == 0) & (Num_valleys == 1); % Potentials that contain no peaks and one valley
 
     % No peak and no valley exists: Do nothing, this is normal for JC and sometimes BH/TF
+    % Since peak height is presumably infinite, do not need to check it.
     %npnv_idx;
 
     % One peak, no valley: This is a normal case for TF and BH
     % repulsive potentials, check to ensure the peak height is at
     % least Settings.MinExpWallHeight
-    U_jj_opnv = U.(jj)(opnv_idx,:)';
-    dU = U_jj_opnv(peaks_idx(opnv_idx,:)');
-    Loss(opnv_idx) = Loss(opnv_idx) + max(Settings.MinExpWallHeight - dU,0).*Settings.BadFcnLossPenalty;
+    opov_set = peaks_idx(opnv_idx,:);
+    U_jj_opnv_set = U.(jj)(opnv_idx,:);
+    op_idx = sum(cumprod(opov_set == 0, 2), 2) + 1;
+    opl_idx = sub2ind(size(U_jj_opnv_set),(1:numel(op_idx)).',op_idx);
+    U_peak = U_jj_opnv_set(opl_idx);
+    Loss(opnv_idx) = Loss(opnv_idx) + max(Settings.MinExpWallHeight - U_peak,0).*Settings.BadFcnLossPenalty; % peak too low
     
     % two peaks are visible implies one valley in between them: 
     % Penalize any model with a non-zero well depth greater than Settings.MaxRepWellDepth
     U_jj_tpov_set = U.(jj)(tpov_idx,:);
-    sp_idx = length(U.r) - sum( cumprod(fliplr(peaks_idx(tpov_idx,:)) == 0, 2), 2);
+    sp_idx = length(U.r) - sum( cumprod(fliplr(peaks_idx(tpov_idx,:)) == 0, 2), 2); % second peak
     spl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(sp_idx)).',sp_idx);
+    fp_idx = sum( cumprod(peaks_idx(tpov_idx,:) == 0, 2), 2) + 1; % first peak
+    fpl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(fp_idx)).',fp_idx);
+    
     ov_idx = sum( cumprod(valleys_idx(tpov_idx,:) == 0, 2), 2) + 1;
     ovl_idx = sub2ind(size(U_jj_tpov_set),(1:numel(ov_idx)).',ov_idx);
-    dU = U_jj_tpov_set(spl_idx) - U_jj_tpov_set(ovl_idx);
-    Loss(tpov_idx) = Loss(tpov_idx) + max(dU - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
+    dU_sp = U_jj_tpov_set(spl_idx) - U_jj_tpov_set(ovl_idx);
+    Loss(tpov_idx) = Loss(tpov_idx) + max(dU_sp - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty; % valley exists
+    % Also check the peak height
+    dU_fp = U_jj_tpov_set(fpl_idx) - U_jj_tpov_set(ovl_idx);
+    Loss(tpov_idx) = Loss(tpov_idx) + max(Settings.MinExpWallHeight - dU_fp,0).*Settings.BadFcnLossPenalty; % peak too low
 
     % One peak visible + one valley, and (possibly) one hidden peak to the right
     % In this case, check if the valley is closer-in than the peak
@@ -457,32 +462,42 @@ for j = 1:2
     % If the peak is closer-in, there is a second hidden peak to the right, use dU = U(end) - valley_U
     opov_set = peaks_idx(opov_idx,:);
     U_jj_opov_set = U.(jj)(opov_idx,:);
-
     op_idx = sum(cumprod(opov_set == 0, 2), 2) + 1;
     ov_idx = sum(cumprod(valleys_idx(opov_idx,:) == 0, 2), 2) + 1;
-
+    
     % split into two subsets
-    ovcc_idx = (ov_idx < op_idx);
+    ovcc_idx = (ov_idx < op_idx); % valley is closer in
     Lossn = zeros(size(ovcc_idx));
-
-    % Valley closer set: use peak_U - valley_U
+    
+    % Valley closer set: in this subset, there is no inner peak. Hence no repulsive wall peak to worry about 
+    % use peak_U - valley_U for the valley depth
     U_jj_opovc_set = U_jj_opov_set(ovcc_idx,:);
     opc_idx = op_idx(ovcc_idx,:);
     opcl_idx = sub2ind(size(U_jj_opovc_set),(1:numel(opc_idx)).',opc_idx);
     ovc_idx = ov_idx(ovcc_idx,:);
     ovcl_idx = sub2ind(size(U_jj_opovc_set),(1:numel(ovc_idx)).',ovc_idx);
     dUc = U_jj_opovc_set(opcl_idx) - U_jj_opovc_set(ovcl_idx);
-    Lossn(ovcc_idx) =  max(dUc - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
+    Lossn(ovcc_idx) =  max(dUc - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty; % valley exists
 
-    % Valley further set: use U(end) - valley_U
+    % Valley further set: In this subset, there is an inner peak but no outer peak.
+    % U(end) - valley_U for valley depth
     U_jj_opovf_set = U_jj_opov_set(~ovcc_idx,:);
-    opf_idx = repmat(length(U.r),sum(~ovcc_idx),1); % set the "peak" to the furthest possible place
-    opfl_idx = sub2ind(size(U_jj_opovf_set),(1:numel(opf_idx)).',opf_idx);
+    fpf_idx = op_idx(~ovcc_idx,:); % set the first peak
+    fpfl_idx = sub2ind(size(U_jj_opovf_set),(1:numel(fpf_idx)).',fpf_idx);
+    spf_idx = repmat(length(U.r),sum(~ovcc_idx),1); % set the second "peak" to the furthest possible place
+    spfl_idx = sub2ind(size(U_jj_opovf_set),(1:numel(spf_idx)).',spf_idx);
     ovf_idx = ov_idx(~ovcc_idx,:);
     ovfl_idx = sub2ind(size(U_jj_opovf_set),(1:numel(ovf_idx)).',ovf_idx);
-    dUf = U_jj_opovf_set(opfl_idx) - U_jj_opovf_set(ovfl_idx);
-    Lossn(~ovcc_idx) =  max(dUf - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
-
+    
+    U_ov = U_jj_opovf_set(ovfl_idx); % valley energy
+    U_fp = U_jj_opovf_set(fpfl_idx); % first peak energy
+    U_sp = U_jj_opovf_set(spfl_idx); % second "peak" energy
+    dUf = U_sp - U_ov; % Well depth relative to the furthest out place
+    dU_fp = U_fp - U_ov; % 
+    Lossn(~ovcc_idx) =  max(dUf - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty; % valley exists
+    % Also check the repulsive peak height
+    Lossn(~ovcc_idx) = Lossn(~ovcc_idx) + max(Settings.MinExpWallHeight - dU_fp,0).*Settings.BadFcnLossPenalty; % wall too low
+    % Add everything back
     Loss(opov_idx) = Loss(opov_idx) + Lossn;
 
     % No peak + one valley: there must be a hidden peak to the right
@@ -492,47 +507,49 @@ for j = 1:2
     ovl_idx = sub2ind(size(U_jj_npov_set),(1:numel(ov_idx)).',ov_idx);
     op_idx = repmat(length(U.r),sum(npov_idx),1); % set the "peak" to the furthest possible place
     opl_idx = sub2ind(size(U_jj_npov_set),(1:numel(op_idx)).',op_idx);
-    dU = U_jj_npov_set(opl_idx) - U_jj_npov_set(ovl_idx);
-    Loss(npov_idx) = Loss(npov_idx) +  max(dU - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty;
+    dU = U_jj_npov_set(opl_idx) - U_jj_npov_set(ovl_idx); % Peak height
+    Loss(npov_idx) = Loss(npov_idx) +  max(dU - Settings.MaxRepWellDepth,0).*Settings.BadFcnLossPenalty; % valley exists
 
-%             idxes = find(Loss > 0);
-%             for jdx = 1:100
-%                 idx=idxes(jdx);
-%                 hold on
-%                 plot(U.r,U.(jj)(idx,:))
-%                 scatter(U.r(peaks_idx(idx,:)),U.(jj)(idx,peaks_idx(idx,:)))
-%                 scatter(U.r(valleys_idx(idx,:)),U.(jj)(idx,valleys_idx(idx,:)))
-%             end
-%             ylim([-1000 1000])
+%     % Loss = zeros(N_par,1);
+%     idxes = find(Loss > 0);
+%     for jdx = 1:min(numel(idxes),10)
+%         idx=idxes(jdx);
+%         hold on
+%         plot(U.r,U.(jj)(idx,:))
+%         scatter(U.r(peaks_idx(idx,:)),U.(jj)(idx,peaks_idx(idx,:)))
+%         scatter(U.r(valleys_idx(idx,:)),U.(jj)(idx,valleys_idx(idx,:)))
+%     end
+%     ylim([-1000 1000])
+
 end
 
 tf = log1p(Loss) < sqrt(eps);
 
-% % Plot result to visualize
-% tf_num = double(tf);
-% 
-% % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
-% % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
-% 
-% ax1 = 'r0_MM';
-% ax2 = 'r0_XX';
-% ax3 = 'gamma_MX';
-% 
-% scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
-% %scatter(Param.(ax1),Param.(ax2),100,tf_num,'filled')
-% if any(strcmp(Settings.Theory,{'TF' 'BH'}))
-% %     set(gca, 'XScale', 'log')
-% %     set(gca, 'YScale', 'log')
-%     %set(gca, 'ZScale', 'log')
-% end
-% 
-% fs=24;
-% % xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
-% % ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
-% xlabel(ax1,'fontsize',fs);
-% ylabel(ax2,'fontsize',fs);
-% zlabel(ax3,'fontsize',fs);
-% set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
-% 
-% clear;
+% Plot result to visualize
+tf_num = double(tf);
+
+% 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
+% 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
+
+ax1 = 'sigma_MM';
+ax2 = 'epsilon_MM';
+ax3 = 'epsilon_XX';
+
+scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
+%scatter(Param.(ax1),Param.(ax2),100,tf_num,'filled')
+if any(strcmp(Settings.Theory,{'TF' 'BH'}))
+%     set(gca, 'XScale', 'log')
+%     set(gca, 'YScale', 'log')
+    %set(gca, 'ZScale', 'log')
+end
+
+fs=24;
+% xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
+% ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
+xlabel(ax1,'fontsize',fs);
+ylabel(ax2,'fontsize',fs);
+zlabel(ax3,'fontsize',fs);
+set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
+
+clear;
 end

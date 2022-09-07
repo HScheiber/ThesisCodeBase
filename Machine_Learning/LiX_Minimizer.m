@@ -1008,19 +1008,28 @@ if Settings.CheckBadFcn
     peaks_idx = islocalmax(U_MX.Total);
     valleys_idx = islocalmin(U_MX.Total);
     
-    maxima_U = U_MX.Total(peaks_idx);
-    minima_U = U_MX.Total(valleys_idx);
+    U_peak = U_MX.Total(peaks_idx);
+    U_valley = U_MX.Total(valleys_idx);
+    r_valley = U_MX.r(valleys_idx);
     
-    if isempty(minima_U) % If no well minimum exists in MX interaction
+    if isempty(U_valley) % If no well minimum exists in MX interaction
         Loss_add = Loss_add + Settings.BadFcnLossPenalty;
-    elseif isempty(maxima_U) % If no peak exists in MX interaction, but valley does, check well depth. 
+    elseif isempty(U_peak) % If no peak exists in MX interaction, but valley does, check well depth. 
         % This is normal for JC potential and some BH/TF potentials
-        Loss_add = Loss_add + max(Settings.MaxAttWellDepth - minima_U,0)*Settings.BadFcnLossPenalty;
+        Loss_add = Loss_add + max(Settings.MaxAttWellDepth - U_valley,0)*Settings.BadFcnLossPenalty;
+        % Also check valley location
+        Loss_add = Loss_add + max(r_valley - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty;
+        Loss_add = Loss_add + max((Settings.MinMXWellR/10) - r_valley,0).*Settings.BadFcnLossPenalty;
+        
+        % Also check well location
     else % Otherwise, a well minimum exists and at least one peak exists
         % Penalize wells that are too shallow and wells that are too deep
-        dU = maxima_U - minima_U;
+        dU = U_peak - U_valley;
         Loss_add = Loss_add + max(Settings.MinExpWallHeight - dU,0)*Settings.BadFcnLossPenalty;
-        Loss_add = Loss_add + max(Settings.MaxAttWellDepth - minima_U,0)*Settings.BadFcnLossPenalty;
+        Loss_add = Loss_add + max(Settings.MaxAttWellDepth - U_valley,0)*Settings.BadFcnLossPenalty;
+        % Also check valley location
+        Loss_add = Loss_add + max(r_valley - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty;
+        Loss_add = Loss_add + max((Settings.MinMXWellR/10) - r_valley,0).*Settings.BadFcnLossPenalty;
     end
 %     plot(U_MX.r,U_MX.Total)
 %     hold on
@@ -1033,11 +1042,11 @@ if Settings.CheckBadFcn
         peaks_idx = islocalmax(U.Total);
         valleys_idx = islocalmin(U.Total);
         
-        maxima_U = U.Total(peaks_idx);
-        minima_U = U.Total(valleys_idx);
+        U_peak = U.Total(peaks_idx);
+        U_valley = U.Total(valleys_idx);
         
-        maxima_r = U.r(peaks_idx);
-        minima_r = U.r(valleys_idx);
+        r_peak = U.r(peaks_idx);
+        r_valley = U.r(valleys_idx);
 
 %         plot(U.r,U.Total)
 %         hold on
@@ -1045,30 +1054,40 @@ if Settings.CheckBadFcn
 %         scatter(U.r(valleys_idx),U.Total(valleys_idx))
 %         ylim([-1000 1000])
 
-        if isempty(maxima_U) % No peak exists
+        if isempty(U_peak) % No peak exists
             % Do nothing, this is normal for JC and sometimes BH/TF
-        elseif length(maxima_U) > 1 % two peaks are visible + one valley in between them
+        elseif length(U_peak) == 1 && isempty(U_valley) % One peak, no valley 
+            % this is a normal case for TF and BH repulsive potentials
+            % check to ensure the peak height is at least Settings.MinExpWallHeight
+            Loss_add = Loss_add + max(Settings.MinExpWallHeight - U_peak,0).*Settings.BadFcnLossPenalty;
+            
+        elseif length(U_peak) > 1 % two peaks are visible + one valley in between them
             % Penalize any model with a non-zero well depth between
             % like-like interactions
-            Threshold = Settings.MaxRepWellDepth; % kJ/mol
-            dU = maxima_U(2) - minima_U;
-            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
-        elseif length(maxima_U) == 1 && isempty(minima_U) % One peak, no valley (this is a normal case for TF and BH repulsive potentials)
-            % Do nothing
-        elseif length(maxima_U) == 1 && length(minima_U) == 1 % One peak visible + one valley in between, and (possibly) one hidden peak to the right
-            Threshold = Settings.MaxRepWellDepth; % kJ/mol
-            if minima_r < maxima_r
-                dU = maxima_U - minima_U;
-            else
+            dU = U_peak(2) - U_valley;
+            Loss_add = Loss_add + max(dU - Settings.MaxRepWellDepth,0)*Settings.BadFcnLossPenalty; % valley exists
+            dU_fp = U_peak(1) - U_valley;
+            Loss_add = Loss_add + max(Settings.MinExpWallHeight - dU_fp,0).*Settings.BadFcnLossPenalty; % peak too low
+
+        elseif length(U_peak) == 1 && length(U_valley) == 1 % One peak visible + one valley in between, and (possibly) one hidden peak to the right
+            
+            if r_valley < r_peak % valley closer set
+                dU = U_peak - U_valley; % valley exists
+                Loss_add = Loss_add + max(dU - Settings.MaxRepWellDepth,0)*Settings.BadFcnLossPenalty;
+            else % peak closer set
                 % Case of hidden peak to the right
                 % Ensure valley depth is not greater than the threshold
-                dU = U.Total(end) - minima_U;
+                dU = U.Total(end) - U_valley;
+                Loss_add = Loss_add + max(dU - Settings.MaxRepWellDepth,0)*Settings.BadFcnLossPenalty;
+                
+                % Also check the repulsive peak height
+                dUfp = U_peak - U_valley;
+                Loss_add = Loss_add + max(Settings.MinExpWallHeight - dUfp,0).*Settings.BadFcnLossPenalty; % wall too low
             end
-            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
-        elseif length(minima_U) == 1 % well minima is available but no peaks are visible, there must be a hidden peak to the right
-            Threshold = Settings.MaxRepWellDepth; % kJ/mol
-            dU = U.Total(end) - minima_U;
-            Loss_add = Loss_add + max(dU - Threshold,0)*Settings.BadFcnLossPenalty;
+            
+        elseif length(U_valley) == 1 % valley exists but no peaks are visible, there must be a hidden peak to the right
+            dU = U.Total(end) - U_valley;
+            Loss_add = Loss_add + max(dU - Settings.MaxRepWellDepth,0)*Settings.BadFcnLossPenalty;
         else
             % This should never be reached...
             warning('Possible issue with the potential!')

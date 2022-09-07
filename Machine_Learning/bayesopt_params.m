@@ -94,14 +94,14 @@ function params = bayesopt_params(Model)
             if Model.InnerRange % For BH model, inner range is when gamma is [0, 6]
 
                 % r_0
-                Sr0MM = optimizableVariable('r0_MM',[0 1],'Type','real'); % Units: nm
-                Sr0XX = optimizableVariable('r0_XX',[0 1],'Type','real'); % Units: nm
-                Sr0MX = optimizableVariable('r0_MX',[0 1],'Type','real'); % Units: nm
+                Sr0MM = optimizableVariable('r0_MM',[0 0.8],'Type','real'); % Units: nm
+                Sr0XX = optimizableVariable('r0_XX',[0 0.8],'Type','real'); % Units: nm
+                Sr0MX = optimizableVariable('r0_MX',[0 0.8],'Type','real'); % Units: nm
 
                 % epsilon
-                SepsilonMM = optimizableVariable('epsilon_MM',[1 1e13],'Type','real','Transform','log'); % Units: kJ/mol
-                SepsilonXX = optimizableVariable('epsilon_XX',[1 1e13],'Type','real','Transform','log'); % Units: kJ/mol
-                SepsilonMX = optimizableVariable('epsilon_MX',[1 1e13],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonMM = optimizableVariable('epsilon_MM',[1 1e8],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonXX = optimizableVariable('epsilon_XX',[1 1e8],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonMX = optimizableVariable('epsilon_MX',[1 1e8],'Type','real','Transform','log'); % Units: kJ/mol
 
                 % gamma
                 SgammaMM = optimizableVariable('gamma_MM',[0 6],'Type','real'); % Units: kJ/mol
