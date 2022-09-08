@@ -68,14 +68,7 @@ Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 
 
 % Potential Scaling
-if istable(Param) || isstruct(Param)
-    if any(isinf(Param{:,:}))
-        Loss = nan;
-        UserData.Finite_T_Data = Settings.Finite_T_Data;
-        UserData.Minimization_Data = Settings.Minimization_Data;
-        return
-    end
-    
+if istable(Param) || isstruct(Param)    
     if strcmp(Settings.Theory,'TF')
         
         % Loose form of exp-C6-C8 model
@@ -474,13 +467,6 @@ if istable(Param) || isstruct(Param)
     
 % When not in table form
 else
-    if any(isinf(Param(:)))
-        Loss = nan;
-        UserData.Finite_T_Data = Settings.Finite_T_Data;
-        UserData.Minimization_Data = Settings.Minimization_Data;
-        return
-    end
-    
     if strcmp(Settings.Theory,'TF')
         
         % Loose form of exp-C6-C8 model
