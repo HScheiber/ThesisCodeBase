@@ -2049,7 +2049,11 @@ classdef BayesianOptimization_priv
             this = fitModels(this);
             [this.IncumbentF, this.IncumbentX] = findIncumbent(this);
             if resuming
-                this.XNext = this.NextPoint{:,:};
+                try
+                    this.XNext = this.transformPoints(this.NextPoint);
+                catch
+                    this = chooseNextPoint(this);
+                end
             else
                 this = chooseNextPoint(this);
             end
