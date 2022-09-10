@@ -324,7 +324,7 @@ for idx = 1:length(T_contents)
 end
 
 % Optional: Calculate the density profile along the Z dimension between 100
-if Settings.FinalDensityProfile && ~T_dat.Alt_Structure
+if Settings.FinalDensityProfile && ~T_dat.Alt_Structure && isfile(tpr_file)
     trr_file = fullfile(Tm_folder,[Settings.JobName '.trr']);
     density_file = fullfile(Settings.WorkDir,[Settings.JobName '_Density_Profile.xvg']);
     gmx_echo = strrep(Settings.gmx_loc,'gmx',['echo "0 0" ' Settings.pipe ' gmx']);
