@@ -301,7 +301,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     elseif Model.Restart_Calculation && continue_bayesopt
         % If you want to resume:
         try
-            dat = load(Intermediate_BO_file);
+            dat = load(Intermediate_BO_file,'-mat');
         catch
             % Catch corrupt files
             disp('Unable to load intermediate bayesian optimization data.')
@@ -323,7 +323,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         end
         
         % Catch corrupt files
-        if ~isfield(dat,'BayesoptResults') || isnan(dat.BayesoptResults.MinObjective)
+        if ~isfield(dat,'BayesoptResults') || ~isfield(dat.BayesoptResults,'TotalElapsedTime')
             % Catch corrupt files
             disp('Unable to load intermediate bayesian optimization data.')
             disp('Attempting to load backup step.')

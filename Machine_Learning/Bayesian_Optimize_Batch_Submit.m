@@ -721,7 +721,7 @@ switch lower(computer)
             Theory = Theories{tidx};
             for sidx = 1:length(Salts)
                 Salt = Salts{sidx};
-
+                
                 % Set initial MP temperature
                 Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
                 Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
