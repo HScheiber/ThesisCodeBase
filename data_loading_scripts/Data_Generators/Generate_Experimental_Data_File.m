@@ -419,7 +419,7 @@ Experiment.CsI.dH_fus	= 25.7;
 
 %% Metal Ion diffusion Constants of Molten of Alkali Halides at MP
 % Data Source: https://aip.scitation.org/doi/pdf/10.1063/1.555665
-% LiBr: https://journals.aps.org/pre/pdf/10.1103/PhysRevE.101.062603
+% NaBr: https://journals.aps.org/pre/pdf/10.1103/PhysRevE.101.062603
 % Units: cm^2 / s
 Experiment.LiF.Liquid.DM_mp     = 1.22e-4;
 Experiment.LiCl.Liquid.DM_mp	= 1.06e-4;
