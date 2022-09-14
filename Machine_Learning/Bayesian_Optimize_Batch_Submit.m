@@ -74,9 +74,9 @@ clear;
 
 % Some options
 skip_models = [];
-check_complete = true; % Checks if job is already completed, skips completed jobs
+check_complete = false; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs
-continue_completed = false; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
+continue_completed = true; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
 
 % Shared calculation parameters
 Shared_Settings = Initialize_LiX_BO_Settings;
@@ -508,6 +508,7 @@ switch lower(computer)
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.InnerRange = true; % Sets domain of BH
+        Shared_Settings.final_opt_type = 'patternsearch';
         
         %% BH Models: MA, MB, MC, MF on LiX
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
@@ -584,27 +585,27 @@ switch lower(computer)
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
                     
-                    %% Model MF
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['MF' Rep];
-                    
-                    % Loss function
-                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
-                    Models(idx).Loss_Options.Rocksalt.a  = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
-                    Models(idx).Loss_Options.FiveFive.RLE  = 1;
-                    Models(idx).Loss_Options.Fusion_Enthalpy  = 2; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                    Models(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
-                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
-                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
+%                     %% Model MF
+%                     idx = idx+1;
+%                     Models(idx) = Shared_Settings;
+%                     Models(idx).Salt = Salt;
+%                     Models(idx).Theory = Theory;
+%                     Models(idx).Trial_ID = ['MF' Rep];
+%                     
+%                     % Loss function
+%                     Models(idx).Loss_Options.Rocksalt.LE  = 1;
+%                     Models(idx).Loss_Options.Rocksalt.a  = 1;
+%                     Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+%                     Models(idx).Loss_Options.FiveFive.RLE  = 1;
+%                     Models(idx).Loss_Options.Fusion_Enthalpy  = 2; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+%                     Models(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+%                     Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+%                     Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+%                     Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+%                     
+%                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+%                     Models(idx).Fix_Charge = true;
+%                     Models(idx).Additivity = true;
                     
                 end
             end
