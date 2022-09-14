@@ -2,32 +2,34 @@
 global sldr_h results X Y idx_X idx_Y input_table p full_opt_point ...
     full_opt_eval bayes_opt_eval bayes_opt_point bayes_opt_est_eval bayes_opt_est_point show_error
 % Analysis parameters
-Salt = 'LiBr';
-Theory = 'JC';
-Model = 'XX1'; % C5squaredexponential
-Plot_X = 'Sigma_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
-Plot_Y = 'Sigma_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+Salt = 'LiI';
+Theory = 'BH';
+Model = 'MC1'; % C5squaredexponential
+Plot_X = 'epsilon_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
+Plot_Y = 'epsilon_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+
+% 'r0_MM'    'r0_XX'    'epsilon_MM'    'epsilon_XX'    'gamma_MX'
 
 grid_density = 50; % Parameter to set the grid density
 fs = 24;
 show_error = false;
 
-Model_type = 'error'; % constraints, error, objective
+Model_type = 'objective'; % constraints, error, objective
 
 % Load data
-% A = load(['C:\Users\Hayden\Documents\Patey_Lab\BO_Models\' Salt '_' Theory '_Model_' Model '_bayesopt.mat']);
-% results = A.results;
-results = BayesoptResults;
-bayes_opt_eval = 0; %results.MinObjective;
+A = load(fullfile('C:\Users\Hayden\Documents\Patey_Lab\BO_Models',Salt,[Salt '_' Theory '_Model_' Model '_data.mat'])).full_data;
+results = A.bayesopt_results;
+
+bayes_opt_eval = nan; results.MinObjective;
 bayes_opt_point = table2array(results.NextPoint); %table2array(results.XAtMinObjective);
 
-bayes_opt_est_eval = 0; %results.MinEstimatedObjective;
+bayes_opt_est_eval = nan;
 bayes_opt_est_point = table2array(results.NextPoint); %table2array(results.XAtMinEstimatedObjective);
 
 % Load best point
 %A = load(['C:\Users\Hayden\Documents\Patey_Lab\BO_Models\' Salt '_' Theory '_Model_' Model '_fullopt.mat']);
-full_opt_point = table2array(BayesoptResults.NextPoint); %A.full_opt_point;
-full_opt_eval = 0; %A.loss;
+full_opt_point = A.full_opt_point;
+full_opt_eval = A.loss;
 
 % Variable names
 varnames = {results.VariableDescriptions.Name};

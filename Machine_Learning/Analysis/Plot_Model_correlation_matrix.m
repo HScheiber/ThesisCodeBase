@@ -3,7 +3,7 @@
 Salt = 'LiI';
 Theory = 'BH';
 Model = 'MC1';
-Show = [50]; % Sort by loss function and only show the lowest-loss results.
+Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
 fs = 10; % fontsize
 scat_size = 50;
@@ -94,26 +94,6 @@ switch lower(Property)
                 Heatmap_Label = [Heatmap_Label newline '[\AA]'];
         end
         clog = false;
-end
-
-if show_as_percent_error && contained_in_cell(Property,{'Pot' 'E' 'a' 'b' 'c'})
-    DFT = Load_Best_DFT_Data;
-    DOI = DFT.(Salt).(Structure);
-    clear('DFT')
-    
-    switch Property
-        case {'Pot' 'E'}
-            DFT_res = DOI.Energy;
-        case {'a' 'b' 'c'}
-            DFT_res = DOI.(Property);
-    end
-    
-    Crystal_data = (Crystal_data - DFT_res).*100./DFT_res;
-    Heatmap_Label = strrep(Heatmap_Label,'[\AA]','[\% Error]');
-    Heatmap_Label = strrep(Heatmap_Label,'[kJ mol$^{-1}$]','[\% Error]');
-    
-elseif show_as_percent_error
-    warning(['Cannot plot ' Property ' as error w.r.t. DFT results: No DFT comparison available.'])
 end
 
 % Sort everything by the loss function
@@ -488,7 +468,7 @@ for idx = 1:N
         if idx == jdx
             
             % Do histogram  
-            if strcmp(param_transform{idx},'log')
+            if strcmp(param_transform{idx},'log') || show_as_scale
                 [~,edges] = histcounts(log(search_pnts_cut{:,idx}),50);
                 P(idx,jdx) = histogram(search_pnts_cut{:,idx},exp(edges));
                 
@@ -514,7 +494,7 @@ for idx = 1:N
             set(cur_ax,'XGrid','On','YGrid','On','GridLineStyle','-','Layer','Top',...
                 'TickLength',[0 0],'FontSize',fs,'TickLabelInterpreter','latex')
             
-            if strcmp(param_transform{idx},'log')
+            if strcmp(param_transform{idx},'log') || show_as_scale
                 set(cur_ax, 'XScale', 'log')
             end
             
@@ -540,7 +520,7 @@ for idx = 1:N
             else
                 xlabel(cur_ax,pnames{jdx},'Interpreter','latex','FontSize',fs);
             end
-            if strcmp(param_transform{jdx},'log')
+            if strcmp(param_transform{jdx},'log') || show_as_scale
                 set(cur_ax, 'XScale', 'log')
             end
             
@@ -549,7 +529,7 @@ for idx = 1:N
             else
                 ylabel(cur_ax,pnames{idx},'Interpreter','latex','FontSize',fs);
             end
-            if strcmp(param_transform{idx},'log')
+            if strcmp(param_transform{idx},'log') || show_as_scale
                 set(cur_ax, 'YScale', 'log')
             end
             
