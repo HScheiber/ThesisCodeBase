@@ -1,98 +1,29 @@
-% Script for plotting an error comparison for multiple models, to show how
-% each performs.
-%#ok<*UNRCH>
-
-% %% Analysis Parameters: Comparison LiBr JC C3 vs C6 set
-% Salt = 'LiI';
-% Theory = 'JC';
-% Models = {'' 'CBa' 'BC6' 'CDa'};
-% Model_Labels = {'JC' 'Target $E$[RS]' 'Target $E$[RS] - $E$[WZ]' 'Target $a_{RS}$'};
-% Title_txt = ['\bf{Comparison of ' Salt ' ' Theory ' Models (Fixed Charge). Target = RS/WZ properties}'];
-% filename = [Salt '_' Theory '_' Models{1} '-' Models{end} '_PES.png'];
-% 
-% PlotType = 'lj';
-% 
-% N_Models = length(Models);
-% Col_MX = [0.2 0.2 0.2; cbrewer('qual','Set2',N_Models)];
-% %Col_MX = [0.5 0.5 0.5; cbrewer('qual','Pastel2',N_Models)];
-% %Col_MX = [0 0 0; cbrewer('qual','Dark2',N_Models)];
-
-
-%% Analysis Parameters: Comparison LiBr JC additivity vs no additivity
-% Salt = 'LiBr';
-% Theory = 'JC';
-% Models = {'' 'C3a' 'C3b' 'C3c' 'C3d' 'C3e' 'C6a1' 'C6a2' 'C6a3' 'C6a4' 'C6a5'};
-% Model_Labels = {'JC' 'No Additivity' 'No Additivity' 'No Additivity' 'No Additivity' 'No Additivity' ...
-%     'Additivity' 'Additivity' 'Additivity' 'Additivity' 'Additivity'};
-% Title_txt = ['\bf{Comparison of ' Salt ' ' Theory ' Models (Fixed Charge). Target = RS/WZ properties}'];
-% filename = [Salt '_' Theory '_' Models{1} '-' Models{end} '_PES.png'];
-% 
-% PlotType = 'lj';
-% 
-% N_Models = length(Models);
-% Col_MX = [0.2 0.2 0.2; cbrewer('seq','Blues',(N_Models-1)/2); cbrewer('seq','Reds',(N_Models-1)/2) ];
-% %Col_MX = [0.5 0.5 0.5; cbrewer('qual','Pastel2',N_Models)];
-% %Col_MX = [0 0 0; cbrewer('qual','Dark2',N_Models)];
-% 
-% Col_MX = min(Col_MX,1);
-
-%% Analysis Parameters: Comparison LiBr JC charge scaling vs no charge scaling
-% Salt = 'LiBr';
-% Theory = 'JC';
-% Models = {'' 'C5a' 'C5b' 'C5c' 'C5d' 'C5e' 'C6a1' 'C6a2' 'C6a3' 'C6a4' 'C6a5'};
-% Model_Labels = {'JC' 'Parameter Charge' 'Parameter Charge' 'Parameter Charge' 'Parameter Charge' 'Parameter Charge' ...
-%     'Fixed Charge' 'Fixed Charge' 'Fixed Charge' 'Fixed Charge' 'Fixed Charge'};
-% Title_txt = ['\bf{Comparison of ' Salt ' ' Theory ' Models (Fixed Charge). Target = RS/WZ properties}'];
-% filename = [Salt '_' Theory '_' Models{1} '-' Models{end} '_PES.png'];
-% 
-% PlotType = 'lj';
-% 
-% N_Models = length(Models);
-% Col_MX = [0.2 0.2 0.2; cbrewer('seq','Blues',(N_Models-1)/2); cbrewer('seq','Reds',(N_Models-1)/2) ];
-% %Col_MX = [0.5 0.5 0.5; cbrewer('qual','Pastel2',N_Models)];
-% %Col_MX = [0 0 0; cbrewer('qual','Dark2',N_Models)];
-% 
-% Col_MX = min(Col_MX,1);
-
-%% Analysis Parameters: Comparison LiBr JC charge scaling vs no charge scaling
-% Salt = 'LiBr';
-% Theory = 'TF';
-% Models = {'' 'B1'};
-% Model_Labels = {'JC' 'Model B1'};
-% Title_txt = ['\bf{Comparison of ' Salt ' ' Theory ' Models (Fixed Charge). Target = Everything}'];
-% filename = [Salt '_' Theory '_' Models{1} '-' Models{end} '_PES.png'];
-% 
-% PlotType = 'full';
-% 
-% N_Models = length(Models);
-% % Col_MX = [0.2 0.2 0.2; cbrewer('seq','Blues',(N_Models-1)/2); cbrewer('seq','Reds',(N_Models-1)/2) ];
-% %Col_MX = [0.5 0.5 0.5; cbrewer('qual','Pastel2',N_Models)];
-% Col_MX = [0 0 0; cbrewer('qual','Dark2',N_Models)];
-% 
-% Col_MX = min(Col_MX,1);
 
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 Settings = Initialize_MD_Settings;
-Settings.Salt = 'LiI';
-Settings.Theory = 'TF';
-Basenum = 'H';
-Midnum = 'A';
+Settings.Salt = 'LiF';
+Settings.Theory = 'BH';
+ModelID = 'MC4';
+PlotType = 'full';
+fs = 28; % font size
+lw = 3; % line width
+savefile = false; % switch to save the final plots to file
+Startpoint = 0.08; % nm
 
 % Find reps of models
-files = {dir(fullfile(ML_results_dir,['*' Basenum Midnum '*'])).name};
-Models = unique(regexp(files,[Basenum Midnum '([0-9]|[a-z])+'],'match','once'));
-nonempty_idx = ~cellfun(@isempty,Models);
-Models = Models(nonempty_idx);
-if ~isempty(Models)
-    [~,idx] = sort(cellfun(@str2double,regexp(Models,'[0-9]+','match','once')));
-    Models = Models(idx);
+if length(ModelID) > 2
+    Models = [{''} ModelID];
+else
+    files = {dir(fullfile(ML_results_dir,Settings.Salt,['*' ModelID '*'])).name};
+    Models = unique(regexp(files,[ModelID '([0-9]|[a-z])+'],'match','once'));
+    nonempty_idx = ~cellfun(@isempty,Models);
+    Models = Models(nonempty_idx);
+    if ~isempty(Models)
+        [~,idx] = sort(cellfun(@str2double,regexp(Models,'[0-9]+','match','once')));
+        Models = Models(idx);
+    end
+    Models = [{''} Models];
 end
-Models = [{''} Models];
-
-Title_txt = ['\bf{Comparison of ' Settings.Salt ' ' Settings.Theory ' Models (Fixed Charge). Target = RS Properties}'];
-filename = [Settings.Salt '_' Settings.Theory '_' Models{1} '-' Models{end} '_PES.png'];
-
-PlotType = 'full';
 
 N_Models = length(Models);
 % Col_MX = [0.2 0.2 0.2; cbrewer('seq','Blues',(N_Models-1)/2); cbrewer('seq','Reds',(N_Models-1)/2) ];
@@ -102,15 +33,11 @@ Col_MX = max(min(Col_MX,1),0);
 
 
 %% Other parameters
-savefile = false; % switch to save the final plots to file
-fs = 28; % font size
-lw = 3; % line width
-Startpoint = 0.001;
 Settings.WaterModel = 'SPC/E';
-Settings.Table_Length = 3;
+Settings.Table_Length = 3; % nm
 Settings.Table_StepSize = 0.001;
 Settings.MDP.vdw_modifier = 'potential-shift';
-Settings.MDP.RVDW_Cutoff = 1.9;
+Settings.MDP.RVDW_Cutoff = 1; % nm
 
 % Pre allocate graphics objects arrays
 h_MX = gobjects(N_Models,1);
@@ -124,17 +51,13 @@ ax = axes(figh,'Position',[0.100 0.1100 0.850 0.8150]); % [left bottom width hei
 hold(ax,'On')
 for idx = N_Models:-1:1
     ML_Model_Name = Models{idx};
-    if ~isempty(ML_Model_Name)
-        Settings.Model = ML_Model_Name;
-        [Settings,ModelFound] = Load_Model_Params(Settings);
-        if ~ModelFound
-            h_MM(idx) = [];
-            h_XX(idx) = [];
-            h_MX(idx) = [];
-            continue
-        end
-    else
-        Settings.Model = '';
+    Settings.Model = ML_Model_Name;
+    [Settings,ModelFound] = Load_Model_Params(Settings);
+    if ~ModelFound
+        h_MM(idx) = [];
+        h_XX(idx) = [];
+        h_MX(idx) = [];
+        continue
     end
     
     if strcmp(Settings.Theory,'JC')
@@ -237,7 +160,7 @@ if savefile
     Model_Labels = [{[Metal '$^{+}$' Halide '$^{-}$']}  ...
         {[Metal '$^{+}$' Metal '$^{+}$']} ...
         {[Halide '$^{-}$' Halide '$^{-}$']}];
-    legend(ax,[h_MX(1); h_MM(1); h_XX(1)],Model_Labels,'Interpreter','latex','location','northeast',...
+    legend(ax,[h_MX(2:end); h_MM(2:end); h_XX(2:end)],Models{2:end},'Interpreter','latex','location','northeast',...
         'NumColumns',1);
     
     set(figh,'renderer','opengl')
@@ -246,7 +169,16 @@ else
     Model_Labels = [{[Metal '$^{+}$' Halide '$^{-}$']}  ...
         {[Metal '$^{+}$' Metal '$^{+}$']} ...
         {[Halide '$^{-}$' Halide '$^{-}$']}];
-    legend(ax,[h_MX(1); h_MM(1); h_XX(1)],Model_Labels,'Interpreter','latex','location','northeast',...
-        'NumColumns',1);
+    legh = legend(ax,h_MX(2:end),Models{2:end},'Interpreter','latex',...
+        'NumColumns',1,'Location','NorthEast');
+    legend('boxoff')
+    
+    
+    %% Copy the axes and plot the second legned
+    ah = copyobj( ax, figh);
+    ah.Visible = 'off';
+    lh = legend(ah, [h_MX(1); h_MM(1); h_XX(1)],Model_Labels,'Interpreter','latex',...
+        'NumColumns',1,'Location','SouthEast');
+    legend('boxoff')
     
 end

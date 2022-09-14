@@ -10,16 +10,21 @@ end
 
 [~,~,~,~,Model_Data_Loc] = find_home;
 
-Model_Filename = fullfile(Model_Data_Loc,[Settings.Salt '_' Settings.Theory '_Model_' Settings.Model '_fullopt.mat']);
-BO_Filename = fullfile(Model_Data_Loc,[Settings.Salt '_' Settings.Theory '_Model_' Settings.Model '_bayesopt.mat']);
+Model_data_Filename = fullfile(Model_Data_Loc,Settings.Salt,[Settings.Salt '_' Settings.Theory '_Model_' Settings.Model '_data.mat']);
 
-Settings.S = Init_Scaling_Object;
-Settings.C6_Damp = Init_C6Damping_Object;
-Settings.CR_Damp = Init_CRDamping_Object;
-[Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
+if ~isfield(Settings,'S')
+    Settings.S = Init_Scaling_Object;
+    Settings.C6_Damp = Init_C6Damping_Object;
+    Settings.CR_Damp = Init_CRDamping_Object;
+    [Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
+end
     
 % Special case
 if isempty(Settings.Model)
+    Settings.S = Init_Scaling_Object;
+    Settings.C6_Damp = Init_C6Damping_Object;
+    Settings.CR_Damp = Init_CRDamping_Object;
+    [Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
     return
 elseif strcmp(Settings.Theory,'JC') && strcmp(Settings.Salt,'LiI') && strcmp(Settings.Model,'A')
     disp(['Model found. Loading ' Settings.Theory ' Model ' Settings.Model])
@@ -30,120 +35,11 @@ elseif strcmp(Settings.Theory,'JC') && strcmp(Settings.Salt,'LiI') && strcmp(Set
     return
 end
 
-if isfile(Model_Filename) && isfile(BO_Filename)
-    pdat = load(Model_Filename);
+if isfile(Model_data_Filename)
+    pdat = load(Model_data_Filename).full_data;
+    Settings = pdat.Settings;
     
-    warning('off','MATLAB:class:InvalidSuperClass')
-    warning('off','MATLAB:load:classNotFound')
-    warning('off','MATLAB:load:classError')
-    BO = load(BO_Filename);
-    warning('on','MATLAB:class:InvalidSuperClass')
-    warning('on','MATLAB:load:classNotFound')
-    warning('on','MATLAB:load:classError')
-    
-    s = functions(BO.results.ObjectiveFcn);
-    
-    if isfield(s.workspace{1},'Salt')
-        BO_WS = s.workspace{1};
-    else
-        BO_WS = s.workspace{1}.Model;
-    end
-    
-    if isfield(BO_WS,'Fix_Charge')
-        Fix_Charge = BO_WS.Fix_Charge;
-    else
-        Fix_Charge = true;
-    end
-    if isfield(BO_WS,'Additivity')
-        Additivity = BO_WS.Additivity;
-    else
-        Additivity = true;
-    end
-    if isfield(BO_WS,'Additional_MM_Disp')
-        Additional_MM_Disp = BO_WS.Additional_MM_Disp;
-    elseif isfield(BO_WS,'Additional_MM_Force')
-        Additional_MM_Disp = BO_WS.Additional_MM_Force;
-    else
-        Additional_MM_Disp = false;
-    end
-    if isfield(BO_WS,'Additional_GAdjust')
-        Additional_GAdjust = BO_WS.Additional_GAdjust;
-    else
-        Additional_GAdjust = {};
-    end
-    if isfield(BO_WS,'SigmaEpsilon')
-        SigmaEpsilon = BO_WS.SigmaEpsilon;
-    else
-        SigmaEpsilon = false;
-    end
-    if isfield(BO_WS,'C6Damp')
-        Settings.C6_Damp = BO_WS.C6Damp;
-        
-        def_C6Damp = Init_C6Damping_Object;
-        if ~isfield(Settings.C6_Damp,'input_rvdw')
-            Settings.C6_Damp.input_rvdw = def_C6Damp.input_rvdw;
-        end
-        if ~isfield(Settings.C6_Damp,'rvdw')
-            Settings.C6_Damp.rvdw = def_C6Damp.rvdw;
-        end
-        if ~isfield(Settings.C6_Damp,'N')
-            Settings.C6_Damp.N = def_C6Damp.N;
-        end
-    elseif isfield(BO_WS,'C6_Damp')
-        Settings.C6_Damp = BO_WS.C6_Damp;
-        
-        def_C6Damp = Init_C6Damping_Object;
-        if ~isfield(Settings.C6_Damp,'input_rvdw')
-            Settings.C6_Damp.input_rvdw = def_C6Damp.input_rvdw;
-        end
-        if ~isfield(Settings.C6_Damp,'rvdw')
-            Settings.C6_Damp.rvdw = def_C6Damp.rvdw;
-        end
-        if ~isfield(Settings.C6_Damp,'N')
-            Settings.C6_Damp.N = def_C6Damp.N;
-        end
-    else
-        Settings.C6_Damp = Init_C6Damping_Object;
-    end
-    
-    
-    if isfield(BO_WS,'CRDamp')
-        Settings.CR_Damp = BO_WS.CRDamp;
-    elseif isfield(BO_WS,'CR_Damp')
-        Settings.CR_Damp = BO_WS.CR_Damp;
-    else
-        % Used as the default in older models
-        Settings.CR_Damp.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping
-        Settings.CR_Damp.MX.b = 100; % sigmoid "steepness" for damping
-        Settings.CR_Damp.MM.r_d = 0.30; % LiCl = 0.21 , LiI = 0.24
-        Settings.CR_Damp.MM.b  = 75; % 75
-        Settings.CR_Damp.XX.r_d = 0.20; 
-        Settings.CR_Damp.XX.b  = 100;
-    end
-    
-
-    if isfield(BO_WS,'Additional_Function')
-        Additional_Function = BO_WS.Additional_Function;
-    else
-        Additional_Function = Init_Additional_Function;
-    end
-    
-    if isfield(BO_WS,'Fix_C8')
-        Fix_C8 = BO_WS.Fix_C8;
-    else
-        Fix_C8 = false;
-    end
-    
-    if isfield(BO_WS,'Fix_Alpha')
-        Fix_Alpha = BO_WS.Fix_Alpha;
-    else
-        Fix_Alpha = false;
-    end
-    if isfield(BO_WS,'Q_value')
-        Q_value = BO_WS.Q_value;
-    else
-        Q_value = 1;
-    end
+    Param = pdat.full_opt_point;
 else
     warning('Model not found.')
     ModelFound = false;
@@ -154,18 +50,10 @@ if damp_MM
     Settings.C6_Damp.MM = true;
 end
 
-if isfield(pdat,'full_opt_point')
-    Param = pdat.full_opt_point;
-else
-    warning('Model not found.')
-    ModelFound = false;
-    return
-end
-
 if strcmp(Settings.Theory,'TF')
 
     % Loose form of exp-C6-C8 model
-    if SigmaEpsilon
+    if Settings.SigmaEpsilon
         % Default model parameters: all length-scale units are nm,
         % energy scale units are kJ/mol
         DefMDSettings = Initialize_MD_Settings;
@@ -176,7 +64,7 @@ if strcmp(Settings.Theory,'TF')
         r0_MM = Param(1); % nm
         r0_XX = Param(2); % nm
 
-        if Additivity
+        if Settings.Additivity
             r0_MX = (r0_MM + r0_XX)/2; % nm
 
             epsilon_MM = Param(3); % kJ/mol
@@ -247,8 +135,8 @@ if strcmp(Settings.Theory,'TF')
         Settings.S.R.MX = B_MX/defTFMX.B;
 
         % Scaling Coulombic Charge
-        if Fix_Charge
-            Settings.S.Q = Q_value;
+        if Settings.Fix_Charge
+            Settings.S.Q = Settings.Q_value;
         else
             Settings.S.Q = Param(pidx+1);
         end
@@ -260,7 +148,7 @@ if strcmp(Settings.Theory,'TF')
         Settings.S.D6D.XX = Param(2);
         Settings.S.D6D.MX = Param(3);
 
-        if Fix_C8
+        if Settings.Fix_C8
 
             % Calculate value of C8 using recursive relations
             [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
@@ -308,7 +196,7 @@ if strcmp(Settings.Theory,'TF')
         end
         
         % Alpha (TF exponential steepness repulsive parameter)
-        if Fix_Alpha
+        if Settings.Fix_Alpha
             Settings.S.A.MM = 1;
             Settings.S.A.XX = 1;
             Settings.S.A.MX = 1;
@@ -326,8 +214,8 @@ if strcmp(Settings.Theory,'TF')
         pidx = pidx+3;
 
         % Scaling Coulombic Charge
-        if Fix_Charge
-            Settings.S.Q = Q_value;
+        if Settings.Fix_Charge
+            Settings.S.Q = Settings.Q_value;
         else
             Settings.S.Q = Param(pidx+1);
             pidx = pidx+1;
@@ -337,7 +225,7 @@ if strcmp(Settings.Theory,'TF')
 elseif strcmp(Settings.Theory,'BH') % Buckingham model
 
     % Loose form of exp-C6 model
-    if SigmaEpsilon
+    if Settings.SigmaEpsilon
 
         % Default model parameters: all length-scale units are nm, energy scale units are kJ/mol
         DefMDSettings = Initialize_MD_Settings;
@@ -348,7 +236,7 @@ elseif strcmp(Settings.Theory,'BH') % Buckingham model
         r0_MM = Param(1); % nm
         r0_XX = Param(2); % nm
 
-        if Additivity
+        if Settings.Additivity
             r0_MX = (r0_MM + r0_XX)/2; % nm
 
             epsilon_MM = Param(3); % kJ/mol
@@ -409,8 +297,8 @@ elseif strcmp(Settings.Theory,'BH') % Buckingham model
         Settings.S.R.MX = B_MX/defBHMX.B;
 
         % Scaling Coulombic Charge
-        if Fix_Charge
-            Settings.S.Q = Q_value;
+        if Settings.Fix_Charge
+            Settings.S.Q = Settings.Q_value;
         else
             Settings.S.Q = Param(pidx+1);
         end
@@ -418,7 +306,7 @@ elseif strcmp(Settings.Theory,'BH') % Buckingham model
     % Tight form of exp-C6 model
     else
 
-        if Additivity
+        if Settings.Additivity
             Settings.S.D.MM = Param(1);
             Settings.S.D.XX = Param(2);
             Settings.S.D.MX = sqrt(Settings.S.D.MM*Settings.S.D.XX);
@@ -441,30 +329,30 @@ elseif strcmp(Settings.Theory,'BH') % Buckingham model
         end
 
         % Alpha (TF exponential steepness repulsive parameter)
-        if ~Fix_Alpha
+        if ~Settings.Fix_Alpha
             Settings.S.A.MM = Param(pidx+1);
             Settings.S.A.XX = Param(pidx+2);
             Settings.S.A.MX = Param(pidx+3);
             pidx = pidx+3;
         end
 
-        if ~Fix_Charge
+        if ~Settings.Fix_Charge
             Settings.S.Q = Param(pidx+1);
             pidx = pidx+1;
 
-            if Additional_MM_Disp
+            if Settings.Additional_MM_Disp
                 Settings.S.D.MM = Settings.S.D.MM + Param(pidx+1);
             end
         else
-            Settings.S.Q = Q_value;
-            if Additional_MM_Disp
+            Settings.S.Q = Settings.Q_value;
+            if Settings.Additional_MM_Disp
                 Settings.S.D.MM = Settings.S.D.MM + Param(pidx+1);
             end
         end
     end
 else % JC models
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
-    if SigmaEpsilon
+    if Settings.SigmaEpsilon
         
         % Default JC params
         DefMDSettings = Initialize_MD_Settings;
@@ -476,7 +364,7 @@ else % JC models
 
         % D <-> sigma
         % R <-> epsilon
-        if Additivity
+        if Settings.Additivity
             % Sigma scaling
             Settings.S.S.MM = Param(1)/MMParams.sigma;
             Settings.S.S.XX = Param(2)/XXParams.sigma;
@@ -492,10 +380,10 @@ else % JC models
             Settings.S.E.MX = Epsilon_MX/def_E_MX;
 
             % Scaling Coulombic Charge
-            if Fix_Charge
-                Settings.S.Q = Q_value;
+            if Settings.Fix_Charge
+                Settings.S.Q = Settings.Q_value;
 
-                if Additional_MM_Disp
+                if Settings.Additional_MM_Disp
                     Full_MM_Epsilon = Param(3) + Param(5);
                     Settings.S.E.MM = Full_MM_Epsilon/MMParams.epsilon;
                     pidx = 5;
@@ -505,7 +393,7 @@ else % JC models
             else
                 Settings.S.Q = Param(5);
 
-                if Additional_MM_Disp
+                if Settings.Additional_MM_Disp
                     Full_MM_Epsilon = Param(3) + Param(6);
                     Settings.S.E.MM = Full_MM_Epsilon/MMParams.epsilon;
                     pidx = 6;
@@ -525,8 +413,8 @@ else % JC models
             Settings.S.E.MX = Param(6)/def_E_MX;
 
             % Scaling Coulombic Charge
-            if Fix_Charge
-                Settings.S.Q = Q_value;
+            if Settings.Fix_Charge
+                Settings.S.Q = Settings.Q_value;
                 pidx = 6;
             else
                 Settings.S.Q = Param(7);
@@ -535,7 +423,7 @@ else % JC models
         end
     % Scaled dispersion/repulsion form
     else
-        if Additivity
+        if Settings.Additivity
             % Dispersion
             Settings.S.D.MM = Param(1);
             Settings.S.D.XX = Param(2);
@@ -573,10 +461,10 @@ else % JC models
             Settings.S.R.MX = MX_R_scaled/MX_R;
 
             % Scaling Coulombic Charge
-            if Fix_Charge
-                Settings.S.Q = Q_value;
+            if Settings.Fix_Charge
+                Settings.S.Q = Settings.Q_value;
 
-                if Additional_MM_Disp
+                if Settings.Additional_MM_Disp
                     Settings.S.D.MM = Settings.S.D.MM + Param(5);
                     pidx = 5;
                 else
@@ -585,7 +473,7 @@ else % JC models
             else
                 Settings.S.Q = Param(5);
 
-                if Additional_MM_Disp
+                if Settings.Additional_MM_Disp
                     Settings.S.D.MM = Settings.S.D.MM + Param(6);
                     pidx = 6;
                 else
@@ -604,8 +492,8 @@ else % JC models
             Settings.S.R.MX = Param(6);
 
             % Scaling Coulombic Charge
-            if Fix_Charge
-                Settings.S.Q = Q_value;
+            if Settings.Fix_Charge
+                Settings.S.Q = Settings.Q_value;
                 pidx = 6;
             else
                 Settings.S.Q = Param(7);
@@ -616,7 +504,7 @@ else % JC models
 end
 
 % Perturb the potential with Gaussians
-if isempty(Additional_GAdjust)
+if isempty(Settings.Additional_GAdjust)
     Settings.GAdjust_MX = [0 0 1];  %[0 0 1];
     Settings.GAdjust_MM = [0 0 1];
     Settings.GAdjust_XX = [0 0 1];
@@ -627,8 +515,8 @@ else
     mx = 1;
     mm = 1;
     xx = 1;
-    for idx = 1:length(Additional_GAdjust)
-        int = [Additional_GAdjust{idx} '_' num2str(idx)];
+    for idx = 1:length(Settings.Additional_GAdjust)
+        int = [Settings.Additional_GAdjust{idx} '_' num2str(idx)];
         switch int
             case ['MM' '_' num2str(idx)]
                 Settings.GAdjust_MM(mm,1) = Param(pidx + 1);
@@ -655,8 +543,8 @@ ints = {'MM' 'XX' 'MX'};
 for idx = 1:length(ints)
     int = ints{idx};
     
-    if Additional_Function.(int).N >= 0
-        Settings.S.N.(int).Value = Additional_Function.(int).N;
+    if Settings.Additional_Function.(int).N >= 0
+        Settings.S.N.(int).Value = Settings.Additional_Function.(int).N;
         Settings.S.N.(int).Scale = Param(pidx + 1);
         pidx = pidx + 1;
     end

@@ -1,12 +1,12 @@
 % Script for plotting bayesian optimization results: model parameters correlated
 % with various target properties
-Salt = 'LiBr';
+Salt = 'LiI';
 Theory = 'BH';
-Model = 'FB1';
-Show = []; % Sort by loss function and only show the lowest-loss results.
-Show_init = 100;
+Model = 'MC1';
+Show = [50]; % Sort by loss function and only show the lowest-loss results.
+Show_init = [];
 fs = 10; % fontsize
-scat_size = 100;
+scat_size = 50;
 show_as_percent_error = true; % Plot as percent error. Does not apply to 'Loss'. Plot results as error w.r.t. DFT results
 show_as_scale = true; % When true, plot parameters as the scaling w.r.t. default model rather than the parameter value itself
 show_additivity = false; % When true, shows the distribution of cross interactions
@@ -33,7 +33,9 @@ end
 
 % Load data
 data = load(model_filename).full_data;
+Settings = data.Settings;
 results = data.bayesopt_results;
+params = bayesopt_params(data.Settings);
 clear('data')
 
 if isempty(Show_init)
@@ -51,13 +53,16 @@ else
     % Get user data: crystal properties at each point
     Crystal_data_full = results.UserDataTrace(1:Show_init);
 end
-
+lossnan = isnan(losses);
+losses(lossnan) = [];
+search_pnts_nan =  search_pnts(lossnan,:);
+search_pnts(lossnan,:) = [];
 
 % Get the Structures (same order at each point)
 N = length(Crystal_data_full{1});
 Structures = cell(1,N);
 for idx = 1:N
-    Structures{idx} = Crystal_data_full{1}{idx}.Structure;
+    Structures{idx} = Crystal_data_full{1}.Minimization_Data{idx}.Structure;
 end
 
 % Get the property of interest
@@ -68,7 +73,7 @@ Crystal_data = nan(1,M);
 switch lower(Property)
     case 'c_over_a'
         for idx = 1:M
-            Crystal_data(idx) = Crystal_data_full{idx}{structure_idx}.c / Crystal_data_full{idx}{structure_idx}.a;
+            Crystal_data(idx) = Crystal_data_full{idx}.Minimization_Data{structure_idx}.c / Crystal_data_full{idx}.Minimization_Data{structure_idx}.a;
         end
         Heatmap_Label = [Structure ' c/a'];
         clog = false;
@@ -78,7 +83,7 @@ switch lower(Property)
         clog = false;
     otherwise
         for idx = 1:M
-            Crystal_data(idx) = Crystal_data_full{idx}{structure_idx}.(Property);
+            Crystal_data(idx) = Crystal_data_full{idx}.Minimization_Data{structure_idx}.(Property);
         end
         Heatmap_Label = [Structure ' ' Property];
         
@@ -195,27 +200,34 @@ if ~show_as_scale && strcmp(Theory,'JC')
         search_pnts_cut.RMX = MX_R.*search_pnts_cut.SRMX;
     end
     
-elseif ~show_as_scale && strcmp(Theory,'TF')
-    PotSettings = Initialize_MD_Settings;
-    PotSettings.Salt = Salt;
-    PotSettings.S = Init_Scaling_Object;
-    [OutputMX,OutputMM,OutputXX] = TF_Potential_Parameters(PotSettings);
+elseif strcmp(Theory,'BH')
     
-    search_pnts_cut.D6MM = search_pnts_cut.SD6MM*OutputMM.C;
-    search_pnts_cut.D6XX = search_pnts_cut.SD6XX*OutputXX.C;
-    search_pnts_cut.D6MX = search_pnts_cut.SD6MX*OutputMX.C;
-    
-    search_pnts_cut.D8MM = search_pnts_cut.SD8MM*OutputMM.D;
-    search_pnts_cut.D8XX = search_pnts_cut.SD8XX*OutputXX.D;
-    search_pnts_cut.D8MX = search_pnts_cut.SD8MX*OutputMX.D;
-    
-    search_pnts_cut.AMM = search_pnts_cut.SAMM*OutputMM.alpha;
-    search_pnts_cut.AXX = search_pnts_cut.SAXX*OutputXX.alpha;
-    search_pnts_cut.AMX = search_pnts_cut.SAMX*OutputMX.alpha;
-    
-    search_pnts_cut.RMM = search_pnts_cut.SRMM*OutputMM.B;
-    search_pnts_cut.RXX = search_pnts_cut.SRXX*OutputXX.B;
-    search_pnts_cut.RMX = search_pnts_cut.SRMX*OutputMX.B;
+    if show_as_scale
+        Settings = Get_Scaling_Params(Settings,search_pnts_cut);
+        search_pnts_cut.SDMM = Settings.S.D.MM;
+        search_pnts_cut.SDXX = Settings.S.D.XX;
+        search_pnts_cut.SRMM = Settings.S.R.MM;
+        search_pnts_cut.SRXX = Settings.S.R.XX;
+        search_pnts_cut.SAMX = Settings.S.A.MX;
+        search_pnts_cut.r0_MM = [];
+        search_pnts_cut.r0_XX = [];
+        search_pnts_cut.epsilon_MM = [];
+        search_pnts_cut.epsilon_XX = [];
+        search_pnts_cut.gamma_MX = [];
+        
+        Settings = Get_Scaling_Params(Settings,search_pnts_nan);
+        search_pnts_nan.SDMM = Settings.S.D.MM;
+        search_pnts_nan.SDXX = Settings.S.D.XX;
+        search_pnts_nan.SRMM = Settings.S.R.MM;
+        search_pnts_nan.SRXX = Settings.S.R.XX;
+        search_pnts_nan.SAMX = Settings.S.A.MX;
+        search_pnts_nan.r0_MM = [];
+        search_pnts_nan.r0_XX = [];
+        search_pnts_nan.epsilon_MM = [];
+        search_pnts_nan.epsilon_XX = [];
+        search_pnts_nan.gamma_MX = [];
+        
+    end
 end
 
 if show_as_sigma_epsilon && strcmp(Theory,'JC')
@@ -327,6 +339,7 @@ end
 % Gather variable names
 [~,N] = size(search_pnts_cut);
 param_names = search_pnts_cut.Properties.VariableNames;
+param_transform = {params.Transform};
 pnames = cell(size(param_names));
 for idx = 1:N
     switch param_names{idx}
@@ -474,8 +487,15 @@ for idx = 1:N
         nexttile;
         if idx == jdx
             
-            % Do histogram            
-            P(idx,jdx) = histogram(search_pnts_cut{:,idx},50);
+            % Do histogram  
+            if strcmp(param_transform{idx},'log')
+                [~,edges] = histcounts(log(search_pnts_cut{:,idx}),50);
+                P(idx,jdx) = histogram(search_pnts_cut{:,idx},exp(edges));
+                
+            else
+                P(idx,jdx) = histogram(search_pnts_cut{:,idx},50);
+            end
+            
             %P(idx,jdx) = scatter(search_pnts_cut{:,idx},losses_srt_cut);
             cur_ax = P(idx,jdx).Parent;
             
@@ -493,25 +513,44 @@ for idx = 1:N
             % some axis properties
             set(cur_ax,'XGrid','On','YGrid','On','GridLineStyle','-','Layer','Top',...
                 'TickLength',[0 0],'FontSize',fs,'TickLabelInterpreter','latex')
+            
+            if strcmp(param_transform{idx},'log')
+                set(cur_ax, 'XScale', 'log')
+            end
+            
         else
             % do scatter plot
             X = search_pnts_cut{:,jdx};
             Y = search_pnts_cut{:,idx};
             
+            Xnan = search_pnts_nan{:,jdx};
+            Ynan = search_pnts_nan{:,idx};
+            
             P(idx,jdx) = scatter(X,Y,10,Crystal_data_cut,'filled','SizeData',scat_size,...
                 'MarkerEdgeColor','k');
             cur_ax = P(idx,jdx).Parent;
+            hold(cur_ax,'on')
+            if isempty(Show)
+                scatter(Xnan,Ynan,10,'g','filled','SizeData',scat_size/5,...
+                    'MarkerEdgeColor','k');
+            end
             
             if idx ~= N
                 cur_ax.XTickLabel = [];
             else
                 xlabel(cur_ax,pnames{jdx},'Interpreter','latex','FontSize',fs);
             end
+            if strcmp(param_transform{jdx},'log')
+                set(cur_ax, 'XScale', 'log')
+            end
             
             if jdx ~= 1
                 cur_ax.YTickLabel = [];
             else
                 ylabel(cur_ax,pnames{idx},'Interpreter','latex','FontSize',fs);
+            end
+            if strcmp(param_transform{idx},'log')
+                set(cur_ax, 'YScale', 'log')
             end
             
             % some axis properties
@@ -544,28 +583,36 @@ drawnow
 % Set pseudo Y-ticks on the histograms
 for idx = 1:N
     ax11 = P(idx,idx).Parent;
-    
-    if idx == 1
-        ax12 = P(idx,2).Parent;
-    else
-        ax12 = P(idx,idx-1).Parent;
-    end
-    
-    axlabs_12 = ax12.YTick;
-    axlim_11 = ax11.YLim;
-    
-    ax11.YTick = linspace(axlim_11(1),axlim_11(end),length(axlabs_12));
-    
-    bot_scl = ax12.YLim(1)./ax12.YTick(1);
-    if isnan(bot_scl)
-        bot_scl = 1;
-    end
-    top_scl = ax12.YLim(2)./ax12.YTick(end);
-    if isnan(top_scl)
-        top_scl = 1;
-    end
-    
-    ax11.YLim = ax11.YLim.*[bot_scl top_scl];
+    ax11.YGrid='off';
+%     if ~strcmp(param_transform{idx},'log')
+%     
+%         ax11 = P(idx,idx).Parent;
+% 
+%         if idx == 1
+%             ax12 = P(idx,2).Parent;
+%         else
+%             ax12 = P(idx,idx-1).Parent;
+%         end
+% 
+%         axlabs_12 = ax12.YTick;
+%         axlim_11 = ax11.YLim;
+% 
+%         ax11.YTick = linspace(axlim_11(1),axlim_11(end),length(axlabs_12));
+% 
+%         bot_scl = ax12.YLim(1)./ax12.YTick(1);
+%         if isnan(bot_scl)
+%             bot_scl = 1;
+%         end
+%         top_scl = ax12.YLim(2)./ax12.YTick(end);
+%         if isnan(top_scl)
+%             top_scl = 1;
+%         end
+% 
+%         ax11.YLim = ax11.YLim.*[bot_scl top_scl];
+%     else
+%         ax11 = P(idx,idx).Parent;
+%         ax11.YGrid='off';
+%     end
 end
 
 % Correct the Y-label at the 1,1 position

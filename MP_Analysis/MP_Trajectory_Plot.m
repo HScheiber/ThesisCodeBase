@@ -4,7 +4,7 @@
 % Density Profile Plotting
 home = find_home;
 %DataFile = fullfile(home,'data','Melting_Point_Data.mat');
-DataFile = fullfile(home,'data','Prod2_MP_Data.mat');
+DataFile = fullfile(home,'data','Melting_Point_Data.mat');
 
 global app
 app.Data = load(DataFile).Data;
@@ -17,7 +17,8 @@ app.Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'KF' 'KCl' 'KBr' 'KI' ...
          'RbF' 'RbCl' 'RbBr' 'RbI' ...
          'CsF' 'CsCl' 'CsBr' 'CsI'};
-app.fs = 24;
+app.fs = 32;
+app.lw = 3;
 
 % Setup empty plot
 app.figh = figure('WindowState','maximized','NumberTitle','off',...
@@ -156,9 +157,9 @@ function PlotChangeCallback(src,~)
     for pidx = 1:N_plots
         col = colours(pidx,:);
         X = 1:length(app.T_Traces{pidx});
-        yline(app.axh,app.Tms{pidx},':','LineWidth',1,'Color',col)
-        plt_objs(pidx) = plot(app.axh,X,app.T_Traces{pidx},'-','LineWidth',2,'Color',col);
-        scatter(app.axh,X,app.T_Traces{pidx},100,app.CDatas{pidx},'filled','LineWidth',2,'MarkerEdgeColor','k');
+        yline(app.axh,app.Tms{pidx},'-.','LineWidth',app.lw,'Color',col)
+        plt_objs(pidx) = plot(app.axh,X,app.T_Traces{pidx},'-','LineWidth',app.lw,'Color',col);
+        scatter(app.axh,X,app.T_Traces{pidx},150,app.CDatas{pidx},'filled','LineWidth',app.lw-1,'MarkerEdgeColor','k');
         X_max = max([X_max X]);
     end
     legend(app.axh,plt_objs,app.LegTexts,'Fontsize',app.fs,'Interpreter','latex',...

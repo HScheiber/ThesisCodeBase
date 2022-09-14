@@ -2,10 +2,10 @@
 
 %% Analysis Parameters
 fs = 24;
-Salt = 'NaCl';
+Salt = 'LiF';
 Theory = 'BH';
-Basenum = 'K';
-Midnum = 'A';
+Basenum = 'M';
+Midnum = 'C';
 min_iter = 1; % Set the first iterations to show, set to 1 for all numbers
 max_iter = Inf; % Set the max to show, set to Inf for all numbers
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
