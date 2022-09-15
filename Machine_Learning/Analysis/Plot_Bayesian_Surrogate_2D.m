@@ -1,12 +1,12 @@
 %clear;
 global sldr_h results X Y idx_X idx_Y input_table p full_opt_point ...
-    full_opt_eval bayes_opt_eval bayes_opt_point bayes_opt_est_eval bayes_opt_est_point show_error
+    full_opt_eval bayes_opt_eval bayes_opt_point bayes_opt_est_eval bayes_opt_est_point show_error transforms_extra
 % Analysis parameters
 Salt = 'LiI';
 Theory = 'BH';
 Model = 'MC1'; % C5squaredexponential
-Plot_X = 'epsilon_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
-Plot_Y = 'epsilon_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+Plot_X = 'r0_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
+Plot_Y = 'r0_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
 
 % 'r0_MM'    'r0_XX'    'epsilon_MM'    'epsilon_XX'    'gamma_MX'
 
@@ -14,25 +14,25 @@ grid_density = 50; % Parameter to set the grid density
 fs = 24;
 show_error = false;
 
-Model_type = 'objective'; % constraints, error, objective
+Model_type = 'error'; % constraints, error, objective
 
 % Load data
 A = load(fullfile('C:\Users\Hayden\Documents\Patey_Lab\BO_Models',Salt,[Salt '_' Theory '_Model_' Model '_data.mat'])).full_data;
 results = A.bayesopt_results;
 
-bayes_opt_eval = nan; results.MinObjective;
-bayes_opt_point = table2array(results.NextPoint); %table2array(results.XAtMinObjective);
+bayes_opt_eval = results.MinObjective;
+bayes_opt_point = table2array(results.XAtMinObjective);
 
 bayes_opt_est_eval = nan;
-bayes_opt_est_point = table2array(results.NextPoint); %table2array(results.XAtMinEstimatedObjective);
+bayes_opt_est_point = table2array(results.XAtMinEstimatedObjective);
 
 % Load best point
-%A = load(['C:\Users\Hayden\Documents\Patey_Lab\BO_Models\' Salt '_' Theory '_Model_' Model '_fullopt.mat']);
 full_opt_point = A.full_opt_point;
 full_opt_eval = A.loss;
 
 % Variable names
 varnames = {results.VariableDescriptions.Name};
+transforms = {results.VariableDescriptions.Transform};
 N_vars = length(varnames);
 
 % Get indexes of the options of interest
@@ -49,13 +49,23 @@ Y_bayes_est = bayes_opt_est_point(idx_Y);
 
 % Get limits of X and Y coordinate
 lims_X = results.VariableDescriptions(idx_X).Range;
+Transform_X = transforms{idx_X};
 lims_Y = results.VariableDescriptions(idx_Y).Range;
+Transform_Y = transforms{idx_Y};
 
 % Generate grids of X and Y coordinate
-gridsize_X = diff(lims_X)/grid_density;
-gridsize_Y = diff(lims_Y)/grid_density;
-Grid_X = lims_X(1):gridsize_X:lims_X(2);
-Grid_Y = lims_Y(1):gridsize_Y:lims_Y(2);
+if strcmp(Transform_X,'log')
+    Grid_X = linspace(log(lims_X(1)),log(lims_X(2)),grid_density+1);
+    Grid_X = exp(Grid_X);
+else
+    Grid_X = linspace(lims_X(1),lims_X(2),grid_density+1);
+end
+if strcmp(Transform_Y,'log')
+    Grid_Y = linspace(log(lims_Y(1)),log(lims_Y(2)),grid_density+1);
+    Grid_Y = exp(Grid_Y);
+else
+    Grid_Y = linspace(lims_Y(1),lims_Y(2),grid_density+1);
+end
 
 [X,Y] = meshgrid(Grid_X,Grid_Y);
 
@@ -111,21 +121,31 @@ ax = axes(figh,'Position',[0.200 0.1100 0.700 0.8150]); % [left bottom width hei
 
 % Add sliders
 varnames_extra = varnames;
+transforms_extra = transforms;
 varnames_extra([idx_X idx_Y]) = [];
+transforms_extra([idx_X idx_Y]) = [];
 N_vars_extra = N_vars-2;
 
 sldr_h = gobjects(N_vars_extra*2,1);
 for idx = 1:N_vars_extra
     
+    [~,idx_Q] = contained_in_cell(varnames_extra{idx},varnames);
+    Transform_Q = transforms_extra{idx};
+    lims_Q = results.VariableDescriptions(idx_Q).Range;
     x0 = full_opt_point(idxs(idx));
-    x0_str = num2str(x0,'%.4f');
+    
+    if strcmp(Transform_Q,'log')
+        lims_Q = log(lims_Q);
+        x0 = log(x0);
+        x0_str = num2str(exp(x0),'%.4f');
+    else
+        x0_str = num2str(x0,'%.4f');
+    end
+    
     
     textpos  = [0 0.7-0.1*idx    0.15 0.05]; % [left bottom width height]
     slidepos = [0 0.65-0.1*idx 0.15 0.05]; % [left bottom width height]
     str = [varnames_extra{idx} ' = ' x0_str];
-    
-    [~,idx_Q] = contained_in_cell(varnames_extra{idx},varnames);
-    lims_Q = results.VariableDescriptions(idx_Q).Range;
     
     sldr_h(idx) = uicontrol(figh,'Style','Text','Units','Normalized','Position',textpos,...
         'String',str,'FontSize',fs-4,'Tag',varnames_extra{idx});
@@ -175,37 +195,57 @@ legend(ax,h,{'Full Opt.','Bayes. Opt.','Est. Bayes. Opt.'},...
 xlim(ax,lims_X)
 ylim(ax,lims_Y)
 
+if strcmp(Transform_X,'log')
+    set(ax, 'XScale', 'log')
+end
+if strcmp(Transform_Y,'log')
+    set(ax, 'YScale', 'log')
+end
+
+
 function output = param_name_map(p_name,Salt)
     [Metal,Halide] = Separate_Metal_Halide(Salt);
-    switch p_name
-        case 'SDMM'
+    switch lower(p_name)
+        case 'sdmm'
             output = ['$S_D$[' Metal '-' Metal ']'];
-        case 'SDXX'
+        case 'sdxx'
             output = ['$S_D$[' Halide '-' Halide ']'];
-        case 'SRMM'
+        case 'srmm'
             output = ['$S_R$[' Metal '-' Metal ']'];
-        case 'SRXX'
+        case 'srxx'
             output = ['$S_R$[' Halide '-' Halide ']'];
-        case 'SNMM'
+        case 'snmm'
             output = ['$S_N$[' Metal '-' Metal ']'];
-        case 'SNXX'
+        case 'snxx'
             output = ['$S_N$[' Halide '-' Halide ']'];
-        case 'SNMX'
+        case 'snmx'
             output = ['$S_N$[' Metal '-' Halide ']'];
-        case 'SQ'
+        case 'sq'
             output = '$S_Q$';
-        case 'Sigma_MM'
+        case 'sigma_mm'
             output = ['$\sigma$[' Metal '-' Metal ']'];
-        case 'Sigma_XX'
+        case 'sigma_xx'
             output = ['$\sigma$[' Halide '-' Halide ']'];
-        case 'Sigma_MX'
+        case 'sigma_mx'
             output = ['$\sigma$[' Metal '-' Halide ']'];
-        case 'Epsilon_MM'
+        case 'epsilon_mm'
             output = ['$\varepsilon$[' Metal '-' Metal ']'];
-        case 'Epsilon_XX'
+        case 'epsilon_xx'
             output = ['$\varepsilon$[' Halide '-' Halide ']'];
-        case 'Epsilon_MX'
-            output = ['$\varepsilon$[' Metal '-' Halide ']'];            
+        case 'epsilon_mx'
+            output = ['$\varepsilon$[' Metal '-' Halide ']'];
+        case 'r0_xx'
+            output = ['$r_{0}$[' Halide '-' Halide ']'];
+        case 'r0_mm'
+            output = ['$r_{0}$[' Metal '-' Metal ']'];
+        case 'r0_mx'
+            output = ['$r_{0}$[' Metal '-' Halide ']'];
+        case 'gamma_mx'
+            output = ['\gamma$[' Metal '-' Halide ']'];
+        case 'gamma_mm'
+            output = ['\gamma$[' Metal '-' Metal ']'];
+        case 'gamma_xx'
+            output = ['\gamma$[' Halide '-' Halide ']'];
         otherwise
             output = p_name;
     end
@@ -213,7 +253,7 @@ end
 
 function UpdatePlot(src,~)
     global sldr_h results X input_table p full_opt_point idx_X idx_Y...
-        bayes_opt_point bayes_opt_est_point show_error
+        bayes_opt_point bayes_opt_est_point show_error transforms_extra
     
     if strcmp(src.Style,'pushbutton')
         
@@ -229,11 +269,14 @@ function UpdatePlot(src,~)
                 for idx = 1:N_vars
                     jdx = fidx(idx);
                     varname = input_table.Properties.VariableNames{jdx};
+                    Transform_Q = results.VariableDescriptions(jdx).Transform;
                     Val = full_opt_point(jdx);
-                    
-                    sldr_h(N_vars+idx).Value = Val;
-                    
                     str = [varname ' = ' num2str(Val,'%.4f')];
+                    
+                    if strcmp(Transform_Q,'log')
+                        Val = log(Val);
+                    end
+                    sldr_h(N_vars+idx).Value = Val;
                     set(sldr_h(idx),'String',str)
                 end
                 
@@ -246,11 +289,15 @@ function UpdatePlot(src,~)
                 for idx = 1:N_vars
                     jdx = fidx(idx);
                     varname = input_table.Properties.VariableNames{jdx};
+                    Transform_Q = results.VariableDescriptions(jdx).Transform;
                     Val = bayes_opt_point(jdx);
+                    str = [varname ' = ' num2str(Val,'%.4f')];
+                    
+                    if strcmp(Transform_Q,'log')
+                        Val = log(Val);
+                    end
                     
                     sldr_h(N_vars+idx).Value = Val;
-                    
-                    str = [varname ' = ' num2str(Val,'%.4f')];
                     set(sldr_h(idx),'String',str)
                 end
                 
@@ -263,11 +310,15 @@ function UpdatePlot(src,~)
                 for idx = 1:N_vars
                     jdx = fidx(idx);
                     varname = input_table.Properties.VariableNames{jdx};
+                    Transform_Q = results.VariableDescriptions(jdx).Transform;
                     Val = bayes_opt_est_point(jdx);
+                    str = [varname ' = ' num2str(Val,'%.4f')];
+                    
+                    if strcmp(Transform_Q,'log')
+                        Val = log(Val);
+                    end
                     
                     sldr_h(N_vars+idx).Value = Val;
-                    
-                    str = [varname ' = ' num2str(Val,'%.4f')];
                     set(sldr_h(idx),'String',str)
                 end
                 
@@ -281,13 +332,17 @@ function UpdatePlot(src,~)
         Scaling = sldr_h(t_idx).Tag; % Scaling selected
         Val = sldr_h(s_idx).Value; % Current value
         
+        Transform_Q = transforms_extra{t_idx};
+        if strcmp(Transform_Q,'log')
+            Val = exp(Val);
+        end
+        
         % Update the string
         str = [Scaling ' = ' num2str(Val,'%.4f')];
         set(sldr_h(t_idx),'String',str)
         
         % Prepare input table
         input_table.(Scaling) = repmat(Val,height(input_table),1);
-
     end
     
     % Sample the model at the grid points

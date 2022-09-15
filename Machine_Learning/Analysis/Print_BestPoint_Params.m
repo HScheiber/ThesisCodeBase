@@ -3,7 +3,7 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BH';
 ModelID = 'MC';
-BestOnly = false;
+Plot_As_Scaling = true;
 Reps = [1:5];
 
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
@@ -26,6 +26,15 @@ end
 Models = intersect(Models_of_Interest,Models);
 N_Models = numel(Models);
 
+% if strcmp(Theory,'BH')
+%     if Plot_As_Scaling
+%         par_matrix = nan(N_Salts,N_Models,9);
+%     else
+%         par_matrix = nan(N_Salts,N_Models,7);
+%     end
+% elseif strcmp(Theory,'JC')
+%     par_matrix = nan(N_Salts,N_Models,6);
+% end
 
 Settings = Initialize_MD_Settings;
 for idx = 1:N_Salts
@@ -55,6 +64,13 @@ for idx = 1:N_Salts
                 Param.(Param_names{jdx}) = params(jdx);
             end
             Settings = Get_Scaling_Params(Settings,Param);
+            
+            if contained_in_cell('r0_MM',Param.Properties.VariableNames) && Settings.Additivity
+                Param.r0_MX = (Param.r0_MM + Param.r0_XX)/2;
+                Param.epsilon_MX = sqrt(Param.epsilon_MM * Param.epsilon_XX);
+                Param_names{end+1} = 'r0_MX';
+                Param_names{end+1} = 'epsilon_MX';
+            end
             
             disp(repmat('*',1,50))
             disp([Salt ', ' Theory ', Model ' Model '.'])

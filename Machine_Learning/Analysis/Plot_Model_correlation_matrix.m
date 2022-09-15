@@ -9,7 +9,7 @@ fs = 10; % fontsize
 scat_size = 50;
 show_as_percent_error = true; % Plot as percent error. Does not apply to 'Loss'. Plot results as error w.r.t. DFT results
 show_as_scale = true; % When true, plot parameters as the scaling w.r.t. default model rather than the parameter value itself
-show_additivity = false; % When true, shows the distribution of cross interactions
+show_additivity = true; % When true, shows the distribution of cross interactions
 show_as_sigma_epsilon = false; % When true, transform JC parameters into sigma-epsilon form
 
 % Properties to correlate with model parameters
@@ -25,10 +25,6 @@ model_filename = fullfile(ML_results_dir,Salt,[Salt '_' Theory '_Model_' Model '
 
 if ~isfile(model_filename)
     error(['No results found for: ' Salt ', ' Theory ', Model ' Model '.']);
-end
-
-if strcmp(Theory,'TF') % Cannot show additivity for TF model
-    show_additivity = false;
 end
 
 % Load data
@@ -113,7 +109,7 @@ else
 end
 
 % Generate the MX parameters by additivity if they aren't present
-if ~contained_in_cell('SDMX',search_pnts_cut.Properties.VariableNames) && show_additivity
+if strcmp(Theory,'JC') && ~contained_in_cell('SDMX',search_pnts_cut.Properties.VariableNames) && show_additivity
     
     PotSettings = Initialize_MD_Settings;
     PotSettings.Salt = Salt;
@@ -150,6 +146,7 @@ if contained_in_cell('SDMM2',search_pnts_cut.Properties.VariableNames)
     search_pnts_cut.SDMM2 = [];
 end
 
+param_transform = {params.Transform};
 if ~show_as_scale && strcmp(Theory,'JC')
     
     PotSettings = Initialize_MD_Settings;
@@ -189,6 +186,13 @@ elseif strcmp(Theory,'BH')
         search_pnts_cut.SRMM = Settings.S.R.MM;
         search_pnts_cut.SRXX = Settings.S.R.XX;
         search_pnts_cut.SAMX = Settings.S.A.MX;
+        if show_additivity
+            search_pnts_cut.SDMX = Settings.S.D.MX;
+            search_pnts_cut.SRMX = Settings.S.R.MX;
+            param_transform{end+1} = 'none';
+            param_transform{end+1} = 'none';
+        end
+        
         search_pnts_cut.r0_MM = [];
         search_pnts_cut.r0_XX = [];
         search_pnts_cut.epsilon_MM = [];
@@ -201,12 +205,15 @@ elseif strcmp(Theory,'BH')
         search_pnts_nan.SRMM = Settings.S.R.MM;
         search_pnts_nan.SRXX = Settings.S.R.XX;
         search_pnts_nan.SAMX = Settings.S.A.MX;
+        if show_additivity
+            search_pnts_nan.SDMX = Settings.S.D.MX;
+            search_pnts_nan.SRMX = Settings.S.R.MX;
+        end
         search_pnts_nan.r0_MM = [];
         search_pnts_nan.r0_XX = [];
         search_pnts_nan.epsilon_MM = [];
         search_pnts_nan.epsilon_XX = [];
         search_pnts_nan.gamma_MX = [];
-        
     end
 end
 
@@ -319,7 +326,6 @@ end
 % Gather variable names
 [~,N] = size(search_pnts_cut);
 param_names = search_pnts_cut.Properties.VariableNames;
-param_transform = {params.Transform};
 pnames = cell(size(param_names));
 for idx = 1:N
     switch param_names{idx}
@@ -460,11 +466,13 @@ end
 
 x = 0;
 P = gobjects(N,N);
+axh = gobjects(N,N);
 T = tiledlayout(figh,N,N, 'Padding', 'loose', 'TileSpacing', 'tight'); 
 for idx = 1:N
     for jdx = 1:N
         x = x+1;
-        nexttile;
+        axh(idx,jdx) = nexttile;
+        
         if idx == jdx
             
             % Do histogram  
@@ -477,25 +485,25 @@ for idx = 1:N
             end
             
             %P(idx,jdx) = scatter(search_pnts_cut{:,idx},losses_srt_cut);
-            cur_ax = P(idx,jdx).Parent;
             
             if idx ~= N
-                cur_ax.XTickLabel = [];
+                axh(idx,jdx).XTickLabel = [];
             else
-                xlabel(cur_ax,pnames{jdx},'Interpreter','latex','FontSize',fs);
+                xlabel(axh(idx,jdx),pnames{jdx},'Interpreter','latex','FontSize',fs);
             end
-            if jdx ~= 1
-                cur_ax.YTickLabel = [];
-            else
-                ylabel(cur_ax,pnames{idx},'Interpreter','latex','FontSize',fs);
-            end
+%             if jdx ~= 1
+%                 cur_ax.YTickLabel = [];
+%             else
+%                 ylabel(cur_ax,pnames{idx},'Interpreter','latex','FontSize',fs);
+%             end
+            axh(idx,jdx).YTickLabel = [];
             
             % some axis properties
-            set(cur_ax,'XGrid','On','YGrid','On','GridLineStyle','-','Layer','Top',...
+            set(axh(idx,jdx),'XGrid','On','YGrid','On','GridLineStyle','-','Layer','Top',...
                 'TickLength',[0 0],'FontSize',fs,'TickLabelInterpreter','latex')
             
             if strcmp(param_transform{idx},'log') || show_as_scale
-                set(cur_ax, 'XScale', 'log')
+                set(axh(idx,jdx), 'XScale', 'log')
             end
             
         else
@@ -508,37 +516,37 @@ for idx = 1:N
             
             P(idx,jdx) = scatter(X,Y,10,Crystal_data_cut,'filled','SizeData',scat_size,...
                 'MarkerEdgeColor','k');
-            cur_ax = P(idx,jdx).Parent;
-            hold(cur_ax,'on')
+            %cur_ax = P(idx,jdx).Parent;
+            hold(axh(idx,jdx),'on')
             if isempty(Show)
                 scatter(Xnan,Ynan,10,'g','filled','SizeData',scat_size/5,...
                     'MarkerEdgeColor','k');
             end
             
             if idx ~= N
-                cur_ax.XTickLabel = [];
+                axh(idx,jdx).XTickLabel = [];
             else
-                xlabel(cur_ax,pnames{jdx},'Interpreter','latex','FontSize',fs);
+                xlabel(axh(idx,jdx),pnames{jdx},'Interpreter','latex','FontSize',fs);
             end
             if strcmp(param_transform{jdx},'log') || show_as_scale
-                set(cur_ax, 'XScale', 'log')
+                set(axh(idx,jdx), 'XScale', 'log')
             end
             
             if jdx ~= 1
-                cur_ax.YTickLabel = [];
+                axh(idx,jdx).YTickLabel = [];
             else
-                ylabel(cur_ax,pnames{idx},'Interpreter','latex','FontSize',fs);
+                ylabel(axh(idx,jdx),pnames{idx},'Interpreter','latex','FontSize',fs);
             end
             if strcmp(param_transform{idx},'log') || show_as_scale
-                set(cur_ax, 'YScale', 'log')
+                set(axh(idx,jdx), 'YScale', 'log')
             end
             
             % some axis properties
-            set(cur_ax,'XGrid','On','YGrid','On','GridLineStyle','-','Layer','Top',...
+            set(axh(idx,jdx),'XGrid','On','YGrid','On','GridLineStyle','-','Layer','Top',...
                 'FontSize',fs,'TickLabelInterpreter','latex')
         end
         if clog
-            set(cur_ax,'ColorScale','log')
+            set(axh(idx,jdx),'ColorScale','log')
         end
     end
 end
@@ -546,12 +554,12 @@ drawnow
 
 % Set the proper X-limits on the histograms
 for idx = 1:N
-    ax11 = P(idx,idx).Parent;
+    ax11 = axh(idx,idx);
     
     if idx == 1
-        ax21 = P(2,idx).Parent;
+        ax21 = axh(2,idx);
     else
-        ax21 = P(idx-1,idx).Parent;
+        ax21 = axh(idx-1,idx);
     end
     
     axlim_21 = ax21.XLim;
@@ -562,7 +570,7 @@ drawnow
 
 % Set pseudo Y-ticks on the histograms
 for idx = 1:N
-    ax11 = P(idx,idx).Parent;
+    ax11 = axh(idx,idx);
     ax11.YGrid='off';
 %     if ~strcmp(param_transform{idx},'log')
 %     
@@ -596,15 +604,15 @@ for idx = 1:N
 end
 
 % Correct the Y-label at the 1,1 position
-ax11 = P(1,1).Parent;
-ax12 = P(1,2).Parent;
-
-axlabs_12 = ax12.YTick;
-axlabs_12_txt = arrayfun(@num2str,axlabs_12,'UniformOutput',false);
-axlabs_11 = ax11.YTick;
-
-ax11.YTick = linspace(axlabs_11(1),axlabs_11(end),length(axlabs_12));
-ax11.YTickLabel = axlabs_12_txt;
+% ax11 = axh(1,1);
+% ax12 = axh(1,2);
+% 
+% axlabs_12 = ax12.YTick;
+% axlabs_12_txt = arrayfun(@num2str,axlabs_12,'UniformOutput',false);
+% axlabs_11 = ax11.YTick;
+% 
+% ax11.YTick = linspace(axlabs_11(1),axlabs_11(end),length(axlabs_12));
+% ax11.YTickLabel = axlabs_12_txt;
 
 
 % Add colorbar
@@ -623,7 +631,7 @@ if show_as_percent_error && ~strcmpi(Property,'loss')
     maxcb = abs_max;
 end
 
-cb = colorbar(P(1,2).Parent,'Position',[0.935 0.11 0.02 0.815],...
+cb = colorbar(P(2,1).Parent,'Position',[0.935 0.11 0.02 0.815],...
     'TickLabelInterpreter','latex','FontSize',fs,'Limits',[mincb maxcb]); % [left, bottom, width, height]
 
 cb.Title.String = Heatmap_Label;
@@ -635,3 +643,14 @@ title(T,[Salt ' ' Theory ' Model ' Model ': Parameter Correlation Matrix'],...
     'Interpreter','Latex','FontSize',fs+16);
 xlabel(T,'Parameter 1','Interpreter','Latex','FontSize',fs+5)
 ylabel(T,'Parameter 2','Interpreter','Latex','FontSize',fs+5)
+
+for idx=1:N
+    for jdx=1:N
+        if jdx > idx
+            axh(idx,jdx).Visible = 'off';
+            for kdx = 1:length(axh(idx,jdx).Children)
+                axh(idx,jdx).Children(kdx).Visible = 'off';
+            end
+        end
+    end
+end

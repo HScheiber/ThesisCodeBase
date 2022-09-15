@@ -7,6 +7,9 @@ if ~isfield(Settings,'MaxMXWellR')
     Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
     Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
 end
+if ~isfolder(Settings.home)
+    Settings.home = find_home;
+end
 
 % Conversion factors
 Bohr_nm = 0.0529177; % a_0 - > Angstrom
