@@ -7,6 +7,10 @@ if ~isfield(Settings,'MaxMXWellR')
     Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
     Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
 end
+if ~isfield(Settings,'EnforceRR')
+    Settings.EnforceRR = false;
+end
+
 if ~isfolder(Settings.home)
     Settings.home = find_home;
 end
@@ -413,6 +417,7 @@ Loss(ovop_idx) = Loss(ovop_idx) + max((Settings.MinMXWellR/10) - r_min,0).*Setti
 
 %% Grab the peaks and valleys of the MM/XX potentials
 YY = {'MM' 'XX'};
+r_wall_sv = cell(2,1);
 for j = 1:2
     jj = YY{j};
 
@@ -524,6 +529,9 @@ for j = 1:2
     Loss(walls_idx) = Loss(walls_idx) + max(r_wall - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % wall too far
     Loss(walls_idx) = Loss(walls_idx) + max((Settings.MinMXWellR/10) - r_wall,0).*Settings.BadFcnLossPenalty; % wall too close
     
+    r_wall_sv{j} = nan(size(U.MX,1),1);
+    r_wall_sv{j}(walls_idx) = r_wall;
+    
 %     % Loss = zeros(N_par,1);
 %     idxes = find(Loss > 0);
 %     for jdx = 1:min(numel(idxes),10)
@@ -536,6 +544,12 @@ for j = 1:2
 %     ylim([-1000 1000])
 end
 
+if Settings.EnforceRR
+    % Check that the repulsive wall of the XX interaction is further out than the MM interaction
+    RR_Walls = r_wall_sv{1}./r_wall_sv{2}; % Ratio of M/X size, should be < 1
+    Loss = Loss + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect
+end
+
 tf = log1p(Loss) < sqrt(eps);
 
 % % Plot result to visualize
@@ -544,15 +558,15 @@ tf = log1p(Loss) < sqrt(eps);
 % % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
 % % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
 % 
-% ax1 = 'epsilon_MM';
-% ax2 = 'epsilon_XX';
+% ax1 = 'r0_MM';
+% ax2 = 'r0_XX';
 % ax3 = 'gamma_MX';
 % 
 % scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
 % %scatter(Param.(ax1),Param.(ax2),100,tf_num,'filled')
 % if any(strcmp(Settings.Theory,{'TF' 'BH'}))
-%     set(gca, 'XScale', 'log')
-%     set(gca, 'YScale', 'log')
+% %     set(gca, 'XScale', 'log')
+% %     set(gca, 'YScale', 'log')
 %     %set(gca, 'ZScale', 'log')
 % end
 % 

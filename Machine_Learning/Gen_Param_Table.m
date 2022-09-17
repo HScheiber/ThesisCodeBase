@@ -137,7 +137,7 @@ else % JC models
         Output.epsilon_MM = Param(3); % kJ/mol
         Output.epsilon_XX= Param(4); % kJ/mol
 
-        Output.Sigma_MX = (Param(1) + Param(2))/2; % nm
+        Output.sigma_MX = (Param(1) + Param(2))/2; % nm
         Output.epsilon_MX = sqrt(Param(3)*Param(4)); % kJ/mol
 
         % Scaling Coulombic Charge

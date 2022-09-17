@@ -1,9 +1,9 @@
 
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 Settings = Initialize_MD_Settings;
-Settings.Salt = 'LiF';
+Settings.Salt = 'LiI';
 Settings.Theory = 'BH';
-ModelID = 'MC4';
+ModelID = 'NB2';
 PlotType = 'full';
 fs = 28; % font size
 lw = 3; % line width

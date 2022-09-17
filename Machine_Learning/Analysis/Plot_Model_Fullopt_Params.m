@@ -82,10 +82,27 @@ for idx = 1:N_Salts
     Param = struct;
     if strcmp(Theory,'JC')
         [OutputMX,OutputMM,OutputXX] = JC_Potential_Parameters(RefSettings);
+        
+        % {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'sigma_MX' 'sigma_MM' 'sigma_XX'};
+        % {'C_MX' 'C_MM' 'C_XX' 'A_MX' 'A_MM' 'A_XX'};
+        
+        Param.sigma_MX = OutputMX.sigma;
+        Param.sigma_MM = OutputMM.sigma;
+        Param.sigma_XX = OutputXX.sigma;
+        Param.epsilon_MX = OutputMX.epsilon;
+        Param.epsilon_MM = OutputMM.epsilon;
+        Param.epsilon_XX = OutputXX.epsilon;
+        
+        Param.A_MX = 4*Param.epsilon_MX*(Param.sigma_MX^12);
+        Param.A_MM = 4*Param.epsilon_MM*(Param.sigma_MM^12);
+        Param.A_XX = 4*Param.epsilon_XX*(Param.sigma_XX^12);
+        
+        Param.C_MX = 4*Param.epsilon_MX*(Param.sigma_MX^6);
+        Param.C_MM = 4*Param.epsilon_MM*(Param.sigma_MM^6);
+        Param.C_XX = 4*Param.epsilon_XX*(Param.sigma_XX^6);
+
     else
         [OutputMX,OutputMM,OutputXX] = TF_Potential_Parameters(RefSettings);
-        % {'C_MX' 'C_MM' 'C_XX' 'B_MX' 'B_MM' 'B_XX' 'alpha_MX' 'alpha_MM' 'alpha_XX'};
-        % {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX'};
         Param.C_MX = OutputMX.C;
         Param.C_MM = OutputMM.C;
         Param.C_XX = OutputXX.C;

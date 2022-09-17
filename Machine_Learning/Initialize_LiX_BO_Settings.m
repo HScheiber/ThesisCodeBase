@@ -57,6 +57,7 @@ Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
 Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
 Settings.BadFcnLossPenalty = 1000; % Penalty to give when (1) the function shape is deemed pathological or (2) the optimized crystal volume is too small or large
 Settings.MinSkipLoss = 2; % Minimum loss value required before skipping further computation
+Settings.EnforceRR = false;
 
 % Intial optimization settings
 Settings.initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'

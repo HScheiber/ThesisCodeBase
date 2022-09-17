@@ -40,6 +40,9 @@ if ~isfield(Settings,'MaxMXWellR')
     Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
     Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
 end
+if ~isfield(Settings,'EnforceRR')
+    Settings.EnforceRR = false;
+end
 
 if Settings.UseCoupledConstraint
     coupledconstraints = -1;
@@ -1044,7 +1047,10 @@ if Settings.CheckBadFcn
 %     ylim([-1000 1000])
     
     %% Grab the peaks and valleys of the MM/XX potentials
+    r_wall_sv = nan(2,1);
+    idx = 0;
     for U = [U_MM,U_XX]
+        idx = idx+1;
         peaks_idx = islocalmax(U.Total);
         valleys_idx = islocalmin(U.Total);
         
@@ -1103,9 +1109,16 @@ if Settings.CheckBadFcn
         if any(U.Total >= Settings.MinExpWallHeight)
             r_above = U.r(U.Total >= Settings.MinExpWallHeight);
             r_wall = r_above(end);
+            r_wall_sv(idx) = r_wall;
             Loss_add = Loss_add + max(r_wall - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % wall too far
             Loss_add = Loss_add + max((Settings.MinMXWellR/10) - r_wall,0).*Settings.BadFcnLossPenalty; % wall too close
         end
+    end
+    
+    % Check that the repulsive wall of the XX interaction is further out than the MM interaction
+    if Settings.EnforceRR
+        RR_Walls = r_wall_sv(1)./r_wall_sv(2); % Ratio of M/X size, should be < 1
+        Loss_add = Loss_add + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect
     end
 end
 

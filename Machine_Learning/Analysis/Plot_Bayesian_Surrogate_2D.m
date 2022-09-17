@@ -5,8 +5,8 @@ global sldr_h results X Y idx_X idx_Y input_table p full_opt_point ...
 Salt = 'LiI';
 Theory = 'BH';
 Model = 'MC1'; % C5squaredexponential
-Plot_X = 'r0_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
-Plot_Y = 'r0_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+Plot_X = 'epsilon_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
+Plot_Y = 'epsilon_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
 
 % 'r0_MM'    'r0_XX'    'epsilon_MM'    'epsilon_XX'    'gamma_MX'
 
