@@ -151,7 +151,7 @@ Settings.MDP.VerletBT = -1;
 idx = 0;
 
 %% Test Model Particular parameter
-Settings.Salt = 'NaCl';
+Settings.Salt = 'LiCl';
 Settings.Theory = 'BD';
 Settings.InnerRange = true;
 Settings.Trial_ID = 'XX2';
