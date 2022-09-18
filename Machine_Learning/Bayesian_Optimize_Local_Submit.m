@@ -152,7 +152,7 @@ idx = 0;
 
 %% Test Model Particular parameter
 Settings.Salt = 'NaCl';
-Settings.Theory = 'Mie';
+Settings.Theory = 'BD';
 Settings.InnerRange = true;
 Settings.Trial_ID = 'XX2';
 
