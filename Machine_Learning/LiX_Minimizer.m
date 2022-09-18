@@ -560,12 +560,15 @@ if Settings.CheckBadFcn
     Settings.Table_StepSize = ss;
     
     %% Grab the peaks and valleys of the MX attractive potential
-    peaks_idx = islocalmax(U_MX.Total);
-    valleys_idx = islocalmin(U_MX.Total);
+    peaks_idx = islocalmax(U_MX.Total,'MinProminence',1e-8);
+    valleys_idx = islocalmin(U_MX.Total,'MinProminence',1e-8);
     
     U_peak = U_MX.Total(peaks_idx);
     U_valley = U_MX.Total(valleys_idx);
+    r_peak = U_MX.r(peaks_idx);
     r_valley = U_MX.r(valleys_idx);
+    U_valley(r_valley<=r_peak) = [];
+    r_valley(r_valley<=r_peak) = [];
     
     if isempty(U_valley) % If no well minimum exists in MX interaction
         Loss_add = Loss_add + Settings.BadFcnLossPenalty;
@@ -597,8 +600,8 @@ if Settings.CheckBadFcn
     idx = 0;
     for U = [U_MM,U_XX]
         idx = idx+1;
-        peaks_idx = islocalmax(U.Total);
-        valleys_idx = islocalmin(U.Total);
+        peaks_idx = islocalmax(U.Total,'MinProminence',1e-8);
+        valleys_idx = islocalmin(U.Total,'MinProminence',1e-8);
         
         U_peak = U.Total(peaks_idx);
         U_valley = U.Total(valleys_idx);

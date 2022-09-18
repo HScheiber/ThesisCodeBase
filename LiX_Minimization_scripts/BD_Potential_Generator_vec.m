@@ -58,7 +58,7 @@ for interaction = {'MX' 'XX' 'MM'}
     dU_LJ_all = -alpha.(int).*B.(int).*exp(-alpha.(int).*U.r) + 6.*C.(int)./(U.r.^7);
     
     % Locate the peaks in the LJ part of the potential
-    peaks_idx = islocalmax(U_LJ_all,2);
+    peaks_idx = islocalmax(U_LJ_all,2,'MinProminence',1e-8);
     Num_peaks = sum(peaks_idx,2);
     np_idx = Num_peaks == 0;  % Potentials that contain no peak. do not need to modify these
     op_idx = ~np_idx;         % Potentials that contain at least 1 peak
@@ -74,7 +74,7 @@ for interaction = {'MX' 'XX' 'MM'}
     
     % Find any inflection points that occur after the peak
     r = repmat(U.r,size(dU_LJ_all,1),1);
-    inflex_idx = ( islocalmax(dU_LJ_all,2) | islocalmin(dU_LJ_all,2) ) & (r > peak_r); % Pick out inflection points after the peak
+    inflex_idx = ( islocalmax(dU_LJ_all,2,'MinProminence',1e-8) | islocalmin(dU_LJ_all,2,'MinProminence',1e-8) ) & (r > peak_r); % Pick out inflection points after the peak
     
     % Exclude any with no inflection point or no peak
     Num_inflex = sum(inflex_idx,2);

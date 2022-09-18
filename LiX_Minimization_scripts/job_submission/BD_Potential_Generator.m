@@ -194,21 +194,17 @@ for interaction = {'MX' 'XX' 'MM'}
     U_LJ = U.(int).g + U.(int).h;
     dU_LJ = -U.(int).dg - U.(int).dh;
     
-    peaks_idx = [false islocalmax(U_LJ(2:end))];
+    peaks_idx = [false islocalmax(U_LJ(2:end),'MinProminence',1e-8)];
     peak_r = r(peaks_idx);
     if numel(peak_r) > 1
         peak_r = peak_r(1);
     end
     
-    inflex_idx = [false islocalmax(dU_LJ(2:end)) | islocalmin(dU_LJ(2:end))];
-    inflex_r = r(inflex_idx);
-
-    if ~isempty(peak_r) && ~isempty(inflex_r) % Ensure peak exists
-        inflex_r(inflex_r < peak_r) = [];
-        inflex_idx = find(inflex_idx);
-        inflex_idx(inflex_r < peak_r) = [];
-        inflex_r = inflex_r(1);
+    inflex_idx = find([false islocalmax(dU_LJ(2:end),'MinProminence',1e-8) | islocalmin(dU_LJ(2:end),'MinProminence',1e-8)]);
+    if ~isempty(peak_r) && ~isempty(inflex_idx) % Ensure peak exists
+        inflex_idx(r(inflex_idx) <= peak_r) = [];
         inflex_idx = inflex_idx(1);
+        inflex_r = r(inflex_idx);
         dU_infl = dU_LJ(inflex_idx);
         
         % Generate a steep repulsion beyond the inflection
@@ -226,8 +222,8 @@ for interaction = {'MX' 'XX' 'MM'}
         U.(int).dg(below_infl_idx) = zeros(1,N_belowpeak);
 
         % Remove infinity at 0
-        fwall(1) = fwall(2);
-        dfwall(1) = 0;
+        fwall(1) = fwall(2)*2;
+        dfwall(1) = dfwall(2);
 
         % Add this repulsion to the repulsive part of the function
         U.(int).h(below_infl_idx) = fwall;

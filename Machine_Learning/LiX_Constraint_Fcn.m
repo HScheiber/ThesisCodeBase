@@ -414,8 +414,8 @@ elseif strcmp(Settings.Theory,'Mie')
 end
 
 %% Grab the peaks and valleys of the MX attractive potential
-peaks_idx = islocalmax(U.MX,2);
-valleys_idx = islocalmin(U.MX,2);
+peaks_idx = islocalmax(U.MX,2,'MinProminence',1e-8);
+valleys_idx = islocalmin(U.MX,2,'MinProminence',1e-8);
 r = repmat(U.r,size(U.MX,1),1);
 
 Num_peaks = sum(peaks_idx,2);
@@ -475,8 +475,8 @@ r_wall_sv = cell(2,1);
 for j = 1:2
     jj = YY{j};
 
-    peaks_idx = islocalmax(U.(jj),2);
-    valleys_idx = islocalmin(U.(jj),2);
+    peaks_idx = islocalmax(U.(jj),2,'MinProminence',1e-8);
+    valleys_idx = islocalmin(U.(jj),2,'MinProminence',1e-8);
 
     Num_peaks = sum(peaks_idx,2);
     Num_valleys = sum(valleys_idx,2);

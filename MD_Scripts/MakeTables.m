@@ -43,13 +43,13 @@ function TableFile_MX = MakeTables(Settings,varargin)
     Us = [U_MX,U_MM,U_XX];
     for idx = 1:3
         U = Us(idx);
-        peaks_idx = [false islocalmax(U.Total(2:end))];
+        peaks_idx = [false islocalmax(U.Total(2:end),'MinProminence',1e-8)];
         peak_r = U.r(peaks_idx);
         if numel(peak_r) > 1
             peak_r = peak_r(1);
         end
         
-        inflex_idx = [false islocalmax(U.dTotal(2:end)) | islocalmin(U.dTotal(2:end))];
+        inflex_idx = [false islocalmax(U.dTotal(2:end),'MinProminence',1e-8) | islocalmin(U.dTotal(2:end),'MinProminence',1e-8)];
         inflex_r = U.r(inflex_idx);
         
         if ~isempty(peak_r) && ~isempty(inflex_r) % If peak and inflection points exist
