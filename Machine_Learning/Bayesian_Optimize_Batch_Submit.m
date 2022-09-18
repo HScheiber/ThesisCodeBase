@@ -355,7 +355,7 @@ switch lower(computer)
         Shared_Settings.InnerRange = true; % Sets domain of BH
         Shared_Settings.EnforceRR = true;
         
-        %% BD and Mie Models: OA, OB, OC on LiX
+        %% BH, BD, and Mie Models: OA, OB, OC on LiX with proper radius ratios
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BH' 'BD' 'Mie'};
         Replicates = 1:5;
