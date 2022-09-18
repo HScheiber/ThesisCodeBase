@@ -25,7 +25,7 @@ Settings = Initialize_MD_Settings;
 Startpoint = 0;
 Settings.Table_Length = 4.01;
 Settings.Table_StepSize = 0.0005;
-Settings.Salt = 'LiI';
+Settings.Salt = 'LiF';
 Settings.Structure = 'Rocksalt';
 Settings.Theory = 'TF';
 Settings.JobName = 'Test';
@@ -40,12 +40,12 @@ Settings.MDP.Maintain_Symmetry = true;
 % Allowed plot types: 'full', 'full-derivative','lj', 'lj-derivative',
 % 'dispersion', 'dispersion-derivative', 'repulsive',
 % 'repulsive-derivative'
-PlotType = 'coulomb';
+PlotType = 'full';
 plot_PES = true;
 Calc_energy = false;
 save_table = false;
 
-Settings.Model = 'ED5';% 'CR3';
+Settings.Model = '';% 'CR3';
 Settings = Load_Model_Params(Settings);
 %Settings.CR_Damp = Init_CRDamping_Object;
 % CRDamping.MX.r_d = 0.15; % This is the value of the sigmoid's midpoint in nm. Set to a negative value to disable close range damping

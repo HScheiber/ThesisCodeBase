@@ -2,7 +2,7 @@
 % Converts JC parameters to sigma/epsilon form
 Salt = 'LiI';
 Model = 'BH';
-Trial = 'MC4';
+Trial = 'MC1';
 Show = []; % leave empty to show all
 Show_init = [];
 fs = 14;
