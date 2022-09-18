@@ -966,7 +966,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     disp(['Final Optimized Loss: ' num2str(loss,'%.10e')])
     disp('Final Optimized Parameters:')
-    disp(ParTable)
+    disp(Pars)
     
     % Save final results
     save(Full_opt_filename,'full_opt_results','loss','full_opt_point',...
