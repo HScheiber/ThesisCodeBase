@@ -75,7 +75,7 @@ clear;
 % Some options
 skip_models = [];
 check_complete = true; % Checks if job is already completed, skips completed jobs
-check_running = true; % Checks if a job is already running, skips running jobs
+check_running = false; % Checks if a job is already running, skips running jobs
 continue_completed = false; % If a job is already complete, but you wish to continue, this will rename the previous *fullopt.mat file and restart. Must be used with check_complete = false
 
 % Shared calculation parameters
