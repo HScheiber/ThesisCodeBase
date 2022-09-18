@@ -29,6 +29,12 @@ function TableFile_MX = MakeTables(Settings,varargin)
         case 'BH'
             [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
                 'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
+        case 'BD'
+            [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,...
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
+        case 'Mie'
+            [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,...
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
     end
 
     % Find function minimum
@@ -46,69 +52,69 @@ function TableFile_MX = MakeTables(Settings,varargin)
         inflex_idx = [false islocalmax(U.dTotal(2:end)) | islocalmin(U.dTotal(2:end))];
         inflex_r = U.r(inflex_idx);
         
-        if isempty(peak_r) || isempty(inflex_r) % Ensure peak exists
-            add_wall = false;
-        else
+        if ~isempty(peak_r) && ~isempty(inflex_r) % If peak and inflection points exist
             inflex_r(inflex_r < peak_r) = [];
             inflex_r = inflex_r(1);
-            add_wall = true;
-        end
+            inflex_idx = find(U.r == inflex_r);
         
-%         %% Visualization
-%         nm_per_m = 1e+9; % nm per m
-%         NA = 6.0221409e23; % Molecules per mole
-%         e_c = 1.60217662e-19; % Elementary charge in Coulombs
-%         epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
-%         k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
-%         
-%         if idx == 1
-%             U.Total = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-%         else
-%             U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-%         end
-%         hold on
-%         plot(U.r(2:end).*10,U.Total(2:end),'-k','Linewidth',3)
-%         scatter(inflex_r.*10,U.Total(U.r == inflex_r),100,'r','Linewidth',3,'MarkerEdgeColor','r')
-%         %%
+            %% Visualization
+            nm_per_m = 1e+9; % nm per m
+            NA = 6.0221409e23; % Molecules per mole
+            e_c = 1.60217662e-19; % Elementary charge in Coulombs
+            epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
+            k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
+
+            if idx == 1
+                U.Total = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
+            else
+                U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
+            end
+            hold on
+            plot(U.r(2:end).*10,U.Total(2:end),'-k','Linewidth',3)
+            scatter(inflex_r.*10,U.Total(inflex_idx),100,'r','Linewidth',3,'MarkerEdgeColor','r')
+            %%
         
-        if add_wall
             % Generate a steep repulsion beyond the peak
-            below_peak_idx = (U.r < inflex_r);
+            below_peak_idx = (U.r <= inflex_r);
             r = U.r(below_peak_idx); % nm
-            D = 1e-15; % prefactor
+            % Generate a steep repulsion beyond the inflection
+            dU_infl = U.dTotal(inflex_idx);
+            D = -dU_infl*(inflex_r^13)/12; % coefficient
             
             fwall = D./(r.^12) - D./(inflex_r.^12);
             dfwall = 12*D./(r.^13); % Wall -derivative
             
             % Kill the attractive interaction beyond the peak
-            g_at_valley = U.g(U.r == inflex_r);
-            N_belowpeak = sum(below_peak_idx);
-            U.g(below_peak_idx) = repmat(g_at_valley,1,N_belowpeak);
-            U.dg(below_peak_idx) = zeros(1,N_belowpeak);
+            U_g_at_infl = U.g(inflex_idx);
+            U.g(below_peak_idx) = zeros(size(r));   %zeros(size(r));
+            U.dg(below_peak_idx) = zeros(size(r));
             
             % Remove infinity at 0
             fwall(1) = fwall(2);
             dfwall(1) = 0;
             
             % Add this repulsion to the repulsive part of the function
-            U.h(U.r < inflex_r) = U.h(U.r < inflex_r) + fwall;
-            U.dh(U.r < inflex_r) = U.dh(U.r < inflex_r) + dfwall;
+            U_h_at_infl = U.h(inflex_idx);
+            U.h(below_peak_idx) = fwall + U_h_at_infl +  U_g_at_infl;
+            U.dh(below_peak_idx) = dfwall - U.df(below_peak_idx);
         end
         
-%         %% Testing visualization
-%         if idx == 1
-%             U.Total = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-%         else
-%             U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-%         end
-%         plot(U.r.*10,U.Total,':r','Linewidth',3)
-%         ylim([-1000 4000])
-%         xlim([0 5])
-%         set(gca,'Fontsize',32,'TickLabelInterpreter','latex','XTick',0:1:5)
-%         xlabel(gca,'$r_{ij}$ [\AA]','fontsize',32,'interpreter','latex')
-%         ylabel(gca,'$u_{ij}$ [kJ mol$^{-1}$]','fontsize',32,'interpreter','latex')
-%         exportgraphics(gca,'Augmented_Potential.eps')
-%         %%
+        %% Testing visualization
+        if idx == 1
+            U.Total  = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g;
+            U.dTotal = k_0*(e_c^2).*(Settings.S.Q^2).*U.df0 - U.dh - U.dg;
+        else
+            U.Total  =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g;
+            U.dTotal =  -k_0*(e_c^2).*(Settings.S.Q^2).*U.df0 - U.dh - U.dg;
+        end
+        plot(U.r.*10,U.Total,':r','Linewidth',3)
+        ylim([-1000 4000])
+        xlim([0 5])
+        set(gca,'Fontsize',32,'TickLabelInterpreter','latex','XTick',0:1:5)
+        xlabel(gca,'$r_{ij}$ [\AA]','fontsize',32,'interpreter','latex')
+        ylabel(gca,'$u_{ij}$ [kJ mol$^{-1}$]','fontsize',32,'interpreter','latex')
+        exportgraphics(gca,'Augmented_Potential.eps')
+        %%
         
         % Output into gromacs format
         Uo = [U.r ; U.f0 ; U.df0 ; U.g ; U.dg ; U.h ; U.dh];

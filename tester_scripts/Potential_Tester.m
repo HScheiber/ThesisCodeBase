@@ -99,6 +99,14 @@ if plot_PES
         
         [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,'Plotswitch',true,'PlotType',PlotType,...
             'Startpoint',Startpoint);
+        
+    elseif strcmp(Settings.Theory,'BD')
+        [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,'Plotswitch',true,'PlotType',PlotType,...
+            'Startpoint',Startpoint);
+        
+    elseif strcmp(Settings.Theory,'Mie')
+        [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,'Plotswitch',true,'PlotType',PlotType,...
+            'Startpoint',Startpoint);
     end
     
     if save_table

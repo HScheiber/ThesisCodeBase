@@ -44,8 +44,8 @@ PotSettings.Salt = Settings.Salt;
 N_par = size(Param,1);
 Loss = zeros(N_par,1);
 % Potential Scaling
-if strcmp(Settings.Theory,'TF')
-
+switch Settings.Theory
+case 'TF'
     % Loose form of exp-C6-C8 model
     if Settings.SigmaEpsilon
 
@@ -164,8 +164,7 @@ if strcmp(Settings.Theory,'TF')
             Settings.S.Q = Param.SQ;
         end
     end
-
-elseif strcmp(Settings.Theory,'BH')
+case {'BH' 'BD'}
 
     % Loose form of exp-C6 model
     if Settings.SigmaEpsilon
@@ -264,30 +263,29 @@ elseif strcmp(Settings.Theory,'BH')
         end
     end
 
-elseif strcmp(Settings.Theory,'JC') % JC models
-
+case 'JC'
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
     if Settings.SigmaEpsilon
-
+        
         % Sigma scaling
         Settings.S.S.MM = Param.sigma_MM./JC_MM.sigma;
         Settings.S.S.XX = Param.sigma_XX./JC_XX.sigma;
-
+        
         % Epsilon scaling
         Settings.S.E.MM = Param.epsilon_MM./JC_MM.epsilon;
         Settings.S.E.XX = Param.epsilon_XX./JC_XX.epsilon;
-
+        
         % Default MX params
         def_S_MX = JC_MX.sigma;
         def_E_MX = JC_MX.epsilon;
-
+        
         if Settings.Additivity
             Sigma_MX = (Param.sigma_MM + Param.sigma_XX)./2;
             Epsilon_MX = sqrt(Param.epsilon_MM.*Param.epsilon_XX);
-
+            
             Settings.S.S.MX = Sigma_MX./def_S_MX;
             Settings.S.E.MX = Epsilon_MX./def_E_MX;
-
+            
             if Settings.Additional_MM_Disp
                 Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
                 Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
@@ -296,42 +294,42 @@ elseif strcmp(Settings.Theory,'JC') % JC models
             Settings.S.S.MX = Param.sigma_MX./def_S_MX;
             Settings.S.E.MX = Param.epsilon_MX./def_E_MX;
         end
-
+        
     % Scaled dispersion/repulsion form
     else
         % Dispersion
         Settings.S.D.MM = Param.SDMM;
         Settings.S.D.XX = Param.SDXX;
-
+        
         % Repulsion
         Settings.S.R.MM = Param.SRMM;
         Settings.S.R.XX = Param.SRXX;
-
+        
         if Settings.Additivity
-
+            
             % Unscaled
             MX_Epsilon = JC_MX.epsilon;
             MX_Sigma   = JC_MX.sigma;
-
+            
             MX_R = 4.*MX_Epsilon.*MX_Sigma.^12;
             MX_D = 4.*MX_Epsilon.*MX_Sigma.^6;
-
+            
             % Scaled
             MM_Epsilon = JC_MM.epsilon.*(Settings.S.D.MM.^2).*(1./Settings.S.R.MM);
             MM_Sigma = JC_MM.sigma.*(1./(Settings.S.D.MM.^(1/6))).*(Settings.S.R.MM.^(1/6));
-
+            
             XX_Epsilon = JC_XX.epsilon.*(Settings.S.D.XX.^2).*(1./Settings.S.R.XX);
             XX_Sigma = JC_XX.sigma.*(1./(Settings.S.D.XX.^(1/6))).*(Settings.S.R.XX.^(1/6));
-
+            
             MX_Epsilon = sqrt(MM_Epsilon.*XX_Epsilon);
             MX_Sigma   = (MM_Sigma + XX_Sigma)./2;
-
+            
             MX_R_scaled = 4.*MX_Epsilon.*MX_Sigma.^12;
             MX_D_scaled = 4.*MX_Epsilon.*MX_Sigma.^6;
-
+            
             Settings.S.D.MX = MX_D_scaled./MX_D;
             Settings.S.R.MX = MX_R_scaled./MX_R;
-
+            
             if Settings.Additional_MM_Disp
                 Settings.S.D.MM = Settings.S.D.MM + Param.SDMM2;
             end
@@ -340,7 +338,60 @@ elseif strcmp(Settings.Theory,'JC') % JC models
             Settings.S.R.MX = Param.SRMX;
         end
     end
-
+    
+    % Scaling Coulombic Charge
+    if Settings.Fix_Charge
+        Settings.S.Q = Settings.Q_value;
+    else
+        Settings.S.Q = Param.SQ;
+    end
+case 'Mie'
+    
+    % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
+    if Settings.SigmaEpsilon
+        
+        % Sigma scaling
+        Settings.S.S.MM = Param.sigma_MM./JC_MM.sigma;
+        Settings.S.S.XX = Param.sigma_XX./JC_XX.sigma;
+        
+        % Epsilon scaling
+        Settings.S.E.MM = Param.epsilon_MM./JC_MM.epsilon;
+        Settings.S.E.XX = Param.epsilon_XX./JC_XX.epsilon;
+        
+        Settings.S.n.MX = Param.n_MX;
+        
+        % Default MX params
+        def_S_MX = JC_MX.sigma;
+        def_E_MX = JC_MX.epsilon;
+        
+        if Settings.Additivity
+            
+            Settings.S.n.MM = Param.n_MX;
+            Settings.S.n.XX = Param.n_MX;
+            
+            Sigma_MX = (Param.sigma_MM + Param.sigma_XX)./2;
+            Epsilon_MX = sqrt(Param.epsilon_MM.*Param.epsilon_XX);
+            
+            Settings.S.S.MX = Sigma_MX./def_S_MX;
+            Settings.S.E.MX = Epsilon_MX./def_E_MX;
+            
+            if Settings.Additional_MM_Disp
+                Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
+                Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
+            end
+        else
+            Settings.S.S.MX = Param.sigma_MX./def_S_MX;
+            Settings.S.E.MX = Param.epsilon_MX./def_E_MX;
+            
+            Settings.S.n.MM = Param.n_MM;
+            Settings.S.n.XX = Param.n_XX;
+        end
+        
+    % Scaled dispersion/repulsion form
+    else
+        error('Mie potential only available in sigma-epsilon form')
+    end
+    
     % Scaling Coulombic Charge
     if Settings.Fix_Charge
         Settings.S.Q = Settings.Q_value;
@@ -352,10 +403,14 @@ end
 % Calculate loss due to infeasible models with no well minima (only works reliably for BH/TF models in sigma-epsilon form)
 if strcmp(Settings.Theory,'BH')
     U = BH_Potential_Generator_vec(Settings);
+elseif strcmp(Settings.Theory,'BD')
+    U = BD_Potential_Generator_vec(Settings);
 elseif strcmp(Settings.Theory,'TF')
     U = TF_Potential_Generator_vec(Settings);
 elseif strcmp(Settings.Theory,'JC')
     U = JC_Potential_Generator_vec(Settings);
+elseif strcmp(Settings.Theory,'Mie')
+    U = Mie_Potential_Generator_vec(Settings);
 end
 
 %% Grab the peaks and valleys of the MX attractive potential
@@ -402,7 +457,6 @@ Loss(ovop_idx) = Loss(ovop_idx) + max(Settings.MaxAttWellDepth - U_min,0).*Setti
 r_min = r_ovop_set(ovl_idx);
 Loss(ovop_idx) = Loss(ovop_idx) + max(r_min - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % valley too far
 Loss(ovop_idx) = Loss(ovop_idx) + max((Settings.MinMXWellR/10) - r_min,0).*Settings.BadFcnLossPenalty; % valley too close
-
 
 % % Loss = zeros(N_par,1);
 % idxes = find(Loss > 0);

@@ -469,6 +469,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                     Settings.WaterModel = 'SD';
             end
             [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings);
+        elseif strcmp(Settings.Theory,'BD')
+            [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings);
+        elseif strcmp(Settings.Theory,'Mie')
+            [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings);
         else
             error(['Warning: Unknown theory type: "' Settings.Theory '".'])
         end

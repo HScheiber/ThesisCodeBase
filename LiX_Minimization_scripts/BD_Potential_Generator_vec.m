@@ -1,4 +1,4 @@
-function U = BH_Potential_Generator_vec(Settings)
+function U = BD_Potential_Generator_vec(Settings)
 
 %% Load BH Parameters
 dat = load(fullfile(Settings.home,'data','BH_Default_Param.mat'));
@@ -53,8 +53,45 @@ for interaction = {'MX' 'XX' 'MM'}
             Y2 = Settings.Halide;
     end
     
+    % Find inflection points of BH potential
+    U_LJ_all = B.(int).*exp(-alpha.(int).*U.r) - C.(int)./(U.r.^6);
+    dU_LJ_all = -alpha.(int).*B.(int).*exp(-alpha.(int).*U.r) + 6.*C.(int)./(U.r.^7);
+    
+    peaks_idx = islocalmax(U_LJ_all,2);
+    
+    Num_peaks = sum(peaks_idx,2);
+    np_idx = Num_peaks == 0;  % Potentials that contain no peak. do not need to modify these
+    op_idx = ~np_idx;         % Potentials that contain a peak
+    
+    U_LJ = U_LJ_all(op_idx,:);
+    dU_LJ = dU_LJ_all(op_idx,:);
+    peaks_idx  = peaks_idx(op_idx,:);
+    r = repmat(U.r,size(U_LJ,1),1);
+    
+    fp_idx = sum(cumprod(peaks_idx == 0, 2), 2) + 1;
+    fpl_idx = sub2ind(size(U_LJ),(1:numel(fp_idx)).',fp_idx);
+    peak_r = r(fpl_idx); % peak positions
+    
+    inflex_idx = ( islocalmax(dU_LJ,2) | islocalmin(dU_LJ,2) ) & (r > peak_r); % Pick out inflection points after the peak
+    ip_idx = sum(cumprod(inflex_idx == 0, 2), 2) + 1;
+    ipl_idx = sub2ind(size(U_LJ),(1:numel(ip_idx)).',ip_idx);
+    inflex_r = r(ipl_idx); % inflection positions
+    
+    dU_infl = dU_LJ(ipl_idx); % value of derivative at inflection point
+    D = -dU_infl.*(inflex_r.^13)/12; % coefficients
+
+    % Generate a steep repulsion beyond the inflection point
+    below_infl_idx = (r < inflex_r); % pick out values of r below the inflection point
+    fwall = D./(r.^12) - D./(inflex_r.^12) + U_LJ(ipl_idx);
+    
+    % Add this repulsion to the repulsive part of the function
+    U_LJ(below_infl_idx) = fwall(below_infl_idx);
+    
+    % Update
+    U_LJ_all(op_idx,:) = U_LJ;
+    
     % Build PES
-    U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + B.(int).*exp(-alpha.(int).*U.r) - C.(int)./(U.r.^6);
+    U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + U_LJ_all;
 end
 
 end

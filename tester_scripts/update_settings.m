@@ -50,3 +50,9 @@ Output = Structure_Minimization(Settings);
 
 [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
     'Startpoint',0.001);
+
+[U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
+    'Startpoint',0.001);
+
+[U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
+    'Startpoint',0.001);

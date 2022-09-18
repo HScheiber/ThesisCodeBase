@@ -1,37 +1,23 @@
 % This function assumes sigma-epsilon form
 function Output = Gen_Param_Table(Settings,Param)
 
+DefParams = bayesopt_params(Settings);
+ParNames = {DefParams.Name};
 Output = struct;
-if strcmp(Settings.Theory,'TF')
-    
-    % Input parameters
-    Output.r0_MM = Param(1); % nm
-    Output.r0_XX = Param(2); % nm
+for idx = 1:numel(Param)
+    Output.(ParNames{idx}) = Param(idx);
+end
 
+
+switch Settings.Theory
+case 'TF'
     if Settings.Additivity
         Output.r0_MX = (Output.r0_MM + Output.r0_XX)/2; % nm
-
-        Output.epsilon_MM = Param(3); % kJ/mol
-        Output.epsilon_XX = Param(4); % kJ/mol
         Output.epsilon_MX = sqrt(Output.epsilon_MM*Output.epsilon_XX); % kJ/mol
-
-        Output.gamma_MX = Param(5); % Unitless
         Output.gamma_MM = Output.gamma_MX; % Unitless
         Output.gamma_XX = Output.gamma_MX; % Unitless
-        pidx = 5;
-    else
-        Output.r0_MX = Param(3); % nm
-
-        Output.epsilon_MM = Param(4); % kJ/mol
-        Output.epsilon_XX = Param(5); % kJ/mol
-        Output.epsilon_MX = Param(6); % kJ/mol
-
-        Output.gamma_MM = Param(7); % Unitless
-        Output.gamma_XX = Param(8); % Unitless
-        Output.gamma_MX = Param(9); % Unitless
-        pidx = 9;
     end
-
+    
     if Output.gamma_MX > 48/7
         Output.epsilon_MX = -Output.epsilon_MX;
     end
@@ -62,37 +48,14 @@ if strcmp(Settings.Theory,'TF')
     % Scaling Coulombic Charge
     if Settings.Fix_Charge
         Output.Q = Settings.Q_value;
-    else
-        Output.Q = Param(pidx+1);
     end
     
-elseif strcmp(Settings.Theory,'BH') % Buckingham model
-    % Input parameters
-    Output.r0_MM = Param(1); % nm
-    Output.r0_XX = Param(2); % nm
-
+case {'BH' 'BD'} % Buckingham model
     if Settings.Additivity
         Output.r0_MX = (Output.r0_MM + Output.r0_XX)/2; % nm
-
-        Output.epsilon_MM = Param(3); % kJ/mol
-        Output.epsilon_XX = Param(4); % kJ/mol
         Output.epsilon_MX = sqrt(Output.epsilon_MM*Output.epsilon_XX); % kJ/mol
-
-        Output.gamma_MX = Param(5); % Unitless
         Output.gamma_MM = Output.gamma_MX; % Unitless
         Output.gamma_XX = Output.gamma_MX; % Unitless
-        pidx = 5;
-    else
-        Output.r0_MX = Param(3); % nm
-
-        Output.epsilon_MM = Param(4); % kJ/mol
-        Output.epsilon_XX = Param(5); % kJ/mol
-        Output.epsilon_MX = Param(6); % kJ/mol
-
-        Output.gamma_MM = Param(7); % Unitless
-        Output.gamma_XX = Param(8); % Unitless
-        Output.gamma_MX = Param(9); % Unitless
-        pidx = 9;
     end
 
     if Output.gamma_MX < 6
@@ -121,48 +84,17 @@ elseif strcmp(Settings.Theory,'BH') % Buckingham model
     % Scaling Coulombic Charge
     if Settings.Fix_Charge
         Output.Q = Settings.Q_value;
-    else
-        Output.Q = Param(pidx+1);
     end
-else % JC models
+case 'JC'
 
     % D <-> sigma
     % R <-> epsilon
     if Settings.Additivity
-        % Sigma scaling
-        Output.sigma_MM = Param(1); % nm
-        Output.sigma_XX = Param(2); % nm
-
-        % Epsilon scaling
-        Output.epsilon_MM = Param(3); % kJ/mol
-        Output.epsilon_XX= Param(4); % kJ/mol
-
-        Output.sigma_MX = (Param(1) + Param(2))/2; % nm
-        Output.epsilon_MX = sqrt(Param(3)*Param(4)); % kJ/mol
-
-        % Scaling Coulombic Charge
-        if Settings.Fix_Charge
-            Output.Q = Settings.Q_value;
-        else
-            Output.Q = Param(5);
-        end
-    else
-        % Sigma scaling
-        Output.sigma_MM = Param(1); % nm
-        Output.sigma_XX = Param(2); % nm
-        Output.sigma_MX = Param(3); % nm
-
-        % Epsilon scaling
-        Output.epsilon_MM = Param(4); % kJ/mol
-        Output.epsilon_XX= Param(5);  % kJ/mol
-        Output.epsilon_MX = Param(6); % kJ/mol
-
-        % Scaling Coulombic Charge
-        if Settings.Fix_Charge
-            Output.Q = Settings.Q_value;
-        else
-            Output.Q = Param(7);
-        end
+        Output.sigma_MX = (Output.sigma_MM + Output.sigma_XX)/2;
+        Output.epsilon_MX = sqrt(Output.epsilon_MM*Output.epsilon_XX); % kJ/mol
+    end
+    if Settings.Fix_Charge
+        Output.Q = Settings.Q_value;
     end
     
     % Convert to Condensed form
@@ -172,6 +104,30 @@ else % JC models
     Output.C_MM = 4*Output.epsilon_MM*(Output.sigma_MM^6); % kJ/mol nm^(6)
     Output.C_XX = 4*Output.epsilon_XX*(Output.sigma_XX^6); % kJ/mol nm^(6)
     Output.C_MX = 4*Output.epsilon_MX*(Output.sigma_MX^6); % kJ/mol nm^(6)
+case 'Mie'
+    
+    if Settings.Additivity
+        Output.sigma_MX = (Output.sigma_MM + Output.sigma_XX)/2;
+        Output.epsilon_MX = sqrt(Output.epsilon_MM*Output.epsilon_XX); % kJ/mol
+        Output.n_MM = Output.n_MX;
+        Output.n_XX = Output.n_MX;
+    end
+    if Settings.Fix_Charge
+        Output.Q = Settings.Q_value;
+    end
+    
+    % Calculate prefactor
+    P_MM = (Output.n_MM/(Output.n_MM - 6))*((Output.n_MM/6)^(6/(Output.n_MM - 6)));
+    P_XX = (Output.n_XX/(Output.n_XX - 6))*((Output.n_XX/6)^(6/(Output.n_XX - 6)));
+    P_MX = (Output.n_MX/(Output.n_MX - 6))*((Output.n_MX/6)^(6/(Output.n_MX - 6)));
+    
+    % Convert to Condensed form
+    Output.B_MM = P_MM*Output.epsilon_MM*(Output.sigma_MM^Output.n_MM); % kJ/mol nm^(n)
+    Output.B_XX = P_XX*Output.epsilon_XX*(Output.sigma_XX^Output.n_XX); % kJ/mol nm^(n)
+    Output.B_MX = P_MX*Output.epsilon_MX*(Output.sigma_MX^Output.n_MX); % kJ/mol nm^(n)
+    Output.C_MM = P_MM*Output.epsilon_MM*(Output.sigma_MM^6); % kJ/mol nm^(6)
+    Output.C_XX = P_XX*Output.epsilon_XX*(Output.sigma_XX^6); % kJ/mol nm^(6)
+    Output.C_MX = P_MX*Output.epsilon_MX*(Output.sigma_MX^6); % kJ/mol nm^(6)
 end
 
 

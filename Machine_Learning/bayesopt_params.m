@@ -1,6 +1,8 @@
 function params = bayesopt_params(Model)
     
-    if strcmp(Model.Theory,'TF')
+
+    switch Model.Theory
+    case 'TF'
         if ~isfield(Model,'InnerRange')
             Model.InnerRange = true;
         end
@@ -84,7 +86,7 @@ function params = bayesopt_params(Model)
             params = [params,SQ];
         end
         
-    elseif strcmp(Model.Theory,'BH')
+    case {'BH' 'BD'}
         if ~isfield(Model,'InnerRange')
             Model.InnerRange = false;
         end
@@ -167,7 +169,7 @@ function params = bayesopt_params(Model)
             end
         end
         
-    else % JC models
+    otherwise
         if Model.SigmaEpsilon
             SDMM = optimizableVariable('sigma_MM',[0.05 1],'Type','real'); % Units: nm
             SDXX = optimizableVariable('sigma_XX',[0.05 1],'Type','real'); % Units: nm
@@ -191,6 +193,10 @@ function params = bayesopt_params(Model)
             SDMM2= optimizableVariable('SDMM2',[0 1000],'Type','real');
         end
         
+        SnMM = optimizableVariable('n_MM',[6 12],'Type','real');
+        SnXX = optimizableVariable('n_XX',[6 12],'Type','real');
+        SnMX = optimizableVariable('n_MX',[6 12],'Type','real');
+        
         if Model.Fix_Charge
             if Model.Additivity
                 if Model.Additional_MM_Disp
@@ -211,6 +217,13 @@ function params = bayesopt_params(Model)
                 end
             else
                 params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX,SQ];
+            end
+        end
+        if strcmp(Model.Theory,'Mie')
+            if Model.Additivity
+                params = [params,SnMX];
+            else
+                params = [params,SnMM,SnXX,SnMX];
             end
         end
     end

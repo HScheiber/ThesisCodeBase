@@ -26,7 +26,8 @@ PotSettings.Salt = Settings.Salt;
 [TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(PotSettings);
 
 % Potential Scaling
-if strcmp(Settings.Theory,'TF')
+switch Settings.Theory
+case 'TF'
 
     % Loose form of exp-C6-C8 model
     if Settings.SigmaEpsilon
@@ -147,7 +148,7 @@ if strcmp(Settings.Theory,'TF')
         end
     end
 
-elseif strcmp(Settings.Theory,'BH')
+case {'BH' 'BD'}
 
     % Loose form of exp-C6 model
     if Settings.SigmaEpsilon
@@ -246,7 +247,7 @@ elseif strcmp(Settings.Theory,'BH')
         end
     end
 
-elseif strcmp(Settings.Theory,'JC') % JC models
+case 'JC' % JC models
 
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
     if Settings.SigmaEpsilon
@@ -321,6 +322,59 @@ elseif strcmp(Settings.Theory,'JC') % JC models
             Settings.S.D.MX = Param.SDMX;
             Settings.S.R.MX = Param.SRMX;
         end
+    end
+
+    % Scaling Coulombic Charge
+    if Settings.Fix_Charge
+        Settings.S.Q = Settings.Q_value;
+    else
+        Settings.S.Q = Param.SQ;
+    end
+    
+case 'Mie'
+    % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
+    if Settings.SigmaEpsilon
+
+        % Sigma scaling
+        Settings.S.S.MM = Param.sigma_MM./JC_MM.sigma;
+        Settings.S.S.XX = Param.sigma_XX./JC_XX.sigma;
+
+        % Epsilon scaling
+        Settings.S.E.MM = Param.epsilon_MM./JC_MM.epsilon;
+        Settings.S.E.XX = Param.epsilon_XX./JC_XX.epsilon;
+        
+        Settings.S.n.MX = Param.n_MX;
+        
+        % Default MX params
+        def_S_MX = JC_MX.sigma;
+        def_E_MX = JC_MX.epsilon;
+        
+        if Settings.Additivity
+            
+            Settings.S.n.MM = Param.n_MX;
+            Settings.S.n.XX = Param.n_MX;
+            
+            Sigma_MX = (Param.sigma_MM + Param.sigma_XX)./2;
+            Epsilon_MX = sqrt(Param.epsilon_MM.*Param.epsilon_XX);
+
+            Settings.S.S.MX = Sigma_MX./def_S_MX;
+            Settings.S.E.MX = Epsilon_MX./def_E_MX;
+
+            if Settings.Additional_MM_Disp
+                Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
+                Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
+            end
+        else
+            Settings.S.S.MX = Param.sigma_MX./def_S_MX;
+            Settings.S.E.MX = Param.epsilon_MX./def_E_MX;
+            
+            Settings.S.n.MM = Param.n_MM;
+            Settings.S.n.XX = Param.n_XX;
+        end
+
+    % Scaled dispersion/repulsion form
+    else
+        error('Mie potential only available in sigma-epsilon form')
     end
 
     % Scaling Coulombic Charge

@@ -1,15 +1,4 @@
-% Jung-Cheatham model parameters adapted for three water models with
-% Lorenz-Berthelot combining rules
-% Use Watermodel = 'SPC/E', 'TIP3P', or 'TIP4PEW'
-% Generates pair potential energy surfaces from 'Startpoint' up to a given
-% length input 'Endpoint'. Plotswitch is a logical true or false to
-% determine whether to plot the resulting potentials
-% Recommended spacing is 0.005 angstroms or 0.0005 nm
-% INPUT UNITS MUST BE ALL IN NANOMETERS. OUTPUTS ARE IN NANOMETER AND
-% kJ/mol
-
-% CRDamping = Close Range Damping
-function U = JC_Potential_Generator_vec(Settings)
+function U = Mie_Potential_Generator_vec(Settings)
 
 %% Load JC Parameters
 dat = load(fullfile(Settings.home,'data','JC_Default_Param.mat'));
@@ -20,6 +9,16 @@ QQ_prefactor = dat.QQ_prefactor;
 q.(Settings.Metal) =  Settings.S.Q; % atomic
 q.(Settings.Halide)= -Settings.S.Q; % atomic
 
+%% n repulsive exponent parameter
+n.MM = Settings.S.n.MM;
+n.XX = Settings.S.n.XX;
+n.MX = Settings.S.n.MX;
+
+%% Calculate prefactor
+P_MM = (n.MM./(n.MM - 6)).*((n.MM./6).^(6./(n.MM - 6)));
+P_XX = (n.XX./(n.XX - 6)).*((n.XX./6).^(6./(n.XX - 6)));
+P_MX = (n.MX./(n.MX - 6)).*((n.MX./6).^(6./(n.MX - 6)));
+
 %% Calculate parameters of interest for LJ potential
 sigma_MM = Settings.S.S.All.*Settings.S.S.MM.*Param.(Settings.Metal).sigma;
 sigma_XX = Settings.S.S.All.*Settings.S.S.XX.*Param.(Settings.Halide).sigma;
@@ -29,16 +28,15 @@ epsilon_MM = Settings.S.E.All.*Settings.S.E.MM.*Param.(Settings.Metal).epsilon;
 epsilon_XX = Settings.S.E.All.*Settings.S.E.XX.*Param.(Settings.Halide).epsilon;
 epsilon_MX = Settings.S.E.All.*Settings.S.E.MX.*sqrt(Param.(Settings.Metal).epsilon.*Param.(Settings.Halide).epsilon);
 
-% Change parameteters into A/r12 - C/r6 format
-A.MM = Settings.S.R.All.*Settings.S.R.MM.*4.*epsilon_MM.*(sigma_MM.^12);
-C.MM = Settings.S.D.All.*Settings.S.D.MM.*4.*epsilon_MM.*(sigma_MM.^6);
+% Change parameteters into A/r^n - C/r^6 format
+A.MM = Settings.S.R.All.*Settings.S.R.MM.*P_MM.*epsilon_MM.*(sigma_MM.^n.MM);
+C.MM = Settings.S.D.All.*Settings.S.D.MM.*P_MM.*epsilon_MM.*(sigma_MM.^6);
 
-A.XX = Settings.S.R.All.*Settings.S.R.XX.*4.*epsilon_XX.*(sigma_XX.^12);
-C.XX = Settings.S.D.All.*Settings.S.D.XX.*4.*epsilon_XX.*(sigma_XX.^6);
+A.XX = Settings.S.R.All.*Settings.S.R.XX.*P_XX.*epsilon_XX.*(sigma_XX.^n.XX);
+C.XX = Settings.S.D.All.*Settings.S.D.XX.*P_XX.*epsilon_XX.*(sigma_XX.^6);
 
-A.MX = Settings.S.R.All.*Settings.S.R.MX.*4.*epsilon_MX.*(sigma_MX.^12);
-C.MX = Settings.S.D.All.*Settings.S.D.MX.*4.*epsilon_MX.*(sigma_MX.^6);
-
+A.MX = Settings.S.R.All.*Settings.S.R.MX.*P_MX.*epsilon_MX.*(sigma_MX.^n.MX);
+C.MX = Settings.S.D.All.*Settings.S.D.MX.*P_MX.*epsilon_MX.*(sigma_MX.^6);
 
 %% Generate range (r) in nm
 U.r = Settings.Table_StepSize:Settings.Table_StepSize:Settings.Table_Length;
@@ -59,7 +57,7 @@ for interaction = {'MX' 'XX' 'MM'}
     end
     
     % Build PES
-    U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + A.(int)./(U.r.^12) - C.(int)./(U.r.^6);
+    U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + A.(int)./(U.r.^n.(int)) - C.(int)./(U.r.^6);
 end
 
 end

@@ -63,6 +63,11 @@ function S = Init_Scaling_Object
     S.A.MX = 1;
     S.A.AB = 1;
     
+    % Born parameter n (Mie only)
+    S.n.MM = 12;
+    S.n.XX = 12;
+    S.n.MX = 12;
+    
     % Zeta, the final wall potential (HS only)
     S.Z.All = 1;
     S.Z.MM = 1;
