@@ -57,22 +57,22 @@ function TableFile_MX = MakeTables(Settings,varargin)
             inflex_r = inflex_r(1);
             inflex_idx = find(U.r == inflex_r);
         
-            %% Visualization
-            nm_per_m = 1e+9; % nm per m
-            NA = 6.0221409e23; % Molecules per mole
-            e_c = 1.60217662e-19; % Elementary charge in Coulombs
-            epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
-            k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
-
-            if idx == 1
-                U.Total = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-            else
-                U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-            end
-            hold on
-            plot(U.r(2:end).*10,U.Total(2:end),'-k','Linewidth',3)
-            scatter(inflex_r.*10,U.Total(inflex_idx),100,'r','Linewidth',3,'MarkerEdgeColor','r')
-            %%
+%             %% Visualization
+%             nm_per_m = 1e+9; % nm per m
+%             NA = 6.0221409e23; % Molecules per mole
+%             e_c = 1.60217662e-19; % Elementary charge in Coulombs
+%             epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
+%             k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
+% 
+%             if idx == 1
+%                 U.Total = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
+%             else
+%                 U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
+%             end
+%             hold on
+%             plot(U.r(2:end).*10,U.Total(2:end),'-k','Linewidth',3)
+%             scatter(inflex_r.*10,U.Total(inflex_idx),100,'r','Linewidth',3,'MarkerEdgeColor','r')
+%             %%
         
             % Generate a steep repulsion beyond the peak
             below_peak_idx = (U.r <= inflex_r);
@@ -99,22 +99,22 @@ function TableFile_MX = MakeTables(Settings,varargin)
             U.dh(below_peak_idx) = dfwall - U.df(below_peak_idx);
         end
         
-        %% Testing visualization
-        if idx == 1
-            U.Total  = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g;
-            U.dTotal = k_0*(e_c^2).*(Settings.S.Q^2).*U.df0 - U.dh - U.dg;
-        else
-            U.Total  =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g;
-            U.dTotal =  -k_0*(e_c^2).*(Settings.S.Q^2).*U.df0 - U.dh - U.dg;
-        end
-        plot(U.r.*10,U.Total,':r','Linewidth',3)
-        ylim([-1000 4000])
-        xlim([0 5])
-        set(gca,'Fontsize',32,'TickLabelInterpreter','latex','XTick',0:1:5)
-        xlabel(gca,'$r_{ij}$ [\AA]','fontsize',32,'interpreter','latex')
-        ylabel(gca,'$u_{ij}$ [kJ mol$^{-1}$]','fontsize',32,'interpreter','latex')
-        exportgraphics(gca,'Augmented_Potential.eps')
-        %%
+%         %% Testing visualization
+%         if idx == 1
+%             U.Total  = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g;
+%             U.dTotal = k_0*(e_c^2).*(Settings.S.Q^2).*U.df0 - U.dh - U.dg;
+%         else
+%             U.Total  =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g;
+%             U.dTotal =  -k_0*(e_c^2).*(Settings.S.Q^2).*U.df0 - U.dh - U.dg;
+%         end
+%         plot(U.r.*10,U.Total,':r','Linewidth',3)
+%         ylim([-1000 4000])
+%         xlim([0 5])
+%         set(gca,'Fontsize',32,'TickLabelInterpreter','latex','XTick',0:1:5)
+%         xlabel(gca,'$r_{ij}$ [\AA]','fontsize',32,'interpreter','latex')
+%         ylabel(gca,'$u_{ij}$ [kJ mol$^{-1}$]','fontsize',32,'interpreter','latex')
+%         exportgraphics(gca,'Augmented_Potential.eps')
+%         %%
         
         % Output into gromacs format
         Uo = [U.r ; U.f0 ; U.df0 ; U.g ; U.dg ; U.h ; U.dh];

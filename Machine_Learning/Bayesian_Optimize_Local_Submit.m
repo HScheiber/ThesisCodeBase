@@ -53,7 +53,7 @@ close all
 Settings = Initialize_LiX_BO_Settings;
 Settings.Project_Directory_Name = 'Model_Building';
 Settings.Verbose = false;
-Settings.UseCoupledConstraint = true;
+Settings.UseCoupledConstraint = false;
 Settings.SigmaEpsilon = true;
 
 % Job settings
@@ -88,6 +88,7 @@ Settings.MaxAttWellDepth = -1000; % [kJ/mol] This is the maximum allowed depth o
 Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
+Settings.EnforceRR = true; % enforce radius ratio < 1 (anion is larger)
 
 % Non-MP Finite T calculation settings
 Settings.Liquid_Test_Time = 200; % ps. simulation time to sample the liquid for enthalpy / MSD calculations
@@ -153,7 +154,7 @@ idx = 0;
 Settings.Salt = 'NaCl';
 Settings.Theory = 'Mie';
 Settings.InnerRange = true;
-Settings.Trial_ID = 'XX1';
+Settings.Trial_ID = 'XX2';
 
 % [T = 0] Loss options
 Settings.Loss_Options.Rocksalt.LE = 1;
