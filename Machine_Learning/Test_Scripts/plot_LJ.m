@@ -83,15 +83,15 @@ cla(ax)
 hold(ax,'on')
 %yline(ax,0,':k',"LineWidth",1)
 
+col = cbrewer('seq','Blues',3);
 
 
-
-plot(ax,[0 xmax],[0 0],':k',"LineWidth",3)
-plot(ax,[sigma sigma],[0 ylims(1)],':k',"LineWidth",3)
-plot(ax,[0 rt],[fmin fmin],':k',"LineWidth",3)
-plot(ax,r,f,'-b',"LineWidth",4)
-scatter(ax,rt,fmin,50,'k','filled','o',"LineWidth",3,'MarkerEdgeColor','k')
-scatter(ax,sigma,ffun(sigma),50,'k','filled','o',"LineWidth",3,'MarkerEdgeColor','k')
+plot(ax,[0 xmax],[0 0],'--k',"LineWidth",3)
+plot(ax,[sigma sigma],[0 ylims(1)],':r',"LineWidth",4)
+plot(ax,[0 rt],[fmin fmin],':r',"LineWidth",4)
+plot(ax,r,f,'-',"LineWidth",5,'Color',col(end,:))
+scatter(ax,rt,fmin,80,'r','filled','o',"LineWidth",2,'MarkerEdgeColor','k')
+scatter(ax,sigma,ffun(sigma),80,'r','filled','o',"LineWidth",2,'MarkerEdgeColor','k')
 ylim(ax,ylims)
 xlim(ax,[rmin,xmax])
 
@@ -99,7 +99,7 @@ fs=32;
 set(gca,'box','on','TickLabelInterpreter','latex');
 set(gca,'XMinorTick','on','YMinorTick','on','FontSize',fs);
 xlabel(gca,'$r$','fontsize',fs,'Interpreter','latex');
-ylabel(gca,'$u^{LJ}$','fontsize',fs,'Interpreter','latex');
+%ylabel(gca,'$u^{LJ}$','fontsize',fs,'Interpreter','latex');
 
 xticks([0 sigma])
 yticks([-epsilon 0])
