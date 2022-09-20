@@ -155,6 +155,7 @@ Settings.Salt = 'LiCl';
 Settings.Theory = 'BE';
 Settings.InnerRange = true;
 Settings.Trial_ID = 'XX2';
+Settings.UseCoupledConstraint = false;
 
 % [T = 0] Loss options
 Settings.Loss_Options.Rocksalt.LE = 1;
