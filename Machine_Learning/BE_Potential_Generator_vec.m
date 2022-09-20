@@ -82,29 +82,31 @@ for interaction = {'MX' 'XX' 'MM'}
     Num_inflex = sum(inflex_idx,2);
     ni_idx = Num_inflex == 0;  % Potentials that contain no inflection point or peak. exclude these...
     oi_idx = ~ni_idx;          % Potentials that contain a peak and inflection point
-    inflex_idx = inflex_idx(oi_idx,:); % Inflection point index for potentials with a peak and inflection point
-    U_Total = U_Total_all(oi_idx,:);   % Total Potential for those with a peak and inflection point
-    dU_Total = dU_Total_all(oi_idx,:); % Total derivative for those with a peak and inflection point
-    r_oi = repmat(U.r,size(U_Total,1),1); % matrix of positions for potentials with a peak and inflection point
-    ip_idx = sum(cumprod(inflex_idx == 0, 2), 2) + 1; % indeces for inflection points
-    ipl_idx = sub2ind(size(U_Total),(1:numel(ip_idx)).',ip_idx); % linear indeces for inflection points
-    inflex_r = r_oi(ipl_idx); % inflection positions
+    if sum(oi_idx) > 0
+        inflex_idx = inflex_idx(oi_idx,:); % Inflection point index for potentials with a peak and inflection point
+        U_Total = U_Total_all(oi_idx,:);   % Total Potential for those with a peak and inflection point
+        dU_Total = dU_Total_all(oi_idx,:); % Total derivative for those with a peak and inflection point
+        r_oi = repmat(U.r,size(U_Total,1),1); % matrix of positions for potentials with a peak and inflection point
+        ip_idx = sum(cumprod(inflex_idx == 0, 2), 2) + 1; % indeces for inflection points
+        ipl_idx = sub2ind(size(U_Total),(1:numel(ip_idx)).',ip_idx); % linear indeces for inflection points
+        inflex_r = r_oi(ipl_idx); % inflection positions
+
+        % Calculate a coefficient to match the total derivative at the inflection point
+        dU_infl = dU_Total(ipl_idx); % value of total derivative at inflection point
+        D = -dU_infl.*(1./alpha.(int)(oi_idx)).*exp(alpha.(int)(oi_idx).*inflex_r); % Calculate the wall prefactor
+
+        % Generate a repulsion beyond the inflection point
+        below_infl_idx = (r_oi < inflex_r); % pick out values of r below the inflection point
     
-    % Calculate a coefficient to match the total derivative at the inflection point
-    dU_infl = dU_Total(ipl_idx); % value of total derivative at inflection point
-    D = -dU_infl.*(1./alpha.(int)(oi_idx)).*exp(alpha.(int)(oi_idx).*inflex_r); % Calculate the wall prefactor
-    
-    % Generate a repulsion beyond the inflection point
-    below_infl_idx = (r_oi < inflex_r); % pick out values of r below the inflection point
-    
-    fwall = D.*exp(-alpha.(int)(oi_idx).*r_oi) - D.*exp(-alpha.(int)(oi_idx).*inflex_r) ...
-        + U_Total(ipl_idx); % Repulsive wall shifted to its value at the inflection point, with U_Coulomb subtracted out
-    
-    % Add this repulsion to the repulsive part of the function
-    U_Total(below_infl_idx) = fwall(below_infl_idx);
-    
-    % Update
-    U_Total_all(oi_idx,:) = U_Total;
+        fwall = D.*exp(-alpha.(int)(oi_idx).*r_oi) - D.*exp(-alpha.(int)(oi_idx).*inflex_r) ...
+            + U_Total(ipl_idx); % Repulsive wall shifted to its value at the inflection point, with U_Coulomb subtracted out
+        
+        % Add this repulsion to the repulsive part of the function
+        U_Total(below_infl_idx) = fwall(below_infl_idx);
+
+        % Update
+        U_Total_all(oi_idx,:) = U_Total;
+    end
     
     % Build PES
     U.(int) = U_Total_all;

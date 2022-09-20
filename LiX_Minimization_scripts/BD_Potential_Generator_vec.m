@@ -79,28 +79,31 @@ for interaction = {'MX' 'XX' 'MM'}
     % Exclude any with no inflection point or no peak
     Num_inflex = sum(inflex_idx,2);
     np_idx = Num_inflex == 0;  % Potentials that contain no inflection point or peak. exclude these...
-    op_idx = ~np_idx;          % Potentials that contain a peak and inflection point
-    inflex_idx = inflex_idx(op_idx,:);
-    U_LJ = U_LJ_all(op_idx,:);
-    dU_LJ = dU_LJ_all(op_idx,:);
-    r = repmat(U.r,size(U_LJ,1),1);
-    ip_idx = sum(cumprod(inflex_idx == 0, 2), 2) + 1;
-    ipl_idx = sub2ind(size(U_LJ),(1:numel(ip_idx)).',ip_idx);
-    inflex_r = r(ipl_idx); % inflection positions
-    
-    % Calculate a coefficient to match the derivative at the inflection point
-    dU_infl = dU_LJ(ipl_idx); % value of derivative at inflection point
-    D = -dU_infl.*(inflex_r.^13)/12; % coefficients
+    oi_idx = ~np_idx;          % Potentials that contain a peak and inflection point
+    if sum(oi_idx) > 0
+        inflex_idx = inflex_idx(oi_idx,:);
+        U_LJ = U_LJ_all(oi_idx,:);
+        dU_LJ = dU_LJ_all(oi_idx,:);
+        r = repmat(U.r,size(U_LJ,1),1);
+        ip_idx = sum(cumprod(inflex_idx == 0, 2), 2) + 1;
+        ipl_idx = sub2ind(size(U_LJ),(1:numel(ip_idx)).',ip_idx);
+        inflex_r = r(ipl_idx); % inflection positions
 
-    % Generate a repulsion beyond the inflection point
-    below_infl_idx = (r < inflex_r); % pick out values of r below the inflection point
-    fwall = D./(r.^12) - D./(inflex_r.^12) + U_LJ(ipl_idx);
+        % Calculate a coefficient to match the derivative at the inflection point
+        dU_infl = dU_LJ(ipl_idx); % value of derivative at inflection point
+        D = -dU_infl.*(inflex_r.^13)/12; % coefficients
+
+        % Generate a repulsion beyond the inflection point
+        below_infl_idx = (r < inflex_r); % pick out values of r below the inflection point
     
-    % Add this repulsion to the repulsive part of the function
-    U_LJ(below_infl_idx) = fwall(below_infl_idx);
-    
-    % Update
-    U_LJ_all(op_idx,:) = U_LJ;
+        fwall = D./(r.^12) - D./(inflex_r.^12) + U_LJ(ipl_idx);
+        
+        % Add this repulsion to the repulsive part of the function
+        U_LJ(below_infl_idx) = fwall(below_infl_idx);
+        
+        % Update
+        U_LJ_all(oi_idx,:) = U_LJ;
+    end
     
     % Build PES
     U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + U_LJ_all;
