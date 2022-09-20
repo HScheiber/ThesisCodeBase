@@ -864,10 +864,7 @@ if ( Settings.Loss_Options.MP > tol && ~Settings.skip_finite_T ) || Settings.The
     Settings.Finite_T_Data.T_dat = T_dat;
     if Aborted
         Settings.Finite_T_Data.MP = nan;
-        if Settings.UseCoupledConstraint
-            %coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
-            Loss_add = nan;
-        end
+        Loss_add = nan;
     else
         Settings.Finite_T_Data.MP = Tm_estimate;
         if Settings.Delete_Equil && isfolder(Settings.WorkDir)
@@ -945,8 +942,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     Settings.Finite_T_Data.Liquid_DM_MP = Liq_Output.Liquid_DM_MP; % cm^2 / s
     Settings.Finite_T_Data.Liquid_DX_MP = Liq_Output.Liquid_DX_MP;
     
-    if isnan(Liq_Output.Liquid_H_MP) && Settings.UseCoupledConstraint
-        %coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
+    if isnan(Liq_Output.Liquid_H_MP)
         Loss_add = nan;
         if ~Settings.Therm_Prop_Override
             Loss = nan;
@@ -1023,7 +1019,7 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
     Settings.Finite_T_Data.Fusion_dV = Settings.Finite_T_Data.Liquid_V_MP - ...
         Settings.Finite_T_Data.Solid_V_MP;
     
-    if isnan(Sol_Output.Solid_H_MP) && Settings.UseCoupledConstraint
+    if isnan(Sol_Output.Solid_H_MP)
         Loss_add = nan;
         if ~Settings.Therm_Prop_Override
             Loss = nan;
