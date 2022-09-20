@@ -66,11 +66,11 @@ for interaction = {'MX' 'XX' 'MM'}
     % For the subset of potentials that have peak(s), find the peak position
     U_LJ = U_LJ_all(op_idx,:);
     peaks_idx  = peaks_idx(op_idx,:);
-    r = repmat(U.r,size(U_LJ,1),1);
+    r_op = repmat(U.r,size(U_LJ,1),1);
     fp_idx = sum(cumprod(peaks_idx == 0, 2), 2) + 1;
     fpl_idx = sub2ind(size(U_LJ),(1:numel(fp_idx)).',fp_idx);
     peak_r = nan(size(U_LJ_all,1),1);
-    peak_r(op_idx) = r(fpl_idx);
+    peak_r(op_idx) = r_op(fpl_idx);
     
     % Find any inflection points that occur after the peak
     r = repmat(U.r,size(dU_LJ_all,1),1);

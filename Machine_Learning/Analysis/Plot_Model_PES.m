@@ -4,8 +4,8 @@ Settings = Initialize_MD_Settings;
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; % 'LiF' 'LiCl' 'LiBr' 'LiI'
 
 Settings.Theory = 'BH';
-ModelID = 'ME';
-PlotType = 'full';
+ModelID = 'MC3';
+PlotType = 'lj';
 fs = 28; % font size
 lw = 3; % line width
 savefile = false; % switch to save the final plots to file
@@ -84,6 +84,9 @@ for sidx = 1:numel(Salts)
                 'Startpoint',Startpoint,'ReturnAsStructure',true);
         elseif strcmp(Settings.Theory,'BD')
             [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,...
+                'Startpoint',Startpoint,'ReturnAsStructure',true);
+        elseif strcmp(Settings.Theory,'BE')
+            [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,...
                 'Startpoint',Startpoint,'ReturnAsStructure',true);
         elseif strcmp(Settings.Theory,'Mie')
             [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,...

@@ -234,7 +234,7 @@ case 'TF'
         end
     end
 
-case {'BH' 'BD'}
+case {'BH' 'BD' 'BE'}
 
     % Loose form of exp-C6 model
     if Settings.SigmaEpsilon
@@ -554,6 +554,9 @@ if Settings.CheckBadFcn
             'Startpoint',0.01,'ReturnAsStructure',true);
     elseif strcmp(Settings.Theory,'BD')
         [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,...
+            'Startpoint',0.01,'ReturnAsStructure',true);
+    elseif strcmp(Settings.Theory,'BE')
+        [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,...
             'Startpoint',0.01,'ReturnAsStructure',true);
     end
     Settings.Table_Length = tl; % nm

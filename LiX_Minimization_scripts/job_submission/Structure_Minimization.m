@@ -153,7 +153,7 @@ elseif Find_Min_Params
     [Settings,~] = FindMinLatticeParam(Settings,...
         'Find_Similar_Params',Find_Similar_Params);
     switch Settings.Theory(1:2)
-        case {'JC' 'BD' 'Mie' 'HS'}
+        case {'JC' 'BD' 'BE' 'Mi' 'HS'}
             AddRepWall = false;
         otherwise
             AddRepWall = true;
@@ -418,6 +418,8 @@ elseif Table_Req
         [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,'MDP_Minimize',true);
     elseif strcmp(Settings.Theory,'BD')
         [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,'MDP_Minimize',true);
+    elseif strcmp(Settings.Theory,'BE')
+        [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,'MDP_Minimize',true);
     else
         error(['Warning: Unknown model type: "' Settings.Theory '.'])
     end

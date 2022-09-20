@@ -152,7 +152,7 @@ idx = 0;
 
 %% Test Model Particular parameter
 Settings.Salt = 'LiCl';
-Settings.Theory = 'BD';
+Settings.Theory = 'BE';
 Settings.InnerRange = true;
 Settings.Trial_ID = 'XX2';
 
