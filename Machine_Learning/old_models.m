@@ -7173,3 +7173,163 @@ for tidx = 1:length(Theories)
     end
 end
         
+%% Shared_Settings
+Shared_Settings.Max_Bayesian_Iterations = 600;
+Shared_Settings.Max_Secondary_Iterations = 200;
+Shared_Settings.Max_Local_Iterations = 1000;
+Shared_Settings.switch_final_opt = true;
+Shared_Settings.Parallel_Bayesopt = true;
+Shared_Settings.Parallel_Struct_Min = false;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = true;
+Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.InnerRange = false; % Sets domain of BH
+
+%% JC/BH Models: LA, LB, LC, LD
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' };
+Theories = {'JC' 'BH'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model LA
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['LA' Rep];
+
+            % Loss function
+            Models(idx).Loss_Options.Rocksalt.LE  = 1;
+            Models(idx).Loss_Options.Rocksalt.a  = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model LB
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['LB' Rep];
+
+            % Loss function
+            Models(idx).Loss_Options.Rocksalt.LE  = 1;
+            Models(idx).Loss_Options.Rocksalt.a  = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model LC
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['LC' Rep];
+
+            % Loss function
+            Models(idx).Loss_Options.Rocksalt.LE  = 1;
+            Models(idx).Loss_Options.Rocksalt.a  = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).Fix_Charge = false;
+            Models(idx).Additivity = true;
+
+            %% Model LD
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['LD' Rep];
+
+            % Loss function
+            Models(idx).Loss_Options.Rocksalt.LE  = 1;
+            Models(idx).Loss_Options.Rocksalt.a  = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = false;
+        end
+    end
+end
+%% Shared_Settings
+Shared_Settings.Max_Bayesian_Iterations = 300;
+Shared_Settings.Max_Secondary_Iterations = 200;
+Shared_Settings.Max_Local_Iterations = 50;
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = true;
+Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.InnerRange = true; % Sets domain of BH
+%% BH Models: MD, ME on LiX
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'BH'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MD
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['MD' Rep];
+
+            % Loss function
+            Models(idx).Loss_Options.Rocksalt.LE  = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+
+            %% Model ME
+            idx = idx+1;
+            Models(idx) = Shared_Settings;
+            Models(idx).Salt = Salt;
+            Models(idx).Theory = Theory;
+            Models(idx).Trial_ID = ['ME' Rep];
+
+            % Loss function
+            Models(idx).Loss_Options.Rocksalt.a  = 1;
+            Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+            Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+
+            Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+            Models(idx).Fix_Charge = true;
+            Models(idx).Additivity = true;
+        end
+    end
+end
+        

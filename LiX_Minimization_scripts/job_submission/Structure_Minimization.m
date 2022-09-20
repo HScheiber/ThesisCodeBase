@@ -153,7 +153,7 @@ elseif Find_Min_Params
     [Settings,~] = FindMinLatticeParam(Settings,...
         'Find_Similar_Params',Find_Similar_Params);
     switch Settings.Theory(1:2)
-        case {'JC' 'BD' 'Mie' 'HS'}
+        case {'JC' 'BD' 'BE' 'Mi' 'HS'}
             AddRepWall = false;
         otherwise
             AddRepWall = true;
@@ -418,6 +418,8 @@ elseif Table_Req
         [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,'MDP_Minimize',true);
     elseif strcmp(Settings.Theory,'BD')
         [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,'MDP_Minimize',true);
+    elseif strcmp(Settings.Theory,'BE')
+        [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,'MDP_Minimize',true);
     else
         error(['Warning: Unknown model type: "' Settings.Theory '.'])
     end
@@ -598,12 +600,12 @@ else
             'OutputFcn',conv_fun,'ObjectiveLimit',Settings.MinMDP.E_Unphys,...
             'UseParallel',Settings.MinMDP.Parallel_Min,'MaxIterations',Settings.MinMDP.MaxCycles,...
             'FiniteDifferenceStepSize',h,'StepTolerance',1e-6,'FunctionTolerance',1e-6,...
-            'FiniteDifferenceType','forward','MaxFunctionEvaluations',100);
+            'FiniteDifferenceType','forward','MaxFunctionEvaluations',200);
         [lattice_params,E,exitflag,~,~,Gradient,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
     end
     
     % Failed to produce a reasonable answer
-    if any(exitflag == [0 -2]) || ...
+    if any(exitflag == -2) || ...
             any( abs(lattice_params - lb) < sqrt(eps) ) || ...
             any( abs(lattice_params - ub) < sqrt(eps) ) || ...
             E < Settings.MinMDP.E_Unphys

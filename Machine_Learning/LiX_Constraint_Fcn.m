@@ -164,7 +164,7 @@ case 'TF'
             Settings.S.Q = Param.SQ;
         end
     end
-case {'BH' 'BD'}
+case {'BH' 'BD' 'BE'}
 
     % Loose form of exp-C6 model
     if Settings.SigmaEpsilon
@@ -405,6 +405,8 @@ if strcmp(Settings.Theory,'BH')
     U = BH_Potential_Generator_vec(Settings);
 elseif strcmp(Settings.Theory,'BD')
     U = BD_Potential_Generator_vec(Settings);
+elseif strcmp(Settings.Theory,'BE')
+    U = BE_Potential_Generator_vec(Settings);
 elseif strcmp(Settings.Theory,'TF')
     U = TF_Potential_Generator_vec(Settings);
 elseif strcmp(Settings.Theory,'JC')
@@ -459,7 +461,7 @@ Loss(ovop_idx) = Loss(ovop_idx) + max(r_min - (Settings.MaxMXWellR/10),0).*Setti
 Loss(ovop_idx) = Loss(ovop_idx) + max((Settings.MinMXWellR/10) - r_min,0).*Settings.BadFcnLossPenalty; % valley too close
 
 % % Loss = zeros(N_par,1);
-% idxes = find(Loss > 0);
+% idxes = find(Loss == 0);
 % for jdx = 1:min(numel(idxes),10)
 %     idx = idxes(jdx);
 %     plot(U.r,U.MX(idx,:))
@@ -587,7 +589,7 @@ for j = 1:2
     r_wall_sv{j}(walls_idx) = r_wall;
     
 %     % Loss = zeros(N_par,1);
-%     idxes = find(Loss > 0);
+%     idxes = find(Loss == 0);
 %     for jdx = 1:min(numel(idxes),10)
 %         idx=idxes(jdx);
 %         hold on

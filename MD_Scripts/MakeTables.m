@@ -32,6 +32,9 @@ function TableFile_MX = MakeTables(Settings,varargin)
         case 'BD'
             [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,...
                 'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
+        case 'BE'
+            [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,...
+                'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);
         case 'Mi'
             [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,...
                 'ReturnAsStructure','true','MDP_Minimize',MDP_Minimize);

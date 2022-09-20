@@ -2,8 +2,11 @@ PlotType = 'LJ';
 epsilon = 1;
 r0 = 1;
 gammas_cell = {[0.1:0.01:0.3 0.35:0.05:5 5.1:0.002:5.9] [6.9:-0.05:6.45 6.4:-0.002:6.1] 7.0 7.0:0.01:8.5};
-titles = {'$0 \leq \gamma < 6$ with $\varepsilon < 1$' '$6 < \gamma  < 7$ with $\varepsilon > 1$' ...
-    '$\gamma = 7$ with $\varepsilon > 1$' '$7 < \gamma <\infty$ with $\varepsilon > 1$'};
+gammas_cell = {[0.1:0.002:5.9] [6.9:-0.002:6.1] 7.0 7.0:0.01:8.5};
+
+titles = {'$0 \leq \gamma < 6$ with $\varepsilon \leq 0$' '$6 < \gamma  < 7$ with $\varepsilon \geq 0$' ...
+    '$\gamma = 7$ with $\varepsilon \geq 0$' '$7 < \gamma <\infty$ with $\varepsilon \geq 0$'};
+labels = {'\textbf{a})' '\textbf{b})' '\textbf{c})' '\textbf{d})'};
 rmin = 0;
 rmax = 3;
 ylims = [-3.5 3.5];
@@ -136,9 +139,9 @@ for idx = 1:numel(gammas_cell)
             fprime = fpfun(r);
         end
         if numel(gammas) == 1
-            plot(ax,r,f,'-b',"LineWidth",5,'color',Colours(end,:))
+            plot(ax,r,f,'-b',"LineWidth",3,'color',Colours(end,:))
         else
-            plot(ax,r,f,'-b',"LineWidth",5,'color',Colours(jdx,:))
+            plot(ax,r,f,'-b',"LineWidth",3,'color',Colours(jdx,:))
         end
     end
     plot(ax,[0 xmax],[0 0],'--k',"LineWidth",1)
@@ -180,6 +183,8 @@ for idx = 1:numel(gammas_cell)
         ylab = {'$-\varepsilon$' '0' '$\varepsilon^{*}$'};
         ylabsrt = ylab(yidx);
     end
+    
+    text(ax,0.1,2.8,labels{idx},'interpreter','latex','fontsize',fs)
 
     xticks(ax,xtt)
     yticks(ax,ytt)
@@ -188,4 +193,4 @@ for idx = 1:numel(gammas_cell)
 end
 
 %exportgraphics(figh,'BH_pot.eps')
-exportgraphics(figh,'BH_pot.png','resolution',600)
+%exportgraphics(figh,'BH_pot.png','resolution',600)

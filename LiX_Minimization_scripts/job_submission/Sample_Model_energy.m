@@ -228,6 +228,8 @@ if Table_Req
         [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,'MDP_Minimize',true);
     elseif strcmp(Settings.Theory,'BD')
         [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,'MDP_Minimize',true);
+    elseif strcmp(Settings.Theory,'BE')
+        [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,'MDP_Minimize',true);
     elseif strcmp(Settings.Theory,'Mie')
         [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,'MDP_Minimize',true);
     elseif contains(Settings.Theory,'JC')

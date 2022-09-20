@@ -86,7 +86,7 @@ function params = bayesopt_params(Model)
             params = [params,SQ];
         end
         
-    case {'BH' 'BD'}
+    case {'BH' 'BD' 'BE'}
         if ~isfield(Model,'InnerRange')
             Model.InnerRange = false;
         end

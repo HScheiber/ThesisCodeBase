@@ -1,6 +1,6 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theory = 'BH';
-ModelID = 'NF';
+ModelID = 'MC';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
