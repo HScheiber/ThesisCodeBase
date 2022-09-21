@@ -599,7 +599,6 @@ switch lower(computer)
             end
         end
         
-    otherwise % Place jobs here for later assignment
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 600;
         Shared_Settings.Max_Secondary_Iterations = 200;
@@ -662,22 +661,6 @@ switch lower(computer)
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
                     
-                    %% Model NC
-                    idx = idx+1;
-                    Models(idx) = Shared_Settings;
-                    Models(idx).Salt = Salt;
-                    Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['NC' Rep];
-                    
-                    % Loss function
-                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
-                    Models(idx).Loss_Options.Rocksalt.a  = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
-                    
-                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
-                    Models(idx).Fix_Charge = false;
-                    Models(idx).Additivity = true;
-                    
                     %% Model ND
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
@@ -698,6 +681,7 @@ switch lower(computer)
             end
         end
         
+    otherwise % Place jobs here for later assignment
 end
 
 %% Check for already running jobs
