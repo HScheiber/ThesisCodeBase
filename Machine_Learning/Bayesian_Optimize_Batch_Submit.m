@@ -261,6 +261,7 @@ switch lower(computer)
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.InnerRange = true; % Sets domain of BH
+        Shared_Settings.EnforceRR = false;
         Shared_Settings.final_opt_type = 'patternsearch';
         
         %% BH Models: MA, MB, MC, MF on LiX
@@ -371,7 +372,7 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.UseCoupledConstraint = true;
+        Shared_Settings.UseCoupledConstraint = false;
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.InnerRange = false; % Sets domain of BH
@@ -446,6 +447,7 @@ switch lower(computer)
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
         Shared_Settings.InnerRange = true; % Sets domain of BH/TF
+        Shared_Settings.EnforceRR = false;
         
         %% BH Models: NA NB NC ND NE NF NG (inner range - targets on T=0 crystals only)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
@@ -606,10 +608,11 @@ switch lower(computer)
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.UseCoupledConstraint = true;
+        Shared_Settings.UseCoupledConstraint = false;
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Shared_Settings.InnerRange = true; % Sets domain of BH/TF
+        Shared_Settings.InnerRange = false; % Sets domain of BH/TF
+        Shared_Settings.EnforceRR = true;
         
         %% BH Models: NA NB NC ND (outer range - targets on T=0 crystals only, RR enforced)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
