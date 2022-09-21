@@ -203,31 +203,33 @@ for interaction = {'MX' 'XX' 'MM'}
     inflex_idx = find([false islocalmax(dU_LJ(2:end),'MinProminence',1e-8) | islocalmin(dU_LJ(2:end),'MinProminence',1e-8)]);
     if ~isempty(peak_r) && ~isempty(inflex_idx) % Ensure peak exists
         inflex_idx(r(inflex_idx) <= peak_r) = [];
-        inflex_idx = inflex_idx(1);
-        inflex_r = r(inflex_idx);
-        dU_infl = dU_LJ(inflex_idx);
-        
-        % Generate a steep repulsion beyond the inflection
-        below_infl_idx = (r < inflex_r); % values of r below the inflection point
-        r_g = r(below_infl_idx); % nm
-        D = -dU_infl*(inflex_r^13)/12; % coefficient
-        
-        fwall = D./(r_g.^12) - D/(inflex_r^12) + U_LJ(inflex_idx);
-        dfwall = 12*D./(r_g.^13); % Wall -derivative
+        if ~isempty(inflex_idx)
+            inflex_idx = inflex_idx(1);
+            inflex_r = r(inflex_idx);
+            dU_infl = dU_LJ(inflex_idx);
 
-        % Kill the attractive interaction beyond the peak
-        %g_at_infl = U_LJ(inflex_idx);
-        N_belowpeak = inflex_idx-1;
-        U.(int).g(below_infl_idx) = zeros(1,N_belowpeak);
-        U.(int).dg(below_infl_idx) = zeros(1,N_belowpeak);
+            % Generate a steep repulsion beyond the inflection
+            below_infl_idx = (r < inflex_r); % values of r below the inflection point
+            r_g = r(below_infl_idx); % nm
+            D = -dU_infl*(inflex_r^13)/12; % coefficient
 
-        % Remove infinity at 0
-        fwall(1) = fwall(2)*2;
-        dfwall(1) = dfwall(2);
+            fwall = D./(r_g.^12) - D/(inflex_r^12) + U_LJ(inflex_idx);
+            dfwall = 12*D./(r_g.^13); % Wall -derivative
 
-        % Add this repulsion to the repulsive part of the function
-        U.(int).h(below_infl_idx) = fwall;
-        U.(int).dh(below_infl_idx) = dfwall;
+            % Kill the attractive interaction beyond the peak
+            %g_at_infl = U_LJ(inflex_idx);
+            N_belowpeak = inflex_idx-1;
+            U.(int).g(below_infl_idx) = zeros(1,N_belowpeak);
+            U.(int).dg(below_infl_idx) = zeros(1,N_belowpeak);
+
+            % Remove infinity at 0
+            fwall(1) = fwall(2)*2;
+            dfwall(1) = dfwall(2);
+
+            % Add this repulsion to the repulsive part of the function
+            U.(int).h(below_infl_idx) = fwall;
+            U.(int).dh(below_infl_idx) = dfwall;
+        end
     end
         
 %         %% Visualization

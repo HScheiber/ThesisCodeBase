@@ -215,32 +215,34 @@ for interaction = {'MX' 'XX' 'MM'}
     inflex_idx = find([false islocalmax(dU_Total(2:end),'MinProminence',1e-8) | islocalmin(dU_Total(2:end),'MinProminence',1e-8)]);
     if ~isempty(peak_r) && ~isempty(inflex_idx) % Ensure peak exists
         inflex_idx(r(inflex_idx) <= peak_r) = [];
-        inflex_idx = inflex_idx(1);
-        inflex_r = r(inflex_idx);
-        dU_infl = dU_Total(inflex_idx);
-        
-        % Generate a steep repulsion beyond the inflection
-        below_infl_idx = (r < inflex_r); % values of r below the inflection point
-        r_g = r(below_infl_idx); % nm
-        D = -dU_infl*(1/alpha.(int))*exp(alpha.(int)*inflex_r); % Wall prefactor chosen to match the total derivative at the inflection point
-        
-        fwall = D.*exp(-alpha.(int).*r_g) - D.*exp(-alpha.(int).*inflex_r) ...
-            + U_Total(inflex_idx) - U_Coul(below_infl_idx); % Repulsive wall shifted to its value at the inflection point
-        dfwall = alpha.(int)*D.*exp(-alpha.(int).*r_g) + dU_Coulomb(below_infl_idx); % Wall -derivative
+        if ~isempty(inflex_idx)
+            inflex_idx = inflex_idx(1);
+            inflex_r = r(inflex_idx);
+            dU_infl = dU_Total(inflex_idx);
 
-        % Kill the attractive interaction beyond the peak
-        %g_at_infl = U_LJ(inflex_idx);
-        N_belowpeak = inflex_idx-1;
-        U.(int).g(below_infl_idx) = zeros(1,N_belowpeak);
-        U.(int).dg(below_infl_idx) = zeros(1,N_belowpeak);
+            % Generate a steep repulsion beyond the inflection
+            below_infl_idx = (r < inflex_r); % values of r below the inflection point
+            r_g = r(below_infl_idx); % nm
+            D = -dU_infl*(1/alpha.(int))*exp(alpha.(int)*inflex_r); % Wall prefactor chosen to match the total derivative at the inflection point
 
-        % Remove infinity at 0
-        fwall(1) = fwall(2)*2;
-        dfwall(1) = dfwall(2);
+            fwall = D.*exp(-alpha.(int).*r_g) - D.*exp(-alpha.(int).*inflex_r) ...
+                + U_Total(inflex_idx) - U_Coul(below_infl_idx); % Repulsive wall shifted to its value at the inflection point
+            dfwall = alpha.(int)*D.*exp(-alpha.(int).*r_g) + dU_Coulomb(below_infl_idx); % Wall -derivative
 
-        % Add this repulsion to the repulsive part of the function
-        U.(int).h(below_infl_idx) = fwall;
-        U.(int).dh(below_infl_idx) = dfwall;
+            % Kill the attractive interaction beyond the peak
+            %g_at_infl = U_LJ(inflex_idx);
+            N_belowpeak = inflex_idx-1;
+            U.(int).g(below_infl_idx) = zeros(1,N_belowpeak);
+            U.(int).dg(below_infl_idx) = zeros(1,N_belowpeak);
+
+            % Remove infinity at 0
+            fwall(1) = fwall(2)*2;
+            dfwall(1) = dfwall(2);
+
+            % Add this repulsion to the repulsive part of the function
+            U.(int).h(below_infl_idx) = fwall;
+            U.(int).dh(below_infl_idx) = dfwall;
+        end
     end
         
 %         %% Visualization
