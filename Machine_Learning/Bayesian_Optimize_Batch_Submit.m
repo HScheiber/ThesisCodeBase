@@ -193,7 +193,7 @@ switch lower(computer)
         Shared_Settings.InnerRange = true; % Sets domain of BH
         Shared_Settings.EnforceRR = true;
         
-        %% BH, BD, and Mie Models: OA, OB, OC on LiX with proper radius ratios
+        %% BH [Gamma<6], BD, [Gamma<6] and Mie Models: OA, OB, OC on LiX with proper radius ratios
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BH' 'BD' 'Mie'};
         Replicates = 1:5;
@@ -364,6 +364,75 @@ switch lower(computer)
             end
         end
         
+        %% Shared_Settings
+        Shared_Settings.Max_Bayesian_Iterations = 300;
+        Shared_Settings.Max_Secondary_Iterations = 200;
+        Shared_Settings.Max_Local_Iterations = 100;
+        Shared_Settings.Parallel_Bayesopt = false;
+        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.UseCoupledConstraint = true;
+        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Shared_Settings.InnerRange = false; % Sets domain of BH
+        Shared_Settings.EnforceRR = true;
+        
+        %% BD[Gamma>7], BE[Gamma>7] Models: OA, OB on LiX
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+        Theories = {'BD' 'BE'};
+        Replicates = 1:5;
+        for tidx = 1:length(Theories)
+            Theory = Theories{tidx};
+            for sidx = 1:length(Salts)
+                Salt = Salts{sidx};
+                
+                % Set initial MP temperature
+                Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+                
+                for ridx = 1:length(Replicates)
+                    Rep = num2str(Replicates(ridx));
+                    
+                    %% Model OA
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['OA' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model OB
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['OB' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 2;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 2; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 0.2; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                end
+            end
+        end
+        
     case 'graham'
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 600;
@@ -530,21 +599,21 @@ switch lower(computer)
         
     otherwise % Place jobs here for later assignment
         %% Shared_Settings
-        Shared_Settings.Max_Bayesian_Iterations = 300;
+        Shared_Settings.Max_Bayesian_Iterations = 600;
         Shared_Settings.Max_Secondary_Iterations = 200;
-        Shared_Settings.Max_Local_Iterations = 100;
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Max_Local_Iterations = 1000;
+        Shared_Settings.switch_final_opt = true;
+        Shared_Settings.Parallel_Bayesopt = true;
+        Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
         Shared_Settings.UseCoupledConstraint = true;
         Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
         Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Shared_Settings.InnerRange = true; % Sets domain of BH
-        Shared_Settings.EnforceRR = true;
+        Shared_Settings.InnerRange = true; % Sets domain of BH/TF
         
-        %% BD and Mie Models: OA, OB on LiX
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
-        Theories = {'BH' 'BD' 'Mie'};
+        %% BH Models: NA NB NC ND (outer range - targets on T=0 crystals only, RR enforced)
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+        Theories = {'BD' 'BE' 'Mie'};
         Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
@@ -555,45 +624,73 @@ switch lower(computer)
                 Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
                 Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
                 Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-                
+
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
-                    
-                    %% Model OA
+
+                    %% Model NA
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['OA' Rep];
+                    Models(idx).Trial_ID = ['NA' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model NB
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['NB' Rep];
                     
                     % Loss function
                     Models(idx).Loss_Options.Rocksalt.LE  = 1;
                     Models(idx).Loss_Options.Rocksalt.a  = 1;
                     Models(idx).Loss_Options.Wurtzite.RLE  = 1;
-                    Models(idx).Loss_Options.Fusion_Enthalpy  = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                    Models(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
                     
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).Fix_Charge = true;
                     Models(idx).Additivity = true;
                     
-                    %% Model OB
+                    %% Model NC
                     idx = idx+1;
                     Models(idx) = Shared_Settings;
                     Models(idx).Salt = Salt;
                     Models(idx).Theory = Theory;
-                    Models(idx).Trial_ID = ['OB' Rep];
+                    Models(idx).Trial_ID = ['NC' Rep];
                     
                     % Loss function
                     Models(idx).Loss_Options.Rocksalt.LE  = 1;
                     Models(idx).Loss_Options.Rocksalt.a  = 1;
-                    Models(idx).Loss_Options.Wurtzite.RLE  = 2;
-                    Models(idx).Loss_Options.Fusion_Enthalpy  = 2; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                    Models(idx).Loss_Options.Liquid_DM_MP = 0.2; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = false;
+                    Models(idx).Additivity = true;
+                    
+                    %% Model ND
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['ND' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE  = 1;
+                    Models(idx).Loss_Options.Rocksalt.a  = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 1;
                     
                     Models(idx).Structures = Auto_Structure_Selection(Models(idx));
                     Models(idx).Fix_Charge = true;
-                    Models(idx).Additivity = true;
+                    Models(idx).Additivity = false;
+                    
                 end
             end
         end

@@ -121,9 +121,9 @@ function params = bayesopt_params(Model)
                 SepsilonMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
 
                 % gamma
-                SgammaMM = optimizableVariable('gamma_MM',[6 100],'Type','real'); % Units: kJ/mol
-                SgammaXX = optimizableVariable('gamma_XX',[6 100],'Type','real'); % Units: kJ/mol
-                SgammaMX = optimizableVariable('gamma_MX',[6 100],'Type','real'); % Units: kJ/mol
+                SgammaMM = optimizableVariable('gamma_MM',[7 20],'Type','real'); % Units: kJ/mol
+                SgammaXX = optimizableVariable('gamma_XX',[7 20],'Type','real'); % Units: kJ/mol
+                SgammaMX = optimizableVariable('gamma_MX',[7 20],'Type','real'); % Units: kJ/mol
             end
             if Model.Additivity
                 params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
