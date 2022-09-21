@@ -323,7 +323,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         end
         
         % Catch corrupt files
-        if ~isfield(dat,'BayesoptResults') || ~isfield(dat.BayesoptResults,'TotalElapsedTime')
+        if ~isfield(dat,'BayesoptResults') || ~isprop(dat.BayesoptResults,'TotalElapsedTime')
             % Catch corrupt files
             disp('Unable to load intermediate bayesian optimization data.')
             disp('Attempting to load backup step.')
