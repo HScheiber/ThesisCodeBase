@@ -46,14 +46,23 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     Run_Minimization = true;
     if isfile(Minimized_Geom_File)
-        gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Minimization_TRR_File)];
-        [state,outp] = system(gmx_check);
-        lf = regexp(outp,'Last frame.+time *([0-9]|\.)+','tokens','once');
-        if state == 0 || ~isempty(lf)
-            last_frame = str2double(lf{1});
-            if last_frame >= Settings.MinMDP.nsteps_min
-                Run_Minimization = false;
+        try
+            % Check integrity of minimized geom file
+            Data = load_gro_file(Minimized_Geom_File);
+            if Data.N_atoms >= Settings.N_atoms
+                % Check to ensure minimization completed
+                gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Minimization_TRR_File)];
+                [state,outp] = system(gmx_check);
+                lf = regexp(outp,'Last frame.+time *([0-9]|\.)+','tokens','once');
+                if state == 0 || ~isempty(lf)
+                    last_frame = str2double(lf{1});
+                    if last_frame >= Settings.MinMDP.nsteps_min
+                        Run_Minimization = false;
+                    end
+                end
             end
+        catch
+            Run_Minimization = true;
         end
     end
         

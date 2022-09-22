@@ -396,14 +396,23 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     
     Run_Equilibration = true;
     if isfile(Final_Geom_File)
-        gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Equilibrate_TRR_File)];
-        [state,outp] = system(gmx_check);
-        lf = regexp(outp,'Step *([0-9]|\.)+ *([0-9]|\.)+\nTime','tokens','once');
-        if state == 0 || ~isempty(lf)
-            traj_time = (str2double(lf{1})-1)*str2double(lf{2});
-            if traj_time >=Settings.Solid_Test_Time
-                Run_Equilibration = false;
+        try
+            % Check integrity of minimized geom file
+            Data = load_gro_file(Final_Geom_File);
+            if Data.N_atoms >= Settings.N_atoms
+                gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Equilibrate_TRR_File)];
+                [state,outp] = system(gmx_check);
+                lf = regexp(outp,'Step *([0-9]|\.)+ *([0-9]|\.)+\nTime','tokens','once');
+                if state == 0 || ~isempty(lf)
+                    traj_time = (str2double(lf{1})-1)*str2double(lf{2});
+                    if traj_time >=Settings.Solid_Test_Time
+                        Run_Equilibration = false;
+                        N_atoms_prev = Data.N_atoms;
+                    end
+                end
             end
+        catch
+            Run_Equilibration = true;
         end
     end
     
@@ -527,6 +536,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     else
         TPR_File = fullfile(Settings.WorkDir,'Equil_Sol.tpr');
         Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
+        import_gro_traj
+        if N_atoms_prev ~= nmol_solid*2
+            copyfile(Final_Geom_File,Settings.SuperCellFile)
+        end
     end
     
     % Check to ensure system remained in the correct solid structure
