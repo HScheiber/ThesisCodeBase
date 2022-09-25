@@ -435,6 +435,8 @@ switch lower(computer)
         end
         
     case 'graham'
+        Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
+        
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 600;
         Shared_Settings.Max_Secondary_Iterations = 200;
