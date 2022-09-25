@@ -1,8 +1,8 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' }; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'NB';
+Theory = 'Mie';
+ModelID = 'OB';
 BestOnly = false;
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
@@ -425,6 +425,12 @@ switch Theory
         PubTheoryName = 'CBH';
     case 'TF'
         PubTheoryName = 'CBHM';
+    case 'BD'
+        PubTheoryName = 'CBH Modifification D';
+    case 'BE'
+        PubTheoryName = 'CBH Modifification E';
+    case 'Mie'
+        PubTheoryName = 'Coulomb Mie[n-6]';
 end
 
 if N_Salts > 1 && ~BestOnly

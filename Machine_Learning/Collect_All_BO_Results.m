@@ -1,4 +1,4 @@
-% Collect_All_BO_Results
+% Collect_All_BO_Results(true)
 function Collect_All_BO_Results(varargin)
 
 if nargin > 0
