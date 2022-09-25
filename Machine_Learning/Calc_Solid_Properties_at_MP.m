@@ -51,10 +51,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Settings.Coordinate_File = fullfile(Settings.home,'templates',[upper(Settings.CoordType) '_Templates'],...
                 [Settings.Structure '.' Settings.CoordType]);
         end
-
+        
         % Generate unit cell coord file text
         Coordinate_Text = fileread(Settings.Coordinate_File);
-
+        
         % Add Metal and Halide symbols
         if strcmp(Settings.CoordType,'gro')
             Met = pad(Settings.Metal,2,'left');
@@ -66,22 +66,22 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         Coordinate_Text = strrep(Coordinate_Text,'##MET##',Met);
         Coordinate_Text = strrep(Coordinate_Text,'##HAL##',Hal);
         Coordinate_Text = AddCartesianCoord(Coordinate_Text,Settings.Geometry,1,false,Settings.CoordType); %input coordinates
-
+        
         % Save unit cell .gro file
         fid = fopen(Settings.UnitCellFile,'wt');
         fwrite(fid,regexprep(Coordinate_Text,'\r',''));
         fclose(fid);
-
+        
         % Generate a box with the structure of interest containing the smallest
         % possible number of atoms for the given cutoff, plus a buffer in case of contraction
         La = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_a; % nm, the minimum box dimension
         Lb = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_b; % nm, the minimum box dimension
         Lc = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer/Settings.Geometry.Skew_c; % nm, the minimum box dimension
-
+        
         Na = ceil(La/(Settings.Geometry.a/10));
         Nb = ceil(Lb/(Settings.Geometry.b/10));
         Nc = ceil(Lc/(Settings.Geometry.c/10));
-
+        
         % Calculate number of formula units
         nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
         
@@ -94,12 +94,12 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             Nc = ceil(Lc/(Settings.Geometry.c/10));
             nmol_solid = Na*Nb*Nc*Settings.Geometry.NF;
         end
-
+        
         Settings.SuperCellFile = fullfile(Settings.WorkDir,['Equil_Sol.' Settings.CoordType]);
         Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
              ' -o ' windows2unix(Settings.SuperCellFile) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
         [errcode,output] = system(Supercell_command);
-
+        
         if errcode ~= 0
             disp(output);
             error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
@@ -536,7 +536,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     else
         TPR_File = fullfile(Settings.WorkDir,'Equil_Sol.tpr');
         Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
-        import_gro_traj
         if N_atoms_prev ~= nmol_solid*2
             copyfile(Final_Geom_File,Settings.SuperCellFile)
         end

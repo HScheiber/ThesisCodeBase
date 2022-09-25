@@ -1,12 +1,12 @@
-Energy_file = 'MSD_Liq_msd.edr';
-system(['wsl source ~/.bashrc; echo "5 15 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
+Energy_file = 'Equil_Sol.edr';
+system(['wsl source ~/.bashrc; echo "15 18 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
 %     Data = import_xvg(En_xvg_file);
 %     plot(Data(:,1),Data(:,2)./nmol_liquid) % Potential
 %     ylim([-1000 1000])
 
-Data = import_xvg('MSD_Liq_msd.xvg');
+Data = import_xvg('energy.xvg');
 
 % @ s0 legend "Potential"
 % @ s1 legend "Pressure"
@@ -20,10 +20,15 @@ Data = import_xvg('MSD_Liq_msd.xvg');
 nmol_solid = 1;
 
 figure
-plot(Data(:,1),Data(:,2)./nmol_solid) % potential (kj/mol ion pairs)
-ylim([-5000 100])
+plot(Data(:,1),Data(:,3)./max(abs(Data(:,3)))+1,'Linewidth',4,'Color','g') % potential (kj/mol ion pairs)
+ylim([-0.2 0.1])
 hold on
-plot(Data(:,1),Data(:,3))              % Pressure (bar)
+plot(Data(:,1),Data(:,2)./max(abs(Data(:,2)))-1,'Linewidth',4,'Color','r')              % Pressure (bar)
+xticks([])
+yticks([])
+
+
+
 plot(Data(:,1),Data(:,4)./nmol_solid) % Volume (nm^3 / ion pair)
 plot(Data(:,1),Data(:,5)./nmol_solid) % Enthalpy ( kJ/mol ion pairs)
 
