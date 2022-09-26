@@ -94,7 +94,6 @@ for idx = 1:length(Salts)
             if ~isempty(fullopt) && ~isfile(destfile)
                 try
                     fullopt_dat = load(fullfile(Current_Model_dir,fullopt.name));
-                    fullopt_hist_dat = load(fullfile(Current_Model_dir,fullopt_history.name));
                     bayesopt_dat = load(fullfile(Current_Model_dir,bayesopt.name));
                     
                     full_data = fullopt_dat;
@@ -102,7 +101,10 @@ for idx = 1:length(Salts)
                         input_model = load(inpfile,'-mat');
                         full_data.Settings = input_model.Model;
                     end
-                    full_data.secondary_result = fullopt_hist_dat.intermediate_data;
+                    if ~isempty(fullopt_history)
+                        fullopt_hist_dat = load(fullfile(Current_Model_dir,fullopt_history.name));
+                        full_data.secondary_result = fullopt_hist_dat.intermediate_data;
+                    end
                     full_data.bayesopt_results = bayesopt_dat.results;
                     if ~isfield(full_data,'Finite_T_Data')
                         Settings = struct();

@@ -1,6 +1,6 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-Theory = 'BH';
-ModelID = 'MC';
+Theory = 'Mie';
+ModelID = 'OB';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
@@ -62,6 +62,19 @@ switch Theory
             NY = 2;
             NX = 3;
         end
+        
+    case 'Mie'
+        if show_as_C6
+            ParNames = {'C_MX' 'C_MM' 'C_XX' 'B_MX' 'B_MM' 'B_XX' 'n_MX'};
+            NPars = 7;
+            NY = 2;
+            NX = 3;
+        else
+            ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'sigma_MX' 'sigma_MM' 'sigma_XX' 'n_MX'};
+            NPars = 7;
+            NY = 2;
+            NX = 3;
+        end
 end
 
 Param_PlotData      = nan(N_Salts,N_Models,NPars);
@@ -70,7 +83,6 @@ Total_loss          = nan(N_Salts,N_Models);
 
 % Plot color scheme
 Colours = cbrewer('qual','Set3',max(N_Salts,3));
-
 
 % Load Data
 for idx = 1:N_Salts
@@ -100,7 +112,29 @@ for idx = 1:N_Salts
         Param.C_MX = 4*Param.epsilon_MX*(Param.sigma_MX^6);
         Param.C_MM = 4*Param.epsilon_MM*(Param.sigma_MM^6);
         Param.C_XX = 4*Param.epsilon_XX*(Param.sigma_XX^6);
-
+        
+    elseif strcmp(Theory,'Mie')
+        [OutputMX,OutputMM,OutputXX] = JC_Potential_Parameters(RefSettings);
+        
+        % {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'sigma_MX' 'sigma_MM' 'sigma_XX'};
+        % {'C_MX' 'C_MM' 'C_XX' 'A_MX' 'A_MM' 'A_XX'};
+        
+        Param.sigma_MX = OutputMX.sigma;
+        Param.sigma_MM = OutputMM.sigma;
+        Param.sigma_XX = OutputXX.sigma;
+        Param.epsilon_MX = OutputMX.epsilon;
+        Param.epsilon_MM = OutputMM.epsilon;
+        Param.epsilon_XX = OutputXX.epsilon;
+        
+        Param.B_MX = 4*Param.epsilon_MX*(Param.sigma_MX^12);
+        Param.B_MM = 4*Param.epsilon_MM*(Param.sigma_MM^12);
+        Param.B_XX = 4*Param.epsilon_XX*(Param.sigma_XX^12);
+        
+        Param.C_MX = 4*Param.epsilon_MX*(Param.sigma_MX^6);
+        Param.C_MM = 4*Param.epsilon_MM*(Param.sigma_MM^6);
+        Param.C_XX = 4*Param.epsilon_XX*(Param.sigma_XX^6);
+        
+        Param.n_MX = 12;
     else
         [OutputMX,OutputMM,OutputXX] = TF_Potential_Parameters(RefSettings);
         Param.C_MX = OutputMX.C;
@@ -136,10 +170,9 @@ for idx = 1:N_Salts
         if Param.gamma_XX < 6
             Param.epsilon_XX = -Param.epsilon_XX;
         end
-        
-        for kdx = 1:NPars
-            RefModeData(idx,kdx) = Param.(ParNames{kdx});
-        end
+    end
+    for kdx = 1:NPars
+        RefModeData(idx,kdx) = Param.(ParNames{kdx});
     end
     
     for jdx = 1:N_Models
@@ -182,6 +215,8 @@ figh = figure('WindowState','maximized','NumberTitle','off',...
 switch Theory
     case 'JC'
         PubTheoryName = 'CLJ';
+    case 'Mie'
+        PubTheoryName = 'Coulomb-Mie';
     case 'BH'
         PubTheoryName = 'CBH';
     case 'TF'
@@ -319,6 +354,9 @@ function [name,units] = param_name_map(p_name)
         case 'B_XX'
             name = 'B$_{XX}$';
             units = '[kJ mol$^{-1}$]';
+        case 'n_MX'
+            name = 'Born Exponent $n$';
+            units = '';
         case 'epsilon_MX'
             name = '$\epsilon_{MX}$';
             units = '[kJ mol$^{-1}$]';
