@@ -39,9 +39,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     else
         Deterministic = true; % Lattice energy calculations are deterministic
     end
-    
-    if ~isfield(Model,'UseCoupledConstraint')
-        Model.UseCoupledConstraint = false;
+    if isfield(Model,'initial_N_Multiplier')
+        Model.Initial_N_Multiplier = 10;
     end
     
     if Model.UseCoupledConstraint
@@ -191,7 +190,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
     %% Set the parameter ranges
     params = bayesopt_params(Model);
-    seed_points = length(params)*10;
+    seed_points = length(params)*Model.Initial_N_Multiplier;
 
     if Model.Parallel_Bayesopt
         Model.Parallel_Struct_Min = false;

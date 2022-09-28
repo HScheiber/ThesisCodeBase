@@ -1,10 +1,12 @@
 clear; %#ok<*UNRCH>
 %% Data options
-Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'MF';
+Salt = 'LiBr'; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
+Theory = 'JC';
+Models = {'C5_EIa' 'C5_EIb' 'C5_EIc' 'C5_EIP0.5a' 'C5_EIP0.5b' 'C5_EIP0.5c' ...
+    'C5_EIP1a' 'C5_EIP1b' 'C5_EIP1c' 'C5_EIP2a' 'C5_EIP2b' 'C5_EIP2c' ...
+    'C5_LCB1a' 'C5_LCB1b' 'C5_LCB1c' 'C5_LCB2a' 'C5_LCB2b' 'C5_LCB2c' ...
+    'C5_LCB3a' 'C5_LCB3b' 'C5_LCB3c' 'C5_POIa' 'C5_POIb' 'C5_POIc'};
 BestOnly = false;
-Reps = [1:5];
 savefile = false; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures';
 
@@ -24,7 +26,7 @@ plot_ac = false;
 plot_volume = false;
 plot_density = false;
 plot_loss = true;
-plot_finite_T_data = true;
+plot_finite_T_data = false;
 
 %% Script begins
 cm3_per_Ang3 = 1e-24; % cubic cm/cubic angstrom

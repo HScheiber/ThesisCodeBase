@@ -61,6 +61,7 @@ Settings.EnforceRR = false;
 
 % Intial optimization settings
 Settings.initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
+Settings.Initial_N_Multiplier = 10; % Multiply the number of input dimensions by this number to obtain the number of initial random points
 Settings.Max_Bayesian_Iterations = 800;
 Settings.Acquisition_Function = 'expected-improvement-plus'; % The acquisition function used in bayesian optimization
 Settings.MinSurrogatePoints = 20; % Minimum number of random sample points to create at the start of a surrogate creation phase. Used only by surrogateopt

@@ -3,8 +3,8 @@ global sldr_h results X Y idx_X idx_Y input_table p full_opt_point ...
     full_opt_eval bayes_opt_eval bayes_opt_point bayes_opt_est_eval bayes_opt_est_point show_error transforms_extra
 % Analysis parameters
 Salt = 'LiI';
-Theory = 'BH';
-Model = 'MC1'; % C5squaredexponential
+Theory = 'BE';
+Model = 'OA1'; % C5squaredexponential
 Plot_X = 'epsilon_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
 Plot_Y = 'epsilon_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
 

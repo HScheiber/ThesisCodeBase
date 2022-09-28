@@ -151,9 +151,9 @@ Settings.MDP.VerletBT = -1;
 idx = 0;
 
 %% Test Model Particular parameter
-Settings.Salt = 'LiCl';
-Settings.Theory = 'BE';
-Settings.InnerRange = true;
+Settings.Salt = 'LiBr';
+Settings.Theory = 'BH';
+Settings.InnerRange = false;
 Settings.Trial_ID = 'XX2';
 Settings.UseCoupledConstraint = false;
 

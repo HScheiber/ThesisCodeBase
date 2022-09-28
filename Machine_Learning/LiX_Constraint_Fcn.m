@@ -614,12 +614,15 @@ tf = log1p(Loss) < sqrt(eps);
 % % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
 % % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
 % 
-% ax1 = 'r0_MM';
-% ax2 = 'r0_XX';
+% ax1 = 'epsilon_MM';
+% ax2 = 'epsilon_XX';
 % ax3 = 'gamma_MX';
 % 
-% scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
-% %scatter(Param.(ax1),Param.(ax2),100,tf_num,'filled')
+% 
+% %scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
+% scatter(Param.(ax1)(~tf),Param.(ax2)(~tf),100,'k','x')
+% hold on
+% scatter(Param.(ax1)(tf),Param.(ax2)(tf),100,'r','filled')
 % if any(strcmp(Settings.Theory,{'TF' 'BH'}))
 % %     set(gca, 'XScale', 'log')
 % %     set(gca, 'YScale', 'log')

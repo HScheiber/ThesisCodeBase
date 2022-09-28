@@ -119,12 +119,11 @@ Experiment.CsI.CsCl.Talpha		= [-1 0 2 5 10 15 20 25 50 75 100 150 200 250 293 35
 % From: Bach, A.; Fischer, D.; Jansen, M. Synthesis of a New Modification of 
 % Lithium Chloride Confirming Theoretical Predictions. Zeitschrift fur Anorg. und Allg. Chemie 2009, 635, 2406–2409.
 Experiment.LiCl.Wurtzite.a = 3.852; % Wurtzite lattice parameter a at T = 223.15 K (Angstrom)
-Experiment.LiCl.Wurtzite.da = 0.0001; % Error in Wurtzite lattice parameter a at T = 223.15 K (Angstrom)
+Experiment.LiCl.Wurtzite.da = 0.001; % Error in Wurtzite lattice parameter a at T = 223.15 K (Angstrom)
 Experiment.LiCl.Wurtzite.c = 6.118; % Wurtzite lattice parameter c at T = 223.15 K (Angstrom)
-Experiment.LiCl.Wurtzite.dc = 0.0001; % Wurtzite lattice parameter c at T = 223.15 K (Angstrom)
+Experiment.LiCl.Wurtzite.dc = 0.001; % Wurtzite lattice parameter c at T = 223.15 K (Angstrom)
 Experiment.LiCl.Wurtzite.c_over_a = 6.118/3.852; % Unitless
 Experiment.LiCl.Wurtzite.Ta = 223.15;
-
 
 % From: Liebold-Ribeiro, Y.; Fischer, D.; Jansen, M. Experimental 
 % Substantiation of the “Energy Landscape Concept” for Solids: Synthesis 
