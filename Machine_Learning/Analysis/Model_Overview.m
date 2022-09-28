@@ -1,8 +1,8 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'MF';
+Theory = 'JC';
+ModelID = 'LB';
 BestOnly = false;
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
@@ -18,10 +18,10 @@ bbbuffer = 0.14;
 
 plot_LE = true;
 plot_RLE = true;
-plot_a = true;
-plot_c = true;
+plot_a = false;
+plot_c = false;
 plot_ac = false;
-plot_volume = false;
+plot_volume = true;
 plot_density = false;
 plot_loss = true;
 plot_finite_T_data = true;
@@ -37,7 +37,7 @@ MinPlotIdxes = [plot_LE plot_RLE plot_a plot_c plot_ac plot_volume plot_density]
 MinPlotTypes = MinPlotTypes(MinPlotIdxes);
 FiniteTTypes = {'MP' 'dH' 'dV' 'LiqV' 'SolV' 'DM'};
 MP_Titles = {'MP Er.' '$\Delta H_{\mathrm{Fus.}}$ Er.' '$\Delta V_{\mathrm{Fus.}}$ Er.' ...
-    '$V_{\mathrm{Liq.}}$($T_{m}$) Er.' '$V_{\mathrm{Sol.}}$($T_{m}$) Er.' 'D$_{\mathrm{M}^{+}}$($T_{m}$) Er.'};
+    '$V_{\mathrm{Liq.}}$($T_{m}$) Er.' '$V_{\mathrm{Sol.}}$($T_{m}$) Er.' 'D$_{\mathrm{Li}^{+}}$($T_{m}$) Er.'};
 FT_Loss_Names = {'MP' 'Fusion_Enthalpy' 'MP_Volume_Change' 'Liquid_MP_Volume' 'Solid_MP_Volume' 'Liquid_DM_MP'};
 
 if show_as_percent_error
@@ -46,8 +46,8 @@ if show_as_percent_error
         'Error in $a$: $\left( a - a^{*} \right) / \left| a^{*} \right|$' ...
         'Error in $c$: $\left( c - c^{*} \right) / \left| c^{*} \right|$' ...
         'Error in $c/a$: $\left( c/a - c^{*}/a^{*} \right) / \left| c^{*}/a^{*} \right|$' ...
-        'Error in $\rho$: $\left( \rho - \rho^{*} \right) / \left| \rho^{*} \right|$' ...
-        'Error in $V$: $\left( V - V^{*} \right) / \left| V^{*} \right|$'};
+        'Error in $V$: $\left( V - V^{*} \right) / \left| V^{*} \right|$' ...
+        'Error in $\rho$: $\left( \rho - \rho^{*} \right) / \left| \rho^{*} \right|$'};
     MinPlotYLabels = {'[\%]' ...
         '[kJ mol$^{-1}$]' ...
         '[\%]' ...
@@ -63,8 +63,8 @@ else
         'Error in $a$: $a - a^{*}$' ...
         'Error in $c$: $c - c^{*}$' ...
         'Error in $c/a$: $c/a - c^{*}/a^{*}$' ...
-        'Error in $\rho$: $\rho - \rho^{*}$' ...
-        'Error in $V$: $V - V^{*}'};
+        'Error in $V$: $V - V^{*}$' ...
+        'Error in $\rho$: $\rho - \rho^{*}$'};
     MinPlotYLabels = {'[kJ mol$^{-1}$]' ...
                       '[kJ mol$^{-1}$]' ...
                       '[\AA]' ...
@@ -178,6 +178,12 @@ for idx = 1:N_Salts
 end
 if ~data_found
     error(['Unable to load targets for ' Theory ' Model ' ModelID])
+elseif plot_volume && ~plot_a
+    for jdx = 1:N_Structures
+        if Bayesopt_Loss_Options.(Structures{jdx}).V < sqrt(eps)
+            Bayesopt_Loss_Options.(Structures{jdx}).V = Bayesopt_Loss_Options.(Structures{jdx}).a;
+        end
+    end
 end
 
 if isfield(Bayesopt_model,'Fix_Charge') && ~Bayesopt_model.Fix_Charge
@@ -207,7 +213,7 @@ if N_MinPlot_Rows
                 disp(['Could not load results found for: ' Salt ', ' Theory ', Model ' Model '.']);
                 continue
             end
-
+            
             % Load data
             try
                 data = load(dat_file).full_data;
@@ -277,11 +283,11 @@ if N_MinPlot_Rows
                                 Volume = ( dot( cross(ABC_vec(1,:),ABC_vec(2,:)),ABC_vec(3,:) ) ) / DefGeometry.NF; % Angstrom^3 / Formula Unit
                                 Density = Exp.(Salt).MM/(Volume*cm3_per_Ang3*N_A); % g/cm^3
                                 if strcmp(MinPlotTypes{rowidx},'V')
-                                    Min_PlotData(rowidx,idx,iidx,jdx) = (Density - DFT.(Salt).(Structure).density)*100/ ...
-                                        DFT.(Salt).(Structure).density;
-                                else
                                     Min_PlotData(rowidx,idx,iidx,jdx) = (Volume - DFT.(Salt).(Structure).V)*100/ ...
                                         DFT.(Salt).(Structure).V;
+                                else
+                                    Min_PlotData(rowidx,idx,iidx,jdx) = (Density - DFT.(Salt).(Structure).density)*100/ ...
+                                        DFT.(Salt).(Structure).density;
                                 end
                         end
                     else
@@ -313,9 +319,9 @@ if N_MinPlot_Rows
                                 Volume = ( dot( cross(ABC_vec(1,:),ABC_vec(2,:)),ABC_vec(3,:) ) ) / DefGeometry.NF; % Angstrom^3 / Formula Unit
                                 Density = Exp.(Salt).MM/(Volume*cm3_per_Ang3*N_A); % g/cm^3
                                 if strcmp(MinPlotTypes{rowidx},'V')
-                                    Min_PlotData(rowidx,idx,iidx,jdx) = Density - DFT.(Salt).(Structure).density;
-                                else
                                     Min_PlotData(rowidx,idx,iidx,jdx) = Volume - DFT.(Salt).(Structure).V;
+                                else
+                                    Min_PlotData(rowidx,idx,iidx,jdx) = Density - DFT.(Salt).(Structure).density;
                                 end
                         end
                     end

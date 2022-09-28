@@ -72,9 +72,9 @@ if isfield(Settings,'Parallel_LiX_Minimizer') && Settings.Parallel_LiX_Minimizer
 elseif isfield(Settings,'Parallel_Bayesopt') && Settings.Parallel_Bayesopt
     gmx_serial = true;
 elseif Settings.MinMDP.Parallel_Min
-    gmx_serial = true;
-else
     gmx_serial = false;
+else
+    gmx_serial = true;
 end   
 
 % Minimum lattice bounds
