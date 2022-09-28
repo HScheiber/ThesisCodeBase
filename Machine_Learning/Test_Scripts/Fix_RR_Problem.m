@@ -1,8 +1,8 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'JC';
 ModelID = 'LB';
-%ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
-ML_results_dir = '/home/user/project/BO_Models';
+ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
+%ML_results_dir = '/home/user/project/BO_Models';
 
 
 N_Salts = numel(Salts);
@@ -105,7 +105,7 @@ for idx = 1:N_Salts
                 Settings.Diary_Loc = '';
                 Settings.Parallel_Bayesopt = false;
                 Settings.Parallel_LiX_Minimizer = false;
-                Settings.MinMDP.Parallel_Min = true;
+                Settings.MinMDP.Parallel_Min = false;
                 [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
                     Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
                 Settings.scratch_dir = pwd;
@@ -116,6 +116,7 @@ for idx = 1:N_Salts
                 % Update data and re-save
                 full_data.full_opt_point = full_opt_point;
                 full_data.Minimization_Data = Minimization_Data;
+                full_data.Pars = ptable;
                 save(dat_file,'full_data');
             end
         end
