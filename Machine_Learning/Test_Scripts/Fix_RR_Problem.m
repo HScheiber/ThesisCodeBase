@@ -1,8 +1,9 @@
+% Fix_RR_Problem
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'JC';
 ModelID = 'LB';
-ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
-%ML_results_dir = '/home/user/project/BO_Models';
+%ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
+ML_results_dir = '/home/user/project/BO_Models';
 
 
 N_Salts = numel(Salts);
