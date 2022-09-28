@@ -668,7 +668,15 @@ if Settings.CheckBadFcn
     end
     
     % Check that the repulsive wall of the XX interaction is further out than the MM interaction
-    if Settings.EnforceRR
+    if Settings.EnforceRR && Settings.SigmaEpsilon && Settings.Additivity
+        switch Settings.Theory
+            case {'JC' 'Mie'}
+                RR_Walls = Param.sigma_MM./Param.sigma_XX; % Ratio of M/X size, should be < 1
+            case {'BH' 'BD' 'BE'}
+                RR_Walls = Param.r0_MM./Param.r0_XX; % Ratio of M/X size, should be < 1
+        end
+        Loss_add = Loss_add + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect
+    elseif Settings.EnforceRR
         RR_Walls = r_wall_sv(1)./r_wall_sv(2); % Ratio of M/X size, should be < 1
         Loss_add = Loss_add + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect
     end

@@ -600,7 +600,15 @@ for j = 1:2
 %     ylim([-1000 1000])
 end
 
-if Settings.EnforceRR
+if Settings.EnforceRR && Settings.SigmaEpsilon && Settings.Additivity
+    switch Settings.Theory
+        case {'JC' 'Mie'}
+            RR_Walls = Param.sigma_MM./Param.sigma_XX; % Ratio of M/X size, should be < 1
+        case {'BH' 'BD' 'BE'}
+            RR_Walls = Param.r0_MM./Param.r0_XX; % Ratio of M/X size, should be < 1
+    end
+    Loss = Loss + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect
+elseif Settings.EnforceRR
     % Check that the repulsive wall of the XX interaction is further out than the MM interaction
     RR_Walls = r_wall_sv{1}./r_wall_sv{2}; % Ratio of M/X size, should be < 1
     Loss = Loss + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect
