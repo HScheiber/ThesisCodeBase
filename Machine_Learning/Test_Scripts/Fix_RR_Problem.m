@@ -57,13 +57,79 @@ for idx = 1:N_Salts
         case 'JC'
             if ptable.sigma_MM > ptable.sigma_XX
                 disp([Salts{idx} ' ' Theory ' ' Models{jdx} ' has reversed radius ratios! Switching...']);
-                sigmas_idx = [find(strcmp(pnames,'sigma_MM')) find(strcmp(pnames,'sigma_XX'))];
+                r0_idx = [find(strcmp(pnames,'sigma_MM')) find(strcmp(pnames,'sigma_XX'))];
                 epsilons_idx = [find(strcmp(pnames,'epsilon_MM')) find(strcmp(pnames,'epsilon_XX'))];
                 NiAs_idx = find(strcmp(Structures,'NiAs'));
                 AntiNiAs_idx = find(strcmp(Structures,'AntiNiAs'));
                 bBeO_idx = find(strcmp(Structures,'BetaBeO'));
                 
-                full_opt_point(sigmas_idx) = full_opt_point(fliplr(sigmas_idx));
+                full_opt_point(r0_idx) = full_opt_point(fliplr(r0_idx));
+                full_opt_point(epsilons_idx) = full_opt_point(fliplr(epsilons_idx));
+                for kdx = 1:numel(pnames)
+                    ptable.(pnames{kdx}) = full_opt_point(kdx);
+                end
+                
+                % Switch NiAs <-> AntiNiAs
+                CoulSR_MM = Minimization_Data{NiAs_idx}.CoulSR_MM;
+                LJSR_MM   = Minimization_Data{NiAs_idx}.LJSR_MM;
+                CoulSR_XX = Minimization_Data{NiAs_idx}.CoulSR_XX;
+                LJSR_XX   = Minimization_Data{NiAs_idx}.LJSR_XX;
+                FC_Metal  = Minimization_Data{NiAs_idx}.FC_Metal;
+                FC_Halide = Minimization_Data{NiAs_idx}.FC_Halide;
+                Minimization_Data{NiAs_idx}.CoulSR_MM = CoulSR_XX;
+                Minimization_Data{NiAs_idx}.LJSR_MM   = LJSR_XX;
+                Minimization_Data{NiAs_idx}.CoulSR_XX = CoulSR_MM;
+                Minimization_Data{NiAs_idx}.LJSR_XX   = LJSR_MM;
+                Minimization_Data{NiAs_idx}.FC_Metal  = FC_Halide;
+                Minimization_Data{NiAs_idx}.FC_Halide = FC_Metal;
+                Minimization_Data{NiAs_idx}.Structure = 'AntiNiAs';
+                
+                CoulSR_MM = Minimization_Data{AntiNiAs_idx}.CoulSR_MM;
+                LJSR_MM   = Minimization_Data{AntiNiAs_idx}.LJSR_MM;
+                CoulSR_XX = Minimization_Data{AntiNiAs_idx}.CoulSR_XX;
+                LJSR_XX   = Minimization_Data{AntiNiAs_idx}.LJSR_XX;
+                FC_Metal  = Minimization_Data{AntiNiAs_idx}.FC_Metal;
+                FC_Halide = Minimization_Data{AntiNiAs_idx}.FC_Halide;
+                Minimization_Data{AntiNiAs_idx}.CoulSR_MM = CoulSR_XX;
+                Minimization_Data{AntiNiAs_idx}.LJSR_MM   = LJSR_XX;
+                Minimization_Data{AntiNiAs_idx}.CoulSR_XX = CoulSR_MM;
+                Minimization_Data{AntiNiAs_idx}.LJSR_XX   = LJSR_MM;
+                Minimization_Data{AntiNiAs_idx}.FC_Metal  = FC_Halide;
+                Minimization_Data{AntiNiAs_idx}.FC_Halide = FC_Metal;
+                Minimization_Data{AntiNiAs_idx}.Structure = 'NiAs';
+                
+                Minimization_Data([NiAs_idx AntiNiAs_idx]) = Minimization_Data([AntiNiAs_idx NiAs_idx]);
+                
+                % Recalculate BetaBeO energy
+                Settings = Potential_Scaling(full_data.Settings,ptable);
+                Settings.Structure = 'BetaBeO';
+                Settings.Diary_Loc = '';
+                Settings.Parallel_Bayesopt = false;
+                Settings.Parallel_LiX_Minimizer = false;
+                Settings.MinMDP.Parallel_Min = false;
+                [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
+                    Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
+                Settings.scratch_dir = pwd;
+                [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.MLModelDir] = MD_Batch_Template(Settings.JobSettings);
+                bBeO_Energies = Structure_Minimization(Settings,'Extra_Properties',true);
+                Minimization_Data{bBeO_idx} = bBeO_Energies;
+                
+                % Update data and re-save
+                full_data.full_opt_point = full_opt_point;
+                full_data.Minimization_Data = Minimization_Data;
+                full_data.Pars = ptable;
+                save(dat_file,'full_data');
+            end
+        case 'BH'
+            if ptable.r0_MM > ptable.r0_XX
+                disp([Salts{idx} ' ' Theory ' ' Models{jdx} ' has reversed radius ratios! Switching...']);
+                r0_idx = [find(strcmp(pnames,'r0_MM')) find(strcmp(pnames,'r0_XX'))];
+                epsilons_idx = [find(strcmp(pnames,'epsilon_MM')) find(strcmp(pnames,'epsilon_XX'))];
+                NiAs_idx = find(strcmp(Structures,'NiAs'));
+                AntiNiAs_idx = find(strcmp(Structures,'AntiNiAs'));
+                bBeO_idx = find(strcmp(Structures,'BetaBeO'));
+                
+                full_opt_point(r0_idx) = full_opt_point(fliplr(r0_idx));
                 full_opt_point(epsilons_idx) = full_opt_point(fliplr(epsilons_idx));
                 for kdx = 1:numel(pnames)
                     ptable.(pnames{kdx}) = full_opt_point(kdx);
