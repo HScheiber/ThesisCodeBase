@@ -1,7 +1,7 @@
 % Fix_RR_Problem
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-Models_cell = {'MA' 'MB' 'MC' 'MD' 'ME'};
+Theory = 'BD';
+Models_cell = {'OA' 'OB'};
 %ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 ML_results_dir = '/home/user/project/BO_Models';
 
@@ -31,7 +31,7 @@ for mdx = 1:numel(Models_cell)
         for jdx = 1:N_Models
             dat_file = fullfile(ML_results_dir,Salts{idx},[Salts{idx} '_' Theory '_Model_' Models{jdx} '_data.mat']);
             if ~isfile(dat_file)
-                disp(['Could not load results found for: ' Salt ', ' Theory ', Model ' Model '.']);
+                disp(['Could not load results found for: ' Salts{idx} ', ' Theory ', Model ' Models{jdx} '.']);
                 continue
             end
             
@@ -56,7 +56,7 @@ for mdx = 1:numel(Models_cell)
             end
             
             switch Theory
-            case 'JC'
+            case {'JC' 'Mie'}
                 if ptable.sigma_MM > ptable.sigma_XX
                     disp([Salts{idx} ' ' Theory ' ' Models{jdx} ' has reversed radius ratios! Switching...']);
                     r0_idx = [find(strcmp(pnames,'sigma_MM')) find(strcmp(pnames,'sigma_XX'))];
