@@ -89,6 +89,8 @@ Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecu
 Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
 Settings.EnforceRR = true; % enforce radius ratio < 1 (anion is larger)
+Settings.MaxMXWellR = 5; % [A] maximum allowed distance for well minima.
+Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
 
 % Non-MP Finite T calculation settings
 Settings.Liquid_Test_Time = 200; % ps. simulation time to sample the liquid for enthalpy / MSD calculations

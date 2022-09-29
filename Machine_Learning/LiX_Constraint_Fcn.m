@@ -616,34 +616,37 @@ end
 
 tf = log1p(Loss) < sqrt(eps);
 
-% % Plot result to visualize
-% tf_num = double(tf);
-% 
-% % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
-% % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
-% 
-% ax1 = 'epsilon_MM';
-% ax2 = 'epsilon_XX';
-% ax3 = 'gamma_MX';
-% 
-% 
-% %scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
-% scatter(Param.(ax1)(~tf),Param.(ax2)(~tf),100,'k','x')
-% hold on
-% scatter(Param.(ax1)(tf),Param.(ax2)(tf),100,'r','filled')
-% if any(strcmp(Settings.Theory,{'TF' 'BH'}))
-% %     set(gca, 'XScale', 'log')
-% %     set(gca, 'YScale', 'log')
-%     %set(gca, 'ZScale', 'log')
-% end
-% 
-% fs=24;
-% % xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
-% % ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
-% xlabel(ax1,'fontsize',fs);
-% ylabel(ax2,'fontsize',fs);
-% zlabel(ax3,'fontsize',fs);
-% set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
-% 
-% clear;
+% Plot result to visualize
+tf_num = double(tf);
+
+% 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
+% 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
+
+ax1 = 'gamma_MX';
+ax2 = 'epsilon_XX';
+ax3 = 'gamma_MX';
+
+
+%scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
+scatter(Param.(ax1)(~tf),Param.(ax2)(~tf),100,'k','x')
+hold on
+scatter(Param.(ax1)(tf),Param.(ax2)(tf),100,'r','filled','linewidth',1,...
+    'MarkerEdgeColor','k')
+if any(strcmp(Settings.Theory,{'TF' 'BH'}))
+%     set(gca, 'XScale', 'log')
+%     set(gca, 'YScale', 'log')
+    %set(gca, 'ZScale', 'log')
+end
+
+fs=36;
+% xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
+% ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
+% xlabel('$\varepsilon_{\textrm{Li}^{+}\textrm{Li}^{+}}$','fontsize',fs,'interpreter','latex');
+% ylabel('$\varepsilon_{\textrm{X}^{-}\textrm{X}^{-}}$','fontsize',fs,'interpreter','latex');
+xlabel(ax1,'fontsize',fs,'interpreter','latex');
+ylabel(ax2,'fontsize',fs,'interpreter','latex');
+%zlabel(ax3,'fontsize',fs);
+set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
+
+clear;
 end

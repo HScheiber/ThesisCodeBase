@@ -111,13 +111,13 @@ function params = bayesopt_params(Model)
                 SgammaMX = optimizableVariable('gamma_MX',[0 6],'Type','real'); % Units: kJ/mol
             else
                 % r_0
-                Sr0MM = optimizableVariable('r0_MM',[0.1 1],'Type','real'); % Units: nm
-                Sr0XX = optimizableVariable('r0_XX',[0.1 1],'Type','real'); % Units: nm
-                Sr0MX = optimizableVariable('r0_MX',[0.1 1],'Type','real'); % Units: nm
+                Sr0MM = optimizableVariable('r0_MM',[0 0.5],'Type','real'); % Units: nm
+                Sr0XX = optimizableVariable('r0_XX',[0.15 0.7],'Type','real'); % Units: nm
+                Sr0MX = optimizableVariable('r0_MX',[0 0.7],'Type','real'); % Units: nm
 
                 % epsilon
                 SepsilonMM = optimizableVariable('epsilon_MM',[0 400],'Type','real'); % Units: kJ/mol
-                SepsilonXX = optimizableVariable('epsilon_XX',[0 400],'Type','real'); % Units: kJ/mol
+                SepsilonXX = optimizableVariable('epsilon_XX',[0 250],'Type','real'); % Units: kJ/mol
                 SepsilonMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
 
                 % gamma
