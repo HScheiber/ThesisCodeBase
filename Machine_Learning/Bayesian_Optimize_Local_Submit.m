@@ -154,7 +154,7 @@ idx = 0;
 
 %% Test Model Particular parameter
 Settings.Salt = 'LiBr';
-Settings.Theory = 'BH';
+Settings.Theory = 'JC';
 Settings.InnerRange = false;
 Settings.Trial_ID = 'XX2';
 Settings.UseCoupledConstraint = false;

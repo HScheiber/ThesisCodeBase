@@ -96,14 +96,14 @@ function params = bayesopt_params(Model)
             if Model.InnerRange % For BH model, inner range is when gamma is [0, 6]
 
                 % r_0
-                Sr0MM = optimizableVariable('r0_MM',[0 0.8],'Type','real'); % Units: nm
-                Sr0XX = optimizableVariable('r0_XX',[0 0.8],'Type','real'); % Units: nm
-                Sr0MX = optimizableVariable('r0_MX',[0 0.8],'Type','real'); % Units: nm
+                Sr0MM = optimizableVariable('r0_MM',[0 0.2],'Type','real'); % Units: nm
+                Sr0XX = optimizableVariable('r0_XX',[0 0.4],'Type','real'); % Units: nm
+                Sr0MX = optimizableVariable('r0_MX',[0 0.4],'Type','real'); % Units: nm
 
                 % epsilon
-                SepsilonMM = optimizableVariable('epsilon_MM',[1 1e8],'Type','real','Transform','log'); % Units: kJ/mol
-                SepsilonXX = optimizableVariable('epsilon_XX',[1 1e8],'Type','real','Transform','log'); % Units: kJ/mol
-                SepsilonMX = optimizableVariable('epsilon_MX',[1 1e8],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonMM = optimizableVariable('epsilon_MM',[50 1e8],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonXX = optimizableVariable('epsilon_XX',[1 1e6],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonMX = optimizableVariable('epsilon_MX',[50 1e8],'Type','real','Transform','log'); % Units: kJ/mol
 
                 % gamma
                 SgammaMM = optimizableVariable('gamma_MM',[0 6],'Type','real'); % Units: kJ/mol
@@ -171,13 +171,13 @@ function params = bayesopt_params(Model)
         
     otherwise
         if Model.SigmaEpsilon
-            SDMM = optimizableVariable('sigma_MM',[0.05 1],'Type','real'); % Units: nm
-            SDXX = optimizableVariable('sigma_XX',[0.05 1],'Type','real'); % Units: nm
-            SDMX = optimizableVariable('sigma_MX',[0.05 1],'Type','real'); % Units: nm
+            SDMM = optimizableVariable('sigma_MM',[0.05 0.46],'Type','real'); % Units: nm
+            SDXX = optimizableVariable('sigma_XX',[0.13 0.55],'Type','real'); % Units: nm
+            SDMX = optimizableVariable('sigma_MX',[0 0.6],'Type','real'); % Units: nm
             
-            SRMM = optimizableVariable('epsilon_MM',[0 400],'Type','real'); % Units: kJ/mol
-            SRXX = optimizableVariable('epsilon_XX',[0 400],'Type','real'); % Units: kJ/mol
-            SRMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
+            SRMM = optimizableVariable('epsilon_MM',[0 600],'Type','real'); % Units: kJ/mol
+            SRXX = optimizableVariable('epsilon_XX',[0 200],'Type','real'); % Units: kJ/mol
+            SRMX = optimizableVariable('epsilon_MX',[0 300],'Type','real'); % Units: kJ/mol
             
             SDMM2= optimizableVariable('epsilon_MM2',[0 1000],'Type','real'); % Units: kJ/mol
             
