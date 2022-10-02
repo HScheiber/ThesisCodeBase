@@ -1,14 +1,16 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-Theory = 'Mie';
-ModelID = 'OB';
+Theory = 'BH';
+ModelID = 'MF';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
-fs = 22; % font size
+fs = 34; % font size
 markers = {'o' 's' '^' 'v' 'd' '>' '<' 'p' 'h' 'x'};
-show_as_C6 = true; % When true, plot parameters as B/C6/C8 than the sigma/epsilon parameter value itself
+show_as_C6 = false; % When true, plot parameters as B/C6/C8 than the sigma/epsilon parameter value itself
+include_loss_panel = false;
 loss_panel_height = 0.3;
 plot_ref_model = true;
+savefile = true; % switch to save the final plots to file
 
 %% Find model in results
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
@@ -52,7 +54,7 @@ switch Theory
         end
     case 'JC'
         if show_as_C6
-            ParNames = {'C_MX' 'C_MM' 'C_XX' 'A_MX' 'A_MM' 'A_XX'};
+            ParNames = {'C_MX' 'C_MM' 'C_XX' 'B_MX' 'B_MM' 'B_XX'};
             NPars = 6;
             NY = 2;
             NX = 3;
@@ -105,9 +107,9 @@ for idx = 1:N_Salts
         Param.epsilon_MM = OutputMM.epsilon;
         Param.epsilon_XX = OutputXX.epsilon;
         
-        Param.A_MX = 4*Param.epsilon_MX*(Param.sigma_MX^12);
-        Param.A_MM = 4*Param.epsilon_MM*(Param.sigma_MM^12);
-        Param.A_XX = 4*Param.epsilon_XX*(Param.sigma_XX^12);
+        Param.B_MX = 4*Param.epsilon_MX*(Param.sigma_MX^12);
+        Param.B_MM = 4*Param.epsilon_MM*(Param.sigma_MM^12);
+        Param.B_XX = 4*Param.epsilon_XX*(Param.sigma_XX^12);
         
         Param.C_MX = 4*Param.epsilon_MX*(Param.sigma_MX^6);
         Param.C_MM = 4*Param.epsilon_MM*(Param.sigma_MM^6);
@@ -224,52 +226,58 @@ switch Theory
 end
 
 % Plot the loss data at the top
-loss_panel = uipanel(figh,'FontSize',fs,...
-    'BorderType','none',...
-    'Position',[0 1-loss_panel_height 1 loss_panel_height],...
-    'AutoResizeChildren','off'); % [left bottom width height]
-axobj_loss = gobjects(N_Salts,1);
+if include_loss_panel
+    loss_panel = uipanel(figh,'FontSize',fs,...
+        'BorderType','none',...
+        'Position',[0 1-loss_panel_height 1 loss_panel_height],...
+        'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
+    axobj_loss = gobjects(N_Salts,1);
 
-ww0 = 1 - 0.04;
-bb0 = 0.05;
-ww1 = ww0/N_Salts - ww0/(N_Salts+0.5);
-ww2 = ww1/(max(N_Salts-1,1));
-ww = ww0/(N_Salts+0.5);
-hh = 1 - bb0 - 0.3;
-bb = bb0;
-for idx = 1:N_Salts
-    ll = (1-ww0) + (ww0/N_Salts+ww2)*(idx-1);
-    axobj_loss(idx) = subplot('Position',[ll bb ww hh],...
-        'parent',loss_panel); % [left bottom width height]
-    hold(axobj_loss(idx),'on');
+    ww0 = 1 - 0.04;
+    bb0 = 0.05;
+    ww1 = ww0/N_Salts - ww0/(N_Salts+0.5);
+    ww2 = ww1/(max(N_Salts-1,1));
+    ww = ww0/(N_Salts+0.5);
+    hh = 1 - bb0 - 0.3;
+    bb = bb0;
+    for idx = 1:N_Salts
+        ll = (1-ww0) + (ww0/N_Salts+ww2)*(idx-1);
+        axobj_loss(idx) = subplot('Position',[ll bb ww hh],...
+            'parent',loss_panel); % [left bottom width height]
+        hold(axobj_loss(idx),'on');
 
 
-    % Gather data
-    plot_data = squeeze(Total_loss(idx,:));
-    expon = floor(log10(max(plot_data)));
+        % Gather data
+        plot_data = squeeze(Total_loss(idx,:));
+        expon = floor(log10(max(plot_data)));
 
-    p = bar(axobj_loss(idx),1:N_Models,plot_data./(10.^expon),'FaceColor',Colours(idx,:),'Visible','on','BarWidth',1,...
-        'LineWidth',2);
-    for mdx = 1:N_Models
-        xpos = p.XEndPoints(mdx);
-        scatter(axobj_loss(idx),xpos,plot_data(mdx)./(10.^expon),100,'MarkerEdgeColor','k',...
-            'MarkerFaceColor',Colours(idx,:),'linewidth',2,'marker',markers{mdx});
+        p = bar(axobj_loss(idx),1:N_Models,plot_data./(10.^expon),'FaceColor',Colours(idx,:),'Visible','on','BarWidth',1,...
+            'LineWidth',2);
+        for mdx = 1:N_Models
+            xpos = p.XEndPoints(mdx);
+            scatter(axobj_loss(idx),xpos,plot_data(mdx)./(10.^expon),100,'MarkerEdgeColor','k',...
+                'MarkerFaceColor',Colours(idx,:),'linewidth',2,'marker',markers{mdx});
+        end
+
+        % Set plot properties
+        set(axobj_loss(idx),'box','on','TickLabelInterpreter','latex');
+        set(axobj_loss(idx),'XMinorTick','off','YMinorTick','on','FontSize',fs-3);
+        xticks(axobj_loss(idx),1:N_Models)
+        xticklabels(axobj_loss(idx),[])
+        axobj_loss(idx).XAxis.TickLength = [0,0];
+        ylim(axobj_loss(idx),'padded')
+        if ~savefile
+            sgtitle(loss_panel,['Minimized Objective Function: ' PubTheoryName ' Model ' ModelID],...
+                'Fontsize',fs-2,'Interpreter','latex')
+        end
+        xlim(axobj_loss(idx),[0 N_Models+1])
+        set(axobj_loss(idx), 'YTickMode', 'auto');
+        set(axobj_loss(idx),'xminorgrid','off','yminorgrid','on');
+        axobj_loss(idx).YAxis.Exponent = 0;
+        ylabel(axobj_loss(idx), ['$f\left(\mathbf{x}^{*}\right)/10^{' num2str(expon) '}$'],'Fontsize',fs-4,'Interpreter','latex')
     end
-
-    % Set plot properties
-    set(axobj_loss(idx),'box','on','TickLabelInterpreter','latex');
-    set(axobj_loss(idx),'XMinorTick','off','YMinorTick','on','FontSize',fs-3);
-    xticks(axobj_loss(idx),1:N_Models)
-    xticklabels(axobj_loss(idx),[])
-    axobj_loss(idx).XAxis.TickLength = [0,0];
-    ylim(axobj_loss(idx),'padded')
-    sgtitle(loss_panel,['Minimized Objective Function: ' PubTheoryName ' Model ' ModelID],...
-        'Fontsize',fs-2,'Interpreter','latex')
-    xlim(axobj_loss(idx),[0 N_Models+1])
-    set(axobj_loss(idx), 'YTickMode', 'auto');
-    set(axobj_loss(idx),'xminorgrid','off','yminorgrid','on');
-    axobj_loss(idx).YAxis.Exponent = 0;
-    ylabel(axobj_loss(idx), ['$f\left(\mathbf{x}_{0}\right)/10^{' num2str(expon) '}$'],'Fontsize',fs-4,'Interpreter','latex')
+else
+    loss_panel_height=0;
 end
 
 % Plot parameters
@@ -277,7 +285,7 @@ bspace = 0.05;
 par_panel = uipanel(figh,'FontSize',fs,...
     'BorderType','none',...
     'Position',[0 0 1 1-loss_panel_height],...
-    'AutoResizeChildren','off'); % [left bottom width height]
+    'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
 
 T = tiledlayout(par_panel,'flow', 'Padding', 'loose', 'TileSpacing', 'loose'); 
 axh = gobjects(1,NPars);
@@ -297,8 +305,8 @@ for idx = 1:NPars
     
     if plot_ref_model
         yy = RefModeData(:,idx);
-        scatter(axh(idx),xx,yy,20,'b','filled','MarkerEdgeColor','k',...
-            'linewidth',1,'marker','o');
+        scatter(axh(idx),xx,yy,200,'r','filled','MarkerEdgeColor','k',...
+            'linewidth',3,'marker','x');
     end
     
     xlim(axh(idx),[0.5 N_Salts + 0.5])
@@ -325,76 +333,82 @@ legh = legend(h,legtxt,'Orientation','Horizontal',...
     'Interpreter','latex','Box','off','fontsize',fs,'NumColumns', N_Salts);
 legh.Layout.Tile = 'south';
 
+if savefile
+    filename = fullfile('C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures',...
+        [Theory '_Model_' ModelID '_Params.png']);
+    print(figh,filename,'-dpng','-r0','-noui')
+end
+
 function [name,units] = param_name_map(p_name)
     switch p_name
         case 'C_MX'
-            name = 'C$_{6,MX}$';
+            name = 'C$_{6,\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$ nm$^{6}$]';
         case 'C_MM'
-            name = 'C$_{6,MM}$';
+            name = 'C$_{6,\textrm{Li}^{+}\textrm{Li}^{+}}$';
             units = '[kJ mol$^{-1}$ nm$^{6}$]';
         case 'C_XX'
-            name = 'C$_{6,XX}$';
+            name = 'C$_{6,\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$ nm$^{6}$]';
         case 'A_MX'
-            name = 'B$_{MX}$';
+            name = 'B$_{\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$ nm$^{12}$]';
         case 'A_MM'
-            name = 'B$_{MM}$';
+            name = 'B$_{\textrm{Li}^{+}\textrm{Li}^{+}}$';
             units = '[kJ mol$^{-1}$ nm$^{12}$]';
         case 'A_XX'
-            name = 'B$_{XX}$';
+            name = 'B$_{\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$ nm$^{12}$]';
         case 'B_MX'
-            name = 'B$_{MX}$';
+            name = 'B$_{\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$]';
         case 'B_MM'
-            name = 'B$_{MM}$';
+            name = 'B$_{\textrm{Li}^{+}\textrm{Li}^{+}}$';
             units = '[kJ mol$^{-1}$]';
         case 'B_XX'
-            name = 'B$_{XX}$';
+            name = 'B$_{\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$]';
         case 'n_MX'
             name = 'Born Exponent $n$';
             units = '';
         case 'epsilon_MX'
-            name = '$\epsilon_{MX}$';
+            name = '$\epsilon_{\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$]';
         case 'epsilon_MM'
-            name = '$\epsilon_{MM}$';
+            name = '$\epsilon_{\textrm{Li}^{+}\textrm{Li}^{+}}$';
             units = '[kJ mol$^{-1}$]';
         case 'epsilon_XX'
-            name = '$\epsilon_{XX}$';
+            name = '$\epsilon_{\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$]';
         case 'sigma_MX'
-            name = '$\sigma_{MX}$';
+            name = '$\sigma_{\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[nm]';
         case 'sigma_MM'
-            name = '$\sigma_{MM}$';
+            name = '$\sigma_{\textrm{Li}^{+}\textrm{Li}^{+}}$';
             units = '[nm]';
         case 'sigma_XX'
-            name = '$\sigma_{XX}$';
+            name = '$\sigma_{\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '[nm]';
         case 'alpha_MX'
-            name = '$\alpha_{MX}$';
+            name = '$\alpha_{\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[nm$^{-1}$]';
         case 'alpha_MM'
-            name = '$\alpha_{MM}$';
+            name = '$\alpha_{\textrm{Li}^{+}\textrm{Li}^{+}}$';
             units = '[nm$^{-1}$]';
         case 'alpha_XX'
-            name = '$\alpha_{XX}$';
+            name = '$\alpha_{\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '[nm$^{-1}$]';
         case 'r0_MX'
-            name = '$r_{0,MX}$';
+            name = '$r_{0,\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[nm]';
         case 'r0_MM'
-            name = '$r_{0,MM}$';
+            name = '$r_{0,\textrm{Li}^{+}\textrm{Li}^{+}}$';
             units = '[nm]';
         case 'r0_XX'
-            name = '$r_{0,XX}$';
+            name = '$r_{0,\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '[nm]';
         case 'gamma_MX'
-            name = '$\gamma_{MX}$';
+            name = '$\gamma_{\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '';
         otherwise
             name = p_name;

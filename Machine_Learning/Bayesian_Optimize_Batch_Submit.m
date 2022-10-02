@@ -301,6 +301,84 @@ switch lower(computer)
             end
         end
         
+        %% Shared_Settings
+        Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+        Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
+        Shared_Settings.ExplorationRatio = 2;
+        Shared_Settings.Max_Bayesian_Iterations = 800;
+        Shared_Settings.Max_Secondary_Iterations = 400;
+        Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
+        Shared_Settings.Parallel_Bayesopt = false;
+        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.UseCoupledConstraint = false;
+        Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Shared_Settings.InnerRange = true; % Sets domain of BH
+        Shared_Settings.EnforceRR = false;
+        Shared_Settings.final_opt_type = 'none';
+        
+        %% BH [Gamma<6] and JC Models: MG
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+        Theories = {'BH' 'JC'};
+        Replicates = 1:5;
+        for tidx = 1:length(Theories)
+            Theory = Theories{tidx};
+            for sidx = 1:length(Salts)
+                Salt = Salts{sidx};
+                
+                % Set initial MP temperature
+                Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+                
+                for ridx = 1:length(Replicates)
+                    Rep = num2str(Replicates(ridx));
+                    
+                    %% Model MG
+                    idx = idx+1;
+                    Models(idx) = Shared_Settings;
+                    Models(idx).Salt = Salt;
+                    Models(idx).Theory = Theory;
+                    Models(idx).Trial_ID = ['MG' Rep];
+                    
+                    % Loss function
+                    Models(idx).Loss_Options.Rocksalt.LE   = 2;
+                    Models(idx).Loss_Options.Rocksalt.a    = 1;
+                    Models(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+                    Models(idx).Loss_Options.FiveFive.RLE  = 0.1;
+                    Models(idx).Loss_Options.CsCl.RLE      = 0.1;
+                    Models(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+                    Models(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                    Models(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+                    Models(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+                    Models(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+                    
+                    % Add gaps
+                    Models(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+                    Models(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+                    Models(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Models(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+                    
+                    Models(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+                    Models(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+                    Models(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Models(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+                    
+                    Models(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+                    Models(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+                    Models(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Models(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+                    
+                    
+                    Models(idx).Structures = Auto_Structure_Selection(Models(idx));
+                    Models(idx).Fix_Charge = true;
+                    Models(idx).Additivity = true;
+                    
+                end
+            end
+        end
+        
     case 'narval'
         %% Shared_Settings
         Shared_Settings.Max_Bayesian_Iterations = 300;
@@ -831,9 +909,9 @@ switch lower(computer)
         Shared_Settings.EnforceRR = false;
         Shared_Settings.final_opt_type = 'none';
         
-        %% BH [Gamma<6] and Mie Models: MG
+        %% BH [Gamma<6] and JC Models: MG
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
-        Theories = {'BH' 'Mie'};
+        Theories = {'BH' 'JC'};
         Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
@@ -891,6 +969,7 @@ switch lower(computer)
                 end
             end
         end
+        
 end
 
 %% Check for already running jobs

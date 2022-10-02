@@ -1,20 +1,23 @@
 clear; %#ok<*UNRCH>
 %% Data options
-Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'JC';
-ModelID = 'LC';
+Salts = {'NaCl'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
+Theory = 'BH';
+ModelID = 'MF';
 BestOnly = false;
+SelectOnly = [4 2 1 4];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures';
+DM_Multiplier = 1e5;
 
 %% Plot options
-fs = 22; % font size
+fs = 30; % font size
 markers = {'o' 's' '^' 'v' 'd' '>' '<' 'p' 'h' 'x'};
 show_as_percent_error = false; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
-wwbuffer = 0.055;
+include_av_line = false;
+wwbuffer = 0.075;
 ttbuffer = 0.08;
-bbbuffer = 0.14;
+bbbuffer = 0.15;
 
 plot_LE = true;
 plot_RLE = true;
@@ -36,18 +39,28 @@ MinPlotTypes = {'LE' 'RLE' 'a' 'c' 'ac' 'V' 'Density'};
 MinPlotIdxes = [plot_LE plot_RLE plot_a plot_c plot_ac plot_volume plot_density];
 MinPlotTypes = MinPlotTypes(MinPlotIdxes);
 FiniteTTypes = {'MP' 'dH' 'dV' 'LiqV' 'SolV' 'DM'};
-MP_Titles = {'MP Er.' '$\Delta H_{\mathrm{Fus.}}$ Er.' '$\Delta V_{\mathrm{Fus.}}$ Er.' ...
-    '$V_{\mathrm{Liq.}}$($T_{m}$) Er.' '$V_{\mathrm{Sol.}}$($T_{m}$) Er.' 'D$_{\mathrm{Li}^{+}}$($T_{m}$) Er.'};
+% MP_Titles = {'$T_{m} - T_{m}^{*}$' ...
+%     '$\Delta H^{\circ}_{\mathrm{fus}} - \Delta H^{\circ *}_{\mathrm{fus}}$' ...
+%     '$\Delta V_{\mathrm{fus}} - \Delta V_{\mathrm{fus}}^{*}$' ...
+%     '$V_{\mathrm{liq}}(T_{m}^{*}) - V_{\mathrm{liq}}^{*}(T_{m}^{*})$' ...
+%     '$V_{\mathrm{sol}}(T_{m}^{*}) - V_{\mathrm{sol}}^{*}(T_{m}^{*})$' ...
+%     '$D_{\mathrm{liq,Li}^{+}} - D_{\mathrm{liq,Li}^{+}}^{*}$'};
+MP_Titles = {'$T_{m}$' ...
+    '$\Delta H^{\circ}_{\mathrm{fus}}$' ...
+    '$\Delta V_{\mathrm{fus}}$' ...
+    '$V_{\mathrm{liq}}(T_{m}^{*})$' ...
+    '$V_{\mathrm{sol}}(T_{m}^{*})$' ...
+    '$D_{\mathrm{liq,Li}^{+}}(T_{m}^{*})$'};
 FT_Loss_Names = {'MP' 'Fusion_Enthalpy' 'MP_Volume_Change' 'Liquid_MP_Volume' 'Solid_MP_Volume' 'Liquid_DM_MP'};
 
 if show_as_percent_error
-    MinPlotTitles = {'Error in $E_L$: $\left( E_{L} - E_{L}^{*} \right) / \left| E_{L}^{*} \right|$' ...
-        '$E_{L}$[Structure] - $E_{L}$[Rocksalt]' ...
-        'Error in $a$: $\left( a - a^{*} \right) / \left| a^{*} \right|$' ...
-        'Error in $c$: $\left( c - c^{*} \right) / \left| c^{*} \right|$' ...
-        'Error in $c/a$: $\left( c/a - c^{*}/a^{*} \right) / \left| c^{*}/a^{*} \right|$' ...
-        'Error in $V$: $\left( V - V^{*} \right) / \left| V^{*} \right|$' ...
-        'Error in $\rho$: $\left( \rho - \rho^{*} \right) / \left| \rho^{*} \right|$'};
+    MinPlotTitles = {'$\left( E_{L} - E_{L}^{*} \right) / \left| E_{L}^{*} \right|$' ...
+        'Error in $E_{L}$: $E_{L}$[Structure] - $E_{L}$[Rocksalt]' ...
+        '$\left( a - a^{*} \right) / \left| a^{*} \right|$' ...
+        '$\left( c - c^{*} \right) / \left| c^{*} \right|$' ...
+        '$\left( c/a - c^{*}/a^{*} \right) / \left| c^{*}/a^{*} \right|$' ...
+        '$\left( V(T = 0) - V(T = 0)^{*} \right) / \left| V^{*} \right|$' ...
+        '$\left( \rho - \rho^{*} \right) / \left| \rho^{*} \right|$'};
     MinPlotYLabels = {'[\%]' ...
         '[kJ mol$^{-1}$]' ...
         '[\%]' ...
@@ -58,13 +71,13 @@ if show_as_percent_error
     
     FiniteTYLabels = {'[\%]' '[\%]' '[\%]' '[\%]' '[\%]' '[\%]'};
 else
-    MinPlotTitles = {'Error in $E_L$: $E_{L} - E_{L}^{*}$' ...
-        '$E_{L}$[Structure] - $E_{L}$[Rocksalt]' ...
-        'Error in $a$: $a - a^{*}$' ...
-        'Error in $c$: $c - c^{*}$' ...
-        'Error in $c/a$: $c/a - c^{*}/a^{*}$' ...
-        'Error in $V$: $V - V^{*}$' ...
-        'Error in $\rho$: $\rho - \rho^{*}$'};
+    MinPlotTitles = {'Error in $E_{L}$: $E_{L} - E_{L}^{*}$' ...
+        '$\Delta E_{L} = E_{L}$(other structure) - $E_{L}$(rocksalt)' ...
+        '$a - a^{*}$' ...
+        '$c - c^{*}$' ...
+        '$c/a - c^{*}/a^{*}$' ...
+        'Error in $V(T = 0)$: $V(T = 0) - V^{*}(T = 0)$' ...
+        '$\rho - \rho^{*}$'};
     MinPlotYLabels = {'[kJ mol$^{-1}$]' ...
                       '[kJ mol$^{-1}$]' ...
                       '[\AA]' ...
@@ -73,7 +86,7 @@ else
                       '[$\AA^{3}$]' ...
                       'g cm$^{-3}$]'};
                   
-    FiniteTYLabels = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$10^{-5}$ cm$^{2}$/s]'};
+    FiniteTYLabels = {'[K]' '[kJ mol$^{-1}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' '[$\AA^{3}$]' ['[$10^{-' num2str(log10(DM_Multiplier)) '}$ cm$^{2}$/s]']};
 end
 MinPlotYLabels = MinPlotYLabels(MinPlotIdxes);
 MinPlotTitles = MinPlotTitles(MinPlotIdxes);
@@ -390,7 +403,7 @@ if N_MinPlot_Rows
                                     Finite_T_Data.MP - Finite_T_Data.Exp_MP;
                             case 'DM'
                                 Finite_T_PlotData(ridx,idx,iidx) = ...
-                                    (Finite_T_Data.Liquid_DM_MP - Finite_T_Data.Exp_DM_MP).*1e5;
+                                    (Finite_T_Data.Liquid_DM_MP - Finite_T_Data.Exp_DM_MP).*DM_Multiplier;
                         end
                     end
                 end
@@ -399,7 +412,7 @@ if N_MinPlot_Rows
     end
 end
 
-if BestOnly
+if BestOnly && numel(SelectOnly) ~= N_Salts
     N_Models = 1;
     
     Min_PlotData_BB        = nan(N_MinPlot_Rows,N_Salts,N_Structures);
@@ -418,12 +431,31 @@ if BestOnly
             Finite_T_PlotData_BB(idx,jdx) = Finite_T_PlotData(idx,jdx,Model_idx);
         end
     end
+elseif BestOnly && numel(SelectOnly) == N_Salts
+    N_Models = 1;
+    Min_PlotData_BB        = nan(N_MinPlot_Rows,N_Salts,N_Structures);
+    Finite_T_PlotData_BB   = nan(N_FiniteTTypes,N_Salts);
+    
+    TL = nan(N_Salts,1);
+    for jdx = 1:N_Salts
+        Model_idx = SelectOnly(jdx);
+        TL(jdx) = Total_loss(jdx,SelectOnly(jdx));
+        for idx = 1:N_MinPlot_Rows
+            for kdx = 1:N_Structures
+                Min_PlotData_BB(idx,jdx,kdx) = Min_PlotData(idx,jdx,Model_idx,kdx);
+            end
+        end
+        for idx = 1:N_FiniteTTypes
+            Finite_T_PlotData_BB(idx,jdx) = Finite_T_PlotData(idx,jdx,Model_idx);
+        end
+    end
+    Total_loss = TL;
 end
 
 %% Plotting
 % Gen figure
 figh = figure('WindowState','maximized','NumberTitle','off',...
-    'Name','','Visible','On');
+    'Name','','Visible','On','color','w');
 switch Theory
     case 'JC'
         PubTheoryName = 'CLJ';
@@ -448,7 +480,7 @@ if N_Salts > 1 && ~BestOnly
         loss_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
             'Position',[0 1-row_height 1 row_height],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
         FTdrop = row_height;
         axobj_loss = gobjects(N_Salts,1);
 
@@ -460,12 +492,11 @@ if N_Salts > 1 && ~BestOnly
         hh = 1 - bb0 - 0.3;
         bb = bb0;
         for idx = 1:N_Salts
-            ll = (1-ww0) + (ww0/N_Salts+ww2)*(idx-1);
+            ll = (0.995-ww0) + (ww0/N_Salts+ww2)*(idx-1);
             axobj_loss(idx) = subplot('Position',[ll bb ww hh],...
                 'parent',loss_panel); % [left bottom width height]
             hold(axobj_loss(idx),'on');
-
-
+            
             % Gather data
             plot_data = squeeze(Total_loss(idx,:));
             expon = floor(log10(max(plot_data)));
@@ -474,27 +505,33 @@ if N_Salts > 1 && ~BestOnly
                 'LineWidth',2);
             for mdx = 1:N_Models
                 xpos = p.XEndPoints(mdx);
-                scatter(axobj_loss(idx),xpos,plot_data(mdx)./(10.^expon),100,'MarkerEdgeColor','k',...
-                    'MarkerFaceColor',Colours(idx,:),'linewidth',2,'marker',markers{mdx});
+                scatter(axobj_loss(idx),xpos,plot_data(mdx)./(10.^expon),200,'MarkerEdgeColor','k',...
+                    'MarkerFaceColor',Colours(idx,:),'linewidth',2,'marker',markers{mdx},'MarkerFaceAlpha',0.5);
             end
 
             % Set plot properties
             set(axobj_loss(idx),'box','on','TickLabelInterpreter','latex');
             set(axobj_loss(idx),'XMinorTick','off','YMinorTick','on','FontSize',fs-3);
+            %set(axobj_loss(idx),'YScale','log');
             xticks(axobj_loss(idx),1:N_Models)
             xticklabels(axobj_loss(idx),[])
             axobj_loss(idx).XAxis.TickLength = [0,0];
-            ylim(axobj_loss(idx),'padded')
-            sgtitle(loss_panel,['Minimized Objective Function: ' PubTheoryName ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
-                'Fontsize',fs-2,'Interpreter','latex')
+            ylim(axobj_loss(idx),[0 max(plot_data./(10.^expon))*1.1])
+            if savefile
+                sgtitle(loss_panel,'Minimized Objective Function $f\left(\mathbf{x}^{*}\right)$',...
+                    'Fontsize',fs-2,'Interpreter','latex')
+            else
+                sgtitle(loss_panel,['Minimized Objective Function: ' PubTheoryName ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
+                    'Fontsize',fs-2,'Interpreter','latex')
+            end
 %             if idx == 1
-%                 ylabel(axobj_loss(idx), '$f(\mathbf{x}_{0})$','Fontsize',fs,'Interpreter','latex')
+%                 ylabel(axobj_loss(idx), '$f(\mathbf{x}^{*})$','Fontsize',fs,'Interpreter','latex')
 %             end
             xlim(axobj_loss(idx),[0 N_Models+1])
             set(axobj_loss(idx), 'YTickMode', 'auto');
             set(axobj_loss(idx),'xminorgrid','off','yminorgrid','on');
             axobj_loss(idx).YAxis.Exponent = 0;
-            ylabel(axobj_loss(idx), ['$f\left(\mathbf{x}_{0}\right)/10^{' num2str(expon) '}$'],'Fontsize',fs-4,'Interpreter','latex')
+            ylabel(axobj_loss(idx), ['$f\left(\mathbf{x}^{*}\right)/10^{' num2str(expon) '}$'],'Fontsize',fs-4,'Interpreter','latex')
         end
     else
         FTdrop = 0;
@@ -503,19 +540,20 @@ if N_Salts > 1 && ~BestOnly
     if plot_finite_T_data
         finite_T_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
-            'Position',[0 1-row_height-FTdrop 1 row_height],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'Position',[0 1-row_height-FTdrop-0.0247 1 row_height+0.0227],...
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
+        
         axobj_ft = gobjects(N_FiniteTTypes,1);
 
-        ww0 = 1 - 0.05;
+        ww0 = 1 - 0.07;
         bb0 = 0.14;
-        ww1 = ww0/N_FiniteTTypes - ww0/(N_FiniteTTypes+2);
+        ww1 = ww0/N_FiniteTTypes - ww0/(N_FiniteTTypes+2.6);
         ww2 = ww1/(N_FiniteTTypes-1);
-        ww = ww0/(N_FiniteTTypes+2);
+        ww = ww0/(N_FiniteTTypes+2.6);
         hh = 1 - bb0 - 0.25;
         bb = bb0;
         for idx = 1:N_FiniteTTypes
-            ll = (1-ww0) + (ww0/N_FiniteTTypes+ww2)*(idx-1);
+            ll = (0.995-ww0) + (ww0/N_FiniteTTypes+ww2)*(idx-1);
             axobj_ft(idx) = subplot('Position',[ll bb ww hh],...
                 'parent',finite_T_panel); % [left bottom width height]
             hold(axobj_ft(idx),'on');
@@ -525,17 +563,21 @@ if N_Salts > 1 && ~BestOnly
             salt_ave = mean(plot_data,2,'omitnan'); % average the data across salts
 
             % Plot data
-            plot(axobj_ft(idx),xx,salt_ave,'--k','linewidth',2);
+            if include_av_line
+                plot(axobj_ft(idx),xx,salt_ave,'--k','linewidth',2);
+            end
             for jdx = 1:N_Models
                 yy = plot_data(:,jdx);
-                scatter(axobj_ft(idx),xx,yy,100,Colours(xx,:),'filled','MarkerEdgeColor','k',...
-                    'linewidth',1,'marker',markers{jdx});
+                scatter(axobj_ft(idx),xx,yy,200,Colours(xx,:),'filled','MarkerEdgeColor','k',...
+                    'linewidth',1,'marker',markers{jdx},'MarkerFaceAlpha',0.5);
             end
-            plot(axobj_ft(idx),[0.5 N_Salts+0.5],[0 0],':k','linewidth',1)
+            
 
             % Add boxes for targets
             ylim(axobj_ft(idx),'padded');
             ylmits = ylim;
+            plot(axobj_ft(idx),[0.5 N_Salts+0.5],[0 0],':k','linewidth',1)
+            ylim(axobj_ft(idx),ylmits);
             if isfield(Bayesopt_Loss_Options,FT_Loss_Names{idx}) && Bayesopt_Loss_Options.(FT_Loss_Names{idx}) > sqrt(eps)
                 rech = rectangle(axobj_ft(idx),'Position',[0.55 ylmits(1) N_Salts-0.1 (ylmits(2) - ylmits(1))],...
                         'Curvature',0,'LineWidth',min(3*Bayesopt_Loss_Options.(FT_Loss_Names{idx}),4),'EdgeColor','r');
@@ -560,7 +602,7 @@ if N_Salts > 1 && ~BestOnly
         min_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
             'Position',[0 0 1 MinPlot_Frac],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
 
         % Some widths and heights
         bbz = 1 - bbbuffer;
@@ -574,10 +616,10 @@ if N_Salts > 1 && ~BestOnly
             for idx = 1:N_Structures
 
                 if strcmp(Structures{idx},'CsCl') && strcmp(MinPlotTypes{jdx},'RLE')
-                    ll = wwbuffer + (1-wwbuffer)*(idx-1)/N_Structures + 0.25*((1-wwbuffer)/N_Structures);
-                    ww = (1/N_Structures)*(1-wwbuffer) - 0.25*(1/N_Structures);
+                    ll = wwbuffer + (1-wwbuffer)*(idx-1)/N_Structures + 0.19*((1-wwbuffer)/N_Structures);
+                    ww = (1/N_Structures)*(1-wwbuffer) - 0.22*(1/N_Structures);
                 else
-                    ll = wwbuffer + (1-wwbuffer)*(idx-1)/N_Structures;
+                    ll = wwbuffer + (1-wwbuffer)*(idx-1)/N_Structures-0.005;
                     ww = (1/N_Structures)*(1-wwbuffer);
                 end
                 bb = 1 - (jdx)*bbz/N_MinPlot_Rows;
@@ -591,41 +633,49 @@ if N_Salts > 1 && ~BestOnly
                 salt_ave = mean(plot_data,2,'omitnan'); % average the data across salts
 
                 % Plot data
-                plot(axobj_min(idx,jdx),xx,salt_ave,'--k','linewidth',2);
+                if include_av_line
+                    plot(axobj_min(idx,jdx),xx,salt_ave,'--k','linewidth',2);
+                end
                 if strcmp(MinPlotTypes{jdx},'RLE') && ~strcmp(Structures{idx},'Rocksalt')
-                    plot(axobj_min(idx,jdx),xx,Rel_Energies_DFT(:,idx),'-','linewidth',2,'color','r')
-                    scatter(axobj_min(idx,jdx),xx,Rel_Energies_DFT(:,idx),100,Colours(xx,:),...
-                        'filled','MarkerEdgeColor','r',...
+                    plot(axobj_min(idx,jdx),xx,Rel_Energies_DFT(:,idx),'-','linewidth',2,'color','b')
+                    scatter(axobj_min(idx,jdx),xx,Rel_Energies_DFT(:,idx),200,Colours(xx,:),...
+                        'filled','MarkerEdgeColor','b',...
                         'linewidth',2,'marker','o');
                 end
 
                 for kdx = 1:N_Models
                     yy = plot_data(:,kdx);
-                    scatter(axobj_min(idx,jdx),xx,yy,100,Colours(xx,:),'filled','MarkerEdgeColor','k',...
-                        'linewidth',1,'marker',markers{kdx});
+                    scatter(axobj_min(idx,jdx),xx,yy,200,Colours(xx,:),'filled','MarkerEdgeColor','k',...
+                        'linewidth',1,'marker',markers{kdx},'MarkerFaceAlpha',0.5);
                 end
-                plot(axobj_min(idx,jdx),[0.5 N_Salts+0.5],[0 0],':k','linewidth',1)
-
+                
                 % Set plot properties
                 set(axobj_min(idx,jdx),'box','on','TickLabelInterpreter','latex');
                 set(axobj_min(idx,jdx),'XMinorTick','off','YMinorTick','on','FontSize',fs);
                 xticks(axobj_min(idx,jdx),1:N_Salts)
                 xticklabels(axobj_min(idx,jdx),[])
                 axobj_min(idx,jdx).XAxis.TickLength = [0,0];
-                ylim(axobj_min(idx,jdx),'padded')
-
+                ylim(axobj_min(idx,jdx),'padded');
                 if ~(strcmp(Structures{idx},'CsCl') && strcmp(MinPlotTypes{jdx},'RLE'))
                     cylim(idx,:) = ylim(axobj_min(idx,jdx));
+                    plot(axobj_min(idx,jdx),[0.5 N_Salts+0.5],[0 0],':k','linewidth',1)
+                elseif (strcmp(Structures{idx},'CsCl') && strcmp(MinPlotTypes{jdx},'RLE'))
+                    csclylim = ylim(axobj_min(idx,jdx));
+                    plot(axobj_min(idx,jdx),[0.5 N_Salts+0.5],[0 0],':k','linewidth',1)
+                    ylim(axobj_min(idx,jdx),csclylim);
                 end
+                plot(axobj_min(idx,jdx),[0.5 N_Salts+0.5],[0 0],':k','linewidth',1)
+                
                 if idx == 1
                     ylabel(axobj_min(idx,jdx), MinPlotYLabels{jdx},'Fontsize',fs,'Interpreter','latex')
                 end
                 if jdx == N_MinPlot_Rows
-                    xlabel(axobj_min(idx,jdx), Structures{idx},'Fontsize',fs,'Interpreter','latex')
+                    xlabel(axobj_min(idx,jdx), LegStructure(Structures{idx}),'Fontsize',fs,'Interpreter','latex')
                 end
                 if idx == ceil(N_Structures/2)
                     title(axobj_min(idx,jdx),MinPlotTitles(jdx),'Fontsize',fs,'Interpreter','latex')
                     axobj_min(idx,jdx).TitleHorizontalAlignment = 'Left';
+                    %axobj_min(idx,jdx).Title.Position = [1.073991031390134,49.12118639249388,0];
                 end
                 ij = ij+1;
             end
@@ -651,11 +701,11 @@ if N_Salts > 1 && ~BestOnly
 
         h = gobjects(length(Salts)+1,1);
         for idx = 1:length(Salts)
-            h(idx) = plot(axobj_min(1,1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', Salts{idx},...
+            h(idx) = plot(axobj_min(1,1),nan, nan, 'o', 'MarkerSize', 16, 'DisplayName', [Salts{idx} '\quad'],...
                 'MarkerFaceColor',Colours(idx,:),'linewidth',2,'Color','k');
         end
-        h(end) = plot(axobj_min(1,1),nan, nan, 'o', 'MarkerSize', 12, 'DisplayName', 'DFT',...
-            'MarkerFaceColor','w','linewidth',2,'Color','r');
+        h(end) = plot(axobj_min(1,1),nan, nan, 'o', 'MarkerSize', 16, 'DisplayName', 'DFT',...
+            'MarkerFaceColor','w','linewidth',2,'Color','b');
         legh = legend(h,'Position',[0.36 0 0.33 0.06],'Orientation','Horizontal',...
             'Interpreter','latex','Box','off','fontsize',fs,'NumColumns', N_Salts+1);
     end
@@ -669,7 +719,7 @@ elseif N_Salts > 1 && BestOnly
         loss_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
             'Position',[0 1-row_height 1 row_height],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
         FTdrop = row_height;
         
         axobj_loss = subplot('Position',[0.1 0.05 0.8 0.65],...
@@ -689,10 +739,18 @@ elseif N_Salts > 1 && BestOnly
         xticks(axobj_loss,1)
         xticklabels(axobj_loss,[])
         axobj_loss.XAxis.TickLength = [0,0];
-        ylim(axobj_loss,'padded')
-        sgtitle(loss_panel,['Minimized Objective Function: ' PubTheoryName ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
-            'Fontsize',fs,'Interpreter','latex')
-        ylabel(axobj_loss, '$f(\mathbf{x}_{0})$','Fontsize',fs,'Interpreter','latex')
+        %ylim(axobj_loss,'padded')
+        set(axobj_loss,'YScale','log')
+        ylim(axobj_loss,[10^(floor( log10(min(Total_loss)))) 10^(ceil( log10(max(Total_loss))))])
+        
+        if savefile
+            sgtitle(loss_panel,'Minimized Objective Function $f\left(\mathbf{x}^{*}\right)$',...
+                'Fontsize',fs,'Interpreter','latex')
+        else
+            sgtitle(loss_panel,['Minimized Objective Function: ' PubTheoryName ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
+                'Fontsize',fs,'Interpreter','latex')
+        end
+        ylabel(axobj_loss, '$f(\mathbf{x}^{*})$','Fontsize',fs,'Interpreter','latex')
         xlim(axobj_loss,'padded')
         set(axobj_loss, 'YTickMode', 'auto')
         set(axobj_loss,'xminorgrid','off','yminorgrid','on')
@@ -704,18 +762,18 @@ elseif N_Salts > 1 && BestOnly
         finite_T_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
             'Position',[0 1-row_height-FTdrop 1 row_height],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
         axobj_ft = gobjects(N_FiniteTTypes,1);
 
-        ww0 = 1 - 0.05;
+        ww0 = 1 - 0.065;
         bb0 = 0.14;
-        ww1 = ww0/N_FiniteTTypes - ww0/(N_FiniteTTypes+2);
+        ww1 = ww0/N_FiniteTTypes - ww0/(N_FiniteTTypes+2.3);
         ww2 = ww1/(N_FiniteTTypes-1);
-        ww = ww0/(N_FiniteTTypes+2);
+        ww = ww0/(N_FiniteTTypes+2.3);
         hh = 1 - bb0 - 0.25;
         bb = bb0;
         for idx = 1:N_FiniteTTypes
-            ll = (1-ww0) + (ww0/N_FiniteTTypes+ww2)*(idx-1);
+            ll = (0.995-ww0) + (ww0/N_FiniteTTypes+ww2)*(idx-1);
             axobj_ft(idx) = subplot('Position',[ll bb ww hh],...
                 'parent',finite_T_panel); % [left bottom width height]
             hold(axobj_ft(idx),'on');
@@ -760,7 +818,7 @@ elseif N_Salts > 1 && BestOnly
         min_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
             'Position',[0 0 1 MinPlot_Frac],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
 
         % Some widths and heights
         bbz = 1 - bbbuffer;
@@ -775,9 +833,9 @@ elseif N_Salts > 1 && BestOnly
 
                 if strcmp(Structures{idx},'CsCl') && strcmp(MinPlotTypes{jdx},'RLE')
                     ll = wwbuffer + (1-wwbuffer)*(idx-1)/N_Structures + 0.25*((1-wwbuffer)/N_Structures);
-                    ww = (1/N_Structures)*(1-wwbuffer) - 0.25*(1/N_Structures);
+                    ww = (1/N_Structures)*(1-wwbuffer) - 0.25*(1/N_Structures) - 0.0025;
                 else
-                    ll = wwbuffer + (1-wwbuffer)*(idx-1)/N_Structures;
+                    ll = wwbuffer + (1-wwbuffer)*(idx-1)/N_Structures - 0.005;
                     ww = (1/N_Structures)*(1-wwbuffer);
                 end
                 bb = 1 - (jdx)*bbz/N_MinPlot_Rows;
@@ -811,7 +869,7 @@ elseif N_Salts > 1 && BestOnly
                     end
                     
                     p = bar(axobj_min(idx,jdx),1,Rel_Energies_DFT(:,idx),'FaceColor',[0.5 0.5 0.5],'Visible','on','BarWidth',1,...
-                        'LineWidth',2,'EdgeColor','r','FaceAlpha',0.5,'LineStyle','--');
+                        'LineWidth',2,'EdgeColor','b','FaceAlpha',0.5,'LineStyle','--');
                 end
                 
                 if ~(strcmp(Structures{idx},'CsCl') && strcmp(MinPlotTypes{jdx},'RLE'))
@@ -821,7 +879,7 @@ elseif N_Salts > 1 && BestOnly
                     ylabel(axobj_min(idx,jdx), MinPlotYLabels{jdx},'Fontsize',fs,'Interpreter','latex')
                 end
                 if jdx == N_MinPlot_Rows
-                    xlabel(axobj_min(idx,jdx), Structures{idx},'Fontsize',fs,'Interpreter','latex')
+                    xlabel(axobj_min(idx,jdx), LegStructure(Structures{idx}),'Fontsize',fs,'Interpreter','latex')
                 end
                 if idx == ceil(N_Structures/2)
                     title(axobj_min(idx,jdx),MinPlotTitles(jdx),'Fontsize',fs,'Interpreter','latex')
@@ -856,7 +914,7 @@ elseif N_Salts > 1 && BestOnly
         h(kdx).CData = Colours(kdx,:);
     end
     h(end+1) = bar(axobj_min(1,1),nan,nan,'FaceColor',[0.5 0.5 0.5],'Visible','on','BarWidth',1,...
-        'LineWidth',2,'EdgeColor','r','FaceAlpha',0.5,'LineStyle','--');
+        'LineWidth',2,'EdgeColor','b','FaceAlpha',0.5,'LineStyle','--');
     legtxt = strcat({'\ \ '},Salts,{'\quad'});
     legtxt{end+1}  = '\ \ DFT';
     legh = legend(h,legtxt,'Position',[0.36 0 0.33 0.06],'Orientation','Horizontal',...
@@ -870,7 +928,7 @@ else
         loss_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
             'Position',[0 1-row_height 1 row_height],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
         FTdrop = row_height;
         
         axobj_loss = subplot('Position',[0.1 0.05 0.8 0.65],...
@@ -882,8 +940,8 @@ else
             'LineWidth',2);
         for mdx = 1:N_Models
             xpos = p.XEndPoints(mdx);
-            scatter(axobj_loss,xpos,Total_loss(mdx),100,'MarkerEdgeColor','k',...
-                'MarkerFaceColor',Colours(1,:),'linewidth',2,'marker',markers{mdx});
+            scatter(axobj_loss,xpos,Total_loss(mdx),200,'MarkerEdgeColor','k',...
+                'MarkerFaceColor',Colours(1,:),'linewidth',2,'marker',markers{mdx},'MarkerFaceAlpha',0.5);
         end
 
         % Set plot properties
@@ -893,9 +951,14 @@ else
         xticklabels(axobj_loss,[])
         axobj_loss.XAxis.TickLength = [0,0];
         ylim(axobj_loss,'padded')
-        sgtitle(loss_panel,['Minimized Objective Function: ' Salts{1} ' ' PubTheoryName ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
-            'Fontsize',fs,'Interpreter','latex')
-        ylabel(axobj_loss, '$f(\mathbf{x}_{0})$','Fontsize',fs,'Interpreter','latex')
+        if savefile
+            sgtitle(loss_panel,'Minimized Objective Function $f\left(\mathbf{x}^{*}\right)$',...
+                'Fontsize',fs,'Interpreter','latex')
+        else
+            sgtitle(loss_panel,['Minimized Objective Function: ' Salts{1} ' ' PubTheoryName ' Model ' ModelID ' [' Fix_Charge ' / ' Additivity ']'],...
+                'Fontsize',fs,'Interpreter','latex')
+        end
+        ylabel(axobj_loss, '$f(\mathbf{x}^{*})$','Fontsize',fs,'Interpreter','latex')
         xlim(axobj_loss,[0 N_Models+1])
         set(axobj_loss, 'YTickMode', 'auto')
         set(axobj_loss,'xminorgrid','off','yminorgrid','on')
@@ -907,7 +970,7 @@ else
         finite_T_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
             'Position',[0 1-row_height-FTdrop 1 row_height],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
         axobj_ft = gobjects(N_FiniteTTypes,1);
 
         ww0 = 1 - 0.05;
@@ -931,8 +994,8 @@ else
                 'LineWidth',2);
             for mdx = 1:N_Models
                 xpos = p.XEndPoints(mdx);
-                scatter(axobj_ft(idx),xpos,plot_data(mdx),100,'MarkerEdgeColor','k',...
-                    'MarkerFaceColor',Colours(1,:),'linewidth',2,'marker',markers{mdx});
+                scatter(axobj_ft(idx),xpos,plot_data(mdx),200,'MarkerEdgeColor','k',...
+                    'MarkerFaceColor',Colours(1,:),'linewidth',2,'marker',markers{mdx},'MarkerFaceAlpha',0.5);
             end
 
             % Add boxes for targets
@@ -962,7 +1025,7 @@ else
         min_panel = uipanel(figh,'FontSize',fs,...
             'BorderType','none',...
             'Position',[0 0 1 MinPlot_Frac],...
-            'AutoResizeChildren','off'); % [left bottom width height]
+            'AutoResizeChildren','off','BackgroundColor','w'); % [left bottom width height]
 
         % Some widths and heights
         bbbuffer = 0.08;
@@ -997,8 +1060,8 @@ else
                     'LineWidth',2);
                 for mdx = 1:N_Models
                     xpos = p.XEndPoints(mdx);
-                    scatter(axobj_min(idx,jdx),xpos,plot_data(mdx),100,'MarkerEdgeColor','k',...
-                        'MarkerFaceColor',Colours(1,:),'linewidth',2,'marker',markers{mdx});
+                    scatter(axobj_min(idx,jdx),xpos,plot_data(mdx),200,'MarkerEdgeColor','k',...
+                        'MarkerFaceColor',Colours(1,:),'linewidth',2,'marker',markers{mdx},'MarkerFaceAlpha',0.5);
                 end
                 
                 if strcmp(MinPlotTypes{jdx},'RLE') && ~strcmp(Structures{idx},'Rocksalt')
@@ -1020,7 +1083,7 @@ else
                     ylabel(axobj_min(idx,jdx), MinPlotYLabels{jdx},'Fontsize',fs,'Interpreter','latex')
                 end
                 if jdx == N_MinPlot_Rows
-                    xlabel(axobj_min(idx,jdx), Structures{idx},'Fontsize',fs,'Interpreter','latex')
+                    xlabel(axobj_min(idx,jdx), LegStructure(Structures{idx}),'Fontsize',fs,'Interpreter','latex')
                 end
                 if idx == ceil(N_Structures/2)
                     title(axobj_min(idx,jdx),MinPlotTitles(jdx),'Fontsize',fs,'Interpreter','latex')
@@ -1066,9 +1129,22 @@ if savefile
 %     figh.PaperPosition = [0 0 1 1];
 %     exportgraphics(mainpanelh,filename)
     %exportapp(figh,filename)
-    filename = ['Model_Overview_' Theory '_Model_' ModelID '.eps'];
+    %filename = ['Model_Overview_' Theory '_Model_' ModelID '.eps'];
     %hgexport(figh,fullfile(saveloc,filename))
-    print(figh,fullfile(saveloc,filename),'-deps','-noui')
+    %print(figh,fullfile(saveloc,filename),'-deps','-noui')
+    figh=gcf;
     filename = ['Model_Overview_' Theory '_Model_' ModelID '.png'];
-    print(figh,fullfile(saveloc,filename),'-dpng','-r0','-noui')
+    print(figh,fullfile(saveloc,filename),'-dpng','-r300','-noui')
+end
+
+
+function Output = LegStructure(Structure)
+    switch Structure
+        case 'BetaBeO'
+            Output = '$\beta$-BeO';
+        case 'FiveFive'
+            Output = '5-5';
+        otherwise
+            Output = Structure;
+    end
 end
