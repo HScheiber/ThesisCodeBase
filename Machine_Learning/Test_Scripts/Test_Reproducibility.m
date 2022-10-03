@@ -9,6 +9,7 @@ Settings.JobSettings.MPI_Ranks = 8;
 Settings.JobSettings.OMP_Threads = 1;
 Settings.JobSettings.dd  = [];
 Settings.JobSettings.npme = [];
+Settings.Diary_Loc='';
 
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
     Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
@@ -21,8 +22,11 @@ for idx = 1:N_Reps
     Settings.WorkDir = tempname(workdir);
     Settings.OuterDir = tempname(workdir);
     Settings.scratch_dir = tempname(workdir);
-    Output_Sol{idx} = Calc_Solid_Properties_at_MP(Settings);
     Output_Liq{idx} = Calc_Liquid_Properties_at_MP(Settings);
+    Settings.WorkDir = tempname(workdir);
+    Settings.OuterDir = tempname(workdir);
+    Settings.scratch_dir = tempname(workdir);
+    Output_Sol{idx} = Calc_Solid_Properties_at_MP(Settings);
 end
 
 save(fullfile(workdir,'Reproducibility.mat'),'Output_Sol','Output_Liq');

@@ -1,6 +1,6 @@
 % Fix_RR_Problem
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BD';
+Theory = 'Mie';
 Models_cell = {'OA' 'OB'};
 %ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 ML_results_dir = '/home/user/project/BO_Models';
@@ -122,7 +122,7 @@ for mdx = 1:numel(Models_cell)
                     full_data.Pars = ptable;
                     save(dat_file,'full_data');
                 end
-            case 'BH'
+            case {'BH' 'BD' 'BE'}
                 if ptable.r0_MM > ptable.r0_XX
                     disp([Salts{idx} ' ' Theory ' ' Models{jdx} ' has reversed radius ratios! Switching...']);
                     r0_idx = [find(strcmp(pnames,'r0_MM')) find(strcmp(pnames,'r0_XX'))];
