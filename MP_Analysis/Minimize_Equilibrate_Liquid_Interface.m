@@ -512,6 +512,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     MDP_Template = regexprep(MDP_Template,'(dt += *)(.+?)( *);',['$1' num2str(Settings.MDP.dt) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(gen-vel += *)(.+?)( *);','$1no$3;');
     MDP_Template = regexprep(MDP_Template,'gen-temp.+?\n','');
+    MDP_Template = regexprep(MDP_Template,'(gen-vel += *)(.+?)( *);','$1no$3;');
 
     % Save MDP file
     MDP_Filename = fullfile(Settings.WorkDir,'MSD_Liq.mdp');
