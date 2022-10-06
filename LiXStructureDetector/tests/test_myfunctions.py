@@ -189,9 +189,9 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\Test_MP'
-Salt = 'NaCl'
-SystemName = 'Test_MP'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\Minimization\Equil_Liq\Test'
+Salt = 'LiF'
+SystemName = 'MSD_Liq'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
@@ -199,7 +199,7 @@ SavePredictions=False
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=10
+TimePerFrame=1
 FileType='gro'
 Verbose=True
 StartPoint = None
@@ -215,8 +215,8 @@ Spatial_Reassignment = False
 Spatial_Interfacial = None
 SaveTrajectoryAux = 2
 LoadFeatures = True
-T = 1275.1680
-T_Ref = 1275.1680
+T = None
+T_Ref = None
 RefChangeThreshold = 0.25
 CheckFullTrajectory = True
 

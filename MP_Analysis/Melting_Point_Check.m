@@ -343,7 +343,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                         ' (' num2str(str2double(cpt_number{1})*CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
                         ' ps) failed to complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
                 end
-            elseif ~isfile(windows2unix(Structure_Out_File))
+            elseif ~isfile(Structure_Out_File)
                 if Settings.Verbose
                     disp('Calculation time is almost up, ending MATLAB session now.')
                 end
@@ -598,7 +598,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                     return
                 end
             end
-        elseif ~isfile(windows2unix(Structure_Out_File))
+        elseif ~isfile(Structure_Out_File)
             if Settings.Verbose
                 disp('Calculation time is almost up, ending MATLAB session now.')
             end
@@ -622,7 +622,11 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 'FileType',Settings.CoordType,...
                 'ML_TimeLength',0,...
                 'ML_TimeStep',0,...
-                'T_Ref',T_dat.T_ref));
+                'T_Ref',T_dat.T_ref,...
+                'CheckFullTrajectory',true,...
+                'SaveTrajectory',true,...
+                'SavePredictionsImage',true,...
+                'TimePerFrame',1));
             Froze = logical(PyOut{1});
             Melted = logical(PyOut{2});
             Froze_alt = logical(PyOut{6});
@@ -681,7 +685,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                     ' (' num2str(CheckTime*ext_idx,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
                     ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
             end
-        elseif ~isfile(windows2unix(Structure_Out_File))
+        elseif ~isfile(Structure_Out_File)
             if Settings.Verbose
                 disp('Calculation time is almost up, ending MATLAB session now.')
             end

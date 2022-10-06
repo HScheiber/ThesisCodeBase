@@ -1,4 +1,8 @@
 
+Settings.MDP.Initial_T = 1326.4;
+Settings.T0 = 1326.4;
+Settings.Target_T = 1326.4;
+
 Settings.JobSettings.Cores = 8;
 Settings.JobSettings.MPI_Ranks = 8;
 Settings.JobSettings.OMP_Threads = 1;
@@ -30,9 +34,10 @@ Settings.Diary_Loc = '';
 % Settings.AmorphousDiffThreshold = 1e-6;
 % Settings.Liquid_Test_Time = 100; % ps
 % Settings.Liquid_Equilibrate_Time = 25; % ps
+Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 Settings.Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]);
-%[Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings);
+[Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings);
 
 OutputLiq = Calc_Liquid_Properties_at_MP(Settings);
 OutputSol = Calc_Solid_Properties_at_MP(Settings);
