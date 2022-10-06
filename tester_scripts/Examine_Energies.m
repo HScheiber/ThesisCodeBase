@@ -17,7 +17,7 @@ Data = import_xvg('energy.xvg');
 
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
-nmol_solid = 1;
+nmol_solid = 1372;
 
 hold on %figure
 plot(Data(:,1),Data(:,2),'Linewidth',4,'Color','g') % potential (kj/mol ion pairs)

@@ -583,7 +583,7 @@ switch lower(computer)
         
         %% BH [Gamma<6] and Mie Models: MG
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
-        Theories = {'BH' 'Mie'};
+        Theories = {'Mie'};
         Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};

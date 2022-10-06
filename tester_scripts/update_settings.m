@@ -1,7 +1,13 @@
 
+<<<<<<< HEAD
 Settings.MDP.Initial_T = 1321.4;
 Settings.T0 = 1321.4;
 Settings.Target_T = 1321.4;
+=======
+Settings.MDP.Initial_T = 1326.4;
+Settings.T0 = 1326.4;
+Settings.Target_T = 1326.4;
+>>>>>>> 22f8ec76224761a1200ab84023a567bef614cb1d
 
 Settings.JobSettings.Cores = 8;
 Settings.JobSettings.MPI_Ranks = 8;

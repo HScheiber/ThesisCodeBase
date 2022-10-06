@@ -1,10 +1,10 @@
 
 
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'MC';
-Plot_As_Scaling = true;
-Reps = [1:5];
+Theory = 'TF';
+ModelID = '';
+Plot_As_Scaling = false;
+Reps = [];
 
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
 
