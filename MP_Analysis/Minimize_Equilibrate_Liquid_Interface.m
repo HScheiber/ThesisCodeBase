@@ -611,24 +611,27 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             return
         end
         
-        % Check volume fluctuations are not too large        
-        ZCheck_File = fullfile(Settings.WorkDir,'Equil_Liq_ZCheck.xvg');
-        ZCheck_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_ZCheck.log');
-        ZCheck_command = [Settings.wsl 'echo Box-Z ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
-            ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File) ' -o ' ...
-            windows2unix(ZCheck_File) ' ' Settings.passlog windows2unix(ZCheck_Log_File)];
-        [~,~] = system(ZCheck_command);
-        ZCheck_Data = import_xvg(ZCheck_File);
-        ZRange = range(ZCheck_Data(:,2));
-        
-        if abs(ZRange) >= 1 %
-            if Settings.Verbose
-                disp('Box Fluctuations in Z-Dimension are too large. Increasing Equilibration Time to 100 ps.')
-            end
-            Settings.Equilibrate_Liquid = 100; % ps
-            Output = Minimize_Equilibrate_Liquid_Interface(Settings);
-            return
-        end
+%         % Check volume fluctuations are not too large        
+%         XZCheck_File = fullfile(Settings.WorkDir,'Equil_Liq_XZCheck.xvg');
+%         XZCheck_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_ZCheck.log');
+%         XZCheck_command = [Settings.wsl 'echo "12 14 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+%             ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File) ' -o ' ...
+%             windows2unix(XZCheck_File) ' ' Settings.passlog windows2unix(XZCheck_Log_File)];
+%         [~,~] = system(XZCheck_command);
+%         XZCheck_Data = import_xvg(XZCheck_File);
+%         dev_from_init = XZCheck_Data(:,3)./XZCheck_Data(:,2) - XZCheck_Data(1,3)./XZCheck_Data(1,2);
+%         max_dev = max(abs(dev_from_init));
+%         
+%         if max_dev >= 0.3 && (Settings.Equilibrate_Liquid < 100)
+%             if Settings.Verbose
+%                 disp(['Max fluctuation in Z/X box ratio is too large (' num2str(max_dev) ...
+%                     '). Retrying with increased equilibration time: 100 ps.'])
+%             end
+%             Settings = Inp_Settings;
+%             Settings.Equilibrate_Liquid = 100; % ps
+%             Output = Minimize_Equilibrate_Liquid_Interface(Settings);
+%             return
+%         end
         
         % check msd
         MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
@@ -766,16 +769,16 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     %Sol_Z = norm(Solid_file_data.c_vec);
     %Sol_atoms_at_edge = Solid_file_data.xyz(:,3) < MinInterfaceWidth | Solid_file_data.xyz(:,3) > (Sol_Z - MinInterfaceWidth); % index of atoms within +-1 angstrom of liquid-solid interfaces
     
-    buffer_vec = 0.1.*(Liquid_file_data.c_vec)/norm(Liquid_file_data.c_vec); % 1 Angstrom buffer
+    %buffer_vec = 0.1.*(Liquid_file_data.c_vec)/norm(Liquid_file_data.c_vec); % 1 Angstrom buffer
     
     a_vec = Solid_file_data.a_vec;
     b_vec = Solid_file_data.b_vec;
-    c_vec = Solid_file_data.c_vec + Liquid_file_data.c_vec + buffer_vec;
+    c_vec = Solid_file_data.c_vec + Liquid_file_data.c_vec; %+ buffer_vec;
     
     Combined_file_data = Solid_file_data;
     Combined_file_data.N_atoms = Solid_file_data.N_atoms + Liquid_file_data.N_atoms;
     Combined_file_data.c_vec = c_vec;
-    Combined_file_data.xyz = [Solid_file_data.xyz; (Liquid_file_data.xyz + Solid_file_data.c_vec + 0.5.*buffer_vec)];
+    Combined_file_data.xyz = [Solid_file_data.xyz; (Liquid_file_data.xyz + Solid_file_data.c_vec)]; %+ 0.5.*buffer_vec)];
     Combined_file_data.vel = [Liquid_file_data.vel; Liquid_file_data.vel];
     Combined_file_data.res_number = [Solid_file_data.res_number; (Liquid_file_data.res_number + Solid_file_data.res_number(end))];
     Combined_file_data.res_name = [Solid_file_data.res_name; Liquid_file_data.res_name];
