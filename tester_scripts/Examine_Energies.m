@@ -1,5 +1,5 @@
 Energy_file = 'MSD_Liq.edr';
-system(['wsl source ~/.bashrc; echo 12 14 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
+system(['wsl source ~/.bashrc; echo 11 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
 %     Data = import_xvg(En_xvg_file);
@@ -20,12 +20,8 @@ Data = import_xvg('energy.xvg');
 nmol_solid = 1372;
 
 hold on %figure
-<<<<<<< HEAD
-plot(Data(:,1),Data(:,3)./Data(:,2),'Linewidth',4,'Color','g') % potential (kj/mol ion pairs)
-std(Data(:,2))
-range(Data(:,2))
-=======
 plot(Data(:,1),Data(:,3)./Data(:,2),'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
+plot(Data(:,1),Data(:,2),'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
 % std(Data(:,3)./Data(:,2))
 % range(Data(:,3)./Data(:,2))
 % min(Data(:,3)./Data(:,2))
@@ -35,7 +31,6 @@ dev_from_init = Data(:,3)./Data(:,2) - Data(1,3)./Data(1,2);
 max(dev_from_init)
 min(dev_from_init)
 
->>>>>>> 1ed0e3ae9142d7ffc032fdd541050e85750ed5bb
 ylim([-0.2 0.1])
 hold on
 plot(Data(:,1),Data(:,2)./max(abs(Data(:,2)))-1,'Linewidth',4,'Color','r')              % Pressure (bar)
