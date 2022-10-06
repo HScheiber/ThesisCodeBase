@@ -610,7 +610,27 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             end
             return
         end
-
+        
+        % Check volume fluctuations are not too large        
+        ZCheck_File = fullfile(Settings.WorkDir,'Equil_Liq_ZCheck.xvg');
+        ZCheck_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_ZCheck.log');
+        ZCheck_command = [Settings.wsl 'echo Box-Z ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+            ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File) ' -o ' ...
+            windows2unix(ZCheck_File) ' ' Settings.passlog windows2unix(ZCheck_Log_File)];
+        [~,~] = system(ZCheck_command);
+        ZCheck_Data = import_xvg(ZCheck_File);
+        ZRange = range(ZCheck_Data(:,2));
+        
+        if abs(ZRange) >= 1 %
+            if Settings.Verbose
+                disp('Box Fluctuations in Z-Dimension are too large. Increasing Equilibration Time to 100 ps.')
+            end
+            Settings.Equilibrate_Liquid = 100; % ps
+            Output = Minimize_Equilibrate_Liquid_Interface(Settings);
+            return
+        end
+        
+        % check msd
         MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
         MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
         msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...

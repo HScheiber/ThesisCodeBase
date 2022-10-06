@@ -2,7 +2,7 @@
 % Calc_Liquid_Properties
 Settings = load('Calc_Settings.mat').Settings;
 
-N_Reps = 50;
+N_Reps = 500;
 Settings.Verbose = true;
 Settings.JobSettings.Cores = 8;
 Settings.JobSettings.MPI_Ranks = 8;
@@ -18,7 +18,8 @@ Settings.Diary_Loc='';
 workdir = pwd;
 Output_Sol = cell(1,N_Reps);
 Output_Liq = cell(1,N_Reps);
-for idx = 1:N_Reps
+load(fullfile(workdir,'Reproducibility.mat'),'Output_Sol','Output_Liq');
+for idx = 206:N_Reps
     Settings.WorkDir = tempname(workdir);
     Settings.OuterDir = tempname(workdir);
     Settings.scratch_dir = tempname(workdir);
