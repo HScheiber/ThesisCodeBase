@@ -612,27 +612,27 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             return
         end
         
-%         % Check volume fluctuations are not too large        
-%         XZCheck_File = fullfile(Settings.WorkDir,'Equil_Liq_XZCheck.xvg');
-%         XZCheck_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_ZCheck.log');
-%         XZCheck_command = [Settings.wsl 'echo "12 14 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
-%             ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File) ' -o ' ...
-%             windows2unix(XZCheck_File) ' ' Settings.passlog windows2unix(XZCheck_Log_File)];
-%         [~,~] = system(XZCheck_command);
-%         XZCheck_Data = import_xvg(XZCheck_File);
-%         dev_from_init = XZCheck_Data(:,3)./XZCheck_Data(:,2) - XZCheck_Data(1,3)./XZCheck_Data(1,2);
-%         max_dev = max(abs(dev_from_init));
-%         
-%         if max_dev >= 0.3 && (Settings.Equilibrate_Liquid < 100)
-%             if Settings.Verbose
-%                 disp(['Max fluctuation in Z/X box ratio is too large (' num2str(max_dev) ...
-%                     '). Retrying with increased equilibration time: 100 ps.'])
-%             end
-%             Settings = Inp_Settings;
-%             Settings.Equilibrate_Liquid = 100; % ps
-%             Output = Minimize_Equilibrate_Liquid_Interface(Settings);
-%             return
-%         end
+        % Check volume fluctuations are not too large        
+        XZCheck_File = fullfile(Settings.WorkDir,'Equil_Liq_XZCheck.xvg');
+        XZCheck_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_ZCheck.log');
+        XZCheck_command = [Settings.wsl 'echo "12 14 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+            ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File) ' -o ' ...
+            windows2unix(XZCheck_File) ' ' Settings.passlog windows2unix(XZCheck_Log_File)];
+        [~,~] = system(XZCheck_command);
+        XZCheck_Data = import_xvg(XZCheck_File);
+        dev_from_init = XZCheck_Data(:,3)./XZCheck_Data(:,2) - XZCheck_Data(1,3)./XZCheck_Data(1,2);
+        max_dev = max(abs(dev_from_init));
+        
+        if max_dev >= 0.3 && (Settings.Equilibrate_Liquid < 100)
+            if Settings.Verbose
+                disp(['Max fluctuation in Z/X box ratio is too large (' num2str(max_dev) ...
+                    '). Retrying with increased equilibration time: 100 ps.'])
+            end
+            Settings = Inp_Settings;
+            Settings.Equilibrate_Liquid = 100; % ps
+            Output = Minimize_Equilibrate_Liquid_Interface(Settings);
+            return
+        end
         
         % check msd
         MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');

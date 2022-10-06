@@ -361,6 +361,72 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         end
         CheckStructureTimer = tic;
         try
+            
+            % Check volume has not exploded
+            XZCheck_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.xvg']);
+            XZCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.log']);
+            XZCheck_command = [Settings.wsl 'echo "15 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+                ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File) ' -o ' ...
+                windows2unix(XZCheck_File) ' ' Settings.passlog windows2unix(XZCheck_Log_File)];
+            [~,~] = system(XZCheck_command);
+            XZCheck_Data = import_xvg(XZCheck_File);
+            dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
+            max_dev = max(abs(dev_from_init));
+            
+            if max_dev >= 1.5 && Settings.MDP.dt/2 >= Settings.MinTimeStep
+                if Settings.Verbose
+                    disp(['System volume exploded (' num2str(max_dev) ...
+                        ' max deviation detected). Retrying with decreased time step.'])
+                end
+                
+                % Look for and delete all checkpoint files
+                cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
+                for idx = 1:length(cpt_check)
+                    CheckPoint_File = fullfile(WorkDir,cpt_check(idx).name);
+                    delete(CheckPoint_File)
+                end
+                
+                Settings.MDP.dt = Settings.MDP.dt/2;
+                Settings.Output_Coords = Settings.Output_Coords*2;
+                [feval,fderiv,User_data] = Melting_Point_Check(T,Settings);
+                return
+            elseif max_dev >= 1.5
+                if Settings.Verbose
+                    disp(['System volume exploded (' num2str(max_dev) ...
+                        ' max deviation detected). Aborting calculation.'])
+                end
+                
+                f = -1;
+                df = 0;
+                T_dat.Alt_Structure = true;
+                T_dat.T = T;
+                T_dat.T_Trace = [T_dat.T_Trace T];
+                T_dat.f_Trace = [T_dat.f_Trace f];
+                T_dat.df_Trace = [T_dat.df_Trace df];
+                T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                while true
+                    try
+                        copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                        save(Settings.CurrentTFile,'T_dat')
+                        break
+                    catch
+                        pause(10)
+                    end
+                end
+                feval = -1; % function evaluation
+                fderiv = 0; % function derivative
+                User_data = T_dat; % user data
+                if Settings.Verbose
+                    disp('System blow up. This potential may be unusable!')
+                    disp('Aborting Melting Point calculation.')
+                end
+                return
+            else
+                delete(XZCheck_File)
+                delete(XZCheck_Log_File)
+            end
+            
             PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
                 pyargs('SystemName',Settings.JobName,...
                 'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
@@ -615,6 +681,72 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 disp('Checking melting/freezing status...')
             end
             CheckStructureTimer = tic;
+            
+            % Check volume has not exploded
+            XZCheck_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.xvg']);
+            XZCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.log']);
+            XZCheck_command = [Settings.wsl 'echo "15 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+                ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File) ' -o ' ...
+                windows2unix(XZCheck_File) ' ' Settings.passlog windows2unix(XZCheck_Log_File)];
+            [~,~] = system(XZCheck_command);
+            XZCheck_Data = import_xvg(XZCheck_File);
+            dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
+            max_dev = max(abs(dev_from_init));
+            
+            if max_dev >= 1.5 && Settings.MDP.dt/2 >= Settings.MinTimeStep
+                if Settings.Verbose
+                    disp(['System volume exploded (' num2str(max_dev) ...
+                        ' max deviation detected). Retrying with decreased time step.'])
+                end
+                
+                % Look for and delete all checkpoint files
+                cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
+                for idx = 1:length(cpt_check)
+                    CheckPoint_File = fullfile(WorkDir,cpt_check(idx).name);
+                    delete(CheckPoint_File)
+                end
+                
+                Settings.MDP.dt = Settings.MDP.dt/2;
+                Settings.Output_Coords = Settings.Output_Coords*2;
+                [feval,fderiv,User_data] = Melting_Point_Check(T,Settings);
+                return
+            elseif max_dev >= 1.5
+                if Settings.Verbose
+                    disp(['System volume exploded (' num2str(max_dev) ...
+                        ' max deviation detected). Aborting calculation.'])
+                end
+                
+                f = -1;
+                df = 0;
+                T_dat.Alt_Structure = true;
+                T_dat.T = T;
+                T_dat.T_Trace = [T_dat.T_Trace T];
+                T_dat.f_Trace = [T_dat.f_Trace f];
+                T_dat.df_Trace = [T_dat.df_Trace df];
+                T_dat.Freeze_Trace = [T_dat.Freeze_Trace false];
+                T_dat.Melt_Trace = [T_dat.Melt_Trace false];
+                while true
+                    try
+                        copyfile(Settings.CurrentTFile,Settings.PrevTFile)
+                        save(Settings.CurrentTFile,'T_dat')
+                        break
+                    catch
+                        pause(10)
+                    end
+                end
+                feval = -1; % function evaluation
+                fderiv = 0; % function derivative
+                User_data = T_dat; % user data
+                if Settings.Verbose
+                    disp('System blow up. This potential may be unusable!')
+                    disp('Aborting Melting Point calculation.')
+                end
+                return
+            else
+                delete(XZCheck_File)
+                delete(XZCheck_Log_File)
+            end
+            
             PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
                 pyargs('SystemName',Settings.JobName,...
                 'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
@@ -698,15 +830,12 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             end
         end
 
-        % Check the final frame of the simulation chunk
         if Settings.Verbose
             disp('Checking melting/freezing status...')
         end
         CheckStructureTimer = tic;
-        try
-            
+        try            
             % Check volume has not exploded
-            % Check volume fluctuations are not too large        
             XZCheck_File = fullfile(WorkDir,[Settings.JobName '_' num2str(ext_idx,'%03.f') '_VolCheck.xvg']);
             XZCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_' num2str(ext_idx,'%03.f') '_VolCheck.log']);
             XZCheck_command = [Settings.wsl 'echo "15 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
@@ -716,13 +845,12 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             XZCheck_Data = import_xvg(XZCheck_File);
             dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
             max_dev = max(abs(dev_from_init));
-
+            
             if max_dev >= 1.5 && Settings.MDP.dt/2 >= Settings.MinTimeStep
                 if Settings.Verbose
                     disp(['System volume exploded (' num2str(max_dev) ...
                         ' max deviation detected). Retrying with decreased time step.'])
                 end
-                Settings = Inp_Settings;
                 
                 % Look for and delete all checkpoint files
                 cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
@@ -767,8 +895,12 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                     disp('Aborting Melting Point calculation.')
                 end
                 return
+            else
+                delete(XZCheck_File)
+                delete(XZCheck_Log_File)
             end
             
+            % Check the final frame of the simulation chunk for phase change
             PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
                 pyargs('SystemName',Settings.JobName,...
                 'RefStructure',Settings.RefStructure,... % 'InitialRefFrac',Settings.Liquid_Fraction,...
