@@ -16,8 +16,6 @@ Settings.Diary_Loc='';
 [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.MLModelDir] = MD_Batch_Template(Settings.JobSettings);
 
 workdir = pwd;
-Output_Sol = cell(1,N_Reps);
-Output_Liq = cell(1,N_Reps);
 load(fullfile(workdir,'Reproducibility.mat'),'Output_Sol','Output_Liq');
 for idx = 206:N_Reps
     Settings.WorkDir = tempname(workdir);

@@ -1,5 +1,5 @@
-Energy_file = 'MSD_Liq.edr';
-system(['wsl source ~/.bashrc; echo 11 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
+Energy_file = 'Equil_System.edr';
+system(['wsl source ~/.bashrc; echo 15 18 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
 %     Data = import_xvg(En_xvg_file);
@@ -20,7 +20,7 @@ Data = import_xvg('energy.xvg');
 nmol_solid = 1372;
 
 hold on %figure
-plot(Data(:,1),Data(:,3)./Data(:,2),'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
+plot(Data(:,1),Data(:,3),'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
 plot(Data(:,1),Data(:,2),'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
 % std(Data(:,3)./Data(:,2))
 % range(Data(:,3)./Data(:,2))

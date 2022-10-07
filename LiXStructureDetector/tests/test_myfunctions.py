@@ -189,9 +189,9 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\Minimization\Equil_Liq\Test'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\check'
 Salt = 'LiF'
-SystemName = 'MSD_Liq'
+SystemName = 'Test_MP'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
