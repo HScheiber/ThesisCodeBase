@@ -17,9 +17,9 @@ for idx = 1:numel(Structures)
     Shared_Settings.Find_Min_Params = true;
     Shared_Settings.MinMDP.Parallel_Min = false;
     Shared_Settings.MinMDP.Verbose = true;
-    Shared_Settings.Output_Coords = 1; % Number of steps between outputting coordinates
-    Shared_Settings.Calc_Energies = 1; % Number of steps that elapse between calculating the energies.
-    Shared_Settings.Output_Energies = 1; % Number of steps that else between writing energies to energy file.
+    Shared_Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
+    Shared_Settings.Calc_Energies = 100; % Number of steps that elapse between calculating the energies.
+    Shared_Settings.Output_Energies = 100; % Number of steps that else between writing energies to energy file.
     
     Shared_Settings.Theory = 'JC'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Shared_Settings.Salt = 'LiI'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -66,7 +66,7 @@ for idx = 1:numel(Structures)
     Shared_Settings.SavePredictionsImage = true;
     Shared_Settings.ML_TimeLength = 0;
     Shared_Settings.ML_TimeStep = 0;
-    Shared_Settings.TimePerFrame = 0.001; % ps
+    Shared_Settings.TimePerFrame = 1; % ps
     Shared_Settings.SaveFeatures = false; % Save structure fraction vs time image when true for each temperature check
     Shared_Settings.SavePredictions = false; % Save structure fraction vs time image when true for each temperature check
 

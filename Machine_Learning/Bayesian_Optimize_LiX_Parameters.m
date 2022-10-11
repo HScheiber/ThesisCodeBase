@@ -826,7 +826,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 error('Unknown final optimization scheme. Choose one of "fminsearch", "patternsearch", "fminsearchbnd", or "none"')
         end
         
-        if ~Deterministic
+        if ~Deterministic && ~strcmpi(Model.final_opt_type,'none')
             try
                 dat = load(Intermediate_Fullopt_file).intermediate_data;
             catch
