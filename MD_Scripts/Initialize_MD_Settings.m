@@ -259,6 +259,8 @@ Settings.SavePredictions = false; % Save structure fraction vs time image when t
 Settings.ML_TimeLength = 21;
 Settings.ML_TimeStep = 5;
 Settings.TimePerFrame = 5; % ps
+Settings.Qlm_Average = true;
+Settings.Voronoi = false;
 
 
 % Default model modification parameters

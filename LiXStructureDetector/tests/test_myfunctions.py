@@ -189,9 +189,9 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\check'
-Salt = 'LiF'
-SystemName = 'Test_MP'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Molten_Salts_MD\LiI\Struc_Check_S_JC_NVT'
+Salt = 'LiI'
+SystemName = 'Struc_Check_S_JC_NVT'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
@@ -199,7 +199,7 @@ SavePredictions=False
 SavePredictionsImage=True
 ML_TimeLength=0
 ML_TimeStep=0
-TimePerFrame=1
+TimePerFrame=0.001
 FileType='gro'
 Verbose=True
 StartPoint = None
@@ -209,7 +209,7 @@ SaveDir = None
 InMemory = False
 Temporal_Cutoff = 0
 Voronoi = False
-Qlm_Average = True
+Qlm_Average = False
 Prob_Interfacial = None
 Spatial_Reassignment = False
 Spatial_Interfacial = None

@@ -769,9 +769,6 @@ if DoGeomEdit
             ac = num2str(Settings.Geometry.beta,'%10.4e');
             ab = num2str(Settings.Geometry.gamma,'%10.4e');
             
-            if isfile(Settings.SuperCellFile)
-                delete(Settings.SuperCellFile)
-            end
             Expand_command = [Settings.gmx_loc ' editconf -f ' windows2unix(Settings.SuperCellFile) ...
                  ' -o ' windows2unix(Settings.SuperCellFile) ' -box ' a_sc ' ' b_sc ' ' c_sc ...
                  ' -angles ' bc ' ' ac ' ' ab];

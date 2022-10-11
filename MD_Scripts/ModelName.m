@@ -40,6 +40,8 @@ function Model_Scaled = ModelName(Settings)
             continue
         elseif strcmp(current_scale{1},'N')
             continue
+        elseif strcmp(current_scale{1},'n')
+            continue
         else
         
             for current_interaction = fieldnames(Settings.S.(current_scale{1}))'

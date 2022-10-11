@@ -361,7 +361,6 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         end
         CheckStructureTimer = tic;
         try
-            
             % Check volume has not exploded
             XZCheck_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.xvg']);
             XZCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.log']);
@@ -373,27 +372,10 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
             max_dev = max(abs(dev_from_init));
             
-            if max_dev >= 1.5 && Settings.MDP.dt/2 >= Settings.MinTimeStep
+            if max_dev >= 1.5
                 if Settings.Verbose
                     disp(['System volume exploded (' num2str(max_dev) ...
-                        ' max deviation detected). Retrying with decreased time step.'])
-                end
-                
-                % Look for and delete all checkpoint files
-                cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
-                for idx = 1:length(cpt_check)
-                    CheckPoint_File = fullfile(WorkDir,cpt_check(idx).name);
-                    delete(CheckPoint_File)
-                end
-                
-                Settings.MDP.dt = Settings.MDP.dt/2;
-                Settings.Output_Coords = Settings.Output_Coords*2;
-                [feval,fderiv,User_data] = Melting_Point_Check(T,Settings);
-                return
-            elseif max_dev >= 1.5
-                if Settings.Verbose
-                    disp(['System volume exploded (' num2str(max_dev) ...
-                        ' max deviation detected). Aborting calculation.'])
+                        ' deviation in volume detected). Aborting calculation.'])
                 end
                 
                 f = -1;
@@ -693,27 +675,10 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
             max_dev = max(abs(dev_from_init));
             
-            if max_dev >= 1.5 && Settings.MDP.dt/2 >= Settings.MinTimeStep
+            if max_dev >= 1.5
                 if Settings.Verbose
                     disp(['System volume exploded (' num2str(max_dev) ...
-                        ' max deviation detected). Retrying with decreased time step.'])
-                end
-                
-                % Look for and delete all checkpoint files
-                cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
-                for idx = 1:length(cpt_check)
-                    CheckPoint_File = fullfile(WorkDir,cpt_check(idx).name);
-                    delete(CheckPoint_File)
-                end
-                
-                Settings.MDP.dt = Settings.MDP.dt/2;
-                Settings.Output_Coords = Settings.Output_Coords*2;
-                [feval,fderiv,User_data] = Melting_Point_Check(T,Settings);
-                return
-            elseif max_dev >= 1.5
-                if Settings.Verbose
-                    disp(['System volume exploded (' num2str(max_dev) ...
-                        ' max deviation detected). Aborting calculation.'])
+                        ' deviation in volume detected). Aborting calculation.'])
                 end
                 
                 f = -1;
@@ -846,27 +811,10 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
             max_dev = max(abs(dev_from_init));
             
-            if max_dev >= 1.5 && Settings.MDP.dt/2 >= Settings.MinTimeStep
+            if max_dev >= 1.5
                 if Settings.Verbose
                     disp(['System volume exploded (' num2str(max_dev) ...
-                        ' max deviation detected). Retrying with decreased time step.'])
-                end
-                
-                % Look for and delete all checkpoint files
-                cpt_check = dir(fullfile(WorkDir,[Settings.JobName '_*.cpt']));
-                for idx = 1:length(cpt_check)
-                    CheckPoint_File = fullfile(WorkDir,cpt_check(idx).name);
-                    delete(CheckPoint_File)
-                end
-                
-                Settings.MDP.dt = Settings.MDP.dt/2;
-                Settings.Output_Coords = Settings.Output_Coords*2;
-                [feval,fderiv,User_data] = Melting_Point_Check(T,Settings);
-                return
-            elseif max_dev >= 1.5
-                if Settings.Verbose
-                    disp(['System volume exploded (' num2str(max_dev) ...
-                        ' max deviation detected). Aborting calculation.'])
+                        ' deviation in volume detected). Aborting calculation.'])
                 end
                 
                 f = -1;
