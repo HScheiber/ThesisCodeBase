@@ -2,7 +2,7 @@
 % Calc_Liquid_Properties
 Settings = load('Calc_Settings.mat').Settings;
 
-N_Reps = 500;
+N_Reps = 1000;
 Settings.Verbose = true;
 Settings.JobSettings.Cores = 8;
 Settings.JobSettings.MPI_Ranks = 8;

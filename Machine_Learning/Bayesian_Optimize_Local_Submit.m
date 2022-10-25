@@ -156,7 +156,7 @@ idx = 0;
 Settings.Salt = 'LiBr';
 Settings.Theory = 'BF';
 Settings.InnerRange = false;
-Settings.Trial_ID = 'XX2';
+Settings.Trial_ID = 'XQ1';
 Settings.UseCoupledConstraint = false;
 
 % [T = 0] Loss options
