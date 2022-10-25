@@ -166,10 +166,8 @@ function params = bayesopt_params(Model)
             if Model.Additivity && Model.Additional_MM_Disp
                 params = [params,SDMM2];
             end
-        end
-        
+        end    
     case 'BF'
-        
         SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
         
         % sigma

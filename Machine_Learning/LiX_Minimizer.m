@@ -612,7 +612,7 @@ if Settings.CheckBadFcn
     % Check that the repulsive wall of the XX interaction is further out than the MM interaction
     if Settings.EnforceRR && Settings.SigmaEpsilon && Settings.Additivity
         switch Settings.Theory
-            case {'JC' 'Mie'}
+            case {'JC' 'Mie' 'BF'}
                 RR_Walls = Param.sigma_MM./Param.sigma_XX; % Ratio of M/X size, should be < 1
             case {'BH' 'BD' 'BE'}
                 RR_Walls = Param.r0_MM./Param.r0_XX; % Ratio of M/X size, should be < 1
