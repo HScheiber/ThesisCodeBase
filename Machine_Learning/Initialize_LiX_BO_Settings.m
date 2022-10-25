@@ -7,17 +7,21 @@ Settings.Trial_ID = ''; % Optional ID to add
 Settings.Salt = 'LiI';
 Settings.Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive'}; % 'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'
 Settings.Theory = 'JC'; % JC, TF
-Settings.Restart_Calculation = true; % restart the calculation from where it left off
+Settings.Continue_Calculation = true; % Continue the calculation from where it left off
 Settings.Fix_Charge = false; % When true, fixes coulombic charges at 1
 Settings.Additivity = false; % Only applies to JC model. When true, use combining rules
 Settings.Additional_MM_Disp = false; % When Additivity is activated with the JC model, tacks on an additional non-additive metal-metal interaction
 Settings.SigmaEpsilon = false; % For all models, recasts the search space in terms of sigma/epsilon rather than dispersion/repulsion
 Settings.InnerRange = false; % When SigmaEpislon is on, use this to set the TF/BH inner gamma range vs outer gamma range
 Settings.Additional_Function = Init_Additional_Function; % Adding additional function options
-Settings.Fix_Alpha = false; % Active for TF and BH models only when NOT using SigmaEpsilon form. When active, the value of exponential repulsion parameter, which is related to compressibility, is fixed to its default
+Settings.Fix_Alpha = false; % Active for TF and BH models only when NOT using SigmaEpsilon form. When active, the value of exponential repulsion parameter, which is related to compressibility, is fixed
 Settings.Fix_C8 = false; % Active for TF model only when NOT using SigmaEpsilon form. When active, the value of C8 is fixed by the value of C6, and is no longer a free parameter
 Settings.Fix_Mie_n = true; % When using the Mie model, this fixes the value of the Born exponent, when false the value is an optimizable parameter
 Settings.Diary_Loc = '';
+
+% This feature allows new calculations to start from the outputs of previous completed calculations
+% Note that the previous calculations must have the same targets, or at least cover all of the current targets
+Settings.Initialize_From_Model = {};
 
 % Charge
 Settings.Q_Range = [0.95 1.05]; % Default range for charge scaling. Only meaningful when Fix_Charge = false

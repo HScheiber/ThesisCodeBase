@@ -262,20 +262,20 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     %% Global optimization with bayesian optimization
     % Deal with restart requests
-    if Model.Restart_Calculation && (isfile(Intermediate_Fullopt_file) || isfile(Intermediate_Fullopt_backup))
+    if Model.Continue_Calculation && (isfile(Intermediate_Fullopt_file) || isfile(Intermediate_Fullopt_backup))
         run_bayesopt = false;
         continue_bayesopt = false;
         continue_fullopt = true;
-    elseif Model.Restart_Calculation && isfile(Results_filename)
+    elseif Model.Continue_Calculation && isfile(Results_filename)
         run_bayesopt = false;
         continue_bayesopt = false;
         continue_fullopt = false;
-    elseif Model.Restart_Calculation && (isfile(Intermediate_BO_file) || isfile(Intermediate_BO_backup))
+    elseif Model.Continue_Calculation && (isfile(Intermediate_BO_file) || isfile(Intermediate_BO_backup))
         run_bayesopt = true;
         continue_bayesopt = true;
         continue_fullopt = false;
     else
-        if Model.Restart_Calculation
+        if Model.Continue_Calculation
             disp('No checkpoint files found. Starting new calculation.');
         end
         run_bayesopt = true;
@@ -294,7 +294,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 results = res.results;
         end
 
-    elseif Model.Restart_Calculation && continue_bayesopt
+    elseif Model.Continue_Calculation && continue_bayesopt
         % If you want to resume:
         try
             dat = load(Intermediate_BO_file,'-mat');
