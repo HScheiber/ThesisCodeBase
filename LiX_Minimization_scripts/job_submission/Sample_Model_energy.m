@@ -203,70 +203,20 @@ if Table_Req
     % Define the combination rules (Lorenz-berthelot)
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##COMBR##','1');
 
-    % Define all the parameters as 1.0 (already included in potentials)
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',pad('1.0',10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',pad('1.0',10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',pad('1.0',10));
+    % Define all the repulsive parameters as 1.0 (already included in potentials)
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##','1.0');
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##','1.0');
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##','1.0');
     
-    % Generate tables of the TF/BH potential
-    if strcmp(Settings.Theory,'TF')
-        [TF_U_MX, TF_U_MM, TF_U_XX, d4fail] = TF_Potential_Generator(Settings,...
-            'MDP_Minimize',true);
-        
-        if ~d4fail
-            U_MX = TF_U_MX;
-            U_MM = TF_U_MM;
-            U_XX = TF_U_XX;
-        else
-            error('Unable to produce initial C6/C8 values due to D4 module failure')
-        end
-        
-    elseif strcmp(Settings.Theory,'BH')
-        [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,'MDP_Minimize',true);
-    elseif strcmp(Settings.Theory,'BD')
-        [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,'MDP_Minimize',true);
-    elseif strcmp(Settings.Theory,'BE')
-        [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,'MDP_Minimize',true);
-    elseif strcmp(Settings.Theory,'Mie')
-        [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,'MDP_Minimize',true);
-    elseif contains(Settings.Theory,'JC')
-        switch Settings.Theory
-            case 'JC'
-                Settings.WaterModel = 'SPC/E';
-            case 'JC3P'
-                Settings.WaterModel = 'TIP3P';
-            case 'JC4P'
-                Settings.WaterModel = 'TIP4PEW';
-            case 'JCSD'
-                Settings.WaterModel = 'SD';
-        end
-        [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,'MDP_Minimize',true);
-    elseif contains(Settings.Theory,'HS')
-        [U_MX, U_MM, U_XX] = HS_Potential_Generator(Settings,'MDP_Minimize',true);
-    else
-        error(['Warning: Unknown model type: "' Settings.Theory '.'])
-    end
-
+    % Generate tables
     TableName = [Settings.Salt '_' Model_Scaled '_Table'];
-    Settings.TableFile_MX = fullfile(Settings.WorkDir,[TableName '.xvg']);
-    Settings.TableFile_MM = fullfile(Settings.WorkDir,[TableName '_' Metal '_' Metal '.xvg']);
-    Settings.TableFile_XX = fullfile(Settings.WorkDir,[TableName '_' Halide '_' Halide '.xvg']);
-
-    % Save tables into current directory
-    fidMX = fopen(Settings.TableFile_MX,'wt');
-    fwrite(fidMX,regexprep(U_MX,{'\r', '\n\n+'}',{'', '\n'}));
-    fclose(fidMX);
-
-    fidMM = fopen(Settings.TableFile_MM,'wt');
-    fwrite(fidMM,regexprep(U_MM,{'\r', '\n\n+'}',{'', '\n'}));
-    fclose(fidMM);
-
-    fidXX = fopen(Settings.TableFile_XX,'wt');
-    fwrite(fidXX,regexprep(U_XX,{'\r', '\n\n+'}',{'', '\n'}));
-    fclose(fidXX);
+    [Settings.TableFile_MX,C6] = MakeTables(Settings,'MDP_Minimize',true,...
+    	'TableName',TableName);
+    
+    % Dispersion coefficients
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',num2str(C6.MM,'%.10e'));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',num2str(C6.XX,'%.10e'));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',num2str(C6.MX,'%.10e'));
 
     % Modify the MDP file
     Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWTYPE##',pad('user',18));
@@ -275,46 +225,6 @@ if Table_Req
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'ewald-rtol-lj.+?\n','');
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'lj-pme-comb-rule.+?\n','');
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'verlet-buffer-tolerance.+?\n','');
-    
-elseif contains(Settings.Theory,'BH')
-    
-    Settings.TableFile_MX = '';
-    
-    % Definte the function type as 2 (Buckingham)
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##NBFUNC##','2');
-    
-    % Define the combination rule as 1 (Buckingham only has 1 comb rule)
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##COMBR##','1');    
-    
-    % Get BH parameters (cross terms are pre-computed using my combining rules)
-    [BH_MX,BH_MM,BH_XX] = BH_Potential_Parameters(Settings);
-    
-    % Add parameters to topology text
-    % For BH potentials, parameter are B*exp(-alpha*r) + C/r^6
-    % Parameter order is B alpha C
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'ptype  C          A','ptype   a              b           c6');
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',[num2str(BH_MM.B,'%10.8e') ' ' num2str(BH_MM.alpha,'%10.8e')]);
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##',pad(num2str(BH_MM.C,'%10.8e'),10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',[num2str(BH_XX.B,'%10.8e') ' ' num2str(BH_XX.alpha,'%10.8e')]);
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##',pad(num2str(BH_XX.C,'%10.8e'),10));
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',[num2str(BH_MX.B,'%10.8e') ' ' num2str(BH_MX.alpha,'%10.8e')]);
-    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##',pad(num2str(BH_MX.C,'%10.8e'),10));
-    
-
-    % Modify the MDP file
-    Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWTYPE##',pad(Settings.MinMDP.VDWType,18));
-    Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWMOD##',pad(Settings.MinMDP.vdw_modifier,18));
-    Settings.MDP_Template = strrep(Settings.MDP_Template,'##CUTOFF##',pad(Settings.MinMDP.CutOffScheme,18));
-    Settings.MDP_Template = regexprep(Settings.MDP_Template,'energygrp-table.+?\n','');
-    Settings.MDP_Template = regexprep(Settings.MDP_Template,'ewald-rtol-lj.+?\n','');
-    Settings.MDP_Template = regexprep(Settings.MDP_Template,'lj-pme-comb-rule.+?\n','');
-    
-    % Add in Verlet Settings
-    if strcmp(Settings.MinMDP.CutOffScheme,'Verlet')
-        Settings.MDP_Template = strrep(Settings.MDP_Template,'##VerletBT##',pad(num2str(Settings.MinMDP.VerletBT),18));
-    else
-        Settings.MDP_Template = regexprep(Settings.MDP_Template,'verlet-buffer-tolerance.+?\n','');
-    end
     
 elseif contains(Settings.Theory,'JC')
     switch Settings.Theory
@@ -366,6 +276,12 @@ else
     error(['Warning: Unknown model type: "' Settings.Theory '.'])
 end
 
+if Settings.MDP.Disp_Correction
+    Settings.MDP_Template = [Settings.MDP_Template newline newline ...
+        '; Long-range dispersion correction' newline ...
+        'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
+end
+
 if Settings.MinMDP.Verbose
     TotalTimer = tic;
     display_option = 'iter';
@@ -388,7 +304,6 @@ end
 OptimizationLoop(Settings,'Extra_Properties',Extra_Properties)
 Output = GrabEnergy(Settings.WorkDir,FileBase,'Extra_Properties',Extra_Properties);
 Output.Coulomb = Output.CoulSR + Output.CoulLR;
-
 
 % Record output into object
 if Settings.Geometry.Conv

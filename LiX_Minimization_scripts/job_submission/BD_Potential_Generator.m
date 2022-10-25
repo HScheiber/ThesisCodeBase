@@ -1,4 +1,4 @@
-function [U_MX_out, U_MM_out, U_XX_out] = BD_Potential_Generator(Settings,varargin)
+function [U_MX_out, U_MM_out, U_XX_out,C6_out] = BD_Potential_Generator(Settings,varargin)
 
 % Optional inputs
 p = inputParser;
@@ -8,11 +8,13 @@ addOptional(p,'ReturnAsStructure',false);
 addOptional(p,'Startpoint',0);
 addOptional(p,'Plotswitch',false);
 addOptional(p,'MDP_Minimize',false);
+addOptional(p,'Include_Dispersion_Scale',true);
 parse(p,varargin{:});
 PlotType = p.Results.PlotType;
 ReturnAsStructure = p.Results.ReturnAsStructure;
 Startpoint = p.Results.Startpoint;
 Plotswitch = p.Results.Plotswitch;
+Incl_Disp = p.Results.Include_Dispersion_Scale;
 % Allowed plot types: 'full', 'lj', 'full-derivative', 'lj-derivative',
 % 'dispersion', 'dispersion-derivative', 'repulsive',
 % 'repulsive-derivative'
@@ -24,160 +26,68 @@ else
 end
 
 %% Conversion factors and fundamental constants
-kj_per_erg = 1e-10; % kJ per erg
 nm_per_m = 1e+9; % nm per m
 NA = 6.0221409e23; % Molecules per mole
 e_c = 1.60217662e-19; % Elementary charge in Coulombs
 epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
 k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
-nm_per_Ang = 0.1; % nm per Angstrom
-kJ_per_kcal = 4.184; % kj per kcal
 
 [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
 
-%% JC Ion sigma/epsilon Parameters in SPC/E water
-Param.Li.sigma = (0.791*nm_per_Ang)*(2^(5/6)); % nm
-Param.Li.epsilon = (0.3367344)*kJ_per_kcal; % kJ/mol
-
-Param.Na.sigma = (1.212*nm_per_Ang)*(2^(5/6)); % nm
-Param.Na.epsilon = (0.3526418)*kJ_per_kcal; % kJ/mol
-
-Param.K.sigma = (1.593*nm_per_Ang)*(2^(5/6)); % nm
-Param.K.epsilon = (0.4297054)*kJ_per_kcal; % kJ/mol
-
-Param.Rb.sigma = (1.737*nm_per_Ang)*(2^(5/6)); % nm
-Param.Rb.epsilon = (0.4451036)*kJ_per_kcal; % kJ/mol
-
-Param.Cs.sigma = (2.021*nm_per_Ang)*(2^(5/6)); % nm
-Param.Cs.epsilon = (0.0898565)*kJ_per_kcal; % kJ/mol
-
-Param.F.sigma = (2.257*nm_per_Ang)*(2^(5/6)); % nm
-Param.F.epsilon = (0.0074005)*kJ_per_kcal; % kJ/mol
-
-Param.Cl.sigma = (2.711*nm_per_Ang)*(2^(5/6)); % nm
-Param.Cl.epsilon = (0.0127850)*kJ_per_kcal; % kJ/mol
-
-Param.Br.sigma = (2.751*nm_per_Ang)*(2^(5/6)); % nm
-Param.Br.epsilon = (0.0269586)*kJ_per_kcal; % kJ/mol
-
-Param.I.sigma = (2.919*nm_per_Ang)*(2^(5/6)); % nm
-Param.I.epsilon = (0.0427845)*kJ_per_kcal; % kJ/mol
-
 %% Parameter: q (charge)
-q.Li =  Settings.S.Q; % atomic
-q.Na =  Settings.S.Q; % atomic
-q.K  =  Settings.S.Q; % atomic
-q.Rb =  Settings.S.Q; % atomic
-q.Cs =  Settings.S.Q; % atomic
+q.M =  Settings.S.Q; % atomic
+q.X = -Settings.S.Q; % atomic
 
-q.F  = -Settings.S.Q; % atomic
-q.Cl = -Settings.S.Q; % atomic
-q.Br = -Settings.S.Q; % atomic
-q.I  = -Settings.S.Q; % atomic
+%% Parameters of interest for vdW potential
+sigma.MX = Settings.S.S.MX; % (also called R0) nm
+sigma.MM = Settings.S.S.MM;
+sigma.XX = Settings.S.S.XX;
 
-%% TF Repulsive Size Parameter sigma (AKA r+/-): P = +   M = -
-% Metals
-sigma.Li = 0.816*nm_per_Ang; % nm
-sigma.Na = 1.170*nm_per_Ang; % nm
-sigma.K  = 1.463*nm_per_Ang; % nm
-sigma.Rb = 1.587*nm_per_Ang; % nm
-sigma.Cs = 1.720*nm_per_Ang; % nm
+gamma.MX = Settings.S.G.MX; % unitless
+gamma.MM = Settings.S.G.MM;
+gamma.XX = Settings.S.G.XX;
 
-% Halides
-sigma.F  = 1.179*nm_per_Ang; % nm
-sigma.Cl = 1.585*nm_per_Ang; % nm
-sigma.Br = 1.716*nm_per_Ang; % nm
-sigma.I  = 1.907*nm_per_Ang; % nm
+epsilon.MX = Settings.S.E.MX; % kJ/mol
+epsilon.MM = Settings.S.E.MM;
+epsilon.XX = Settings.S.E.XX;
 
-%% TF Parameter: Number of Valence electrons (for Pauling Coefficient Calculation)
-% Metals
-valence.Li = 2;
-valence.Na = 8;
-valence.K = 8;
-valence.Rb = 8;
-valence.Cs = 8;
+%% Convert to B*exp - C6/r^6 form
+B.MX = Settings.S.R.All*Settings.S.R.MX*(6*epsilon.MX/(gamma.MX - 6))*exp(gamma.MX);
+B.MM = Settings.S.R.All*Settings.S.R.MM*(6*epsilon.MM/(gamma.MM - 6))*exp(gamma.MM);
+B.XX = Settings.S.R.All*Settings.S.R.XX*(6*epsilon.XX/(gamma.XX - 6))*exp(gamma.XX);
 
-% Halides
-valence.F = 8;
-valence.Cl = 8;
-valence.Br = 8;
-valence.I = 8;
+C.MX = Settings.S.D.All*Settings.S.D.MX*(epsilon.MX*gamma.MX*(sigma.MX^6))/(gamma.MX - 6);
+C.MM = Settings.S.D.All*Settings.S.D.MM*(epsilon.MM*gamma.MM*(sigma.MM^6))/(gamma.MM - 6);
+C.XX = Settings.S.D.All*Settings.S.D.XX*(epsilon.XX*gamma.XX*(sigma.XX^6))/(gamma.XX - 6);
 
-%% TF Hardness Parameter Rho
-rho.LiF = 0.299*nm_per_Ang; % nm
-rho.LiCl = 0.342*nm_per_Ang; % nm
-rho.LiBr = 0.353*nm_per_Ang; % nm
-rho.LiI = 0.430*nm_per_Ang; % nm
-
-rho.NaF = 0.330*nm_per_Ang; % nm
-rho.NaCl = 0.317*nm_per_Ang; % nm
-rho.NaBr = 0.340*nm_per_Ang; % nm
-rho.NaI = 0.386*nm_per_Ang; % nm
-
-rho.KF = 0.338*nm_per_Ang; % nm
-rho.KCl = 0.337*nm_per_Ang; % nm
-rho.KBr = 0.335*nm_per_Ang; % nm
-rho.KI = 0.355*nm_per_Ang; % nm
-
-rho.RbF = 0.328*nm_per_Ang; % nm
-rho.RbCl = 0.318*nm_per_Ang; % nm
-rho.RbBr = 0.335*nm_per_Ang; % nm
-rho.RbI = 0.337*nm_per_Ang; % nm
-
-rho.CsF = 0.282*nm_per_Ang; % nm
-rho.CsCl = 0.272*nm_per_Ang; % nm THIS IS ESTIMATED
-rho.CsBr = 0.289*nm_per_Ang; % nm THIS IS ESTIMATED
-rho.CsI = 0.291*nm_per_Ang; % nm THIS IS ESTIMATED
-
-%% Huggins-Mayer potential parameter b (same for all salts)
-b = (0.338e-12)*kj_per_erg*NA; % kJ/mol
-
-%% Calculate Pauling Coefficients beta: MX = +-   MM = ++     XX = --
-beta.MM = 1 + 2/valence.(Metal);   % Unitless
-beta.XX = 1 - 2/valence.(Halide); % Unitless
-beta.MX = 1 + 1/valence.(Metal) - 1/valence.(Halide); % Unitless
-
-%% Calculate TF Repulsive Exponential Parameter alpha: MX = +-   MM = ++     XX = --
-alpha.MM = Settings.S.A.All*Settings.S.A.MM/rho.(Settings.Salt); % nm^-1
-alpha.MX = Settings.S.A.All*Settings.S.A.MX/rho.(Settings.Salt); % nm^-1
-alpha.XX = Settings.S.A.All*Settings.S.A.XX/rho.(Settings.Salt); % nm^-1
-
-%% Calculate TF Repulsive Scaling Parameter B: MX = +-   MM = ++     XX = -- (Including scaling)
-B.MM = Settings.S.R.All*Settings.S.R.MM*beta.MM*b*exp(2*sigma.(Metal)/rho.(Settings.Salt));
-B.XX = Settings.S.R.All*Settings.S.R.XX*beta.XX*b*exp(2*sigma.(Halide)/rho.(Settings.Salt));
-B.MX = Settings.S.R.All*Settings.S.R.MX*beta.MX*b*exp((sigma.(Metal) + sigma.(Halide))/rho.(Settings.Salt));
-
-%% Calculate parameters of interest for LJ potential
-sigma_MM = Param.(Metal).sigma;
-sigma_XX = Param.(Halide).sigma;
-
-epsilon_MM = Param.(Metal).epsilon;
-epsilon_XX = Param.(Halide).epsilon;
-
-% Change parameteters into C6/r6 format and apply mixing rules
-CMM_pre = 4*epsilon_MM*(sigma_MM^6);
-CXX_pre = 4*epsilon_XX*(sigma_XX^6);
-C.MM = Settings.S.D.All*Settings.S.D.MM*CMM_pre;
-C.XX = Settings.S.D.All*Settings.S.D.XX*CXX_pre;
-C.MX = Settings.S.D.All*Settings.S.D.MX*sqrt(CMM_pre*CXX_pre);
+alpha.MX = Settings.S.A.All*Settings.S.A.MX*gamma.MX/sigma.MX; % nm^(-1)
+alpha.MM = Settings.S.A.All*Settings.S.A.MM*gamma.MM/sigma.MM; % nm^(-1)
+alpha.XX = Settings.S.A.All*Settings.S.A.XX*gamma.XX/sigma.XX; % nm^(-1)
 
 %% Generate range (r) in nm
 r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 
-%% If Damping at close range, affects all attractive interactions
+%% Build PES
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
     
-    %% Build PES
+    % C6 values should be in terms on nm and kJ/mol
+    if Incl_Disp
+        C6 = C.(int);
+        C6_out.(int) = 1;
+    else
+        C6 = 1;
+        C6_out.(int) = C.(int);
+    end
     
     % Components of potential
     U.(int).f = 1./r; % Electrostatics function f(r)
-    U.(int).g = - C.(int)./(r.^6); % Dispersion g(r)
+    U.(int).g = - C6./(r.^6); % Dispersion g(r)
     U.(int).h = B.(int)*exp(-alpha.(int).*r); % Short range repulsion (with possible close-range coulomb damping)
     
     % Negative components of derivative
     U.(int).df = 1./(r.^2); % Electrostatics function (not including Coulomb constant or charges)
-    U.(int).dg = -C.(int).*6./(r.^7); % Dispersion -dg(r)/dr
+    U.(int).dg = -C6.*6./(r.^7); % Dispersion -dg(r)/dr
     U.(int).dh = alpha.(int)*B.(int)*exp(-alpha.(int).*r); % Short range repulsion
     
     % Shift the potential to zero at the cutoff
@@ -187,12 +97,12 @@ for interaction = {'MX' 'XX' 'MM'}
 
         % Shift by the dispersion energy at vdw cutoff radius. only affects one
         % energy component, not derivatives (i.e. forces)
-        U.(int).g = U.(int).g - EVDW_Cutoff;
+        U.(int).g = U.(int).g - EVDW_Cutoff./C6_out.(int);
     end
     
     %% Grab the inflection point of the potential
-    U_LJ = U.(int).g + U.(int).h;
-    dU_LJ = -U.(int).dg - U.(int).dh;
+    U_LJ = C6_out.(int).*U.(int).g + U.(int).h;
+    dU_LJ = -C6_out.(int).*U.(int).dg - U.(int).dh;
     
     peaks_idx = [false islocalmax(U_LJ(2:end),'MinProminence',1e-8)];
     peak_r = r(peaks_idx);
@@ -281,21 +191,21 @@ if ReturnAsStructure
     U.MM.df0 = U.MM.df;
     U.XX.df0 = U.XX.df;
     
-	U.MX.f = k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.f;
-    U.MM.f = k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.f;
-    U.XX.f = k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.f;
+	U.MX.f = k_0*(e_c^2).*q.M*q.X.*U.MX.f;
+    U.MM.f = k_0*(e_c^2).*q.M*q.M.*U.MM.f;
+    U.XX.f = k_0*(e_c^2).*q.X*q.X.*U.XX.f;
     
-	U.MX.df = k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.df;
-    U.MM.df = k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.df;
-    U.XX.df = k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.df;
+	U.MX.df = k_0*(e_c^2).*q.M*q.X.*U.MX.df;
+    U.MM.df = k_0*(e_c^2).*q.M*q.M.*U.MM.df;
+    U.XX.df = k_0*(e_c^2).*q.X*q.X.*U.XX.df;
     
-    U.MX.Total = U.MX.f + U.MX.g + U.MX.h;
-    U.MM.Total = U.MM.f + U.MM.g + U.MM.h;
-    U.XX.Total = U.XX.f + U.XX.g + U.XX.h;
+    U.MX.Total = U.MX.f + C6_out.MX.*U.MX.g + U.MX.h;
+    U.MM.Total = U.MM.f + C6_out.MM.*U.MM.g + U.MM.h;
+    U.XX.Total = U.XX.f + C6_out.XX.*U.XX.g + U.XX.h;
     
-    U.MX.dTotal = -(U.MX.df + U.MX.dg + U.MX.dh);
-    U.MM.dTotal = -(U.MM.df + U.MM.dg + U.MM.dh);
-    U.XX.dTotal = -(U.XX.df + U.XX.dg + U.XX.dh);
+    U.MX.dTotal = -(U.MX.df + C6_out.MX.*U.MX.dg + U.MX.dh);
+    U.MM.dTotal = -(U.MM.df + C6_out.MM.*U.MM.dg + U.MM.dh);
+    U.XX.dTotal = -(U.XX.df + C6_out.XX.*U.XX.dg + U.XX.dh);
     
     U_MX_out = U.MX;
     U_MM_out = U.MM;
@@ -321,15 +231,15 @@ if Plotswitch
     hold on
     switch lower(PlotType)
         case 'full'
-            h{1} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.f + U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.f + U.MM.g + U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.f + U.XX.g + U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(r.*10,k_0*(e_c^2).*q.M*q.X.*U.MX.f + U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(r.*10,k_0*(e_c^2).*q.M*q.M.*U.MM.f + U.MM.g + U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.f + U.XX.g + U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-600 1000];
             ttxt = 'Full Potential';
         case 'full-derivative'
-            h{1} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.df + U.MX.dg + U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.df + U.MM.dg + U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.df + U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(r.*10,k_0*(e_c^2).*q.M*q.X.*U.MX.df + U.MX.dg + U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(r.*10,k_0*(e_c^2).*q.M*q.M.*U.MM.df + U.MM.dg + U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.df + U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-600 1000];
             ttxt = 'Derivative of Full Potential';
         case 'lj'

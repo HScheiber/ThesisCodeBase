@@ -11,7 +11,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
 
-include_interfacial = True
+include_interfacial = False
 scatter = True
 
 labels = ["Liquid","Rocksalt","Wurtzite","5-5","NiAs","Sphalerite","$\\beta$-BeO","AntiNiAs","CsCl","Interfacial"]
@@ -54,9 +54,11 @@ for idx,y_dat in enumerate(y[:]):
         
 plt.axis('off')
 if scatter:
-    plt.legend(loc=10,bbox_to_anchor=(0.,0.,0.5,1.),ncol=1,markerscale=2,fancybox=False,
-                shadow=False,framealpha=1,edgecolor='0.75',mode="expand",
-                columnspacing=1.0,handletextpad=0)
+#    plt.legend(loc=10,bbox_to_anchor=(0.,0.,0.5,1.),ncol=5,markerscale=2,fancybox=False,
+#                shadow=False,framealpha=1,edgecolor='0.75',mode="expand",
+#                columnspacing=1.0,handletextpad=0)
+    plt.legend(loc=10,bbox_to_anchor=(0.,0.,0.5,1.),ncol=5,markerscale=3,fancybox=True,
+                shadow=False,framealpha=1,edgecolor='1')
 else:
     plt.legend(ncol=5,markerscale=1,fancybox=True,
                 shadow=False,framealpha=1,edgecolor='0.75',mode="expand")

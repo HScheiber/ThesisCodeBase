@@ -506,12 +506,13 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                     # Construct the neighbour filter and build
                     query_args = dict(mode='nearest', num_neighbors=N_neighbour, exclude_ii=True)
                     nlist = freud.locality.AABBQuery(box_data, point_data).query(point_data, query_args).toNeighborList()
-                
+                    
                 if Save_Neighbour and (Neighbour_idx+1 == len(N_neighbour_list)):
                     Neighbourlist_slice[t_idx] = nlist
                     if t_idx == central_idx:
                         Neighbourlist_list.append(nlist)
                 
+                ttime1 = time.time()
                 for L in L_list[Neighbour_idx]:
                     ql = freud.order.Steinhardt(L,wl=Include_Wl,
                                                 wl_normalize=True,

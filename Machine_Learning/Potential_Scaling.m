@@ -23,7 +23,6 @@ end
 % Potential Scaling
 switch Settings.Theory
 case 'TF'
-
     % Loose form of exp-C6-C8 model
     if Settings.SigmaEpsilon
 
@@ -172,7 +171,6 @@ case 'TF'
             Settings.S.Q = Param.SQ;
         end
     end
-
 case {'BH' 'BD' 'BE'}
 
     % Loose form of exp-C6 model
@@ -283,9 +281,7 @@ case {'BH' 'BD' 'BE'}
             Settings.S.Q = Param.SQ;
         end
     end
-
 case 'JC'
-
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
     if Settings.SigmaEpsilon
         PotSettings = Initialize_MD_Settings;
@@ -375,48 +371,68 @@ case 'JC'
     else
         Settings.S.Q = Param.SQ;
     end
+case 'BF'
+    % Input parameters
+    Settings.S.S.MM = Param.sigma_MM; % nm
+    Settings.S.S.XX = Param.sigma_XX; % nm
+    
+    Settings.S.E.MM = Param.epsilon_MM; % kJ/mol
+    Settings.S.E.XX = Param.epsilon_XX; % kJ/mol
+    
+    Settings.S.G.MX = Param.gamma_MX; % Unitless
+    
+    if Settings.Additivity
+        Settings.S.S.MX = (Settings.S.S.MM + Settings.S.S.XX)./2; % nm
+        Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX); % kJ/mol
+        Settings.S.G.MM = Settings.S.G.MX; % Unitless
+        Settings.S.G.XX = Settings.S.G.MX; % Unitless
+    else
+        Settings.S.S.MX = Param.sigma_MX; % nm
+        Settings.S.E.MX = Param.epsilon_MX; % kJ/mol
+        Settings.S.G.MM = Param.gamma_MM; % Unitless
+        Settings.S.G.XX = Param.gamma_XX; % Unitless
+    end
+    
+    % Scaling Coulombic Charge
+    if Settings.Fix_Charge
+        Settings.S.Q = Settings.Q_value;
+    else
+        Settings.S.Q = Param.SQ;
+    end
 case 'Mie'
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
     if Settings.SigmaEpsilon
-        PotSettings = Initialize_MD_Settings;
-        PotSettings.Salt = Settings.Salt;
-        [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(PotSettings);
-        
         % Sigma scaling
-        Settings.S.S.MM = Param.sigma_MM./JC_MM.sigma;
-        Settings.S.S.XX = Param.sigma_XX./JC_XX.sigma;
+        Settings.S.S.MM = Param.sigma_MM;
+        Settings.S.S.XX = Param.sigma_XX;
         
         % Epsilon scaling
-        Settings.S.E.MM = Param.epsilon_MM./JC_MM.epsilon;
-        Settings.S.E.XX = Param.epsilon_XX./JC_XX.epsilon;
-        
-        Settings.S.n.MX = Param.n_MX;
-        
-        % Default MX params
-        def_S_MX = JC_MX.sigma;
-        def_E_MX = JC_MX.epsilon;
+        Settings.S.E.MM = Param.epsilon_MM;
+        Settings.S.E.XX = Param.epsilon_XX;
         
         if Settings.Additivity
             
-            Settings.S.n.MM = Param.n_MX;
-            Settings.S.n.XX = Param.n_MX;
+            if ~Settings.Fix_Mie_n
+                Settings.S.n.MX = Param.n_MX;
+                Settings.S.n.MM = Param.n_MX;
+                Settings.S.n.XX = Param.n_MX;
+            end
             
-            Sigma_MX = (Param.sigma_MM + Param.sigma_XX)./2;
-            Epsilon_MX = sqrt(Param.epsilon_MM.*Param.epsilon_XX);
-            
-            Settings.S.S.MX = Sigma_MX./def_S_MX;
-            Settings.S.E.MX = Epsilon_MX./def_E_MX;
+            Settings.S.S.MX = (Param.sigma_MM + Param.sigma_XX)./2;
+            Settings.S.E.MX = sqrt(Param.epsilon_MM.*Param.epsilon_XX);
             
             if Settings.Additional_MM_Disp
-                Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
-                Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
+                Settings.S.E.MM = Param.epsilon_MM + Param.epsilon_MM2;
             end
         else
-            Settings.S.S.MX = Param.sigma_MX./def_S_MX;
-            Settings.S.E.MX = Param.epsilon_MX./def_E_MX;
+            Settings.S.S.MX = Param.sigma_MX;
+            Settings.S.E.MX = Param.epsilon_MX;
             
-            Settings.S.n.MM = Param.n_MM;
-            Settings.S.n.XX = Param.n_XX;
+            if ~Settings.Fix_Mie_n
+                Settings.S.n.MX = Param.n_MX;
+                Settings.S.n.MM = Param.n_MM;
+                Settings.S.n.XX = Param.n_XX;
+            end
         end
         
     % Scaled dispersion/repulsion form

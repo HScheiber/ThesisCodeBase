@@ -1,4 +1,4 @@
-function [U_MX_out, U_MM_out, U_XX_out] = Mie_Potential_Generator(Settings,varargin)
+function [U_MX_out, U_MM_out, U_XX_out,C6_out] = Mie_Potential_Generator(Settings,varargin)
 
 % Optional inputs
 p = inputParser;
@@ -8,11 +8,13 @@ addOptional(p,'ReturnAsStructure',false);
 addOptional(p,'Startpoint',0);
 addOptional(p,'Plotswitch',false);
 addOptional(p,'MDP_Minimize',false);
+addOptional(p,'Include_Dispersion_Scale',true);
 parse(p,varargin{:});
 PlotType = p.Results.PlotType;
 ReturnAsStructure = p.Results.ReturnAsStructure;
 Startpoint = p.Results.Startpoint;
 Plotswitch = p.Results.Plotswitch;
+Incl_Disp = p.Results.Include_Dispersion_Scale;
 % Allowed plot types: 'full', 'lj', 'full-derivative', 'lj-derivative',
 % 'dispersion', 'dispersion-derivative', 'repulsive',
 % 'repulsive-derivative'
@@ -29,38 +31,8 @@ NA = 6.0221409e23; % Molecules per mole
 e_c = 1.60217662e-19; % Elementary charge in Coulombs
 epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
 k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
-nm_per_Ang = 0.1; % nm per Angstrom
-kJ_per_kcal = 4.184; % kj per kcal
 
 [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
-
-%% JC Ion Parameters in SPC/E water
-Param.Li.sigma = (0.791*nm_per_Ang)*(2^(5/6)); % nm
-Param.Li.epsilon = (0.3367344)*kJ_per_kcal; % kJ/mol
-
-Param.Na.sigma = (1.212*nm_per_Ang)*(2^(5/6)); % nm
-Param.Na.epsilon = (0.3526418)*kJ_per_kcal; % kJ/mol
-
-Param.K.sigma = (1.593*nm_per_Ang)*(2^(5/6)); % nm
-Param.K.epsilon = (0.4297054)*kJ_per_kcal; % kJ/mol
-
-Param.Rb.sigma = (1.737*nm_per_Ang)*(2^(5/6)); % nm
-Param.Rb.epsilon = (0.4451036)*kJ_per_kcal; % kJ/mol
-
-Param.Cs.sigma = (2.021*nm_per_Ang)*(2^(5/6)); % nm
-Param.Cs.epsilon = (0.0898565)*kJ_per_kcal; % kJ/mol
-
-Param.F.sigma = (2.257*nm_per_Ang)*(2^(5/6)); % nm
-Param.F.epsilon = (0.0074005)*kJ_per_kcal; % kJ/mol
-
-Param.Cl.sigma = (2.711*nm_per_Ang)*(2^(5/6)); % nm
-Param.Cl.epsilon = (0.0127850)*kJ_per_kcal; % kJ/mol
-
-Param.Br.sigma = (2.751*nm_per_Ang)*(2^(5/6)); % nm
-Param.Br.epsilon = (0.0269586)*kJ_per_kcal; % kJ/mol
-
-Param.I.sigma = (2.919*nm_per_Ang)*(2^(5/6)); % nm
-Param.I.epsilon = (0.0427845)*kJ_per_kcal; % kJ/mol
 
 %% Parameter: q (charge)
 q.Li =  Settings.S.Q; % atomic
@@ -85,13 +57,13 @@ P_XX = (n.XX/(n.XX - 6))*((n.XX/6)^(6/(n.XX - 6)));
 P_MX = (n.MX/(n.MX - 6))*((n.MX/6)^(6/(n.MX - 6)));
 
 %% Calculate parameters of interest for Mie potential
-sigma_MM = Settings.S.S.All*Settings.S.S.MM*Param.(Metal).sigma;
-sigma_XX = Settings.S.S.All*Settings.S.S.XX*Param.(Halide).sigma;
-sigma_MX = Settings.S.S.All*Settings.S.S.MX*( Param.(Metal).sigma + Param.(Halide).sigma )/2;
+sigma_MM = Settings.S.S.All*Settings.S.S.MM;
+sigma_XX = Settings.S.S.All*Settings.S.S.XX;
+sigma_MX = Settings.S.S.All*Settings.S.S.MX;
 
-epsilon_MM = Settings.S.E.All*Settings.S.E.MM*Param.(Metal).epsilon;
-epsilon_XX = Settings.S.E.All*Settings.S.E.XX*Param.(Halide).epsilon;
-epsilon_MX = Settings.S.E.All*Settings.S.E.MX*sqrt(Param.(Metal).epsilon*Param.(Halide).epsilon);
+epsilon_MM = Settings.S.E.All*Settings.S.E.MM;
+epsilon_XX = Settings.S.E.All*Settings.S.E.XX;
+epsilon_MX = Settings.S.E.All*Settings.S.E.MX;
 
 % Change parameteters into A/r12 - C/r6 format
 A.MM = Settings.S.R.All*Settings.S.R.MM*P_MM*epsilon_MM*(sigma_MM^n.MM);
@@ -110,14 +82,23 @@ r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
     
+    % C6 values should be in terms on nm and kJ/mol
+    if Incl_Disp
+        C6 = C.(int);
+        C6_out.(int) = 1;
+    else
+        C6 = 1;
+        C6_out.(int) = C.(int);
+    end
+    
     % Components of potential
     U.(int).f = 1./r; % Electrostatics function f(r)
-    U.(int).g = -C.(int)./(r.^6); % Dispersion g(r)
+    U.(int).g = -C6./(r.^6); % Dispersion g(r)
     U.(int).h =  A.(int)./(r.^n.(int)); % Short range repulsion h(r) (with possible close-range coulomb damping)
     
     % Negative components of derivative
     U.(int).df = 1./(r.^2); % Electrostatics function (not including Coulomb constant or charges)
-    U.(int).dg = - C.(int).*6./(r.^7); % Dispersion -dg(r)/dr
+    U.(int).dg = - C6.*6./(r.^7); % Dispersion -dg(r)/dr
     U.(int).dh =   A.(int).*n.(int)./(r.^(n.(int)+1)); % Short range repulsion
     
     % Shift the potential to zero at the cutoff
@@ -127,7 +108,7 @@ for interaction = {'MX' 'XX' 'MM'}
 
         % Shift by the dispersion energy at vdw cutoff radius. Only affects one
         % energy component, not derivatives (i.e. forces)
-        U.(int).g = U.(int).g - EVDW_Cutoff;
+        U.(int).g = U.(int).g - EVDW_Cutoff./C6_out.(int);
     end
     
     % remove infinities
@@ -155,13 +136,13 @@ if ReturnAsStructure
     U.MM.df = k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.df;
     U.XX.df = k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.df;
     
-    U.MX.Total = U.MX.f + U.MX.g + U.MX.h;
-    U.MM.Total = U.MM.f + U.MM.g + U.MM.h;
-    U.XX.Total = U.XX.f + U.XX.g + U.XX.h;
+    U.MX.Total = U.MX.f + C6_out.MX.*U.MX.g + U.MX.h;
+    U.MM.Total = U.MM.f + C6_out.MM.*U.MM.g + U.MM.h;
+    U.XX.Total = U.XX.f + C6_out.XX.*U.XX.g + U.XX.h;
     
-    U.MX.dTotal = -(U.MX.df + U.MX.dg + U.MX.dh);
-    U.MM.dTotal = -(U.MM.df + U.MM.dg + U.MM.dh);
-    U.XX.dTotal = -(U.XX.df + U.XX.dg + U.XX.dh);
+    U.MX.dTotal = -(U.MX.df + C6_out.MX.*U.MX.dg + U.MX.dh);
+    U.MM.dTotal = -(U.MM.df + C6_out.MM.*U.MM.dg + U.MM.dh);
+    U.XX.dTotal = -(U.XX.df + C6_out.XX.*U.XX.dg + U.XX.dh);
     
     U_MX_out = U.MX;
     U_MM_out = U.MM;

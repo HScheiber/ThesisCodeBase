@@ -1,10 +1,10 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'LB';
+Theory = 'JC';
+ModelID = 'MG';
 BestOnly = false;
-SelectOnly = [4 2 1 4];
+SelectOnly = [];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures';
@@ -235,11 +235,15 @@ if N_MinPlot_Rows
                 
                 Minimization_Data = data.Minimization_Data;
                 
-                optimvals = nan(1,length(data.secondary_result));
-                for jdx = 1:length(data.secondary_result)
-                    optimvals(jdx) = [data.secondary_result(jdx).optimValues.fval];
+                if isfield(data,'secondary_result')
+                    optimvals = nan(1,length(data.secondary_result));
+                    for jdx = 1:length(data.secondary_result)
+                        optimvals(jdx) = [data.secondary_result(jdx).optimValues.fval];
+                    end
+                    Total_loss(idx,iidx) = min(optimvals);
+                else
+                    Total_loss(idx,iidx) = data.bayesopt_results.MinObjective;
                 end
-                Total_loss(idx,iidx) = min(optimvals);
             catch
                 disp(['Could not obtain crystal minimization data for: ' Salt ', ' Theory ', Model ' Model '.']);
                 continue

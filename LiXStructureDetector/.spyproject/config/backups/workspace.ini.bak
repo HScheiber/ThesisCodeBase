@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = empty-project-type
-recent_files = ['tests\\Temporal_Clustering_Test.py', '..\\..\\Machine_Learning_Structure_Finder\\LiX_Structure_Selector_Optimization\\Visualize_Models.py', 'tests\\test_myfunctions.py', 'LiXStructureDetector\\Calculate_Liquid_Fraction.py', 'LiXStructureDetector\\Check_Structures.py']
+recent_files = ['tests\\Temporal_Clustering_Test.py', '..\\..\\Machine_Learning_Structure_Finder\\LiX_Structure_Selector_Optimization\\Visualize_Models.py', 'tests\\test_myfunctions.py', 'LiXStructureDetector\\Calculate_Liquid_Fraction.py', 'LiXStructureDetector\\Check_Structures.py', 'tests\\Gen_Legend.py']
 
 [main]
 version = 0.2.0

@@ -110,7 +110,6 @@ Settings.MDP.continuation = 'no'; % Yes = do not apply constraints to the start 
 Settings.MDP.Num_Groups = 1;
 Settings.MDP.vdw_modifier = 'Potential-shift'; % Potential-shift-Verlet, Potential-shift, None, Force-switch, Potential-switch
 Settings.MDP.Disp_Correction = true; % Adds in a long-range dispersion correction when true
-Settings.MDP.Disp_Correction_Tables = false; % ONLY TURN THIS ON FOR DEBUGGING, can be used to enable disp correction for tables
 Settings.Table_Length = 4.01; % How far should tabulated potentials extend in nm
 Settings.CoordType = 'gro'; % Either pdb, gro, or g96 (use g96 for extra precision)
 

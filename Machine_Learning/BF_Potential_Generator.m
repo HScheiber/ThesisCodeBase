@@ -1,9 +1,9 @@
-function [U_MX_out, U_MM_out, U_XX_out,C6_out] = BE_Potential_Generator(Settings,varargin)
+function [U_MX_out, U_MM_out, U_XX_out,C6_out] = BF_Potential_Generator(Settings,varargin)
 
 % Optional inputs
 p = inputParser;
-p.FunctionName = 'BE_Potential_Generator';
-addOptional(p,'PlotType','full')
+p.FunctionName = 'BF_Potential_Generator';
+addOptional(p,'PlotType','full');
 addOptional(p,'ReturnAsStructure',false);
 addOptional(p,'Startpoint',0);
 addOptional(p,'Plotswitch',false);
@@ -36,158 +36,67 @@ k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
 
 %% Parameter: q (charge)
 q.M =  Settings.S.Q; % atomic
-q.X = -Settings.S.Q; % atomic
+q.X  = -Settings.S.Q; % atomic
 
 %% Parameters of interest for vdW potential
-sigma.MX = Settings.S.S.MX; % (also called R0) nm
+sigma.MX = Settings.S.S.MX; % nm
 sigma.MM = Settings.S.S.MM;
 sigma.XX = Settings.S.S.XX;
-
-gamma.MX = Settings.S.G.MX; % unitless
-gamma.MM = Settings.S.G.MM;
-gamma.XX = Settings.S.G.XX;
 
 epsilon.MX = Settings.S.E.MX; % kJ/mol
 epsilon.MM = Settings.S.E.MM;
 epsilon.XX = Settings.S.E.XX;
 
-%% Convert to B*exp - C6/r^6 form
-B.MX = Settings.S.R.All*Settings.S.R.MX*(6*epsilon.MX/(gamma.MX - 6))*exp(gamma.MX);
-B.MM = Settings.S.R.All*Settings.S.R.MM*(6*epsilon.MM/(gamma.MM - 6))*exp(gamma.MM);
-B.XX = Settings.S.R.All*Settings.S.R.XX*(6*epsilon.XX/(gamma.XX - 6))*exp(gamma.XX);
-
-C.MX = Settings.S.D.All*Settings.S.D.MX*(epsilon.MX*gamma.MX*(sigma.MX^6))/(gamma.MX - 6);
-C.MM = Settings.S.D.All*Settings.S.D.MM*(epsilon.MM*gamma.MM*(sigma.MM^6))/(gamma.MM - 6);
-C.XX = Settings.S.D.All*Settings.S.D.XX*(epsilon.XX*gamma.XX*(sigma.XX^6))/(gamma.XX - 6);
-
-alpha.MX = Settings.S.A.All*Settings.S.A.MX*gamma.MX/sigma.MX; % nm^(-1)
-alpha.MM = Settings.S.A.All*Settings.S.A.MM*gamma.MM/sigma.MM; % nm^(-1)
-alpha.XX = Settings.S.A.All*Settings.S.A.XX*gamma.XX/sigma.XX; % nm^(-1)
+gamma.MX = Settings.S.G.MX; % unitless
+gamma.MM = Settings.S.G.MM;
+gamma.XX = Settings.S.G.XX;
 
 %% Generate range (r) in nm
 r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 
-%% Build Potential energy curve
+%% If Damping at close range, affects all attractive interactions
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
-    if strcmp(int,'MM')
-        Y1 = Metal;
-        Y2 = Metal;
-    elseif strcmp(int,'XX')
-        Y1 = Halide;
-        Y2 = Halide;
-    elseif strcmp(int,'MX')
-        Y1 = Metal;
-        Y2 = Halide;
-    end
     
-    %% Build PES
+    Kappa = 2*epsilon.(int)/(1 - (3/(gamma.(int) + 3)));
+    Beta = Kappa*(3/(gamma.(int) + 3));
+    D = (sigma.(int)^6)./((sigma.(int)^6) + (r.^6));
+    dD = (6*(sigma.(int)^6).*(r.^5))./(((sigma.(int)^6) + (r.^6)).^2);
+    
     % C6 values should be in terms on nm and kJ/mol
     if Incl_Disp
-        C6 = C.(int);
+        C6 = Kappa*(sigma.(int)^6);
         C6_out.(int) = 1;
     else
         C6 = 1;
-        C6_out.(int) = C.(int);
+        C6_out.(int) = Kappa*(sigma.(int)^6);
     end
+    
+    %% Build PES
     
     % Components of potential
     U.(int).f = 1./r; % Electrostatics function f(r)
-    U.(int).g = - C6./(r.^6); % Dispersion g(r)
-    U.(int).h = B.(int)*exp(-alpha.(int).*r); % Short range repulsion (with possible close-range coulomb damping)
+    U.(int).g = - C6./(sigma.(int)^6 + r.^6); % Dispersion g(r)
+    U.(int).h = Beta.*D.*exp(gamma.(int).*(1 - (r./sigma.(int)))); % Short range repulsion (with possible close-range coulomb damping)
     
     % Negative components of derivative
     U.(int).df = 1./(r.^2); % Electrostatics function (not including Coulomb constant or charges)
-    U.(int).dg = -C6.*6./(r.^7); % Dispersion -dg(r)/dr
-    U.(int).dh = alpha.(int)*B.(int)*exp(-alpha.(int).*r); % Short range repulsion
+    U.(int).dg = (-C6.*6.*(r.^5))./((sigma.(int)^6 + r.^6).^2); % Dispersion -dg(r)/dr
+    U.(int).dh = Beta.*dD.*exp(gamma.(int).*(1 - (r./sigma.(int)))) ...
+               + Beta.*D.*(gamma.(int)./sigma.(int)).*exp(gamma.(int).*(1 - (r./sigma.(int)))); % Short range repulsion
     
     % Shift the potential to zero at the cutoff
     if contains(Settings.(MDP).vdw_modifier,'potential-shift','IgnoreCase',true)
-        EVDW_Cutoff = B.(int)*exp(-alpha.(int)*Settings.(MDP).RVDW_Cutoff) ...
-                      -C.(int)./(Settings.(MDP).RVDW_Cutoff.^6);
+        D_VDW = (sigma.(int)^6)./((sigma.(int)^6) + (Settings.(MDP).RVDW_Cutoff.^6));
+        C6_VDW = Kappa*(sigma.(int)^6);
+        EVDW_Cutoff = Beta.*D_VDW.*exp(gamma.(int).*(1 - (Settings.(MDP).RVDW_Cutoff./sigma.(int)))) ...
+                    - C6_VDW./(sigma.(int)^6 + Settings.(MDP).RVDW_Cutoff.^6);
 
         % Shift by the dispersion energy at vdw cutoff radius. only affects one
         % energy component, not derivatives (i.e. forces)
         U.(int).g = U.(int).g - EVDW_Cutoff./C6_out.(int);
     end
     
-    %% Grab the inflection point of the potential
-    U_Total  =  k_0*(e_c^2).*q.(Y1)*q.(Y2).*U.(int).f  + C6_out.(int).*U.(int).g  + U.(int).h; % Full potential
-    U_Coul   =  k_0*(e_c^2).*q.(Y1)*q.(Y2).*U.(int).f; % Coulomb potential
-    dU_Total = -k_0*(e_c^2).*q.(Y1)*q.(Y2).*U.(int).df - C6_out.(int).*U.(int).dg - U.(int).dh; % Full potential derivative
-    dU_Coulomb = -k_0*(e_c^2).*q.(Y1)*q.(Y2).*U.(int).df;
-    
-    peaks_idx = [false islocalmax(U_Total(2:end),'MinProminence',1e-8)];
-    peak_r = r(peaks_idx);
-    if numel(peak_r) > 1
-        peak_r = peak_r(1);
-    end
-    
-    inflex_idx = find([false islocalmax(dU_Total(2:end),'MinProminence',1e-8) | islocalmin(dU_Total(2:end),'MinProminence',1e-8)]);
-    if ~isempty(peak_r) && ~isempty(inflex_idx) % Ensure peak exists
-        inflex_idx(r(inflex_idx) <= peak_r) = [];
-        if ~isempty(inflex_idx)
-            inflex_idx = inflex_idx(1);
-            inflex_r = r(inflex_idx);
-            dU_infl = dU_Total(inflex_idx);
-
-            % Generate a steep repulsion beyond the inflection
-            below_infl_idx = (r < inflex_r); % values of r below the inflection point
-            r_g = r(below_infl_idx); % nm
-            D = -dU_infl*(1/alpha.(int))*exp(alpha.(int)*inflex_r); % Wall prefactor chosen to match the total derivative at the inflection point
-
-            fwall = D.*exp(-alpha.(int).*r_g) - D.*exp(-alpha.(int).*inflex_r) ...
-                + U_Total(inflex_idx) - U_Coul(below_infl_idx); % Repulsive wall shifted to its value at the inflection point
-            dfwall = alpha.(int)*D.*exp(-alpha.(int).*r_g) + dU_Coulomb(below_infl_idx); % Wall -derivative
-
-            % Kill the attractive interaction beyond the peak
-            %g_at_infl = U_LJ(inflex_idx);
-            N_belowpeak = inflex_idx-1;
-            U.(int).g(below_infl_idx) = zeros(1,N_belowpeak);
-            U.(int).dg(below_infl_idx) = zeros(1,N_belowpeak);
-
-            % Remove infinity at 0
-            fwall(1) = fwall(2)*2;
-            dfwall(1) = dfwall(2);
-
-            % Add this repulsion to the repulsive part of the function
-            U.(int).h(below_infl_idx) = fwall;
-            U.(int).dh(below_infl_idx) = dfwall;
-        end
-    end
-        
-%         %% Visualization
-%         nm_per_m = 1e+9; % nm per m
-%         NA = 6.0221409e23; % Molecules per mole
-%         e_c = 1.60217662e-19; % Elementary charge in Coulombs
-%         epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
-%         k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
-%         
-%         if idx == 1
-%             U.Total = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-%         else
-%             U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-%         end
-%         hold on
-%         plot(U.r(2:end).*10,U.Total(2:end),'-k','Linewidth',3)
-%         scatter(inflex_r.*10,U.Total(U.r == inflex_r),100,'r','Linewidth',3,'MarkerEdgeColor','r')
-%         %%
-        
-%         %% Testing visualization
-%         if idx == 1
-%             U.Total = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-%         else
-%             U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-%         end
-%         plot(U.r.*10,U.Total,':r','Linewidth',3)
-%         ylim([-1000 4000])
-%         xlim([0 5])
-%         set(gca,'Fontsize',32,'TickLabelInterpreter','latex','XTick',0:1:5)
-%         xlabel(gca,'$r_{ij}$ [\AA]','fontsize',32,'interpreter','latex')
-%         ylabel(gca,'$u_{ij}$ [kJ mol$^{-1}$]','fontsize',32,'interpreter','latex')
-%         exportgraphics(gca,'Augmented_Potential.eps')
-%         %%
-
     % remove infinities
     U.(int) = Remove_Infinities(U.(int));
     

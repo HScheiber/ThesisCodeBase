@@ -16,6 +16,7 @@ Settings.InnerRange = false; % When SigmaEpislon is on, use this to set the TF/B
 Settings.Additional_Function = Init_Additional_Function; % Adding additional function options
 Settings.Fix_Alpha = false; % Active for TF and BH models only when NOT using SigmaEpsilon form. When active, the value of exponential repulsion parameter, which is related to compressibility, is fixed to its default
 Settings.Fix_C8 = false; % Active for TF model only when NOT using SigmaEpsilon form. When active, the value of C8 is fixed by the value of C6, and is no longer a free parameter
+Settings.Fix_Mie_n = true; % When using the Mie model, this fixes the value of the Born exponent, when false the value is an optimizable parameter
 Settings.Diary_Loc = '';
 
 % Charge
@@ -57,7 +58,7 @@ Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
 Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
 Settings.BadFcnLossPenalty = 1000; % Penalty to give when (1) the function shape is deemed pathological or (2) the optimized crystal volume is too small or large
 Settings.MinSkipLoss = 2; % Minimum loss value required before skipping further computation
-Settings.EnforceRR = false;
+Settings.EnforceRR = true; % Enforce radius ratios
 
 % Intial optimization settings
 Settings.initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'

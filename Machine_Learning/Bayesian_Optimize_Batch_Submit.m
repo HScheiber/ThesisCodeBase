@@ -581,7 +581,7 @@ switch lower(computer)
         Shared_Settings.EnforceRR = false;
         Shared_Settings.final_opt_type = 'none';
         
-        %% BH [Gamma<6] and Mie Models: MG
+        %% Mie Models: MG
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'Mie'};
         Replicates = 1:5;
@@ -909,9 +909,14 @@ switch lower(computer)
         Shared_Settings.EnforceRR = false;
         Shared_Settings.final_opt_type = 'none';
         
+        Shared_Settings.Fix_Mie_n = true;
+        Shared_Settings.S.n.MM = 8;
+        Shared_Settings.S.n.XX = 8;
+        Shared_Settings.S.n.MX = 8;
+        
         %% BH [Gamma<6] and JC Models: MG
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
-        Theories = {'BH' 'JC'};
+        Theories = {'Mie'};
         Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
