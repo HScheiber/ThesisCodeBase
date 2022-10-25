@@ -39,9 +39,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     else
         Deterministic = true; % Lattice energy calculations are deterministic
     end
-    if isfield(Model,'initial_N_Multiplier')
-        Model.Initial_N_Multiplier = 10;
-    end
     
     if Model.UseCoupledConstraint
         NumCC = 1;

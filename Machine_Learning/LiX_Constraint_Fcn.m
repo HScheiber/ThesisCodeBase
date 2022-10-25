@@ -3,14 +3,6 @@ function tf = LiX_Constraint_Fcn(Settings,Param)
 Settings.Table_Length = 10; % nm
 Settings.Table_StepSize = 0.01;
 
-if ~isfield(Settings,'MaxMXWellR')
-    Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
-    Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
-end
-if ~isfield(Settings,'EnforceRR')
-    Settings.EnforceRR = false;
-end
-
 if ~isfolder(Settings.home)
     Settings.home = find_home;
 end

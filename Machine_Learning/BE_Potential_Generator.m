@@ -70,16 +70,6 @@ r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 %% Build Potential energy curve
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
-    if strcmp(int,'MM')
-        Y1 = Metal;
-        Y2 = Metal;
-    elseif strcmp(int,'XX')
-        Y1 = Halide;
-        Y2 = Halide;
-    elseif strcmp(int,'MX')
-        Y1 = Metal;
-        Y2 = Halide;
-    end
     
     %% Build PES
     % C6 values should be in terms on nm and kJ/mol
@@ -112,10 +102,10 @@ for interaction = {'MX' 'XX' 'MM'}
     end
     
     %% Grab the inflection point of the potential
-    U_Total  =  k_0*(e_c^2).*q.(Y1)*q.(Y2).*U.(int).f  + C6_out.(int).*U.(int).g  + U.(int).h; % Full potential
-    U_Coul   =  k_0*(e_c^2).*q.(Y1)*q.(Y2).*U.(int).f; % Coulomb potential
-    dU_Total = -k_0*(e_c^2).*q.(Y1)*q.(Y2).*U.(int).df - C6_out.(int).*U.(int).dg - U.(int).dh; % Full potential derivative
-    dU_Coulomb = -k_0*(e_c^2).*q.(Y1)*q.(Y2).*U.(int).df;
+    U_Total  =  k_0*(e_c^2).*q.(int(1))*q.(int(2)).*U.(int).f  + C6_out.(int).*U.(int).g  + U.(int).h; % Full potential
+    U_Coul   =  k_0*(e_c^2).*q.(int(1))*q.(int(2)).*U.(int).f; % Coulomb potential
+    dU_Total = -k_0*(e_c^2).*q.(int(1))*q.(int(2)).*U.(int).df - C6_out.(int).*U.(int).dg - U.(int).dh; % Full potential derivative
+    dU_Coulomb = -k_0*(e_c^2).*q.(int(1))*q.(int(2)).*U.(int).df;
     
     peaks_idx = [false islocalmax(U_Total(2:end),'MinProminence',1e-8)];
     peak_r = r(peaks_idx);

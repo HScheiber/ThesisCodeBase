@@ -33,17 +33,6 @@ function [Loss,coupledconstraints,UserData] = LiX_Minimizer(Settings,Param,varar
 %   (5) The liquid is amorphous at the experimental MP 
 %   (6) The liquid or solid converts to another structure at the experimental MP
 
-if ~isfield(Settings,'UseCoupledConstraint')
-    Settings.UseCoupledConstraint = false;
-end
-if ~isfield(Settings,'MaxMXWellR')
-    Settings.MaxMXWellR = 10; % [A] maximum allowed distance for well minima.
-    Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
-end
-if ~isfield(Settings,'EnforceRR')
-    Settings.EnforceRR = false;
-end
-
 if Settings.UseCoupledConstraint
     coupledconstraints = -1;
 else
@@ -292,6 +281,36 @@ case {'BH' 'BD' 'BE'}
             Settings.S.Q = Param.SQ;
         end
     end
+    
+case 'BF'
+    % Input parameters
+    Settings.S.S.MM = Param.sigma_MM; % nm
+    Settings.S.S.XX = Param.sigma_XX; % nm
+    
+    Settings.S.E.MM = Param.epsilon_MM; % kJ/mol
+    Settings.S.E.XX = Param.epsilon_XX; % kJ/mol
+    
+    Settings.S.G.MX = Param.gamma_MX; % Unitless
+    
+    if Settings.Additivity
+        Settings.S.S.MX = (Settings.S.S.MM + Settings.S.S.XX)./2; % nm
+        Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX); % kJ/mol
+        Settings.S.G.MM = Settings.S.G.MX; % Unitless
+        Settings.S.G.XX = Settings.S.G.MX; % Unitless
+    else
+        Settings.S.S.MX = Param.sigma_MX; % nm
+        Settings.S.E.MX = Param.epsilon_MX; % kJ/mol
+        Settings.S.G.MM = Param.gamma_MM; % Unitless
+        Settings.S.G.XX = Param.gamma_XX; % Unitless
+    end
+    
+    % Scaling Coulombic Charge
+    if Settings.Fix_Charge
+        Settings.S.Q = Settings.Q_value;
+    else
+        Settings.S.Q = Param.SQ;
+    end
+    
 case 'JC' % JC models
 
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
