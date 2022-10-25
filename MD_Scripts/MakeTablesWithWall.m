@@ -54,8 +54,10 @@ function [TableFile_MX,C6] = MakeTablesWithWall(Settings,varargin)
     %% Grab the valleys of the potential
     TableName = [Settings.JobName '_Table'];
     Us = [U_MX,U_MM,U_XX];
+    ints = {'MX' 'MM' 'XX'};
     for idx = 1:3
         U = Us(idx);
+        int = ints{idx};
         peaks_idx = [false islocalmax(U.Total(2:end),'MinProminence',1e-8)];
         peak_r = U.r(peaks_idx);
         if numel(peak_r) > 1
@@ -98,7 +100,7 @@ function [TableFile_MX,C6] = MakeTablesWithWall(Settings,varargin)
             dfwall = 12*D./(r.^13); % Wall -derivative
             
             % Kill the attractive interaction beyond the peak
-            U_g_at_infl = U.g(inflex_idx);
+            U_g_at_infl = C6.(int).*U.g(inflex_idx);
             U.g(below_peak_idx) = zeros(size(r));   %zeros(size(r));
             U.dg(below_peak_idx) = zeros(size(r));
             

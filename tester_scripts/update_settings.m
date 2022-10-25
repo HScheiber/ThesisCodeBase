@@ -3,8 +3,8 @@ Settings.MDP.Initial_T = 1121.4;
 Settings.T0 = 1121.4;
 Settings.Target_T = 1121.4;
 
-Settings.JobSettings.Cores = 8;
-Settings.JobSettings.MPI_Ranks = 8;
+Settings.JobSettings.Cores = 12;
+Settings.JobSettings.MPI_Ranks = 12;
 Settings.JobSettings.OMP_Threads = 1;
 Settings.JobSettings.dd  = [];
 Settings.JobSettings.npme = [];
