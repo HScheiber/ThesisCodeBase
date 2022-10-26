@@ -1,9 +1,15 @@
 function [TableFile_MX,C6] = MakeTables(Settings,varargin)
-
+    
+    if isfield(Settings,'JobName') && ~isempty(Settings.JobName)
+        TabName = Settings.JobName;
+    else
+        TabName = [Settings.Salt '_' Settings.Theory '_Table'];
+    end
+    
     p = inputParser;
     p.FunctionName = 'MakeTables';
     addOptional(p,'MDP_Minimize',false)
-    addOptional(p,'TableName',Settings.JobName)
+    addOptional(p,'TableName',TabName)
     addOptional(p,'SaveTables',true)
     parse(p,varargin{:});
     MDP_Minimize = p.Results.MDP_Minimize;
