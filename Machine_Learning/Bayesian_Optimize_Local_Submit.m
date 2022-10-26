@@ -153,11 +153,11 @@ idx = 0;
 
 %% Test Model Particular parameter
 Settings.Salt = 'LiBr';
-Settings.Theory = 'BH';
+Settings.Theory = 'BF';
 Settings.InnerRange = true;
 Settings.Trial_ID = 'XX1';
 Settings.UseCoupledConstraint = false;
-Settings.Initialize_From_Model = {'MG'};
+Settings.Initialize_From_Model = {};
 
 % Loss function
 Settings.Loss_Options.Rocksalt.LE   = 2;

@@ -194,7 +194,6 @@ function params = bayesopt_params(Model)
         if ~Model.Fix_Charge
             params = [params,SQ];
         end
-        
     case {'JC' 'Mie'}
         if Model.SigmaEpsilon
             SDMM = optimizableVariable('sigma_MM',[0.05 0.46],'Type','real'); % Units: nm
