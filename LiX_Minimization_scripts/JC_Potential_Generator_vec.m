@@ -60,6 +60,16 @@ for interaction = {'MX' 'XX' 'MM'}
     
     % Build PES
     U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + A.(int)./(U.r.^12) - C.(int)./(U.r.^6);
+    
+    % vdw cutoff shift
+    if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)
+        EVDW_Cutoff = A.(int)./(Settings.MDP.RVDW_Cutoff.^12) ...
+                    - C.(int)./(Settings.MDP.RVDW_Cutoff.^6);
+        
+        % Shift by the dispersion energy at vdw cutoff radius. only affects one
+        % energy component, not derivatives (i.e. forces)
+        U.(int) = U.(int) - EVDW_Cutoff;
+    end
 end
 
 end

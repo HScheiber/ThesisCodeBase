@@ -1,7 +1,7 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'JC';
+Theory = 'BH';
 ModelID = 'MG';
 BestOnly = false;
 SelectOnly = [];
@@ -32,7 +32,7 @@ plot_finite_T_data = true;
 %% Script begins
 cm3_per_Ang3 = 1e-24; % cubic cm/cubic angstrom
 N_A = 6.02214076e23; % formula units/mol
-ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
+ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed';
 
 Structures   = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
 MinPlotTypes = {'LE' 'RLE' 'a' 'c' 'ac' 'V' 'Density'};
@@ -218,10 +218,10 @@ if N_MinPlot_Rows
         Settings.Salt = Salt;
         for iidx = 1:N_Models
             Model = Models{iidx};
-
+            
             % Find the fully optimized model
             dat_file = fullfile(ML_results_dir,Salt,[Salt '_' Theory '_Model_' Model '_data.mat']);
-
+            
             if ~isfile(dat_file)
                 disp(['Could not load results found for: ' Salt ', ' Theory ', Model ' Model '.']);
                 continue

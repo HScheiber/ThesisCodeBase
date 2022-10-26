@@ -1,4 +1,12 @@
-function tf = LiX_Constraint_Fcn(Settings,Param)
+function tf = LiX_Constraint_Fcn(Settings,Param,varargin)
+
+% Optional inputs
+p = inputParser;
+p.FunctionName = 'LiX_Constraint_Fcn';
+addOptional(p,'Output_Loss',false,@(x)validateattributes(x,{'logical'},{'nonempty'}))
+
+parse(p,varargin{:});
+Output_Loss = p.Results.Output_Loss;
 
 Settings.Table_Length = 10; % nm
 Settings.Table_StepSize = 0.01;
@@ -596,7 +604,11 @@ elseif Settings.EnforceRR
     Loss = Loss + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect
 end
 
-tf = log1p(Loss) < sqrt(eps);
+if Output_Loss
+    tf = Loss;
+else
+    tf = log1p(Loss) < sqrt(eps);
+end
 
 % % Plot result to visualize
 % % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'

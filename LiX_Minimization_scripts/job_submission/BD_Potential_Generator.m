@@ -94,7 +94,7 @@ for interaction = {'MX' 'XX' 'MM'}
     if contains(Settings.(MDP).vdw_modifier,'potential-shift','IgnoreCase',true)
         EVDW_Cutoff = B.(int)*exp(-alpha.(int)*Settings.(MDP).RVDW_Cutoff) ...
                       -C.(int)./(Settings.(MDP).RVDW_Cutoff.^6);
-
+        
         % Shift by the dispersion energy at vdw cutoff radius. only affects one
         % energy component, not derivatives (i.e. forces)
         U.(int).g = U.(int).g - EVDW_Cutoff./C6_out.(int);

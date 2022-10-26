@@ -5,8 +5,8 @@ dat = load(fullfile(Settings.home,'data','JC_Default_Param.mat'));
 QQ_prefactor = dat.QQ_prefactor;
 
 %% Parameter: q (charge)
-q.(Settings.Metal) =  Settings.S.Q; % atomic
-q.(Settings.Halide)= -Settings.S.Q; % atomic
+q.M =  Settings.S.Q; % atomic
+q.X = -Settings.S.Q; % atomic
 
 %% n repulsive exponent parameter
 n.MM = Settings.S.n.MM;
@@ -43,19 +43,17 @@ U.r = Settings.Table_StepSize:Settings.Table_StepSize:Settings.Table_Length;
 %% Build the PES
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
-    switch int
-        case 'MX'
-            Y1 = Settings.Metal;
-            Y2 = Settings.Halide;
-        case 'MM'
-            Y1 = Settings.Metal;
-            Y2 = Settings.Metal;
-        case 'XX'
-            Y1 = Settings.Halide;
-            Y2 = Settings.Halide;
+    
+    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2))./U.r + A.(int)./(U.r.^n.(int)) - C.(int)./(U.r.^6);
+    
+    % Shift the potential to zero at the cutoff
+    if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)
+        EVDW_Cutoff = A.(int)./(Settings.MDP.RVDW_Cutoff.^n.(int)) ...
+                    - C.(int)./(Settings.MDP.RVDW_Cutoff.^6);
+        
+        U.(int) = U.(int) - EVDW_Cutoff;
     end
     
-    U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + A.(int)./(U.r.^n.(int)) - C.(int)./(U.r.^6);
 end
 
 end

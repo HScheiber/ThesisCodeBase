@@ -526,7 +526,7 @@ for interaction = {'MX' 'XX' 'MM'}
                       - f6_cutoff.(int).*C.(int)./(Settings.(MDP).RVDW_Cutoff.^6) ...
                       + G_r_cutoff.(int) ...
                       + U_add_cutoff;
-
+        
         % Shift by the dispersion energy at vdw cutoff radius. only affects one
         % energy component, not derivatives (i.e. forces)
         U.(int).g = U.(int).g - EVDW_Cutoff./C6_out.(int);

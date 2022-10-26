@@ -716,7 +716,6 @@ end
 % outside of the allowed energy or volume bounds
 if Structure_Min_Calc_Fail && ~Settings.Therm_Prop_Override
     if Settings.UseCoupledConstraint
-        %coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
         Loss = nan;
     else
         Loss = real(log1p(Loss_add + Settings.BadFcnLossPenalty));
@@ -726,7 +725,6 @@ if Structure_Min_Calc_Fail && ~Settings.Therm_Prop_Override
     return
 elseif Structure_Min_Calc_Fail && Settings.Therm_Prop_Override
     if Settings.UseCoupledConstraint
-        %coupledconstraints = real(log1p(Settings.BadFcnLossPenalty));
         Loss_add = nan;
     else
         Loss_add = Loss_add + Settings.BadFcnLossPenalty;

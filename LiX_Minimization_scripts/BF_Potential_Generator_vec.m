@@ -35,6 +35,16 @@ for interaction = {'MX' 'XX' 'MM'}
     
     %% Build PES
     U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2))./U.r + Beta.*D.*exp(gamma.(int).*(1 - (U.r./sigma.(int)))) - C6./(sigma.(int).^6 + U.r.^6);
+    
+    % Shift the potential to zero at the cutoff
+    if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)
+        D_VDW = (sigma.(int).^6)./((sigma.(int).^6) + (Settings.MDP.RVDW_Cutoff.^6));
+        EVDW_Cutoff = Beta.*D_VDW.*exp(gamma.(int).*(1 - (Settings.MDP.RVDW_Cutoff./sigma.(int)))) ...
+                    - C6./(sigma.(int).^6 + Settings.MDP.RVDW_Cutoff.^6);
+        
+        U.(int) = U.(int) - EVDW_Cutoff;
+    end
+    
 end
 
 end
