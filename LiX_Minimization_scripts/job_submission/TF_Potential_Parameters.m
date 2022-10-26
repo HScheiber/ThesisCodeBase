@@ -1,5 +1,5 @@
 % Output units: energies are kJ/mol and distances are nm
-function [OutputMX,OutputMM,OutputXX] = TF_Potential_Parameters(Settings,varargin)
+function [OutputMX,OutputMM,OutputXX,S] = TF_Potential_Parameters(Settings,varargin)
 
 % Optional inputs
 p = inputParser;
@@ -281,6 +281,7 @@ D.(Settings.Salt).XX = Settings.S.D8D.All*Settings.S.D8D.XX*Settings.S.D.All*Set
 C.(Settings.Salt).MX = Settings.S.D6D.All*Settings.S.D6D.MX*Settings.S.D.All*Settings.S.D.MX.*C.(Settings.Salt).MX;
 D.(Settings.Salt).MX = Settings.S.D8D.All*Settings.S.D8D.MX*Settings.S.D.All*Settings.S.D.MX.*D.(Settings.Salt).MX;
 
+%% Outputs
 OutputMM.B = B.MM; % Repulsion parameter
 OutputMM.C = C.(Settings.Salt).MM; % C6 dispersion constant
 OutputMM.D = D.(Settings.Salt).MM; % C8 dispersion constant
@@ -295,6 +296,41 @@ OutputMX.B = B.MX; % Repulsion parameter
 OutputMX.C = C.(Settings.Salt).MX; % C6 dispersion constant
 OutputMX.D = D.(Settings.Salt).MX; % C8 dispersion constant
 OutputMX.alpha = alpha.MX; % Exponential steepness parameter
+
+% Convert to sigma-epsilon form
+OutputMM.sigma = sqrt((4/3)*(D.(Settings.Salt).MM/C.(Settings.Salt).MM));
+OutputXX.sigma = sqrt((4/3)*(D.(Settings.Salt).XX/C.(Settings.Salt).XX));
+OutputMX.sigma = sqrt((4/3)*(D.(Settings.Salt).MX/C.(Settings.Salt).MX));
+
+OutputMM.gamma = alpha.MM*OutputMM.sigma;
+OutputXX.gamma = alpha.XX*OutputXX.sigma;
+OutputMX.gamma = alpha.MX*OutputMX.sigma;
+
+OutputMM.epsilon = B.MM*exp(-OutputMM.gamma)*(1 - (7/48)*OutputMM.gamma);
+OutputXX.epsilon = B.XX*exp(-OutputXX.gamma)*(1 - (7/48)*OutputXX.gamma);
+OutputMX.epsilon = B.MX*exp(-OutputMX.gamma)*(1 - (7/48)*OutputMX.gamma);
+
+
+S = Settings.S;
+% Alpha (nm^-1)
+S.A.MM = alpha.MM;
+S.A.XX = alpha.XX;
+S.A.MX = alpha.MX;
+
+% Repulsive prefactor param % kJ/mol
+S.R.MM = B.MM;
+S.R.XX = B.XX;
+S.R.MX = B.MX;
+
+% C6 param
+S.D6D.MM = C.(Settings.Salt).MM;
+S.D6D.XX = C.(Settings.Salt).XX;
+S.D6D.MX = C.(Settings.Salt).MX;
+
+% C8 param
+S.D8D.MM = D.(Settings.Salt).MM;
+S.D8D.XX = D.(Settings.Salt).XX;
+S.D8D.MX = D.(Settings.Salt).MX;
 
 if Plotswitch
     figure;

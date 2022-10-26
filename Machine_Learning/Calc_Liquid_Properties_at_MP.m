@@ -171,7 +171,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Table_Req = IsGmxTableRequired(Settings);
         Settings.JobName = [Settings.Theory '_TestModel'];
         
-        if Table_Req || strncmp(Settings.Theory,'BH',2) % Buckingham potential is incompatible with verlet cutoff
+        if Table_Req
             MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad('user',18));
             MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWMOD##',pad(MDP.vdw_modifier,18));
             MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##CUTOFF##',pad('group',18));
@@ -181,7 +181,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             
             % For minimization, add in a close-range repulsive wall to the
             % potential with the following function
-            Settings.TableFile_MX = MakeTables(Settings);
+            [Settings.TableFile_MX,C6] = MakeTablesWithWall(Settings);
         else
             % Modify the MDP file
             MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad(MDP.VDWType,18));
@@ -202,13 +202,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         end
         
         % Add in dispersion corrections
-        if Settings.MDP.Disp_Correction && ~Table_Req && ~strncmp(Settings.Theory,'BH',2)
+        if Settings.MDP.Disp_Correction
             MDP.Minimization_txt = [MDP.Minimization_txt newline newline...
-                '; Long-range dispersion correction' newline ...
-                'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
-        elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
-            disp('Warning: enabling long-range dispersion correction for tabulated potential!')
-            MDP.Minimization_txt = [MDP.Minimization_txt newline newline ...
                 '; Long-range dispersion correction' newline ...
                 'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
         end
@@ -250,20 +245,22 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##',num2str(nmol_liquid));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##GEOM##','molecule liquid');
         
-        if Table_Req || strncmp(Settings.Theory,'BH',2)
+        if Table_Req
             % Define the function type as 1 (needed for tabulated functions)
             Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','1');
             
             % Define the combination rules (Lorenz-berthelot)
             Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','1');
             
-            % Define all the parameters as 1.0 (already included in potentials)
-            Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad('1.0',10));
-            Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad('1.0',10));
-            Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad('1.0',10));
+            % Define the repulsive parameters as 1.0 (already included in potentials)
             Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##','1.0');
             Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##','1.0');
             Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##','1.0');
+            
+            % Dispersion coefficients
+            Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',num2str(C6.MM,'%.10e'));
+            Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',num2str(C6.XX,'%.10e'));
+            Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',num2str(C6.MX,'%.10e'));
             
         elseif contains(Settings.Theory,'JC')
             switch Settings.Theory
@@ -453,58 +450,19 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         % Define the combination rules (Lorenz-berthelot)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','1');
         
-        % Define all the parameters as 1.0 (already included in potentials)
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad('1.0',10));
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad('1.0',10));
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad('1.0',10));
+        % Define repulsive parameters as 1.0 (already included in potentials)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##','1.0');
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##','1.0');
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##','1.0');
         
         % Generate tables of the potential
-        if strcmp(Settings.Theory,'TF')
-            [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings);
-        elseif strcmp(Settings.Theory,'BH')
-            [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings);
-        elseif contains(Settings.Theory,'JC')
-            switch Settings.Theory
-                case 'JC'
-                    Settings.WaterModel = 'SPC/E';
-                case 'JC3P'
-                    Settings.WaterModel = 'TIP3P';
-                case 'JC4P'
-                    Settings.WaterModel = 'TIP4PEW';
-                case 'JCSD'
-                    Settings.WaterModel = 'SD';
-            end
-            [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings);
-        elseif strcmp(Settings.Theory,'BD')
-            [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings);
-        elseif strcmp(Settings.Theory,'BE')
-            [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings);
-        elseif strcmp(Settings.Theory,'Mie')
-            [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings);
-        else
-            error(['Warning: Unknown theory type: "' Settings.Theory '".'])
-        end
-        
         TableName = [Settings.JobName '_Table'];
-        Settings.TableFile_MX = fullfile(Settings.WorkDir,[TableName '.xvg']);
-        Settings.TableFile_MM = fullfile(Settings.WorkDir,[TableName '_' Settings.Metal '_' Settings.Metal '.xvg']);
-        Settings.TableFile_XX = fullfile(Settings.WorkDir,[TableName '_' Settings.Halide '_' Settings.Halide '.xvg']);
-        
-        % Save tables into current directory
-        fidMX = fopen(Settings.TableFile_MX,'wt');
-        fwrite(fidMX,regexprep(U_MX,'\r',''));
-        fclose(fidMX);
-        
-        fidMM = fopen(Settings.TableFile_MM,'wt');
-        fwrite(fidMM,regexprep(U_MM,'\r',''));
-        fclose(fidMM);
-        
-        fidXX = fopen(Settings.TableFile_XX,'wt');
-        fwrite(fidXX,regexprep(U_XX,'\r',''));
-        fclose(fidXX);
+        [Settings.TableFile_MX,C6] = MakeTables(Settings,'TableName',TableName);
+                                
+        % Dispersion coefficients
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',num2str(C6.MM,'%.10e'));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',num2str(C6.XX,'%.10e'));
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',num2str(C6.MX,'%.10e'));
         
         % Modify the MDP file
         MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad('user',18));
@@ -563,60 +521,14 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         else
             MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
         end
-    elseif contains(Settings.Theory,'BH')
-        
-        Settings.TableFile_MX = '';
-        
-        % Definte the function type as 2 (Buckingham)
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','2');
-        
-        % Define the combination rule as 1 (Buckingham only has 1 comb rule)
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','1');
-        
-        % Get BH parameters (cross terms are pre-computed using my combining rules)
-        [U_MX,U_MM,U_XX] = BH_Potential_Parameters(Settings);
-        
-        % Add parameters to topology text
-        % For BH potentials, parameter are B*exp(-alpha*r) + C/r^6
-        % Parameter order is B alpha C
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'ptype  C          A','ptype   a              b           c6');
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',[num2str(U_MM.B,'%10.8e') ' ' num2str(U_MM.alpha,'%10.8e')]);
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',pad(num2str(U_MM.C,'%10.8e'),10));
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',[num2str(U_XX.B,'%10.8e') ' ' num2str(U_XX.alpha,'%10.8e')]);
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',pad(num2str(U_XX.C,'%10.8e'),10));
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',[num2str(U_MX.B,'%10.8e') ' ' num2str(U_MX.alpha,'%10.8e')]);
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',pad(num2str(U_MX.C,'%10.8e'),10));
-        
-        % Modify the MDP file
-        MDP_Template = strrep(MDP_Template,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
-        MDP_Template = strrep(MDP_Template,'##CUTOFF##',pad('group',18));
-        MDP_Template = regexprep(MDP_Template,'energygrp-table.+?\n','');
-        MDP_Template = regexprep(MDP_Template,'ewald-rtol-lj.+?\n','');
-        MDP_Template = regexprep(MDP_Template,'lj-pme-comb-rule.+?\n','');
-        MDP_Template = strrep(MDP_Template,'##RLIST##',pad(num2str(Settings.MDP.RList_Cutoff),18));
-        MDP_Template = strrep(MDP_Template,'##RCOULOMB##',pad(num2str(Settings.MDP.RCoulomb_Cutoff),18));
-        MDP_Template = strrep(MDP_Template,'##RVDW##',pad(num2str(Settings.MDP.RVDW_Cutoff),18));
-        MDP_Template = strrep(MDP_Template,'##VDWMOD##',pad(Settings.MDP.vdw_modifier,18));
-        MDP_Template = regexprep(MDP_Template,'verlet-buffer-tolerance.+?\n','');
     else
         error(['Warning: Unknown theory type: "' Settings.Theory '".'])
     end
     
-    if Settings.MDP.Disp_Correction && ~Table_Req
+    if Settings.MDP.Disp_Correction
         MDP_Template = [MDP_Template newline newline ...
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
-    elseif Settings.MDP.Disp_Correction && Settings.MDP.Disp_Correction_Tables
-        if Settings.Verbose
-            disp('Warning: enabling long-range dispersion correction for tabulated potential!')
-        end
-        MDP_Template = [MDP_Template newline newline ...
-            '; Long-range dispersion correction' newline ...
-            'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
-    elseif Settings.MDP.Disp_Correction
-        if Settings.Verbose
-            disp('Disabling long-range dispersion correction as this is not compatible with tables as implemented here.')
-        end
     end
     
     % Add in parameters to MDP template

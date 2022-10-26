@@ -22,8 +22,6 @@ sqrt_Q.I  = 5.533218150000000;
 PotSettings = Initialize_MD_Settings;
 PotSettings.Salt = Settings.Salt;
 [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(PotSettings);
-[BH_MX,BH_MM,BH_XX] = BH_Potential_Parameters(PotSettings);
-[TF_MX,TF_MM,TF_XX] = TF_Potential_Parameters(PotSettings);
 
 % Potential Scaling
 switch Settings.Theory
@@ -60,39 +58,18 @@ case 'TF'
         epsilon_MM(gamma_MM > 48/7) = -epsilon_MM(gamma_MM > 48/7);
         epsilon_XX(gamma_XX > 48/7) = -epsilon_XX(gamma_XX > 48/7);
         
-        % Convert to Condensed form
-        alpha_MM = gamma_MM./r0_MM;
-        alpha_XX = gamma_XX./r0_XX;
-        alpha_MX = gamma_MX./r0_MX;
-
-        B_MM = 48.*epsilon_MM.*exp(gamma_MM)./(48 - 7*gamma_MM);
-        B_XX = 48.*epsilon_XX.*exp(gamma_XX)./(48 - 7*gamma_XX);
-        B_MX = 48.*epsilon_MX.*exp(gamma_MX)./(48 - 7*gamma_MX);
-
-        C_MM = 4.*epsilon_MM.*gamma_MM.*(r0_MM.^6)./(48 - 7.*gamma_MM);
-        C_XX = 4.*epsilon_XX.*gamma_XX.*(r0_XX.^6)./(48 - 7.*gamma_XX);
-        C_MX = 4.*epsilon_MX.*gamma_MX.*(r0_MX.^6)./(48 - 7.*gamma_MX);
-
-        D_MM = 3.*epsilon_MM.*gamma_MM.*(r0_MM.^8)./(48 - 7.*gamma_MM);
-        D_XX = 3.*epsilon_XX.*gamma_XX.*(r0_XX.^8)./(48 - 7.*gamma_XX);
-        D_MX = 3.*epsilon_MX.*gamma_MX.*(r0_MX.^8)./(48 - 7.*gamma_MX);
-
-        % Convert to scaling w.r.t. TF
-        Settings.S.A.MM = alpha_MM./TF_MM.alpha;
-        Settings.S.A.XX = alpha_XX./TF_XX.alpha;
-        Settings.S.A.MX = alpha_MX./TF_MX.alpha;
-
-        Settings.S.R.MM = B_MM./TF_MM.B;
-        Settings.S.R.XX = B_XX./TF_XX.B;
-        Settings.S.R.MX = B_MX./TF_MX.B;
-
-        Settings.S.D6D.MM = C_MM./TF_MM.C;
-        Settings.S.D6D.XX = C_XX./TF_XX.C;
-        Settings.S.D6D.MX = C_MX./TF_MX.C;
-
-        Settings.S.D8D.MM = D_MM./TF_MM.D;
-        Settings.S.D8D.XX = D_XX./TF_XX.D;
-        Settings.S.D8D.MX = D_MX./TF_MX.D;
+        % Outputs
+        Settings.S.S.MM = r0_MM;
+        Settings.S.S.XX = r0_XX;
+        Settings.S.S.MX = r0_MX;
+        
+        Settings.S.E.MM = epsilon_MM;
+        Settings.S.E.XX = epsilon_XX;
+        Settings.S.E.MX = epsilon_MX;
+        
+        Settings.S.G.MM = gamma_MM;
+        Settings.S.G.XX = gamma_XX;
+        Settings.S.G.MX = gamma_MX;
 
         % Scaling Coulombic Charge
         if Settings.Fix_Charge
@@ -114,14 +91,14 @@ case 'TF'
             % Calculate value of C8 using recursive relations
 
             % Calculate Scaled C8 using recursion relation from D3 paper
-            C8_MM = 3.0.*(Settings.S.D6D.MM.*TF_MM.C./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Metal).*c8units; % in kJ/mol nm^8
-            C8_XX = 3.0.*(Settings.S.D6D.XX.*TF_XX.C./c6units).*sqrt_Q.(Settings.Halide).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
-            C8_MX = 3.0.*(Settings.S.D6D.MX.*TF_MX.C./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
+            C8_MM = 3.0.*(Settings.S.D6D.MM./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Metal).*c8units; % in kJ/mol nm^8
+            C8_XX = 3.0.*(Settings.S.D6D.XX./c6units).*sqrt_Q.(Settings.Halide).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
+            C8_MX = 3.0.*(Settings.S.D6D.MX./c6units).*sqrt_Q.(Settings.Metal).*sqrt_Q.(Settings.Halide).*c8units; % in kJ/mol nm^8
 
             % Update the scaling
-            Settings.S.D8D.MM = C8_MM./TF_MM.D;
-            Settings.S.D8D.XX = C8_XX./TF_XX.D;
-            Settings.S.D8D.MX = C8_MX./TF_MX.D;
+            Settings.S.D8D.MM = C8_MM;
+            Settings.S.D8D.XX = C8_XX;
+            Settings.S.D8D.MX = C8_MX;
         else
             Settings.S.D8D.MM = Param.SD8MM;
             Settings.S.D8D.XX = Param.SD8XX;
@@ -148,7 +125,7 @@ case 'TF'
         end
     end
 
-case {'BH' 'BD'}
+case {'BH' 'BD' 'BE'}
 
     % Loose form of exp-C6 model
     if Settings.SigmaEpsilon
@@ -178,31 +155,18 @@ case {'BH' 'BD'}
         epsilon_MM(gamma_MM < 6) = -epsilon_MM(gamma_MM < 6);
         epsilon_XX(gamma_XX < 6) = -epsilon_XX(gamma_XX < 6);
         
-        % Convert to Condensed form
-        alpha_MM = gamma_MM./r0_MM;
-        alpha_XX = gamma_XX./r0_XX;
-        alpha_MX = gamma_MX./r0_MX;
+        % Outputs
+        Settings.S.S.MM = r0_MM;
+        Settings.S.S.XX = r0_XX;
+        Settings.S.S.MX = r0_MX;
         
-        B_MM = 6.*epsilon_MM.*exp(gamma_MM)./(gamma_MM - 6);
-        B_XX = 6.*epsilon_XX.*exp(gamma_XX)./(gamma_XX - 6);
-        B_MX = 6.*epsilon_MX.*exp(gamma_MX)./(gamma_MX - 6);
+        Settings.S.E.MM = epsilon_MM;
+        Settings.S.E.XX = epsilon_XX;
+        Settings.S.E.MX = epsilon_MX;
         
-        C_MM = epsilon_MM.*gamma_MM.*(r0_MM.^6)./(gamma_MM - 6);
-        C_XX = epsilon_XX.*gamma_XX.*(r0_XX.^6)./(gamma_XX - 6);
-        C_MX = epsilon_MX.*gamma_MX.*(r0_MX.^6)./(gamma_MX - 6);
-        
-        % Convert to scaling w.r.t. default BH
-        Settings.S.A.MM = alpha_MM./BH_MM.alpha;
-        Settings.S.A.XX = alpha_XX./BH_XX.alpha;
-        Settings.S.A.MX = alpha_MX./BH_MX.alpha;
-        
-        Settings.S.R.MM = B_MM./BH_MM.B;
-        Settings.S.R.XX = B_XX./BH_XX.B;
-        Settings.S.R.MX = B_MX./BH_MX.B;
-        
-        Settings.S.D.MM = C_MM./BH_MM.C;
-        Settings.S.D.XX = C_XX./BH_XX.C;
-        Settings.S.D.MX = C_MX./BH_MX.C;
+        Settings.S.G.MM = gamma_MM;
+        Settings.S.G.XX = gamma_XX;
+        Settings.S.G.MX = gamma_MX;
         
         % Scaling Coulombic Charge
         if Settings.Fix_Charge
@@ -330,46 +294,72 @@ case 'JC' % JC models
     else
         Settings.S.Q = Param.SQ;
     end
+case 'BF'
+    % Input parameters
+    Settings.S.S.MM = Param.sigma_MM; % nm
+    Settings.S.S.XX = Param.sigma_XX; % nm
     
+    Settings.S.E.MM = Param.epsilon_MM; % kJ/mol
+    Settings.S.E.XX = Param.epsilon_XX; % kJ/mol
+    
+    Settings.S.G.MX = Param.gamma_MX; % Unitless
+    
+    if Settings.Additivity
+        Settings.S.S.MX = (Settings.S.S.MM + Settings.S.S.XX)./2; % nm
+        Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX); % kJ/mol
+        Settings.S.G.MM = Settings.S.G.MX; % Unitless
+        Settings.S.G.XX = Settings.S.G.MX; % Unitless
+    else
+        Settings.S.S.MX = Param.sigma_MX; % nm
+        Settings.S.E.MX = Param.epsilon_MX; % kJ/mol
+        Settings.S.G.MM = Param.gamma_MM; % Unitless
+        Settings.S.G.XX = Param.gamma_XX; % Unitless
+    end
+    
+    % Scaling Coulombic Charge
+    if Settings.Fix_Charge
+        Settings.S.Q = Settings.Q_value;
+    else
+        Settings.S.Q = Param.SQ;
+    end
 case 'Mie'
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
     if Settings.SigmaEpsilon
 
         % Sigma scaling
-        Settings.S.S.MM = Param.sigma_MM./JC_MM.sigma;
-        Settings.S.S.XX = Param.sigma_XX./JC_XX.sigma;
+        Settings.S.S.MM = Param.sigma_MM;
+        Settings.S.S.XX = Param.sigma_XX;
 
         % Epsilon scaling
-        Settings.S.E.MM = Param.epsilon_MM./JC_MM.epsilon;
-        Settings.S.E.XX = Param.epsilon_XX./JC_XX.epsilon;
-        
-        Settings.S.n.MX = Param.n_MX;
-        
-        % Default MX params
-        def_S_MX = JC_MX.sigma;
-        def_E_MX = JC_MX.epsilon;
+        Settings.S.E.MM = Param.epsilon_MM;
+        Settings.S.E.XX = Param.epsilon_XX;
         
         if Settings.Additivity
             
-            Settings.S.n.MM = Param.n_MX;
-            Settings.S.n.XX = Param.n_MX;
+            if ~Settings.Fix_Mie_n
+                Settings.S.n.MX = Param.n_MX;
+                Settings.S.n.MM = Param.n_MX;
+                Settings.S.n.XX = Param.n_MX;
+            end
             
             Sigma_MX = (Param.sigma_MM + Param.sigma_XX)./2;
             Epsilon_MX = sqrt(Param.epsilon_MM.*Param.epsilon_XX);
 
-            Settings.S.S.MX = Sigma_MX./def_S_MX;
-            Settings.S.E.MX = Epsilon_MX./def_E_MX;
+            Settings.S.S.MX = Sigma_MX;
+            Settings.S.E.MX = Epsilon_MX;
 
             if Settings.Additional_MM_Disp
-                Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
-                Settings.S.E.MM = Full_MM_Epsilon./JC_MM.epsilon;
+                Settings.S.E.MM = Param.epsilon_MM + Param.epsilon_MM2;
             end
         else
-            Settings.S.S.MX = Param.sigma_MX./def_S_MX;
-            Settings.S.E.MX = Param.epsilon_MX./def_E_MX;
+            Settings.S.S.MX = Param.sigma_MX;
+            Settings.S.E.MX = Param.epsilon_MX;
             
-            Settings.S.n.MM = Param.n_MM;
-            Settings.S.n.XX = Param.n_XX;
+            if ~Settings.Fix_Mie_n
+                Settings.S.n.MX = Param.n_MX;
+                Settings.S.n.MM = Param.n_MM;
+                Settings.S.n.XX = Param.n_XX;
+            end
         end
 
     % Scaled dispersion/repulsion form

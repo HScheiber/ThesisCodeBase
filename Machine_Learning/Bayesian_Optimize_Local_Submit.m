@@ -53,7 +53,6 @@ close all
 Settings = Initialize_LiX_BO_Settings;
 Settings.Project_Directory_Name = 'Model_Building';
 Settings.Verbose = false;
-Settings.UseCoupledConstraint = false;
 Settings.SigmaEpsilon = true;
 
 % Job settings
@@ -84,12 +83,12 @@ Settings.MinSkipLoss = 2; % Minimum loss value required before skipping further 
 Settings.BadFcnLossPenalty = 1000; % Penalty to give bad potentials
 Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
-Settings.MaxAttWellDepth = -1000; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
+Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
 Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
-Settings.MaxModelVolume = 2000; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
+Settings.MaxModelVolume = 1024; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
-Settings.EnforceRR = true; % enforce radius ratio < 1 (anion is larger)
-Settings.MaxMXWellR = 5; % [A] maximum allowed distance for well minima.
+Settings.EnforceRR = false; % enforce radius ratio < 1 (anion is larger)
+Settings.MaxMXWellR = 8; % [A] maximum allowed distance for well minima.
 Settings.MinMXWellR = 0.5; % [A] minimum allowable distance for well minima.
 
 % Non-MP Finite T calculation settings
@@ -154,23 +153,39 @@ idx = 0;
 
 %% Test Model Particular parameter
 Settings.Salt = 'LiBr';
-Settings.Theory = 'JC';
-Settings.InnerRange = false;
-Settings.Trial_ID = 'XX2';
+Settings.Theory = 'BH';
+Settings.InnerRange = true;
+Settings.Trial_ID = 'XX1';
 Settings.UseCoupledConstraint = false;
+Settings.Initialize_From_Model = {'MG'};
 
-% [T = 0] Loss options
-Settings.Loss_Options.Rocksalt.LE = 1;
-Settings.Loss_Options.Rocksalt.a = 1;
-Settings.Loss_Options.Wurtzite.RLE = 1;
+% Loss function
+Settings.Loss_Options.Rocksalt.LE   = 2;
+Settings.Loss_Options.Rocksalt.a    = 1;
+Settings.Loss_Options.Wurtzite.RLE  = 0.1;
+Settings.Loss_Options.FiveFive.RLE  = 0.1;
+Settings.Loss_Options.CsCl.RLE      = 0.1;
+Settings.Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+Settings.Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+Settings.Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+Settings.Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+Settings.Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
 
-% [T = Tm] loss options
-Settings.Loss_Options.Fusion_Enthalpy = 1; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-%Settings.Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
-%Settings.Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
-%Settings.Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-Settings.Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-%            Settings.Loss_Options.MP  = 1; % Fitting the experimental MP, using the experimental structure as the solid
+% Add gaps
+Settings.Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+Settings.Loss_Options.Wurtzite.Gap.Weight = 1000;
+Settings.Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+Settings.Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+Settings.Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+Settings.Loss_Options.FiveFive.Gap.Weight = 1000;
+Settings.Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+Settings.Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+Settings.Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+Settings.Loss_Options.CsCl.Gap.Weight = 1000;
+Settings.Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+Settings.Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
 
 % Other loss options options
 Settings.Fix_Charge = true;

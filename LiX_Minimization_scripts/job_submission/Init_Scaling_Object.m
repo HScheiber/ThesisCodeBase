@@ -42,26 +42,31 @@ function S = Init_Scaling_Object
     S.R.MX = 1;
     S.R.AB = 1;
     
-    % Epsilon (LJ only)
+    % Epsilon
     S.E.All = 1;
     S.E.MM = 1;
     S.E.XX = 1;
     S.E.MX = 1;
     S.E.AB = 1;
     
-    % Sigma (LJ only)
+    % Sigma
     S.S.All = 1;
     S.S.MM = 1;
     S.S.XX = 1;
     S.S.MX = 1;
     S.S.AB = 1;
     
-    % Alpha (TF only)
+    % Alpha (TF, BH, BD, BE only)
     S.A.All = 1;
     S.A.MM = 1;
     S.A.XX = 1;
     S.A.MX = 1;
     S.A.AB = 1;
+    
+    % Gamma (TF, BH, BD, BE only)
+    S.G.MM = 1;
+    S.G.XX = 1;
+    S.G.MX = 1;
     
     % Born parameter n (Mie only)
     S.n.MM = 12;

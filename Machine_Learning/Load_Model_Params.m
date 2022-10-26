@@ -25,6 +25,11 @@ if isempty(Settings.Model)
     Settings.C6_Damp = Init_C6Damping_Object;
     Settings.CR_Damp = Init_CRDamping_Object;
     [Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
+    
+    if strcmp(Settings.Theory,'TF')
+        [~,~,~,Settings.S] = TF_Potential_Parameters(Settings);
+    end
+    
     return
 elseif strcmp(Settings.Theory,'JC') && strcmp(Settings.Salt,'LiI') && strcmp(Settings.Model,'A')
     disp(['Model found. Loading ' Settings.Theory ' Model ' Settings.Model])
@@ -54,12 +59,7 @@ if strcmp(Settings.Theory,'TF')
 
     % Loose form of exp-C6-C8 model
     if Settings.SigmaEpsilon
-        % Default model parameters: all length-scale units are nm,
-        % energy scale units are kJ/mol
-        DefMDSettings = Initialize_MD_Settings;
-        DefMDSettings.Salt = Settings.Salt;
-        [defTFMX,defTFMM,defTFXX] = TF_Potential_Parameters(DefMDSettings);
-
+        
         % Input parameters
         r0_MM = Param(1); % nm
         r0_XX = Param(2); % nm
@@ -117,22 +117,22 @@ if strcmp(Settings.Theory,'TF')
 
         % Convert to scaling w.r.t. TF (Pars output)
         % Dispersion scale
-        Settings.S.D6D.MM = C_MM/defTFMM.C;
-        Settings.S.D6D.XX = C_XX/defTFXX.C;
-        Settings.S.D6D.MX = C_MX/defTFMX.C;
-        Settings.S.D8D.MM = D_MM/defTFMM.D;
-        Settings.S.D8D.XX = D_XX/defTFXX.D;
-        Settings.S.D8D.MX = D_MX/defTFMX.D;
+        Settings.S.D6D.MM = C_MM;
+        Settings.S.D6D.XX = C_XX;
+        Settings.S.D6D.MX = C_MX;
+        Settings.S.D8D.MM = D_MM;
+        Settings.S.D8D.XX = D_XX;
+        Settings.S.D8D.MX = D_MX;
 
         % Repulsive wall exponent scale
-        Settings.S.A.MM = alpha_MM/defTFMM.alpha;
-        Settings.S.A.XX = alpha_XX/defTFXX.alpha;
-        Settings.S.A.MX = alpha_MX/defTFMX.alpha;
+        Settings.S.A.MM = alpha_MM;
+        Settings.S.A.XX = alpha_XX;
+        Settings.S.A.MX = alpha_MX;
 
         % Repulsive wall prefactor scale
-        Settings.S.R.MM = B_MM/defTFMM.B;
-        Settings.S.R.XX = B_XX/defTFXX.B;
-        Settings.S.R.MX = B_MX/defTFMX.B;
+        Settings.S.R.MM = B_MM;
+        Settings.S.R.XX = B_XX;
+        Settings.S.R.MX = B_MX;
 
         % Scaling Coulombic Charge
         if Settings.Fix_Charge
@@ -227,11 +227,6 @@ elseif strcmp(Settings.Theory,'BH') % Buckingham model
     % Loose form of exp-C6 model
     if Settings.SigmaEpsilon
 
-        % Default model parameters: all length-scale units are nm, energy scale units are kJ/mol
-        DefMDSettings = Initialize_MD_Settings;
-        DefMDSettings.Salt = Settings.Salt;
-        [defBHMX,defBHMM,defBHXX] = BH_Potential_Parameters(DefMDSettings);
-
         % Input parameters
         r0_MM = Param(1); % nm
         r0_XX = Param(2); % nm
@@ -284,17 +279,17 @@ elseif strcmp(Settings.Theory,'BH') % Buckingham model
         C_MX = epsilon_MX*gamma_MX*(r0_MX^6)/(gamma_MX - 6);
 
         % Convert to scaling w.r.t. default BH
-        Settings.S.D.MM = C_MM/defBHMM.C;
-        Settings.S.D.XX = C_XX/defBHXX.C;
-        Settings.S.D.MX = C_MX/defBHMX.C;
+        Settings.S.D.MM = C_MM;
+        Settings.S.D.XX = C_XX;
+        Settings.S.D.MX = C_MX;
 
-        Settings.S.A.MM = alpha_MM/defBHMM.alpha;
-        Settings.S.A.XX = alpha_XX/defBHXX.alpha;
-        Settings.S.A.MX = alpha_MX/defBHMX.alpha;
+        Settings.S.A.MM = alpha_MM;
+        Settings.S.A.XX = alpha_XX;
+        Settings.S.A.MX = alpha_MX;
 
-        Settings.S.R.MM = B_MM/defBHMM.B;
-        Settings.S.R.XX = B_XX/defBHXX.B;
-        Settings.S.R.MX = B_MX/defBHMX.B;
+        Settings.S.R.MM = B_MM;
+        Settings.S.R.XX = B_XX;
+        Settings.S.R.MX = B_MX;
 
         % Scaling Coulombic Charge
         if Settings.Fix_Charge

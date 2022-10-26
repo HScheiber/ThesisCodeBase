@@ -45,13 +45,16 @@ if Settings.Table_Req
     % Define the combination rules (Lorenz-berthelot)
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','1');
 
-    % Define all the parameters as 1.0 (already included in potentials)
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad('1.0',10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad('1.0',10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad('1.0',10));
+    % Define the repulsive parameters as 1.0 (already included in potentials)
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##','1.0');
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##','1.0');
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##','1.0');
+    
+    % Dispersion coefficients
+    [~,C6] = MakeTables(Settings,'SaveTables',false);
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',num2str(C6.MM,'%.10e'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',num2str(C6.XX,'%.10e'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',num2str(C6.MX,'%.10e'));    
     
 elseif contains(Settings.Theory,'JC')
     
@@ -80,29 +83,6 @@ elseif contains(Settings.Theory,'JC')
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',num2str(U_MM.epsilon,'%10.8e'));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(U_XX.epsilon,'%10.8e'));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(U_MX.epsilon,'%10.8e'));
-
-elseif contains(Settings.Theory,'BH')
-    
-    % Definte the function type as 2 (Buckingham)
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','2');
-
-    % Define the combination rule as 1 (Buckingham only has 1 comb rule)
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','1');
-
-    % Get BH parameters
-    [U_MX,U_MM,U_XX] = BH_Potential_Parameters(Settings);
-    
-    % Add parameters to topology text
-    % For BH potentials, parameter are B*exp(-alpha*r) + C/r^6
-    % Parameter order is B alpha C
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'ptype  C          A','ptype   a              b           c6');
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',[num2str(U_MM.B,'%10.8e') ' ' num2str(U_MM.alpha,'%10.8e')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',pad(num2str(U_MM.C,'%10.8e'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',[num2str(U_XX.B,'%10.8e') ' ' num2str(U_XX.alpha,'%10.8e')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',pad(num2str(U_XX.C,'%10.8e'),10));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',[num2str(U_MX.B,'%10.8e') ' ' num2str(U_MX.alpha,'%10.8e')]);
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',pad(num2str(U_MX.C,'%10.8e'),10));
-    
 else
     rmdir(Settings.WorkDir)
     error(['Warning: Unknown theory type: "' Settings.Theory '".'])
@@ -110,7 +90,6 @@ end
 
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##','');
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##GEOM##','Liquid-Crystal Interface');
-
 
 Settings.Topology_File = fullfile(Settings.WorkDir,[Settings.JobName '.top']);
 Atomlist = copy_atom_order(Settings.SuperCellFile);

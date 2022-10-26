@@ -2,38 +2,37 @@ function U = BD_Potential_Generator_vec(Settings)
 
 %% Load BH Parameters
 dat = load(fullfile(Settings.home,'data','BH_Default_Param.mat'));
-Param = dat.Param;
-b = dat.b;
-rho = dat.rho;
-sigma = dat.sigma;
-valence = dat.valence;
 QQ_prefactor = dat.QQ_prefactor;
 
 %% Parameter: q (charge)
-q.(Settings.Metal) =  Settings.S.Q; % atomic
-q.(Settings.Halide)= -Settings.S.Q; % atomic
+q.M =  Settings.S.Q; % atomic
+q.X = -Settings.S.Q; % atomic
 
-%% Calculate Pauling Coefficients beta: MX = +-   MM = ++     XX = --
-beta.MM = 1 + 2/valence.(Settings.Metal); % Unitless
-beta.XX = 1 - 2/valence.(Settings.Halide); % Unitless
-beta.MX = 1 + 1/valence.(Settings.Metal) - 1/valence.(Settings.Halide); % Unitless
+%% Parameters of interest for vdW potential
+sigma.MX = Settings.S.S.MX; % nm
+sigma.MM = Settings.S.S.MM;
+sigma.XX = Settings.S.S.XX;
 
-%% Calculate Repulsive Exponential Parameter alpha: MX = +-   MM = ++     XX = --
-alpha.MM = Settings.S.A.All.*Settings.S.A.MM./rho.(Settings.Salt); % nm^-1
-alpha.MX = Settings.S.A.All.*Settings.S.A.MX./rho.(Settings.Salt); % nm^-1
-alpha.XX = Settings.S.A.All.*Settings.S.A.XX./rho.(Settings.Salt); % nm^-1
+epsilon.MX = Settings.S.E.MX; % kJ/mol
+epsilon.MM = Settings.S.E.MM;
+epsilon.XX = Settings.S.E.XX;
 
-%% Calculate Repulsive Scaling Parameter B: MX = +-   MM = ++     XX = -- (Including scaling)
-B.MM = Settings.S.R.All.*Settings.S.R.MM.*beta.MM.*b.*exp(2.*sigma.(Settings.Metal)./rho.(Settings.Salt));
-B.XX = Settings.S.R.All.*Settings.S.R.XX.*beta.XX.*b.*exp(2.*sigma.(Settings.Halide)./rho.(Settings.Salt));
-B.MX = Settings.S.R.All.*Settings.S.R.MX.*beta.MX.*b.*exp((sigma.(Settings.Metal) + sigma.(Settings.Halide))./rho.(Settings.Salt));
+gamma.MX = Settings.S.G.MX; % unitless
+gamma.MM = Settings.S.G.MM;
+gamma.XX = Settings.S.G.XX;
 
-%% Calculate parameters of interest for LJ potential: change parameteters into C6/r6 format and apply mixing rules
-CMM_pre = 4*Param.(Settings.Metal).epsilon*(Param.(Settings.Metal).sigma^6);
-CXX_pre = 4*Param.(Settings.Halide).epsilon*(Param.(Settings.Halide).sigma^6);
-C.MM = Settings.S.D.All.*Settings.S.D.MM.*CMM_pre;
-C.XX = Settings.S.D.All.*Settings.S.D.XX.*CXX_pre;
-C.MX = Settings.S.D.All.*Settings.S.D.MX.*sqrt(CMM_pre.*CXX_pre);
+%% Convert to B*exp - C6/r^6 form
+B.MX = Settings.S.R.All.*Settings.S.R.MX.*(6*epsilon.MX./(gamma.MX - 6)).*exp(gamma.MX);
+B.MM = Settings.S.R.All.*Settings.S.R.MM.*(6*epsilon.MM./(gamma.MM - 6)).*exp(gamma.MM);
+B.XX = Settings.S.R.All.*Settings.S.R.XX.*(6*epsilon.XX./(gamma.XX - 6)).*exp(gamma.XX);
+
+C.MX = Settings.S.D.All.*Settings.S.D.MX.*(epsilon.MX.*gamma.MX.*(sigma.MX.^6))./(gamma.MX - 6);
+C.MM = Settings.S.D.All.*Settings.S.D.MM.*(epsilon.MM.*gamma.MM.*(sigma.MM.^6))./(gamma.MM - 6);
+C.XX = Settings.S.D.All.*Settings.S.D.XX.*(epsilon.XX.*gamma.XX.*(sigma.XX.^6))./(gamma.XX - 6);
+
+alpha.MX = Settings.S.A.All.*Settings.S.A.MX.*gamma.MX./sigma.MX; % nm^(-1)
+alpha.MM = Settings.S.A.All.*Settings.S.A.MM.*gamma.MM./sigma.MM; % nm^(-1)
+alpha.XX = Settings.S.A.All.*Settings.S.A.XX.*gamma.XX./sigma.XX; % nm^(-1)
 
 %% Generate range (r) in nm
 U.r = Settings.Table_StepSize:Settings.Table_StepSize:Settings.Table_Length;
@@ -41,17 +40,6 @@ U.r = Settings.Table_StepSize:Settings.Table_StepSize:Settings.Table_Length;
 %% If Damping at close range, affects all attractive interactions
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
-    switch int
-        case 'MX'
-            Y1 = Settings.Metal;
-            Y2 = Settings.Halide;
-        case 'MM'
-            Y1 = Settings.Metal;
-            Y2 = Settings.Metal;
-        case 'XX'
-            Y1 = Settings.Halide;
-            Y2 = Settings.Halide;
-    end
     
     % First build the potential
     U_LJ_all = B.(int).*exp(-alpha.(int).*U.r) - C.(int)./(U.r.^6);
@@ -106,7 +94,17 @@ for interaction = {'MX' 'XX' 'MM'}
     end
     
     % Build PES
-    U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + U_LJ_all;
+    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2))./U.r + U_LJ_all;
+    
+    % vdw cutoff shift
+    if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)
+        EVDW_Cutoff = B.(int).*exp(-alpha.(int).*Settings.MDP.RVDW_Cutoff) ...
+            - C.(int)./(Settings.MDP.RVDW_Cutoff.^6);
+        
+        % Shift by the dispersion energy at vdw cutoff radius. only affects one
+        % energy component, not derivatives (i.e. forces)
+        U.(int) = U.(int) - EVDW_Cutoff;
+    end
 end
 
 end

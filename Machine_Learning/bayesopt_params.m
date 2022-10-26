@@ -113,12 +113,12 @@ function params = bayesopt_params(Model)
                 Sr0MM = optimizableVariable('r0_MM',[0 0.5],'Type','real'); % Units: nm
                 Sr0XX = optimizableVariable('r0_XX',[0.15 0.7],'Type','real'); % Units: nm
                 Sr0MX = optimizableVariable('r0_MX',[0 0.7],'Type','real'); % Units: nm
-
+                
                 % epsilon
                 SepsilonMM = optimizableVariable('epsilon_MM',[0 400],'Type','real'); % Units: kJ/mol
                 SepsilonXX = optimizableVariable('epsilon_XX',[0 250],'Type','real'); % Units: kJ/mol
                 SepsilonMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
-
+                
                 % gamma
                 SgammaMM = optimizableVariable('gamma_MM',[7 20],'Type','real'); % Units: kJ/mol
                 SgammaXX = optimizableVariable('gamma_XX',[7 20],'Type','real'); % Units: kJ/mol
@@ -166,7 +166,35 @@ function params = bayesopt_params(Model)
             if Model.Additivity && Model.Additional_MM_Disp
                 params = [params,SDMM2];
             end
+        end    
+    case 'BF'
+        SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
+        
+        % sigma
+        SsigmaMM = optimizableVariable('sigma_MM',[0.05 0.5],'Type','real'); % Units: nm
+        SsigmaXX = optimizableVariable('sigma_XX',[0.15 0.7],'Type','real'); % Units: nm
+        SsigmaMX = optimizableVariable('sigma_MX',[0.1 0.6],'Type','real'); % Units: nm
+
+        % epsilon
+        SepsilonMM = optimizableVariable('epsilon_MM',[0 1000],'Type','real'); % Units: kJ/mol
+        SepsilonXX = optimizableVariable('epsilon_XX',[0 220],'Type','real'); % Units: kJ/mol
+        SepsilonMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
+
+        % gamma
+        SgammaMM = optimizableVariable('gamma_MM',[0 10],'Type','real'); % Units: kJ/mol
+        SgammaXX = optimizableVariable('gamma_XX',[0 10],'Type','real'); % Units: kJ/mol
+        SgammaMX = optimizableVariable('gamma_MX',[0 10],'Type','real'); % Units: kJ/mol
+        
+        if Model.Additivity
+            params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMX];
+        else
+            params = [SsigmaMM,SsigmaXX,SsigmaMX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
         end
+
+        if ~Model.Fix_Charge
+            params = [params,SQ];
+        end
+        
     case {'JC' 'Mie'}
         if Model.SigmaEpsilon
             SDMM = optimizableVariable('sigma_MM',[0.05 0.46],'Type','real'); % Units: nm
@@ -217,7 +245,7 @@ function params = bayesopt_params(Model)
                 params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX,SQ];
             end
         end
-        if strcmp(Model.Theory,'Mie')
+        if strcmp(Model.Theory,'Mie') && ~Model.Fix_Mie_n
             if Model.Additivity
                 params = [params,SnMX];
             else

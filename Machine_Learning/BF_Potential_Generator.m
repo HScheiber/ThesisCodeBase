@@ -1,9 +1,9 @@
-function [U_MX_out, U_MM_out, U_XX_out,C6_out] = Mie_Potential_Generator(Settings,varargin)
+function [U_MX_out, U_MM_out, U_XX_out,C6_out] = BF_Potential_Generator(Settings,varargin)
 
 % Optional inputs
 p = inputParser;
-p.FunctionName = 'Mie_Potential_Generator';
-addOptional(p,'PlotType','full')
+p.FunctionName = 'BF_Potential_Generator';
+addOptional(p,'PlotType','full');
 addOptional(p,'ReturnAsStructure',false);
 addOptional(p,'Startpoint',0);
 addOptional(p,'Plotswitch',false);
@@ -35,78 +35,64 @@ k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
 [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
 
 %% Parameter: q (charge)
-q.Li =  Settings.S.Q; % atomic
-q.Na =  Settings.S.Q; % atomic
-q.K  =  Settings.S.Q; % atomic
-q.Rb =  Settings.S.Q; % atomic
-q.Cs =  Settings.S.Q; % atomic
+q.M =  Settings.S.Q; % atomic
+q.X  = -Settings.S.Q; % atomic
 
-q.F  = -Settings.S.Q; % atomic
-q.Cl = -Settings.S.Q; % atomic
-q.Br = -Settings.S.Q; % atomic
-q.I  = -Settings.S.Q; % atomic
+%% Parameters of interest for vdW potential
+sigma.MX = Settings.S.S.MX; % nm
+sigma.MM = Settings.S.S.MM;
+sigma.XX = Settings.S.S.XX;
 
-%% n repulsive exponent parameter
-n.MM = Settings.S.n.MM;
-n.XX = Settings.S.n.XX;
-n.MX = Settings.S.n.MX;
+epsilon.MX = Settings.S.E.MX; % kJ/mol
+epsilon.MM = Settings.S.E.MM;
+epsilon.XX = Settings.S.E.XX;
 
-%% Calculate prefactor
-P_MM = (n.MM/(n.MM - 6))*((n.MM/6)^(6/(n.MM - 6)));
-P_XX = (n.XX/(n.XX - 6))*((n.XX/6)^(6/(n.XX - 6)));
-P_MX = (n.MX/(n.MX - 6))*((n.MX/6)^(6/(n.MX - 6)));
-
-%% Calculate parameters of interest for Mie potential
-sigma_MM = Settings.S.S.All*Settings.S.S.MM;
-sigma_XX = Settings.S.S.All*Settings.S.S.XX;
-sigma_MX = Settings.S.S.All*Settings.S.S.MX;
-
-epsilon_MM = Settings.S.E.All*Settings.S.E.MM;
-epsilon_XX = Settings.S.E.All*Settings.S.E.XX;
-epsilon_MX = Settings.S.E.All*Settings.S.E.MX;
-
-% Change parameteters into A/r12 - C/r6 format
-A.MM = Settings.S.R.All*Settings.S.R.MM*P_MM*epsilon_MM*(sigma_MM^n.MM);
-C.MM = Settings.S.D.All*Settings.S.D.MM*P_MM*epsilon_MM*(sigma_MM^6);
-
-A.XX = Settings.S.R.All*Settings.S.R.XX*P_XX*epsilon_XX*(sigma_XX^n.XX);
-C.XX = Settings.S.D.All*Settings.S.D.XX*P_XX*epsilon_XX*(sigma_XX^6);
-
-A.MX = Settings.S.R.All*Settings.S.R.MX*P_MX*epsilon_MX*(sigma_MX^n.MX);
-C.MX = Settings.S.D.All*Settings.S.D.MX*P_MX*epsilon_MX*(sigma_MX^6);
+gamma.MX = Settings.S.G.MX; % unitless
+gamma.MM = Settings.S.G.MM;
+gamma.XX = Settings.S.G.XX;
 
 %% Generate range (r) in nm
 r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 
-%% Build PES
+%% If Damping at close range, affects all attractive interactions
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
     
+    Kappa = 2*epsilon.(int)/(1 - (3/(gamma.(int) + 3)));
+    Beta = Kappa*(3/(gamma.(int) + 3));
+    D = (sigma.(int)^6)./((sigma.(int)^6) + (r.^6));
+    dD = (6*(sigma.(int)^6).*(r.^5))./(((sigma.(int)^6) + (r.^6)).^2);
+    
     % C6 values should be in terms on nm and kJ/mol
     if Incl_Disp
-        C6 = C.(int);
+        C6 = Kappa*(sigma.(int)^6);
         C6_out.(int) = 1;
     else
         C6 = 1;
-        C6_out.(int) = C.(int);
+        C6_out.(int) = Kappa*(sigma.(int)^6);
     end
+    
+    %% Build PES
     
     % Components of potential
     U.(int).f = 1./r; % Electrostatics function f(r)
-    U.(int).g = -C6./(r.^6); % Dispersion g(r)
-    U.(int).h =  A.(int)./(r.^n.(int)); % Short range repulsion h(r) (with possible close-range coulomb damping)
+    U.(int).g = - C6./(sigma.(int)^6 + r.^6); % Dispersion g(r)
+    U.(int).h = Beta.*D.*exp(gamma.(int).*(1 - (r./sigma.(int)))); % Short range repulsion (with possible close-range coulomb damping)
     
     % Negative components of derivative
     U.(int).df = 1./(r.^2); % Electrostatics function (not including Coulomb constant or charges)
-    U.(int).dg = - C6.*6./(r.^7); % Dispersion -dg(r)/dr
-    U.(int).dh =   A.(int).*n.(int)./(r.^(n.(int)+1)); % Short range repulsion
+    U.(int).dg = (-C6.*6.*(r.^5))./((sigma.(int)^6 + r.^6).^2); % Dispersion -dg(r)/dr
+    U.(int).dh = Beta.*dD.*exp(gamma.(int).*(1 - (r./sigma.(int)))) ...
+               + Beta.*D.*(gamma.(int)./sigma.(int)).*exp(gamma.(int).*(1 - (r./sigma.(int)))); % Short range repulsion
     
     % Shift the potential to zero at the cutoff
     if contains(Settings.(MDP).vdw_modifier,'potential-shift','IgnoreCase',true)
-        EVDW_Cutoff = A.(int)./(Settings.(MDP).RVDW_Cutoff.^n.(int)) ...
-                    - C.(int)./(Settings.(MDP).RVDW_Cutoff.^6);
+        D_VDW = (sigma.(int)^6)./((sigma.(int)^6) + (Settings.(MDP).RVDW_Cutoff.^6));
+        C6_VDW = Kappa*(sigma.(int)^6);
+        EVDW_Cutoff = Beta.*D_VDW.*exp(gamma.(int).*(1 - (Settings.(MDP).RVDW_Cutoff./sigma.(int)))) ...
+                    - C6_VDW./(sigma.(int)^6 + Settings.(MDP).RVDW_Cutoff.^6);
         
-        % Shift by the dispersion energy at vdw cutoff radius. Only affects one
+        % Shift by the dispersion energy at vdw cutoff radius. only affects one
         % energy component, not derivatives (i.e. forces)
         U.(int).g = U.(int).g - EVDW_Cutoff./C6_out.(int);
     end
@@ -128,13 +114,13 @@ if ReturnAsStructure
     U.MM.df0 = U.MM.df;
     U.XX.df0 = U.XX.df;
     
-	U.MX.f = k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.f;
-    U.MM.f = k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.f;
-    U.XX.f = k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.f;
+	U.MX.f = k_0*(e_c^2).*q.M*q.X.*U.MX.f;
+    U.MM.f = k_0*(e_c^2).*q.M*q.M.*U.MM.f;
+    U.XX.f = k_0*(e_c^2).*q.X*q.X.*U.XX.f;
     
-	U.MX.df = k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.df;
-    U.MM.df = k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.df;
-    U.XX.df = k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.df;
+	U.MX.df = k_0*(e_c^2).*q.M*q.X.*U.MX.df;
+    U.MM.df = k_0*(e_c^2).*q.M*q.M.*U.MM.df;
+    U.XX.df = k_0*(e_c^2).*q.X*q.X.*U.XX.df;
     
     U.MX.Total = U.MX.f + C6_out.MX.*U.MX.g + U.MX.h;
     U.MM.Total = U.MM.f + C6_out.MM.*U.MM.g + U.MM.h;
@@ -159,30 +145,30 @@ end
 
 %% PLOT if plotswitch chosen
 if Plotswitch
-    %figure;
+    figure;
     % Options
-    lw=3;
-    fs=35;
-    
-    h = cell(1,3);
+    lw=2;
+    fs=25;
+
+    h = cell(1,8);
     hold on
     switch lower(PlotType)
         case 'full'
-            h{1} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.f + U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.f + U.MM.g + U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.f + U.XX.g + U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(r.*10,k_0*(e_c^2).*q.M*q.X.*U.MX.f + U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(r.*10,k_0*(e_c^2).*q.M*q.M.*U.MM.f + U.MM.g + U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.f + U.XX.g + U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-600 1000];
             ttxt = 'Full Potential';
         case 'full-derivative'
-            h{1} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.df + U.MX.dg + U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.df + U.MM.dg + U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.df + U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(r.*10,k_0*(e_c^2).*q.M*q.X.*U.MX.df + U.MX.dg + U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(r.*10,k_0*(e_c^2).*q.M*q.M.*U.MM.df + U.MM.dg + U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.df + U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-600 1000];
             ttxt = 'Derivative of Full Potential';
         case 'lj'
             h{1} = plot(r.*10,U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,U.MM.g + U.MM.h,'Color','g','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,U.XX.g + U.XX.h,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{2} = plot(r.*10,U.MM.g + U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(r.*10,U.XX.g + U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-50 10];
             ttxt = 'Lennard-Jones Potential';
         case 'lj-derivative'
@@ -217,17 +203,17 @@ if Plotswitch
             ttxt = 'Derivative of Repulsive Potential';
     end
     
-    title(['Plot of ' ttxt ' for ' Settings.Salt ' JC Model'],...
+    title(['Plot of ' ttxt ' for ' Settings.Salt ' BH Model'],...
        'Interpreter','latex','fontsize',fs)
-    
+
     set(gca,'box','on','TickLabelInterpreter','latex');
     set(gca,'XMinorTick','on','YMinorTick','on','FontSize',fs);
     xlabel('Separation [\AA]','fontsize',fs,'Interpreter','latex');
     ylabel('Potential Energy [kJ mol$^{-1}$]','fontsize',fs,'Interpreter','latex');
-    
+
     ylim(yl);
     xlim([Startpoint Settings.Table_Length]);
-    
+
     % Blank line
     hline = refline([0 0]);
     hline.Color = 'k';

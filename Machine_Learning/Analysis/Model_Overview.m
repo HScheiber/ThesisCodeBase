@@ -2,9 +2,9 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BH';
-ModelID = 'LB';
+ModelID = 'MG';
 BestOnly = false;
-SelectOnly = [4 2 1 4];
+SelectOnly = [];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Draft\BO_Figures';
@@ -32,7 +32,7 @@ plot_finite_T_data = true;
 %% Script begins
 cm3_per_Ang3 = 1e-24; % cubic cm/cubic angstrom
 N_A = 6.02214076e23; % formula units/mol
-ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
+ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed';
 
 Structures   = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
 MinPlotTypes = {'LE' 'RLE' 'a' 'c' 'ac' 'V' 'Density'};
@@ -218,10 +218,10 @@ if N_MinPlot_Rows
         Settings.Salt = Salt;
         for iidx = 1:N_Models
             Model = Models{iidx};
-
+            
             % Find the fully optimized model
             dat_file = fullfile(ML_results_dir,Salt,[Salt '_' Theory '_Model_' Model '_data.mat']);
-
+            
             if ~isfile(dat_file)
                 disp(['Could not load results found for: ' Salt ', ' Theory ', Model ' Model '.']);
                 continue
@@ -235,11 +235,15 @@ if N_MinPlot_Rows
                 
                 Minimization_Data = data.Minimization_Data;
                 
-                optimvals = nan(1,length(data.secondary_result));
-                for jdx = 1:length(data.secondary_result)
-                    optimvals(jdx) = [data.secondary_result(jdx).optimValues.fval];
+                if isfield(data,'secondary_result')
+                    optimvals = nan(1,length(data.secondary_result));
+                    for jdx = 1:length(data.secondary_result)
+                        optimvals(jdx) = [data.secondary_result(jdx).optimValues.fval];
+                    end
+                    Total_loss(idx,iidx) = min(optimvals);
+                else
+                    Total_loss(idx,iidx) = data.bayesopt_results.MinObjective;
                 end
-                Total_loss(idx,iidx) = min(optimvals);
             catch
                 disp(['Could not obtain crystal minimization data for: ' Salt ', ' Theory ', Model ' Model '.']);
                 continue

@@ -1,12 +1,12 @@
-function Bayesian_Optimize_LiX_Parameters(Input_Model)
+function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     
     %% Load the model parameters
-    if isstruct(Input_Model)
-        Model = Input_Model;
+    if isstruct(Input_Settings)
+        Settings = Input_Settings;
         batch_subm = false;
-    elseif isfile(Input_Model)
-        Model_dat = load(Input_Model,'-mat');
-        Model = Model_dat.Model;
+    elseif isfile(Input_Settings)
+        Settings_dat = load(Input_Settings,'-mat');
+        Settings = Settings_dat.Settings;
         batch_subm = true;
     else
         error('Input model does not exist, or is not a compatible data structure.')
@@ -15,35 +15,32 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     % Disable an annoying warning
     warning('off','stats:classreg:learning:impl:GPImpl:GPImpl:SigmaMustBeGreaterThanSigmaLowerBound');
     
-    if ~isfield(Model,'OuterDir')
-        Model.OuterDir = pwd;
+    if ~isfield(Settings,'OuterDir')
+        Settings.OuterDir = pwd;
     end
-    Intermediate_BO_file = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat');
-    Intermediate_BO_backup = fullfile(Model.OuterDir,'intermediate_bayesian_opt.mat.PREV');
-    Intermediate_Fullopt_file = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat');
-    Intermediate_Fullopt_backup = fullfile(Model.OuterDir,'intermediate_secondary_opt.mat.PREV');
-    if isfield(Model,'Diary_Loc') && ~isempty(Model.Diary_Loc)
-        diary(Model.Diary_Loc)
+    Intermediate_BO_file = fullfile(Settings.OuterDir,'intermediate_bayesian_opt.mat');
+    Intermediate_BO_backup = fullfile(Settings.OuterDir,'intermediate_bayesian_opt.mat.PREV');
+    Intermediate_Fullopt_file = fullfile(Settings.OuterDir,'intermediate_secondary_opt.mat');
+    Intermediate_Fullopt_backup = fullfile(Settings.OuterDir,'intermediate_secondary_opt.mat.PREV');
+    if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
+        diary(Settings.Diary_Loc)
     end
     
     % Initialize some global settings for later
-    [Model.Metal,Model.Halide] = Separate_Metal_Halide(Model.Salt);
-    Model.Longest_Cutoff = max([Model.MDP.RList_Cutoff Model.MDP.RCoulomb_Cutoff Model.MDP.RVDW_Cutoff]);
-    [~,Model.gmx,Model.gmx_loc,Model.mdrun_opts] = MD_Batch_Template(Model.JobSettings);
+    [Settings.Metal,Settings.Halide] = Separate_Metal_Halide(Settings.Salt);
+    Settings.Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]);
+    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
     
-    Finite_T_Calc = any([Model.Loss_Options.Fusion_Enthalpy Model.Loss_Options.MP_Volume_Change Model.Loss_Options.Liquid_MP_Volume ...
-        Model.Loss_Options.Solid_MP_Volume Model.Loss_Options.Liquid_DM_MP Model.Loss_Options.MP ] > sqrt(eps));
+    Finite_T_Calc = any([Settings.Loss_Options.Fusion_Enthalpy Settings.Loss_Options.MP_Volume_Change Settings.Loss_Options.Liquid_MP_Volume ...
+        Settings.Loss_Options.Solid_MP_Volume Settings.Loss_Options.Liquid_DM_MP Settings.Loss_Options.MP ] > sqrt(eps));
     
     if Finite_T_Calc
         Deterministic = false; % Thermal properties are not deterministic
     else
         Deterministic = true; % Lattice energy calculations are deterministic
     end
-    if isfield(Model,'initial_N_Multiplier')
-        Model.Initial_N_Multiplier = 10;
-    end
     
-    if Model.UseCoupledConstraint
+    if Settings.UseCoupledConstraint
         NumCC = 1;
         CCDet = true;
     else
@@ -57,96 +54,96 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         disp(repmat('*',1,30))
         disp('Model Input Parameters')
         disp(repmat('*',1,30))
-        disp(Model)
+        disp(Settings)
         disp(repmat('*',1,30))
         disp('Structures:')
-        disp(Model.Structures)
+        disp(Settings.Structures)
         disp('Loss Function')
         disp(repmat('*',1,30))
-        disp(['Regularization: ' Model.Loss_Options.regularization])
-        if Model.Additional_Function.MM.N >= 0 && ~isempty(Model.Additional_Function.MM.Range)
+        disp(['Regularization: ' Settings.Loss_Options.regularization])
+        if Settings.Additional_Function.MM.N >= 0 && ~isempty(Settings.Additional_Function.MM.Range)
             disp(repmat('*',1,30))
             disp('Additional MM Function Included.')
-            disp(['Additional MM Function Exponent: ' num2str(Model.Additional_Function.MM.N)])
-            disp(['Additional MM Function Scale Range: ' num2str(Model.Additional_Function.MM.Range(1)) ...
-                ' - ' num2str(Model.Additional_Function.MM.Range(2))])
+            disp(['Additional MM Function Exponent: ' num2str(Settings.Additional_Function.MM.N)])
+            disp(['Additional MM Function Scale Range: ' num2str(Settings.Additional_Function.MM.Range(1)) ...
+                ' - ' num2str(Settings.Additional_Function.MM.Range(2))])
             disp(repmat('*',1,30))
         end
-        if Model.Additional_Function.XX.N >= 0 && ~isempty(Model.Additional_Function.XX.Range)
+        if Settings.Additional_Function.XX.N >= 0 && ~isempty(Settings.Additional_Function.XX.Range)
             disp(repmat('*',1,30))
             disp('Additional XX Function Included.')
-            disp(['Additional XX Function Exponent: ' num2str(Model.Additional_Function.XX.N)])
-            disp(['Additional XX Function Scale Range: ' num2str(Model.Additional_Function.XX.Range(1)) ...
-                ' - ' num2str(Model.Additional_Function.XX.Range(2))])
+            disp(['Additional XX Function Exponent: ' num2str(Settings.Additional_Function.XX.N)])
+            disp(['Additional XX Function Scale Range: ' num2str(Settings.Additional_Function.XX.Range(1)) ...
+                ' - ' num2str(Settings.Additional_Function.XX.Range(2))])
             disp(repmat('*',1,30))
         end
-        if Model.Additional_Function.MX.N >= 0 && ~isempty(Model.Additional_Function.MX.Range)
+        if Settings.Additional_Function.MX.N >= 0 && ~isempty(Settings.Additional_Function.MX.Range)
             disp(repmat('*',1,30))
             disp('Additional MX Function Included.')
-            disp(['Additional MX Function Exponent: ' num2str(Model.Additional_Function.MX.N)])
-            disp(['Additional MX Function Scale Range: ' num2str(Model.Additional_Function.MX.Range(1)) ...
-                ' - ' num2str(Model.Additional_Function.MX.Range(2))])
+            disp(['Additional MX Function Exponent: ' num2str(Settings.Additional_Function.MX.N)])
+            disp(['Additional MX Function Scale Range: ' num2str(Settings.Additional_Function.MX.Range(1)) ...
+                ' - ' num2str(Settings.Additional_Function.MX.Range(2))])
             disp(repmat('*',1,30))
         end
-        if Model.Loss_Options.Experimental_LE
+        if Settings.Loss_Options.Experimental_LE
             disp('Reference Rocksalt Energy: Born-Haber Experimental')
         else
             disp('Reference Rocksalt Energy: DFT')
         end
-        if Model.Loss_Options.Experimental_LP
+        if Settings.Loss_Options.Experimental_LP
             disp('Reference Rocksalt/Wurtzite Parameters: Experiment')
         else
             disp('Reference Rocksalt/Wurtzite Parameters: DFT')
         end
         tol = sqrt(eps);
-        if Model.Loss_Options.Fusion_Enthalpy > tol
-            disp(['Enthalpy of Fusion at Experimental MP - Weight: ' num2str(Model.Loss_Options.Fusion_Enthalpy)])
+        if Settings.Loss_Options.Fusion_Enthalpy > tol
+            disp(['Enthalpy of Fusion at Experimental MP - Weight: ' num2str(Settings.Loss_Options.Fusion_Enthalpy)])
         end
-        if Model.Loss_Options.MP_Volume_Change > tol
-            disp(['Volume Change of Fusion at Experimental MP - Weight: ' num2str(Model.Loss_Options.MP_Volume_Change)])
+        if Settings.Loss_Options.MP_Volume_Change > tol
+            disp(['Volume Change of Fusion at Experimental MP - Weight: ' num2str(Settings.Loss_Options.MP_Volume_Change)])
         end
-        if Model.Loss_Options.Liquid_MP_Volume > tol
-            disp(['Liquid Volume at Experimental MP - Weight: ' num2str(Model.Loss_Options.Liquid_MP_Volume)])
+        if Settings.Loss_Options.Liquid_MP_Volume > tol
+            disp(['Liquid Volume at Experimental MP - Weight: ' num2str(Settings.Loss_Options.Liquid_MP_Volume)])
         end
-        if Model.Loss_Options.Solid_MP_Volume > tol
-            disp(['Solid Volume at Experimental MP - Weight: ' num2str(Model.Loss_Options.Solid_MP_Volume)])
+        if Settings.Loss_Options.Solid_MP_Volume > tol
+            disp(['Solid Volume at Experimental MP - Weight: ' num2str(Settings.Loss_Options.Solid_MP_Volume)])
         end
-        if Model.Loss_Options.Liquid_DM_MP > tol
-            disp([Model.Metal ' Diffusion Constant at Experimental MP - Weight: ' num2str(Model.Loss_Options.Liquid_DM_MP)])
-        end
-        
-        if Model.Loss_Options.MP > tol
-            disp(['Melting Point - Weight: ' num2str(Model.Loss_Options.MP)])
+        if Settings.Loss_Options.Liquid_DM_MP > tol
+            disp([Settings.Metal ' Diffusion Constant at Experimental MP - Weight: ' num2str(Settings.Loss_Options.Liquid_DM_MP)])
         end
         
-        for idx = 1:length(Model.Structures)
-            Structure = Model.Structures{idx};
-            if Model.Loss_Options.(Structure).LE > tol
-                disp([Structure ' Absolute Lattice Energy - Weight: ' num2str(Model.Loss_Options.(Structure).LE)])
+        if Settings.Loss_Options.MP > tol
+            disp(['Melting Point - Weight: ' num2str(Settings.Loss_Options.MP)])
+        end
+        
+        for idx = 1:length(Settings.Structures)
+            Structure = Settings.Structures{idx};
+            if Settings.Loss_Options.(Structure).LE > tol
+                disp([Structure ' Absolute Lattice Energy - Weight: ' num2str(Settings.Loss_Options.(Structure).LE)])
             end
-            if Model.Loss_Options.(Structure).RLE > tol
-                disp([Structure ' Relative Lattice Energy - Weight: ' num2str(Model.Loss_Options.(Structure).RLE)])
+            if Settings.Loss_Options.(Structure).RLE > tol
+                disp([Structure ' Relative Lattice Energy - Weight: ' num2str(Settings.Loss_Options.(Structure).RLE)])
             end
-            if Model.Loss_Options.(Structure).a > tol
-                disp([Structure ' Lattice Parameter a - Weight: ' num2str(Model.Loss_Options.(Structure).a)])
+            if Settings.Loss_Options.(Structure).a > tol
+                disp([Structure ' Lattice Parameter a - Weight: ' num2str(Settings.Loss_Options.(Structure).a)])
             end
-            if Model.Loss_Options.(Structure).b > tol
-                disp([Structure ' Lattice Parameter b - Weight: ' num2str(Model.Loss_Options.(Structure).b)])
+            if Settings.Loss_Options.(Structure).b > tol
+                disp([Structure ' Lattice Parameter b - Weight: ' num2str(Settings.Loss_Options.(Structure).b)])
             end
-            if Model.Loss_Options.(Structure).c > tol
-                disp([Structure ' Lattice Parameter c - Weight: ' num2str(Model.Loss_Options.(Structure).c)])
+            if Settings.Loss_Options.(Structure).c > tol
+                disp([Structure ' Lattice Parameter c - Weight: ' num2str(Settings.Loss_Options.(Structure).c)])
             end
-            if Model.Loss_Options.(Structure).V > tol
-                disp([Structure ' Crystal Volume - Weight: ' num2str(Model.Loss_Options.(Structure).V)])
+            if Settings.Loss_Options.(Structure).V > tol
+                disp([Structure ' Crystal Volume - Weight: ' num2str(Settings.Loss_Options.(Structure).V)])
             end
-            if Model.Loss_Options.(Structure).Gap.Weight > 0
+            if Settings.Loss_Options.(Structure).Gap.Weight > 0
                 
-                Ref_Structure = Model.Loss_Options.(Structure).Gap.Ref;
+                Ref_Structure = Settings.Loss_Options.(Structure).Gap.Ref;
 
-                disp([Ref_Structure ' - ' Structure ' Energy Gap - Value: ' num2str(Model.Loss_Options.(Structure).Gap.Value)])
-                disp([Ref_Structure ' - ' Structure ' Energy Gap - Weight: ' num2str(Model.Loss_Options.(Structure).Gap.Weight)])
+                disp([Ref_Structure ' - ' Structure ' Energy Gap - Value: ' num2str(Settings.Loss_Options.(Structure).Gap.Value)])
+                disp([Ref_Structure ' - ' Structure ' Energy Gap - Weight: ' num2str(Settings.Loss_Options.(Structure).Gap.Weight)])
                 
-                compare_fun_info = functions(Model.Loss_Options.(Structure).Gap.Type);
+                compare_fun_info = functions(Settings.Loss_Options.(Structure).Gap.Type);
                 
                 switch compare_fun_info.function % lt | gt | eq | ge | le | ne
                     case 'lt'
@@ -170,47 +167,47 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
     
     %% Filenames
-    FileBase = [Model.Salt '_' Model.Theory '_Model_' Model.Trial_ID];
+    FileBase = [Settings.Salt '_' Settings.Theory '_Model_' Settings.Trial_ID];
     Results_filename = [FileBase '_bayesopt.mat'];
     Final_point_filename = [FileBase '_final_point.mat'];
     Full_opt_filename = [FileBase '_fullopt.mat'];
     
     % Check for old results files
-    obs = dir(['*Model_' Model.Trial_ID '*bayesopt.mat']);
+    obs = dir(['*Model_' Settings.Trial_ID '*bayesopt.mat']);
     if ~isempty(obs)
         Results_filename = obs.name;
     end
-    obs = dir(['*Model_' Model.Trial_ID '*final_point.mat']);
+    obs = dir(['*Model_' Settings.Trial_ID '*final_point.mat']);
     if ~isempty(obs)
         Final_point_filename = obs.name;
     end
-    obs = dir(['*Model_' Model.Trial_ID '*fullopt.mat']);
+    obs = dir(['*Model_' Settings.Trial_ID '*fullopt.mat']);
     if ~isempty(obs)
         Full_opt_filename = obs.name;
     end
     %% Set the parameter ranges
-    params = bayesopt_params(Model);
-    seed_points = length(params)*Model.Initial_N_Multiplier;
+    params = bayesopt_params(Settings);
+    seed_points = length(params)*Settings.Initial_N_Multiplier;
 
-    if Model.Parallel_Bayesopt
-        Model.Parallel_Struct_Min = false;
-        Model.Parallel_LiX_Minimizer = false;
-        Model.MinMDP.Parallel_Min = false;
-    elseif Model.Parallel_LiX_Minimizer
-        Model.Parallel_Bayesopt = false;
-        Model.Parallel_Struct_Min = false;
-        Model.MinMDP.Parallel_Min = false;
-    elseif Model.Parallel_Struct_Min
-        Model.Parallel_Bayesopt = false;
-        Model.Parallel_LiX_Minimizer = false;
-        Model.MinMDP.Parallel_Min = true;
+    if Settings.Parallel_Bayesopt
+        Settings.Parallel_Struct_Min = false;
+        Settings.Parallel_LiX_Minimizer = false;
+        Settings.MinMDP.Parallel_Min = false;
+    elseif Settings.Parallel_LiX_Minimizer
+        Settings.Parallel_Bayesopt = false;
+        Settings.Parallel_Struct_Min = false;
+        Settings.MinMDP.Parallel_Min = false;
+    elseif Settings.Parallel_Struct_Min
+        Settings.Parallel_Bayesopt = false;
+        Settings.Parallel_LiX_Minimizer = false;
+        Settings.MinMDP.Parallel_Min = true;
     end
 
-    fun = @(x)LiX_Minimizer(Model,x);
-    constraint_fun = @(x)LiX_Constraint_Fcn(Model,x);
+    fun = @(x)LiX_Minimizer(Settings,x);
+    constraint_fun = @(x)LiX_Constraint_Fcn(Settings,x);
     
     % Set up parallel features
-    if Model.Parallel_Bayesopt
+    if Settings.Parallel_Bayesopt
         PrefCores = feature('numcores');
         if ~isempty(gcp('nocreate')) % If there is currently a parallel pool
             Cur_Pool = gcp;
@@ -265,20 +262,20 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     %% Global optimization with bayesian optimization
     % Deal with restart requests
-    if Model.Restart_Calculation && (isfile(Intermediate_Fullopt_file) || isfile(Intermediate_Fullopt_backup))
+    if Settings.Continue_Calculation && (isfile(Intermediate_Fullopt_file) || isfile(Intermediate_Fullopt_backup))
         run_bayesopt = false;
         continue_bayesopt = false;
         continue_fullopt = true;
-    elseif Model.Restart_Calculation && isfile(Results_filename)
+    elseif Settings.Continue_Calculation && isfile(Results_filename)
         run_bayesopt = false;
         continue_bayesopt = false;
         continue_fullopt = false;
-    elseif Model.Restart_Calculation && (isfile(Intermediate_BO_file) || isfile(Intermediate_BO_backup))
+    elseif Settings.Continue_Calculation && (isfile(Intermediate_BO_file) || isfile(Intermediate_BO_backup))
         run_bayesopt = true;
         continue_bayesopt = true;
         continue_fullopt = false;
     else
-        if Model.Restart_Calculation
+        if Settings.Continue_Calculation
             disp('No checkpoint files found. Starting new calculation.');
         end
         run_bayesopt = true;
@@ -289,15 +286,12 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     if ~run_bayesopt
         % Skip primary bayesian optimization step
         
-        switch Model.initial_opt_type
-            case 'bayesopt'
-                % Find and Load the previous results
-                obs = dir(['*Model_' Model.Trial_ID '*_bayesopt.mat']);         
-                res = load(obs.name); % Loads the results variable
-                results = res.results;
-        end
-
-    elseif Model.Restart_Calculation && continue_bayesopt
+        % Find and Load the previous results
+        obs = dir(['*Model_' Settings.Trial_ID '*_bayesopt.mat']);         
+        res = load(obs.name); % Loads the results variable
+        results = res.results;
+        
+    elseif Settings.Continue_Calculation && continue_bayesopt
         % If you want to resume:
         try
             dat = load(Intermediate_BO_file,'-mat');
@@ -316,7 +310,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 if isfile(Intermediate_BO_backup)
                     delete(Intermediate_BO_backup)
                 end
-                Bayesian_Optimize_LiX_Parameters(Input_Model)
+                Bayesian_Optimize_LiX_Parameters(Input_Settings)
                 return
             end
         end
@@ -336,40 +330,40 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 if isfile(Intermediate_BO_backup)
                     delete(Intermediate_BO_backup)
                 end
-                Bayesian_Optimize_LiX_Parameters(Input_Model)
+                Bayesian_Optimize_LiX_Parameters(Input_Settings)
                 return
             end
         end
         
-        switch Model.initial_opt_type
+        switch Settings.initial_opt_type
             case 'bayesopt'
-                if Model.ShowPlots
+                if Settings.ShowPlots
                     plotopt = 'all';
                 else
                     plotopt = [];
                 end
                 
                 BayesoptResults = dat.BayesoptResults;
-                remaining_evals = Model.Max_Bayesian_Iterations - BayesoptResults.NumObjectiveEvaluations;
+                remaining_evals = Settings.Max_Bayesian_Iterations - BayesoptResults.NumObjectiveEvaluations;
                 
                 if isfield(BayesoptResults.Options,'KernelFunction')
                     results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
-                        'ExplorationRatio',Model.ExplorationRatio,'PlotFcn',plotopt,...
-                        'AcquisitionFunctionName',Model.Acquisition_Function,'Verbose',1,...
+                        'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
+                        'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
                         'ParallelMethod','clipped-model-prediction',...
                         'MaxObjectiveEvaluations',remaining_evals,...
                         'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                        'GPActiveSetSize',Model.Max_Bayesian_Iterations,...
-                        'KernelFunction',Model.KernelFunction,'XConstraintFcn',constraint_fun,...
+                        'GPActiveSetSize',Settings.Max_Bayesian_Iterations,...
+                        'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
                         'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
                 else
                     results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
-                        'ExplorationRatio',Model.ExplorationRatio,'PlotFcn',plotopt,...
-                        'AcquisitionFunctionName',Model.Acquisition_Function,'Verbose',1,...
+                        'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
+                        'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
                         'ParallelMethod','clipped-model-prediction',...
                         'MaxObjectiveEvaluations',remaining_evals,...
                         'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                        'GPActiveSetSize',Model.Max_Bayesian_Iterations,'XConstraintFcn',constraint_fun,...
+                        'GPActiveSetSize',Settings.Max_Bayesian_Iterations,'XConstraintFcn',constraint_fun,...
                         'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
                 end
                 % Save results
@@ -377,36 +371,58 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         end
     else
         rng('shuffle'); % Reset the random seed to current time
-        switch Model.initial_opt_type
+        switch Settings.initial_opt_type
             case 'bayesopt'
-                if Model.ShowPlots
+                if Settings.ShowPlots
                     plotopt = 'all';
                 else
                     plotopt = [];
                 end
-                results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
-                    'ExplorationRatio',Model.ExplorationRatio,'PlotFcn',plotopt,...
-                    'AcquisitionFunctionName',Model.Acquisition_Function,'Verbose',1,...
-                    'UseParallel',Model.Parallel_Bayesopt,'ParallelMethod','clipped-model-prediction',...
-                    'MaxObjectiveEvaluations',Model.Max_Bayesian_Iterations,'NumSeedPoints',seed_points,...
-                    'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                    'GPActiveSetSize',Model.Max_Bayesian_Iterations,...
-                    'KernelFunction',Model.KernelFunction,'XConstraintFcn',constraint_fun,...
-                    'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
                 
+                if ~isempty(Settings.Initialize_From_Model)
+                    Prev_Data = LoadPrevModelData(Settings,params);
+                    Iterations = size(Prev_Data.InitialObjective,1) + Settings.Max_Bayesian_Iterations;
+                    
+                    results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
+                        'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
+                        'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
+                        'UseParallel',Settings.Parallel_Bayesopt,'ParallelMethod','clipped-model-prediction',...
+                        'MaxObjectiveEvaluations',Iterations,'NumSeedPoints',seed_points,...
+                        'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
+                        'GPActiveSetSize',min(Iterations,2000),...
+                        'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
+                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet,...
+                        'InitialX',Prev_Data.InitialX,...
+                        'InitialObjective',Prev_Data.InitialObjective,...
+                        'InitialConstraintViolations',Prev_Data.InitialConstraintViolations,...
+                        'InitialErrorValues',Prev_Data.InitialErrorValues,...
+                        'InitialUserData',Prev_Data.InitialUserData,...
+                        'InitialObjectiveEvaluationTimes',Prev_Data.InitialObjectiveEvaluationTimes,...
+                        'InitialIterationTimes',Prev_Data.InitialIterationTimes);
+                else
+                    results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
+                        'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
+                        'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
+                        'UseParallel',Settings.Parallel_Bayesopt,'ParallelMethod','clipped-model-prediction',...
+                        'MaxObjectiveEvaluations',Settings.Max_Bayesian_Iterations,'NumSeedPoints',seed_points,...
+                        'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
+                        'GPActiveSetSize',Settings.Max_Bayesian_Iterations,...
+                        'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
+                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
+                end
             case 'surrogateopt'
-                if Model.ShowPlots
+                if Settings.ShowPlots
                     plotopt = 'surrogateoptplot';
                 else
                     plotopt = [];
                 end
                 % surrogateopt options
                 options = optimoptions('surrogateopt','Display','iter',...
-                    'MaxFunctionEvaluations',Model.Max_Bayesian_Iterations,...
-                    'MinSurrogatePoints',Model.MinSurrogatePoints,...
-                    'MinSampleDistance',Model.MinSampleDistance,...
+                    'MaxFunctionEvaluations',Settings.Max_Bayesian_Iterations,...
+                    'MinSurrogatePoints',Settings.MinSurrogatePoints,...
+                    'MinSampleDistance',Settings.MinSampleDistance,...
                     'PlotFcn',plotopt,...
-                    'UseParallel',Model.Parallel_Bayesopt,...
+                    'UseParallel',Settings.Parallel_Bayesopt,...
                     'CheckpointFile','intermediate_surrogate_opt.mat');
 
                 ub = nan(1,length(params));
@@ -428,8 +444,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     end
     
     %% Secondary optimization with different aqcuisition function focused on locally optimizing result
-    if strcmpi(Model.initial_opt_type,'bayesopt') && strcmpi(Model.second_opt_type,'bayesopt') && ~isfile('secondary_completed')
-        if Model.ShowPlots
+    if strcmpi(Settings.initial_opt_type,'bayesopt') && strcmpi(Settings.second_opt_type,'bayesopt') && ~isfile('secondary_completed')
+        if Settings.ShowPlots
             plotopt = 'all';
         else
             plotopt = [];
@@ -467,26 +483,26 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         end
         
         % Calculate remaining evaluations for secondary optimization
-        remaining_evals = Model.Max_Secondary_Iterations + Model.Max_Bayesian_Iterations - BayesoptResults.NumObjectiveEvaluations;
+        remaining_evals = Settings.Max_Secondary_Iterations + Settings.Max_Bayesian_Iterations - BayesoptResults.NumObjectiveEvaluations;
         
         if remaining_evals > 0
             if isfield(BayesoptResults.Options,'KernelFunction')
                 results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
-                    'PlotFcn',plotopt,'ExplorationRatio',Model.ExplorationRatio_Secondary,...
-                    'AcquisitionFunctionName',Model.Secondary_Acquisition_Function,'Verbose',1,...
+                    'PlotFcn',plotopt,'ExplorationRatio',Settings.ExplorationRatio_Secondary,...
+                    'AcquisitionFunctionName',Settings.Secondary_Acquisition_Function,'Verbose',1,...
                     'ParallelMethod','clipped-model-prediction',...
                     'MaxObjectiveEvaluations',remaining_evals,...
                     'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                    'GPActiveSetSize',Model.Max_Secondary_Iterations + Model.Max_Bayesian_Iterations,...
-                    'KernelFunction',Model.SecondaryKernelFunction,'XConstraintFcn',constraint_fun,...
+                    'GPActiveSetSize',Settings.Max_Secondary_Iterations + Settings.Max_Bayesian_Iterations,...
+                    'KernelFunction',Settings.SecondaryKernelFunction,'XConstraintFcn',constraint_fun,...
                     'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
             else
                 results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
-                    'PlotFcn',plotopt,'ExplorationRatio',Model.ExplorationRatio_Secondary,...
-                    'AcquisitionFunctionName',Model.Secondary_Acquisition_Function,'Verbose',1,...
+                    'PlotFcn',plotopt,'ExplorationRatio',Settings.ExplorationRatio_Secondary,...
+                    'AcquisitionFunctionName',Settings.Secondary_Acquisition_Function,'Verbose',1,...
                     'ParallelMethod','clipped-model-prediction','MaxObjectiveEvaluations',remaining_evals,...
                     'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                    'GPActiveSetSize',Model.Max_Secondary_Iterations + Model.Max_Bayesian_Iterations,...
+                    'GPActiveSetSize',Settings.Max_Secondary_Iterations + Settings.Max_Bayesian_Iterations,...
                     'XConstraintFcn',constraint_fun,...
                     'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
             end
@@ -502,26 +518,26 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     %% Perform final local optimization %%
     if ~isfile(Final_point_filename)
-        switch Model.final_opt_type
+        switch Settings.final_opt_type
             case 'fminsearch'
                 % First, reset the parallelization scheme for fminsearch as it has no parallel option
                 % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
-                if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
-                    Model.Parallel_Bayesopt = false;
-                    Model.Parallel_Struct_Min = false;
-                    Model.Parallel_LiX_Minimizer = true;
-                    Model.MinMDP.Parallel_Min = false;
-                elseif Model.Parallel_Struct_Min
-                    Model.Parallel_Bayesopt = false;
-                    Model.Parallel_Struct_Min = true;
-                    Model.Parallel_LiX_Minimizer = false;
-                    Model.MinMDP.Parallel_Min = true;
+                if Settings.Parallel_Bayesopt || Settings.Parallel_LiX_Minimizer
+                    Settings.Parallel_Bayesopt = false;
+                    Settings.Parallel_Struct_Min = false;
+                    Settings.Parallel_LiX_Minimizer = true;
+                    Settings.MinMDP.Parallel_Min = false;
+                elseif Settings.Parallel_Struct_Min
+                    Settings.Parallel_Bayesopt = false;
+                    Settings.Parallel_Struct_Min = true;
+                    Settings.Parallel_LiX_Minimizer = false;
+                    Settings.MinMDP.Parallel_Min = true;
                 end
-                fun = @(x)LiX_Minimizer(Model,x);
+                fun = @(x)LiX_Minimizer(Settings,x);
 
                 % Options for the Nelder–Mead search
-                optionsNM = optimset('Display','iter','MaxIter',Model.Max_Local_Iterations,...
-                    'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence,...
+                optionsNM = optimset('Display','iter','MaxIter',Settings.Max_Local_Iterations,...
+                    'TolFun',Settings.Loss_Convergence,'TolX',Settings.Param_Convergence,...
                     'OutputFcn',@outputFcn_secondary_opt);
 
                 if continue_fullopt
@@ -530,7 +546,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;
 
-                        remaining_evals = Model.Max_Local_Iterations - length(intermediate_data)+2;
+                        remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
                         if remaining_evals <= 0
                             remaining_evals = 1;
                         end
@@ -547,7 +563,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;
 
-                            remaining_evals = Model.Max_Local_Iterations - length(intermediate_data)+2;
+                            remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
                             if remaining_evals <= 0
                                 remaining_evals = 1;
                             end
@@ -577,22 +593,22 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 
                 % First, reset the parallelization scheme for fminsearchbnd as it has no parallel option
                 % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
-                if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
-                    Model.Parallel_Bayesopt = false;
-                    Model.Parallel_Struct_Min = false;
-                    Model.Parallel_LiX_Minimizer = true;
-                    Model.MinMDP.Parallel_Min = false;
-                elseif Model.Parallel_Struct_Min
-                    Model.Parallel_Bayesopt = false;
-                    Model.Parallel_Struct_Min = true;
-                    Model.Parallel_LiX_Minimizer = false;
-                    Model.MinMDP.Parallel_Min = true;
+                if Settings.Parallel_Bayesopt || Settings.Parallel_LiX_Minimizer
+                    Settings.Parallel_Bayesopt = false;
+                    Settings.Parallel_Struct_Min = false;
+                    Settings.Parallel_LiX_Minimizer = true;
+                    Settings.MinMDP.Parallel_Min = false;
+                elseif Settings.Parallel_Struct_Min
+                    Settings.Parallel_Bayesopt = false;
+                    Settings.Parallel_Struct_Min = true;
+                    Settings.Parallel_LiX_Minimizer = false;
+                    Settings.MinMDP.Parallel_Min = true;
                 end
-                fun = @(x)LiX_Minimizer(Model,x);
+                fun = @(x)LiX_Minimizer(Settings,x);
 
                 % Options for the Nelder–Mead search
-                optionsNM = optimset('Display','iter','MaxIter',Model.Max_Local_Iterations,...
-                    'MaxFunEvals',Model.MaxFunEvals,'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence,...
+                optionsNM = optimset('Display','iter','MaxIter',Settings.Max_Local_Iterations,...
+                    'MaxFunEvals',Settings.MaxFunEvals,'TolFun',Settings.Loss_Convergence,'TolX',Settings.Param_Convergence,...
                     'OutputFcn',@outputFcn_secondary_opt);
 
                 if continue_fullopt
@@ -601,7 +617,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         intermediate_data = dat.intermediate_data;
                         x0 = intermediate_data(end).x;
 
-                        remaining_evals = Model.Max_Local_Iterations - length(intermediate_data)+2;
+                        remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
 
                         if remaining_evals <= 0
                             remaining_evals = 1;
@@ -618,7 +634,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;
 
-                            remaining_evals = Model.Max_Local_Iterations - length(intermediate_data)+2;
+                            remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
 
                             if remaining_evals <= 0
                                 remaining_evals = 1;
@@ -630,13 +646,13 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             if isfile(Intermediate_Fullopt_backup)
                                 delete(Intermediate_Fullopt_backup);
                             end
-                            remaining_evals = Model.Max_Local_Iterations;
+                            remaining_evals = Settings.Max_Local_Iterations;
                             [~,midx] = min(results.ObjectiveTrace);
                             x0 = results.XTrace{midx,:};
                         end
                     end
                 else
-                    remaining_evals = Model.Max_Local_Iterations;
+                    remaining_evals = Settings.Max_Local_Iterations;
                     [~,midx] = min(results.ObjectiveTrace);
                     x0 = results.XTrace{midx,:};
                 end
@@ -644,17 +660,17 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 [full_opt_point,~,exitflag,full_opt_results] = fminsearchbnd(fun,x0,lb,ub,optionsNM);
 
                 % Check to see if the max local iterations is exceeded
-                if exitflag == 0 && remaining_evals > 1 && Model.switch_final_opt % calculation exceeded number of allowed iterations
+                if exitflag == 0 && remaining_evals > 1 && Settings.switch_final_opt % calculation exceeded number of allowed iterations
                     % switch to nealder-mead simplex minimization
                     disp('Swicthing local optimization to patternsearch')
-                    Model.final_opt_type = 'patternsearch';
+                    Settings.final_opt_type = 'patternsearch';
 
                     % Overwrite the input file if it exists
                     if batch_subm
-                        save(Input_Model,'Model','-mat')
+                        save(Input_Settings,'Settings','-mat')
                     end
 
-                    Bayesian_Optimize_LiX_Parameters(Model)
+                    Bayesian_Optimize_LiX_Parameters(Settings)
                     return
                 end
             case 'patternsearch'
@@ -681,7 +697,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         end
 
                         current_iterations = length(intermediate_data);
-                        max_iter = Model.Max_Local_Iterations - current_iterations;
+                        max_iter = Settings.Max_Local_Iterations - current_iterations;
                     catch
                         disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
                         if isfile(Intermediate_Fullopt_file)
@@ -700,7 +716,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             end
 
                             current_iterations = length(intermediate_data);
-                            max_iter = Model.Max_Local_Iterations - current_iterations;
+                            max_iter = Settings.Max_Local_Iterations - current_iterations;
 
                         catch
                             disp('Unable to load backup secondary optimization checkpoint file, starting new.')
@@ -711,14 +727,14 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             x0 = results.XTrace{midx,:};
                             
                             init_meshsize = 0.1;
-                            max_iter = Model.Max_Local_Iterations;
+                            max_iter = Settings.Max_Local_Iterations;
                         end
                     end
                 else
                     [~,midx] = min(results.ObjectiveTrace);
                     x0 = results.XTrace{midx,:};
                     init_meshsize = 0.1;
-                    max_iter = Model.Max_Local_Iterations;
+                    max_iter = Settings.Max_Local_Iterations;
                 end
 
         %         optionsNM = optimset('Display','iter','MaxIter',50,'MaxFunEvals',Model.MaxFunEvals,...
@@ -728,15 +744,15 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                     max_iter = 1;
                 end
 
-                if Model.ShowPlots
+                if Settings.ShowPlots
                     plotopt = 'psplotbestf';
                 else
                     plotopt = [];
                 end
 
                 options = optimoptions(@patternsearch,'Display','iter','MaxIterations',max_iter,...
-                    'UseParallel',Model.Parallel_Bayesopt,'UseVectorized',false,'PlotFcn',plotopt,...
-                    'InitialMeshSize',init_meshsize,'StepTolerance',Model.Param_Convergence,'FunctionTolerance',Model.Loss_Convergence,...
+                    'UseParallel',Settings.Parallel_Bayesopt,'UseVectorized',false,'PlotFcn',plotopt,...
+                    'InitialMeshSize',init_meshsize,'StepTolerance',Settings.Param_Convergence,'FunctionTolerance',Settings.Loss_Convergence,...
                     'PollOrderAlgorithm','Success','Cache','On','UseCompletePoll',false,...
                     'PollMethod','GPSPositiveBasis2N','MaxMeshSize',Inf,'MeshTolerance',1e-8,...
                     'OutputFcn',@outputFcn_patternsearch_opt);%,'MaxFunctionEvaluations',Model.MaxFunEvals);
@@ -751,10 +767,10 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         %             
         %             % Overwrite the input file if it exists
         %             if batch_subm
-        %                 save(Input_Model,'Model','-mat')
+        %                 save(Input_Model,'Settings','-mat')
         %             end
         %             
-        %             Bayesian_Optimize_LiX_Parameters(Model)
+        %             Bayesian_Optimize_LiX_Parameters(Settings)
         %             return
         %         end
             case 'fmincon' % fmincon uses gradients!
@@ -772,7 +788,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         x0 = intermediate_data(end).x;    
 
                         current_iterations = length(intermediate_data);
-                        max_iter = Model.Max_Local_Iterations - current_iterations;
+                        max_iter = Settings.Max_Local_Iterations - current_iterations;
                     catch
                         disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
                         if isfile(Intermediate_Fullopt_file)
@@ -784,7 +800,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             x0 = intermediate_data(end).x;    
                             
                             current_iterations = length(intermediate_data);
-                            max_iter = Model.Max_Local_Iterations - current_iterations;
+                            max_iter = Settings.Max_Local_Iterations - current_iterations;
                         catch
                             disp('Unable to load backup secondary optimization checkpoint file, starting new.')
                             if isfile(Intermediate_Fullopt_backup)
@@ -792,13 +808,13 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                             end
                             [~,midx] = min(results.ObjectiveTrace);
                             x0 = results.XTrace{midx,:};
-                            max_iter = Model.Max_Local_Iterations;
+                            max_iter = Settings.Max_Local_Iterations;
                         end
                     end
                 else
                     [~,midx] = min(results.ObjectiveTrace);
                     x0 = results.XTrace{midx,:};
-                    max_iter = Model.Max_Local_Iterations;
+                    max_iter = Settings.Max_Local_Iterations;
                 end
 
                 if max_iter <= 0
@@ -807,9 +823,9 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
 
                 % For unconstrained problem with fmincon, OptimalityTolerance is the max of the gradient
                 options = optimoptions(@fmincon,'Display','iter','Algorithm','active-set',...
-                    'DiffMaxChange',1e-1,'OptimalityTolerance',1e-1,'UseParallel',Model.Parallel_Bayesopt,...
+                    'DiffMaxChange',1e-1,'OptimalityTolerance',1e-1,'UseParallel',Settings.Parallel_Bayesopt,...
                     'MaxIterations',max_iter,'FiniteDifferenceStepSize',sqrt(eps),...
-                    'StepTolerance',Model.Param_Convergence,'FunctionTolerance',Model.Loss_Convergence,...
+                    'StepTolerance',Settings.Param_Convergence,'FunctionTolerance',Settings.Loss_Convergence,...
                     'FiniteDifferenceType','forward','MaxFunctionEvaluations',Inf,...
                     'OutputFcn',@outputFcn_secondary_opt);
 
@@ -826,7 +842,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                 error('Unknown final optimization scheme. Choose one of "fminsearch", "patternsearch", "fminsearchbnd", or "none"')
         end
         
-        if ~Deterministic && ~strcmpi(Model.final_opt_type,'none')
+        if ~Deterministic && ~strcmpi(Settings.final_opt_type,'none')
             try
                 dat = load(Intermediate_Fullopt_file).intermediate_data;
             catch
@@ -841,7 +857,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
                         if isfile(Intermediate_Fullopt_backup)
                             delete(Intermediate_Fullopt_backup);
                         end
-                        Bayesian_Optimize_LiX_Parameters(Input_Model);
+                        Bayesian_Optimize_LiX_Parameters(Input_Settings);
                         return
                     end
             end
@@ -854,13 +870,13 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
         end
         
         % Save a structure containing some calculation properties
-        Calculation_properties.Salt = Model.Salt;
-        Calculation_properties.Theory = Model.Theory;
-        Calculation_properties.Fix_Charge = Model.Fix_Charge;
-        Calculation_properties.Additivity = Model.Additivity;
-        Calculation_properties.Additional_MM_Disp = Model.Additional_MM_Disp;
-        Calculation_properties.Additional_GAdjust = Model.Additional_GAdjust;
-        Calculation_properties.SigmaEpsilon = Model.SigmaEpsilon;
+        Calculation_properties.Salt = Settings.Salt;
+        Calculation_properties.Theory = Settings.Theory;
+        Calculation_properties.Fix_Charge = Settings.Fix_Charge;
+        Calculation_properties.Additivity = Settings.Additivity;
+        Calculation_properties.Additional_MM_Disp = Settings.Additional_MM_Disp;
+        Calculation_properties.Additional_GAdjust = Settings.Additional_GAdjust;
+        Calculation_properties.SigmaEpsilon = Settings.SigmaEpsilon;
         save(Final_point_filename,'full_opt_results','full_opt_point',...
             'Calculation_properties');
     else
@@ -871,7 +887,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
             if isfile(Final_point_filename)
                 delete(Final_point_filename)
             end
-            Bayesian_Optimize_LiX_Parameters(Input_Model)
+            Bayesian_Optimize_LiX_Parameters(Input_Settings)
             return
         end
         Calculation_properties = dat.Calculation_properties;
@@ -881,20 +897,20 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     %% Final test of parameters on all structures for output
     % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
-    if Model.Parallel_Bayesopt || Model.Parallel_LiX_Minimizer
-        Model.Parallel_Bayesopt = false;
-        Model.Parallel_Struct_Min = false;
-        Model.Parallel_LiX_Minimizer = true;
-        Model.MinMDP.Parallel_Min = false;
-    elseif Model.Parallel_Struct_Min
-        Model.Parallel_Bayesopt = false;
-        Model.Parallel_LiX_Minimizer = false;
-        Model.MinMDP.Parallel_Min = true;
+    if Settings.Parallel_Bayesopt || Settings.Parallel_LiX_Minimizer
+        Settings.Parallel_Bayesopt = false;
+        Settings.Parallel_Struct_Min = false;
+        Settings.Parallel_LiX_Minimizer = true;
+        Settings.MinMDP.Parallel_Min = false;
+    elseif Settings.Parallel_Struct_Min
+        Settings.Parallel_Bayesopt = false;
+        Settings.Parallel_LiX_Minimizer = false;
+        Settings.MinMDP.Parallel_Min = true;
     end
-    Model.Delete_Equil = false; % save the final MP calculation directories
-    Model.Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
-    Model.Verbose = true;
-    [loss,~,UserData] = LiX_Minimizer(Model,full_opt_point,...
+    Settings.Delete_Equil = false; % save the final MP calculation directories
+    Settings.Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+    Settings.Verbose = true;
+    [loss,~,UserData] = LiX_Minimizer(Settings,full_opt_point,...
         'Extra_Properties',true,'Therm_Prop_Override',true);
     
     ParNames = {params.Name};
@@ -905,34 +921,34 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     
     % Load targets
     DFT = Load_Best_DFT_Data;
-    Structures = Model.Structures;
+    Structures = Settings.Structures;
     N = length(Structures);
-    if Model.Loss_Options.Experimental_LE || Model.Loss_Options.Experimental_LP
+    if Settings.Loss_Options.Experimental_LE || Settings.Loss_Options.Experimental_LP
         Exp = Load_Experimental_Data;
         
-        if Model.Loss_Options.Experimental_LE
-            E_Correction = Exp.(Model.Salt).Rocksalt.E - DFT.(Model.Salt).Rocksalt.Energy;        
+        if Settings.Loss_Options.Experimental_LE
+            E_Correction = Exp.(Settings.Salt).Rocksalt.E - DFT.(Settings.Salt).Rocksalt.Energy;        
             for idx = 1:N
                 try
-                    DFT.(Model.Salt).(Structures{idx}).Energy = DFT.(Model.Salt).(Structures{idx}).Energy + E_Correction;
+                    DFT.(Settings.Salt).(Structures{idx}).Energy = DFT.(Settings.Salt).(Structures{idx}).Energy + E_Correction;
                 catch
-                    DFT.(Model.Salt).(Structures{idx}).Energy = nan;
-                    DFT.(Model.Salt).(Structures{idx}).a = nan;
-                    DFT.(Model.Salt).(Structures{idx}).b = nan;
-                    DFT.(Model.Salt).(Structures{idx}).c = nan;
+                    DFT.(Settings.Salt).(Structures{idx}).Energy = nan;
+                    DFT.(Settings.Salt).(Structures{idx}).a = nan;
+                    DFT.(Settings.Salt).(Structures{idx}).b = nan;
+                    DFT.(Settings.Salt).(Structures{idx}).c = nan;
                 end
             end
         end
-        if Model.Loss_Options.Experimental_LP
-            DFT.(Model.Salt).Rocksalt.a = Exp.(Model.Salt).Rocksalt.a_zero;
-            DFT.(Model.Salt).Rocksalt.b = Exp.(Model.Salt).Rocksalt.b_zero;
-            DFT.(Model.Salt).Rocksalt.c = Exp.(Model.Salt).Rocksalt.c_zero;
-            DFT.(Model.Salt).Rocksalt.V = Exp.(Model.Salt).Rocksalt.V_zero;
-            if isfield(Exp.(Model.Salt),'Wurtzite')
-                DFT.(Model.Salt).Wurtzite.a = Exp.(Model.Salt).Wurtzite.a_zero;
-                DFT.(Model.Salt).Wurtzite.b = Exp.(Model.Salt).Wurtzite.b_zero;
-                DFT.(Model.Salt).Wurtzite.c = Exp.(Model.Salt).Wurtzite.c_zero;
-                DFT.(Model.Salt).Wurtzite.V = Exp.(Model.Salt).Wurtzite.V_zero;
+        if Settings.Loss_Options.Experimental_LP
+            DFT.(Settings.Salt).Rocksalt.a = Exp.(Settings.Salt).Rocksalt.a_zero;
+            DFT.(Settings.Salt).Rocksalt.b = Exp.(Settings.Salt).Rocksalt.b_zero;
+            DFT.(Settings.Salt).Rocksalt.c = Exp.(Settings.Salt).Rocksalt.c_zero;
+            DFT.(Settings.Salt).Rocksalt.V = Exp.(Settings.Salt).Rocksalt.V_zero;
+            if isfield(Exp.(Settings.Salt),'Wurtzite')
+                DFT.(Settings.Salt).Wurtzite.a = Exp.(Settings.Salt).Wurtzite.a_zero;
+                DFT.(Settings.Salt).Wurtzite.b = Exp.(Settings.Salt).Wurtzite.b_zero;
+                DFT.(Settings.Salt).Wurtzite.c = Exp.(Settings.Salt).Wurtzite.c_zero;
+                DFT.(Settings.Salt).Wurtzite.V = Exp.(Settings.Salt).Wurtzite.V_zero;
             end
         end
     end
@@ -941,18 +957,18 @@ function Bayesian_Optimize_LiX_Parameters(Input_Model)
     Finite_T_Data = UserData.Finite_T_Data;
     
     disp(repmat('*',1,80))
-    disp(['Final Results - [Salt: ' Model.Salt '] - [Potential Form: ' Model.Theory '] - [Model name: ' Model.Trial_ID ']'])
+    disp(['Final Results - [Salt: ' Settings.Salt '] - [Potential Form: ' Settings.Theory '] - [Model name: ' Settings.Trial_ID ']'])
     disp(repmat('*',1,80))
     
     format long g
-    for idx = 1:length(Model.Structures)
+    for idx = 1:length(Settings.Structures)
         disp(repmat('*',1,60))
-        disp(Model.Structures{idx})
+        disp(Settings.Structures{idx})
         disp('Target (Exp/DFT) Data:')
         disp(repmat('*',1,60))
-        disp(DFT.(Model.Salt).(Model.Structures{idx}))
+        disp(DFT.(Settings.Salt).(Settings.Structures{idx}))
         disp(repmat('*',1,60))
-        disp(Model.Structures{idx})
+        disp(Settings.Structures{idx})
         disp('Model Result:')
         disp(repmat('*',1,60))
         disp(Minimization_Data{idx})

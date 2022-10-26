@@ -24,7 +24,7 @@
 % are the same)
 
 % CRDamping = Close Range Damping
-function [U_MX_out, U_MM_out, U_XX_out] = JC_Potential_Generator(Settings,varargin)
+function [U_MX_out, U_MM_out, U_XX_out,C6_out] = JC_Potential_Generator(Settings,varargin)
 
 
 % Optional inputs
@@ -35,11 +35,13 @@ addOptional(p,'ReturnAsStructure',false);
 addOptional(p,'Startpoint',0);
 addOptional(p,'Plotswitch',false);
 addOptional(p,'MDP_Minimize',false);
+addOptional(p,'Include_Dispersion_Scale',true);
 parse(p,varargin{:});
 PlotType = p.Results.PlotType;
 ReturnAsStructure = p.Results.ReturnAsStructure;
 Startpoint = p.Results.Startpoint;
 Plotswitch = p.Results.Plotswitch;
+Incl_Disp = p.Results.Include_Dispersion_Scale;
 % Allowed plot types: 'full', 'lj', 'full-derivative', 'lj-derivative',
 % 'dispersion', 'dispersion-derivative', 'repulsive',
 % 'repulsive-derivative'
@@ -632,20 +634,29 @@ for interaction = {'MX' 'XX' 'MM'}
         U_add_cutoff = 0;
     end
     
+    % C6 and C8 values should be in terms on nm and kJ/mol
+    if Incl_Disp
+        C6 = C.(int);
+        C6_out.(int) = 1;
+    else
+        C6 = 1;
+        C6_out.(int) = C.(int);
+    end
+    
     % Components of potential
     U.(int).f = 1./r; % Electrostatics function f(r)
-    U.(int).g = - f6.(int).*C.(int)./(r.^6) ...
-                + G_r.(int) ...
-                + U_add; % Dispersion g(r)
+    U.(int).g = - f6.(int).*C6./(r.^6) ...
+                + G_r.(int)./C6_out.(int) ...
+                + U_add./C6_out.(int); % Dispersion g(r)
     U.(int).h = A.(int)./(r.^12) ...
                 + U_Qdamp; % Short range repulsion h(r) (with possible close-range coulomb damping)
     
     % Negative components of derivative
     U.(int).df = 1./(r.^2); % Electrostatics function (not including Coulomb constant or charges)
-    U.(int).dg = - f6.(int).*C.(int).*6./(r.^7) ...
-                 + df6.(int).*C.(int)./(r.^6) ...
-                 - dG_r.(int) ...
-                 + dU_add; % Dispersion -dg(r)/dr
+    U.(int).dg = - f6.(int).*C6.*6./(r.^7) ...
+                 + df6.(int).*C6./(r.^6) ...
+                 - dG_r.(int)./C6_out.(int) ...
+                 + dU_add./C6_out.(int); % Dispersion -dg(r)/dr
     U.(int).dh = A.(int).*12./(r.^13) ...
                  + dU_Qdamp; % Short range repulsion
     
@@ -659,7 +670,7 @@ for interaction = {'MX' 'XX' 'MM'}
 
         % Shift by the dispersion energy at vdw cutoff radius. Only affects one
         % energy component, not derivatives (i.e. forces)
-        U.(int).g = U.(int).g - EVDW_Cutoff;
+        U.(int).g = U.(int).g - EVDW_Cutoff./C6_out.(int);
     end
     
     % remove infinities
@@ -687,13 +698,13 @@ if ReturnAsStructure
     U.MM.df = k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.df;
     U.XX.df = k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.df;
     
-    U.MX.Total = U.MX.f + U.MX.g + U.MX.h;
-    U.MM.Total = U.MM.f + U.MM.g + U.MM.h;
-    U.XX.Total = U.XX.f + U.XX.g + U.XX.h;
+    U.MX.Total = U.MX.f + C6_out.MX.*U.MX.g + U.MX.h;
+    U.MM.Total = U.MM.f + C6_out.MM.*U.MM.g + U.MM.h;
+    U.XX.Total = U.XX.f + C6_out.XX.*U.XX.g + U.XX.h;
     
-    U.MX.dTotal = -(U.MX.df + U.MX.dg + U.MX.dh);
-    U.MM.dTotal = -(U.MM.df + U.MM.dg + U.MM.dh);
-    U.XX.dTotal = -(U.XX.df + U.XX.dg + U.XX.dh);
+    U.MX.dTotal = -(U.MX.df + C6_out.MX.*U.MX.dg + U.MX.dh);
+    U.MM.dTotal = -(U.MM.df + C6_out.MM.*U.MM.dg + U.MM.dh);
+    U.XX.dTotal = -(U.XX.df + C6_out.XX.*U.XX.dg + U.XX.dh);
     
     U_MX_out = U.MX;
     U_MM_out = U.MM;
