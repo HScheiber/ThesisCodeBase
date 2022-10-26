@@ -344,7 +344,10 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                 end
                 
                 BayesoptResults = dat.BayesoptResults;
-                remaining_evals = Settings.Max_Bayesian_Iterations - BayesoptResults.NumObjectiveEvaluations;
+                size(BayesoptResults.Options.InitialX,1)
+                remaining_evals = Settings.Max_Bayesian_Iterations ...
+                    + size(BayesoptResults.Options.InitialX,1) ...
+                    - BayesoptResults.NumObjectiveEvaluations;
                 
                 if isfield(BayesoptResults.Options,'KernelFunction')
                     results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
@@ -483,7 +486,10 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
         end
         
         % Calculate remaining evaluations for secondary optimization
-        remaining_evals = Settings.Max_Secondary_Iterations + Settings.Max_Bayesian_Iterations - BayesoptResults.NumObjectiveEvaluations;
+        remaining_evals = Settings.Max_Secondary_Iterations ...
+            + Settings.Max_Bayesian_Iterations ...
+            + size(BayesoptResults.Options.InitialX,1) ...
+            - BayesoptResults.NumObjectiveEvaluations;
         
         if remaining_evals > 0
             if isfield(BayesoptResults.Options,'KernelFunction')
