@@ -50,6 +50,8 @@ Settings.Liquid_Interface = false; % When true, creates an system with half STRU
 Settings.Liquid_Fraction = 0.5; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
 Settings.Theory = ''; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
 Settings.Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
+Settings.GaussianCharge = false; % Turn on Gaussian distributed charges when true
+Settings.Polarization = false; % Turn on polarizible Drude model when true
 Settings.WaterModel = 'SPC/E'; % For use with JC model
 Settings.JobID = ''; % An ID that is tacked onto the folder name of all current jobs
 Settings.N_atoms = 5000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed

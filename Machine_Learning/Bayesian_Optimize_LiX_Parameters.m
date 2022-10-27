@@ -344,7 +344,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                 end
                 
                 BayesoptResults = dat.BayesoptResults;
-                size(BayesoptResults.Options.InitialX,1)
                 remaining_evals = Settings.Max_Bayesian_Iterations ...
                     + size(BayesoptResults.Options.InitialX,1) ...
                     - BayesoptResults.NumObjectiveEvaluations;

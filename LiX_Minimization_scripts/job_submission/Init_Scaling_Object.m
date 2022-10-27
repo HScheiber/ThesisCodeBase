@@ -95,7 +95,14 @@ function S = Init_Scaling_Object
     S.r_d.AB = 1;
     
     % Scaling charges
-    S.Q = 1;
+    S.Q = 1; % Scales all charges
+    S.QM = 1; % Sets metal charge
+    S.QX = -1; % Sets halide charge
+    
+    % Charge distribution parameter beta_i
+    S.beta.MM = 1;
+    S.beta.XX = 1;
+    S.beta.MX = 1;
     
     % TF Parameter set
     S.TFParamset = 0;
@@ -107,5 +114,9 @@ function S = Init_Scaling_Object
     S.N.XX.Scale = 1;  % Scale of the interaction
     S.N.MX.Value = -1; % Sets the exponent. When value is less than 0, the interaction is turned off
     S.N.MX.Scale = 1;  % Scale of the interaction
+    
+    % Polarization parameters
+    S.PM = 1; % polarizibility parameter for the metal ions
+    S.PX = 1; % polarizibility parameter for the halide ions
 
 end
