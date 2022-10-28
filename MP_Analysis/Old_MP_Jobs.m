@@ -1385,8 +1385,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     Settings_array(idx).MDP.Disp_Correction = false; % Adds in long-range dispersion correction
     
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).Barostat = 'Parrinello-Rahman';
     
 end
@@ -1427,8 +1427,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -1530,8 +1530,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     Settings_array(idx).MDP.Disp_Correction = false; % Adds in long-range dispersion correction
     
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).Barostat = 'Parrinello-Rahman';
     
 end
@@ -1573,8 +1573,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -1633,8 +1633,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -1695,8 +1695,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -1757,8 +1757,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -1819,8 +1819,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -1881,8 +1881,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -1942,8 +1942,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2003,8 +2003,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2064,8 +2064,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2125,8 +2125,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2186,8 +2186,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2247,8 +2247,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2308,8 +2308,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2369,8 +2369,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2430,8 +2430,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2491,8 +2491,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2552,8 +2552,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2613,8 +2613,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2674,8 +2674,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2735,8 +2735,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2795,8 +2795,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2856,8 +2856,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2917,8 +2917,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -2978,8 +2978,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 25; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 25; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     
     % Barostat Options
     Settings_array(idx).Isotropy = 'semiisotropic';
@@ -3044,8 +3044,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     Settings_array(idx).MDP.Disp_Correction = false; % Adds in long-range dispersion correction
     
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     Settings_array(idx).Barostat = 'Parrinello-Rahman';
     
@@ -3088,8 +3088,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     
     % Barostat Options
@@ -3150,8 +3150,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     
     % Barostat Options
@@ -3212,8 +3212,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     
     % Barostat Options
@@ -3279,8 +3279,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     Settings_array(idx).MDP.Disp_Correction = true; % Adds in long-range dispersion correction
     
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     Settings_array(idx).Barostat = 'Parrinello-Rahman';
     
@@ -3332,8 +3332,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MDP.RCoulomb_Cutoff = 1.4; % nm
     Settings_array(idx).MDP.RList_Cutoff = 1.4; % nm
     
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     Settings_array(idx).Barostat = 'Parrinello-Rahman';
     
@@ -3385,8 +3385,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MDP.RCoulomb_Cutoff = 1.4; % nm
     Settings_array(idx).MDP.RList_Cutoff = 1.4; % nm
     
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     Settings_array(idx).Barostat = 'Parrinello-Rahman';
     
@@ -3434,8 +3434,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     Settings_array(idx).MDP.Disp_Correction = false; % Adds in long-range dispersion correction
     
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     Settings_array(idx).Barostat = 'Parrinello-Rahman';
     
@@ -3485,8 +3485,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MDP.RCoulomb_Cutoff = 1.4; % nm
     Settings_array(idx).MDP.RList_Cutoff = 1.4; % nm
     
-    Settings_array(idx).Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 10; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     
     % Barostat Options
@@ -3543,8 +3543,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     Settings_array(idx).InitialMeshSize = 10;
     Settings_array(idx).MeshSizeMultiplier = 1;
@@ -3608,8 +3608,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.25;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     Settings_array(idx).InitialMeshSize = 10;
     Settings_array(idx).MeshSizeMultiplier = 1;
@@ -3673,8 +3673,8 @@ for kdx = 1:length(Reps)
     Settings_array(idx).MeltFreezeThreshold = 0.15;
     
     Settings_array(idx).MaxWarn = 2;
-    Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
     Settings_array(idx).InitialMeshSize = 10;
     Settings_array(idx).MeshSizeMultiplier = 1;
@@ -3803,8 +3803,8 @@ for jdx = 1:length(Salts)
             Settings_array(idx).MinStepSize = 0.25;
             Settings_array(idx).MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
 
-            Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-            Settings_array(idx).Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+            Settings_array(idx).MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+            Settings_array(idx).MP_Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
             Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 
             % Barostat Options
@@ -3927,8 +3927,8 @@ for jdx = 1:length(Salts)
             Settings_array(idx).MinStepSize = 0.25;
             Settings_array(idx).MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
 
-            Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-            Settings_array(idx).Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+            Settings_array(idx).MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+            Settings_array(idx).MP_Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
             Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 
             % Barostat Options

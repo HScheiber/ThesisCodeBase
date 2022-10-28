@@ -1,14 +1,17 @@
 
-Settings.MDP.Initial_T = 1121.4;
-Settings.T0 = 1121.4;
-Settings.Target_T = 1121.4;
+Settings.MDP.Initial_T = 1133.9;
+Settings.T0 = 1133.9;
+Settings.Target_T = 1133.9;
 
-Settings.JobSettings.Cores = 12;
-Settings.JobSettings.MPI_Ranks = 12;
+Settings.JobSettings.Cores = 8;
+Settings.JobSettings.MPI_Ranks = 8;
 Settings.JobSettings.OMP_Threads = 1;
 Settings.JobSettings.dd  = [];
 Settings.JobSettings.npme = [];
 
+Settings.MP_Liquid_Test_Time = 100; % ps
+Settings.MP_Equilibrate_Solid = Settings.Equilibrate_Solid; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MP_Equilibrate_Liquid = 100; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
     Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
 Settings.scratch_dir = pwd;
@@ -34,7 +37,6 @@ Settings.Diary_Loc = '';
 % Settings.AmorphousDiffThreshold = 1e-6;
 % Settings.Liquid_Test_Time = 100; % ps
 % Settings.Liquid_Equilibrate_Time = 25; % ps
-Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 Settings.Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]);
 [Tm_estimate,WorkDir,Aborted,T_dat] = Find_Melting_Point(Settings);

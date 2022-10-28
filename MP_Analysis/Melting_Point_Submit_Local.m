@@ -100,8 +100,9 @@ for jdx = 1:length(JobStuff)
     Settings_array(idx).MinStepSize = 0.25;
     Settings_array(idx).MaxCheckTime = 5000; % ps. Max time for melting/freezing runs
 
-    Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-    Settings_array(idx).Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Liquid_Test_Time = 100; %  Time used for calculation of liquid MSD in melting point calculations.
+    Settings_array(idx).MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+    Settings_array(idx).MP_Equilibrate_Liquid = 5; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
     Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 
     % Barostat Options

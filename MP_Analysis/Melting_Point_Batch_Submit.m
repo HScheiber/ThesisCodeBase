@@ -39,8 +39,7 @@ Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit t
 Shared_Settings.Liquid_Fraction = 0.50;
 Shared_Settings.MaxTDiff = 0.01; % K, maximum change in temperature between points before selecting new initial conditions
 Shared_Settings.MaxWarn = 2;
-Shared_Settings.Liquid_Test_Time = 50; % ps. simulation time to sample the liquid (second half averaged for enthalpy / volume)
-Shared_Settings.Solid_Test_Time = 30; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
+Shared_Settings.MP_Liquid_Test_Time = 100; % ps. simulation time to sample the liquid for MSD calculation
 
 Exp = Load_Experimental_Data;
 
@@ -82,8 +81,8 @@ switch lower(computer)
                     Settings_array(idx).MeltFreezeThreshold = 0.25;
 
                     Settings_array(idx).MaxWarn = 2;
-                    Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-                    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+                    Settings_array(idx).MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+                    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
                     Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
                     Settings_array(idx).InitialMeshSize = 20;
                     Settings_array(idx).MeshSizeMultiplier = 5;
@@ -153,8 +152,8 @@ switch lower(computer)
                     Settings_array(idx).MeltFreezeThreshold = 0.25;
 
                     Settings_array(idx).MaxWarn = 2;
-                    Settings_array(idx).Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-                    Settings_array(idx).Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+                    Settings_array(idx).MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+                    Settings_array(idx).MP_Equilibrate_Liquid = 10; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
                     Settings_array(idx).PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
                     Settings_array(idx).InitialMeshSize = 20;
                     Settings_array(idx).MeshSizeMultiplier = 5;

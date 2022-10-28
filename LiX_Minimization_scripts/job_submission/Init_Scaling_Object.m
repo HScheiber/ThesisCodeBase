@@ -96,13 +96,6 @@ function S = Init_Scaling_Object
     
     % Scaling charges
     S.Q = 1; % Scales all charges
-    S.QM = 1; % Sets metal charge
-    S.QX = -1; % Sets halide charge
-    
-    % Charge distribution parameter beta_i
-    S.beta.MM = 1;
-    S.beta.XX = 1;
-    S.beta.MX = 1;
     
     % TF Parameter set
     S.TFParamset = 0;
@@ -115,8 +108,18 @@ function S = Init_Scaling_Object
     S.N.MX.Value = -1; % Sets the exponent. When value is less than 0, the interaction is turned off
     S.N.MX.Scale = 1;  % Scale of the interaction
     
+    % Charge distribution parameters
+    % Typically, cross parameters should be constructed from combining rules
+    % Only used when Settings.GaussianCharge is active
+    S.beta.MM = 1;
+    S.beta.XX = 1;
+    S.beta.MX = 1;
+    
     % Polarization parameters
-    S.PM = 1; % polarizibility parameter for the metal ions
-    S.PX = 1; % polarizibility parameter for the halide ions
+    % Only used when Settings.Polarization is active
+    S.PM = 1; % polarizibility parameter alpha for the metal ions
+    S.PX = 1; % polarizibility parameter alpha for the halide ions
+    S.QM = 1; % Sets metal core charge. Total charge is given by S.Q such that Q_core + Q_shell = S.Q for metals
+    S.QX = -1; % Sets halide core charge. Total charge is given by S.Q such that Q_core + Q_shell = -S.Q for halides
 
 end

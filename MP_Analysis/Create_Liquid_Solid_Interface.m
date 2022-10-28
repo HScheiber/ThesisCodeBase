@@ -16,7 +16,7 @@ function Output = Create_Liquid_Solid_Interface(Settings)
     
     % Run a short equilibrating NPT simulation of the solid to obtain the correct solid density
     % This will update the SuperCell file
-    if Settings.Equilibrate_Solid > 0
+    if Settings.MP_Equilibrate_Solid > 0
         Output = Equilibrate_Solid(Settings);
         Settings.nmol_liquid = Output.nmol_liquid;
         if Output.Aborted
@@ -24,7 +24,7 @@ function Output = Create_Liquid_Solid_Interface(Settings)
         end
     end
     
-    if Settings.Equilibrate_Liquid && Settings.GenCluster
+    if Settings.MP_Equilibrate_Liquid > 0 && Settings.GenCluster
         % Update liquid density to match average equilibrated density
         Output = Equilibrate_Liquid(Settings);
         if Output.Aborted
@@ -37,7 +37,7 @@ function Output = Create_Liquid_Solid_Interface(Settings)
             disp('Warning: Skipping Liquid Equilibration.')
         end
         Minimize_Liquid_Cluster(Settings)
-    elseif Settings.Equilibrate_Liquid % Interface with pre-equilibration
+    elseif Settings.MP_Equilibrate_Liquid > 0 % Interface with pre-equilibration
         Output = Minimize_Equilibrate_Liquid_Interface(Settings);
         if Output.Aborted
             return

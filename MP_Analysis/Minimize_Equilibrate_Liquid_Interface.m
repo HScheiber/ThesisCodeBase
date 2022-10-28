@@ -7,7 +7,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     % Randomly fill box with the required number of atoms for the full simulation
     % Use Make_Tables function if necessary, run a [Settings.MinMDP.nsteps_min] step minimization
     % Set up for fast NPT equilibration: Use semiisotropic barostat. Set box compressibility in X-Y to zero and Z to appropriate value. Use Berendsen Barostat and Berendsen Thermostat, both with time constants equal to the time step. 
-    % Equilibrate for [Settings.Equilibrate_Liquid] amount of time with fast equilibration settings (Berendsen baro and Velocity-Rescale thermo)
+    % Equilibrate for [Settings.MP_Equilibrate_Liquid] amount of time with fast equilibration settings (Berendsen baro and Velocity-Rescale thermo)
     % Attach equilibrated liquid box to solid such that X-Y dimensions align, Displace all liquid atoms by Z length of solid box
     % Fix all atoms except atoms within -+0.5 Angstroms of the solid-liquid interface interface. Re-minimize interfacial atoms using Make-Tables    
     Output.StructureChange = false;
@@ -264,7 +264,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     end
     
     % Set the number of steps
-    timesteps = Settings.Equilibrate_Liquid/Settings.MDP.dt;
+    timesteps = Settings.MP_Equilibrate_Liquid/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt,'Isotropy','isotropic','Molten',true);
     Compressibility = ['0 ' num2str(Settings.QECompressibility)]; % bar^(-1)
     tau_p = Settings.MDP.dt; % ps
@@ -335,7 +335,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     
     % Run Liquid Equilibration
     if Settings.Verbose
-        disp(['Beginning Liquid Equilibration for ' num2str(Settings.Equilibrate_Liquid) ' ps...'] )
+        disp(['Beginning Liquid Equilibration for ' num2str(Settings.MP_Equilibrate_Liquid) ' ps...'] )
     end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
@@ -440,7 +440,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     
     %% Check if liquid is properly mobile (i.e. not amorphous solid)
     % Set the number of steps
-    MD_nsteps = Settings.Liquid_Test_Time/Settings.MDP.dt;
+    MD_nsteps = Settings.MP_Liquid_Test_Time/Settings.MDP.dt;
 
     % Ensure fast equilibration with Berendsen barostat + small time constant
     xyz_out = num2str(0.1 / Settings.MDP.dt); % Output coords every 0.1 ps
@@ -495,7 +495,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
 
     % Run Liquid Equilibration
     if Settings.Verbose
-        disp(['(2/2) Running liquid with realistic dynamics for ' num2str(Settings.Liquid_Test_Time) ' ps...'] )
+        disp(['(2/2) Running liquid with realistic dynamics for ' num2str(Settings.MP_Liquid_Test_Time) ' ps...'] )
     end
     mintimer = tic;
     [state,~] = system(mdrun_command);
@@ -562,15 +562,20 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         dev_from_init = XZCheck_Data(:,3)./XZCheck_Data(:,2) - XZCheck_Data(1,3)./XZCheck_Data(1,2);
         max_dev = max(abs(dev_from_init));
         
-        if max_dev >= 0.3 && (Settings.Equilibrate_Liquid < 100)
+        if max_dev >= 0.3 && (Settings.MP_Equilibrate_Liquid < 100)
             if Settings.Verbose
                 disp(['Max fluctuation in Z/X box ratio is too large (' num2str(max_dev) ...
                     '). Retrying with increased equilibration time: 100 ps.'])
             end
             Settings = Inp_Settings;
-            Settings.Equilibrate_Liquid = 100; % ps
+            Settings.MP_Equilibrate_Liquid = 100; % ps
             Output = Minimize_Equilibrate_Liquid_Interface(Settings);
             return
+        elseif max_dev >= 0.3
+            if Settings.Verbose
+                disp(['Warning: max fluctuation in Z/X box ratio is large (' num2str(max_dev) ...
+                    '), but equilibration time is already long.'])
+            end
         end
         
         % check msd
@@ -578,9 +583,9 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
         msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
             ' msd -f ' windows2unix(TRR_File) ' -s ' windows2unix(TPR_File) ' -o ' ...
-            windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
-            ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.Liquid_Test_Time) ...
-            ' -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+            windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.MP_Liquid_Test_Time) ...
+            ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.MP_Liquid_Test_Time) ...
+            ' -endfit ' num2str(0.75*Settings.MP_Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
         [~,~] = system(msd_command);
         outp = fileread(MSD_Log_File);
         Diff_txt = regexp(outp,['D\[ *' Settings.Metal '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
@@ -725,7 +730,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     Combined_file_data.atom_name = [Solid_file_data.atom_name; Liquid_file_data.atom_name];
     Combined_file_data.atom_number = [Solid_file_data.atom_number; (Liquid_file_data.atom_number + Solid_file_data.atom_number(end))];
     Combined_file_data.boxcoords = {a_vec(1) b_vec(2) c_vec(3) a_vec(2) a_vec(3) b_vec(1) b_vec(3) c_vec(1) c_vec(2)};
-    Combined_file_data.Salt = 'NaCl';
+    Combined_file_data.Salt = Settings.Salt;
     Combined_file_data.N = Combined_file_data.N_atoms;
     
     Comb_Equil_Geom_File = fullfile(Settings.WorkDir,['Comb_Equil.' Settings.CoordType]);
@@ -777,17 +782,17 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     M_atnums(end+1:end+addnan) = nan;
     M_atnums = reshape(M_atnums,15,[])';
     M_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(M_atnums)),newline),' *NaN','')));
-
+    
     addnan = 15 - mod(length(X_atnums),15);
     X_atnums(end+1:end+addnan) = nan;
     X_atnums = reshape(X_atnums,15,[])';
     X_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(X_atnums)),newline),' *NaN','')));
-
+    
     ndx_text = ['[ System ]'     newline system_atnum_txt newline ...
     '[ Freeze ]'      newline sol_atnums_txt newline ...
     '[ ' Settings.Metal ' ]'  newline M_atnums_txt newline ...
     '[ ' Settings.Halide ' ]' newline X_atnums_txt newline];
-
+    
     % Save index file
     NDX_Filename = fullfile(Settings.WorkDir,'Comb_Equil.ndx');
     fidNDX = fopen(NDX_Filename,'wt');
@@ -846,7 +851,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         Settings.mdrun_opts];
     
     if Settings.Table_Req
-        Settings.TableFile_MX = MakeTables(Settings);
+        [Settings.TableFile_MX,~] = MakeTablesWithWall(Settings);
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
 

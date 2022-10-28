@@ -63,7 +63,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
     end
     
     % Set the number of steps
-    timesteps = Settings.Equilibrate_Solid/Settings.MDP.dt;
+    timesteps = Settings.MP_Equilibrate_Solid/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt);
     Compressibility = Settings.QECompressibility;
     tau_p = Settings.MDP.dt; % ps
@@ -155,7 +155,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
 
     % Final Equilibration
     if Settings.Verbose
-        disp(['Beginning Solid Equilibration for ' num2str(Settings.Equilibrate_Solid) ' ps...'] )
+        disp(['Beginning Solid Equilibration for ' num2str(Settings.MP_Equilibrate_Solid) ' ps...'] )
     end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
@@ -261,11 +261,11 @@ function Output = Equilibrate_Solid(Settings,varargin)
     Box_xvg_file = fullfile(WorkDir,'Equil_Sol_Box.xvg');
     
     % Create gmx traj command
-    startpoint = Settings.Equilibrate_Solid*0.50; % ps. Average over second half of equilibration period
+    startpoint = Settings.MP_Equilibrate_Solid*0.50; % ps. Average over second half of equilibration period
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo 0 ' Settings.pipe ' gmx']) ...
         ' traj -f ' windows2unix(TRR_File) ' -ob ' windows2unix(Box_xvg_file) ...
         ' -s ' windows2unix(TPR_File) ' -b ' num2str(startpoint) ...
-        ' -e ' num2str(Settings.Equilibrate_Solid)];
+        ' -e ' num2str(Settings.MP_Equilibrate_Solid)];
     [err,~] = system(gmx_command);
     
     if err ~= 0

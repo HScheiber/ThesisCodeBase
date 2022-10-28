@@ -3,8 +3,9 @@ Settings.BatchMode = false; % Sets up batch job when true, or runs immediately w
 Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
 Settings.Liquid_Fraction = 0.50; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
-Settings.Equilibrate_Liquid = 20; % ps
-Settings.Equilibrate_Solid = 15; % ps
+Settings.MP_Liquid_Test_Time = 100; % ps. Time used for calculation of liquid MSD in melting point calculations.
+Settings.MP_Equilibrate_Liquid = 20; % ps
+Settings.MP_Equilibrate_Solid = 15; % ps
 Settings.PreEquilibration = 0.3; % ps
 Settings.JobSettings.MPI_Ranks = 8;
 Settings.JobSettings.OMP_Threads = 1;

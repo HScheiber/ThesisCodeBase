@@ -6,7 +6,7 @@ function Output = Equilibrate_Liquid(Settings)
     % Increase that box size by Settings.Cutoff_Buffer to account for possibility of shrinkage
     % Randomly fill box with appropriate number of atoms to reach experimental density
     % Use Make_Tables function if necessary, run a brief ~1000 step minimization
-    % Run NPT simulation for [Settings.Equilibrate_Liquid] amount of time using fast equilibration settings (Berendsen baro and Velocity-Rescale thermo)
+    % Run NPT simulation for [Settings.MP_Equilibrate_Liquid] amount of time using fast equilibration settings (Berendsen baro and Velocity-Rescale thermo)
     % Calculate average density of equilibrated box based on last 25% of simulation
     % Give new density as output
     
@@ -241,7 +241,7 @@ function Output = Equilibrate_Liquid(Settings)
     end
     
     % Set the number of steps
-    timesteps = Settings.Equilibrate_Liquid/Settings.MDP.dt;
+    timesteps = Settings.MP_Equilibrate_Liquid/Settings.MDP.dt;
     %Compressibility = Get_Alkali_Halide_Compressibility(Settings.Salt,'Isotropy','isotropic','Molten',true);
     Compressibility = Settings.QECompressibility; % bar^(-1)
     tau_p = Settings.MDP.dt; % ps
@@ -308,7 +308,7 @@ function Output = Equilibrate_Liquid(Settings)
 
     % Run Liquid Equilibration
     if Settings.Verbose
-        disp(['Begining Liquid Equilibration for ' num2str(Settings.Equilibrate_Liquid) ' ps...'] )
+        disp(['Begining Liquid Equilibration for ' num2str(Settings.MP_Equilibrate_Liquid) ' ps...'] )
     end
     mintimer = tic;
     [state,mdrun_output] = system(mdrun_command);
@@ -401,8 +401,8 @@ function Output = Equilibrate_Liquid(Settings)
         MSD_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.xvg');
         MSD_Log_File = fullfile(Settings.WorkDir,'Equil_Liq_MSD.log');
         msd_command = [Settings.wsl 'echo 0 ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(TRR_File) ...   
-            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b ' num2str(Settings.Equilibrate_Liquid/2) ' -e ' num2str(Settings.Equilibrate_Liquid) ...
-            ' -trestart 1 -beginfit 1 -endfit ' num2str(0.75*Settings.Equilibrate_Liquid/2) Settings.passlog windows2unix(MSD_Log_File)];
+            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b ' num2str(Settings.MP_Equilibrate_Liquid/2) ' -e ' num2str(Settings.MP_Equilibrate_Liquid) ...
+            ' -trestart 1 -beginfit 1 -endfit ' num2str(0.75*Settings.MP_Equilibrate_Liquid/2) Settings.passlog windows2unix(MSD_Log_File)];
         [~,~] = system(msd_command);
         outp = fileread(MSD_Log_File);
         Diff_txt = regexp(outp,'D\[ *System] *([0-9]|\.|e|-)+ *(\(.+?\)) *([0-9]|\.|e|-)+','tokens','once');
@@ -446,11 +446,11 @@ function Output = Equilibrate_Liquid(Settings)
     En_set = regexprep(En_set,' +',' ');
 
     % Grab data from results
-    startpoint = Settings.Equilibrate_Liquid*0.5; % ps
+    startpoint = Settings.MP_Equilibrate_Liquid*0.5; % ps
     gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
     ' energy -f ' windows2unix(Energy_file)...
     ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
-    ' -b ' num2str(startpoint) ' -e ' num2str(Settings.Equilibrate_Liquid)];
+    ' -b ' num2str(startpoint) ' -e ' num2str(Settings.MP_Equilibrate_Liquid)];
 
     [err,~] = system(gmx_command);
     if err ~= 0

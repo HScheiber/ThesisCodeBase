@@ -1,5 +1,5 @@
 
-function View_Gmx_Table(Table_Loc,Q)
+function View_Gmx_Table(Table_Loc,Q,C)
 
 
     nm_per_m = 1e+9; % nm per m
@@ -81,17 +81,16 @@ function View_Gmx_Table(Table_Loc,Q)
 
     %% Clear temporary variables
     clearvars filename formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp R;
-    
-    U_Total = U.h + U.g; %k_0*(e_c^2).*Q.*U.f + U.h + U.g;
-    dU_Total = - U.dh  - U.dg; %-k_0*(e_c^2).*Q.*U.df - U.dh  - U.dg;
+    U_Total = k_0*(e_c^2).*Q.*U.f + C.*U.h + U.g;
+    dU_Total = -k_0*(e_c^2).*Q.*U.df - C.*U.dh  - U.dg;
     %ref_U = %k_0*(e_c^2).*Q.*(1./U.r);
     
     hold on
     plot(U.r,U_Total)
-    hold on
-    plot(U.r,dU_Total)
-    hold on
+    %hold on
+    %plot(U.r,dU_Total)
+    %hold on
     %plot(U.r,ref_U)
-    ylim([-100 100])
+    ylim([-800 100])
     xlim([0 1])
 end

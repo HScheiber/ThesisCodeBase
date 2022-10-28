@@ -271,11 +271,14 @@ Settings.C6_Damp = Init_C6Damping_Object;
 [Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
 
 % Finite T settings
-Settings.Liquid_Test_Time = 100; % ps
+Settings.Liquid_Test_Time = 100; % ps. Sets time for primary liquid calculation
 Settings.Liquid_Equilibrate_Time = 25; % ps
-Settings.Solid_Test_Time = 30; % ps
-Settings.Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Settings.Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.Solid_Test_Time = 30; % ps. Sets time for combination of solid equilibration + test time
+
+% MP settings
+Settings.MP_Liquid_Test_Time = 100; % ps. Time used for calculation of liquid MSD in melting point calculations.
+Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.MinTimeStep = 0.00025; % [ps] minimum time step
 
 end
