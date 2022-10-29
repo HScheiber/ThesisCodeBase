@@ -19,6 +19,7 @@ Settings.MinMDP.RList_Cutoff = 2;
 Settings.MinMDP.RCoulomb_Cutoff = 2;
 Settings.MinMDP.RVDW_Cutoff = 2;
 Settings.GaussianCharge = true;
+Settings.initial_opt_type = true;
 
 [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
 Settings.MinMDP.Parallel_Min = false;
