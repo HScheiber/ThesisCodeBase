@@ -1,15 +1,17 @@
 Settings = Initialize_MD_Settings;
-Data = load(fullfile(Settings.home,'data','MX_JCTF_Min_Data.mat'),'Data').Data;
+%Data = load(fullfile(Settings.home,'data','MX_JCTF_Min_Data.mat'),'Data').Data;
+Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
+
 
 fs = 24;
 
-Theory = 'JCSD';
-Salts = {'NaCl'};
-% Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
-%          'NaF' 'NaCl' 'NaBr' 'NaI' ...
-%          'KF' 'KCl' 'KBr' 'KI' ...
-%          'RbF' 'RbCl' 'RbBr' 'RbI' ...
-%          'CsF' 'CsCl' 'CsBr' 'CsI'};
+Theory = 'BF';
+%Salts = {'NaCl'};
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
+         'NaF' 'NaCl' 'NaBr' 'NaI' ...
+         'KF' 'KCl' 'KBr' 'KI' ...
+         'RbF' 'RbCl' 'RbBr' 'RbI' ...
+         'CsF' 'CsCl' 'CsBr' 'CsI'};
 Structures = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
 Structures_legend = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' '$\beta$-BeO' 'CsCl'};
 Prop_of_intr = 'E';
@@ -55,6 +57,8 @@ switch Theory
         Thertxt = 'Jeung-Cheatham (TIP4P$_{\mathrm{EW}}$)';
     case 'JCSD'
         Thertxt = 'Smith-Dang';
+    case 'BF'
+        Thertxt = 'Alexandria (WBK)';
     otherwise
         Thertxt = Theory;
 end
@@ -73,7 +77,7 @@ ylabel(axh,'$E_{\textrm{RS}} - E_{\textrm{Struc}}$ [kJ mol$^{-1}$]','Interpreter
 legend(p,Structures_legend,'FontSize',fs,'Box','On','Interpreter','latex',...
     'NumColumns',4)
 ylim(axh,[-60 10])
-xticks(axh,[]);
-xticklabels(axh,[]);
+%xticks(axh,[]);
+%xticklabels(axh,[]);
 
-exportgraphics(axh ,['Min_Structures_' Theory '.png'],'ContentType','image','BackgroundColor','none','Resolution',600)
+%exportgraphics(axh ,['Min_Structures_' Theory '.png'],'ContentType','image','BackgroundColor','none','Resolution',600)

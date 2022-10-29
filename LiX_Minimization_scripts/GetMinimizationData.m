@@ -5,7 +5,7 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'KF' 'KCl' 'KBr' 'KI' ...
          'RbF' 'RbCl' 'RbBr' 'RbI' ...
          'CsF' 'CsCl' 'CsBr' 'CsI'};
-Theories = {'BF'};
+Theories = {'BF' 'BH' 'JC' 'Mie'};
 Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
 
 Settings.JobSettings.Cores = 1;
@@ -69,7 +69,31 @@ for idx = 1:N
     Settings.Salt = Salts{indexes(1,idx)};
     Settings.Theory = Theories{indexes(2,idx)};
     Settings.Structure = Structures{indexes(3,idx)};
-    Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
+    switch Settings.Theory
+        case 'BF'
+            Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
+        case 'BH'
+            Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','BK');
+        case 'JC'
+            PotSettings = Settings;
+            Settings.S = Init_Scaling_Object;
+            [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(PotSettings);
+            Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','LJ_12-6');
+            
+            % Sigma scaling
+            Settings.S.S.MM = Settings.S.S.MM/JC_MM.sigma;
+            Settings.S.S.XX = Settings.S.S.XX/JC_XX.sigma;
+            Settings.S.S.MX = Settings.S.S.MX/JC_MX.sigma;
+            
+            % Epsilon scaling
+            Settings.S.E.MM = Settings.S.E.MM/JC_MM.epsilon;
+            Settings.S.E.XX = Settings.S.E.XX/JC_XX.epsilon;
+            Settings.S.E.MX = Settings.S.E.MX/JC_MX.epsilon;
+            
+        case 'Mie'
+            Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','LJ_8-6');
+    end
+    
     
     if strcmp(Settings.Structure,'FiveFive')
         Find_Min_Params = false;

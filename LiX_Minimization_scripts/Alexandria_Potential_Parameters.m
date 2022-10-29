@@ -147,6 +147,11 @@ switch lower(vdW_Type)
         epsilon.Br = 0.08802;
         epsilon.I  = 0.20108;
         
+        % Exponent
+        Settings.S.n.MM = 12;
+        Settings.S.n.XX = 12;
+        Settings.S.n.MX = 12;
+        
         % Epsilon in kJ/mol
         Settings.S.E.MM = epsilon.(Metal);
         Settings.S.E.XX = epsilon.(Halide);
