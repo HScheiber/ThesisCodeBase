@@ -34,6 +34,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
     save(Input_File,'Settings')
     
+    if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
+        Settings.MDP.CoulombType = 'PME-User';
+    end
+    
     if Settings.Verbose
         disp('*** Separate Equilibration of Solid Selected ***')
     end

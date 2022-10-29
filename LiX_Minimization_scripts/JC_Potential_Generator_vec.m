@@ -17,8 +17,8 @@ Param = dat.Param;
 QQ_prefactor = dat.QQ_prefactor;
 
 %% Parameter: q (charge)
-q.(Settings.Metal) =  Settings.S.Q; % atomic
-q.(Settings.Halide)= -Settings.S.Q; % atomic
+q.M =  Settings.S.Q; % atomic
+q.X = -Settings.S.Q; % atomic
 
 %% Calculate parameters of interest for LJ potential
 sigma_MM = Settings.S.S.All.*Settings.S.S.MM.*Param.(Settings.Metal).sigma;
@@ -46,20 +46,10 @@ U.r = Settings.Table_StepSize:Settings.Table_StepSize:Settings.Table_Length;
 %% If Damping at close range, affects all attractive interactions
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
-    switch int
-        case 'MX'
-            Y1 = Settings.Metal;
-            Y2 = Settings.Halide;
-        case 'MM'
-            Y1 = Settings.Metal;
-            Y2 = Settings.Metal;
-        case 'XX'
-            Y1 = Settings.Halide;
-            Y2 = Settings.Halide;
-    end
     
     % Build PES
-    U.(int) = QQ_prefactor.*q.(Y1).*q.(Y2)./U.r + A.(int)./(U.r.^12) - C.(int)./(U.r.^6);
+    [f,~]= Coulomb_Potential(Settings,U.r,int);
+    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2)).*f + A.(int)./(U.r.^12) - C.(int)./(U.r.^6);
     
     % vdw cutoff shift
     if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)

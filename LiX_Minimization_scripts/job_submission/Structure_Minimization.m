@@ -329,7 +329,11 @@ Settings.Topology_Template = strrep(Settings.Topology_Template,'##GEOM##',Settin
 Settings.FileBase = [Settings.Salt '_' Settings.Geometry.Label '_' Model '_' OptTxt];
 
 % Update Topology and MDP files
-Settings.MDP_Template = strrep(Settings.MDP_Template,'##COULOMB##',pad('PME',18));
+if Settings.GaussianCharge
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##COULOMB##',pad('PME-User',18));
+else
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##COULOMB##',pad('PME',18));
+end
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##FOURIER##',pad(num2str(Settings.MinMDP.Fourier_Spacing),18));
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##PMEORDER##',pad(num2str(Settings.MinMDP.PME_Order),18));
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##EWALDTOL##',pad(num2str(Settings.MinMDP.Ewald_rtol),18));

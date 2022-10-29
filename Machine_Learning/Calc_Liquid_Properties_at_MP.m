@@ -40,6 +40,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
     save(Input_File,'Settings')
     
+    if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
+        Settings.MDP.CoulombType = 'PME-User';
+    end
+    
     % Check for previous minimization calculation    
     Minimization_TRR_File = fullfile(Settings.WorkDir,'Prep_Liq.trr'); % mMinimizaion started
     Minimized_Geom_File = fullfile(Settings.WorkDir,['Equil_Liq.' Settings.CoordType]); % Minimization complete

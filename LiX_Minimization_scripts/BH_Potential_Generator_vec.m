@@ -57,7 +57,8 @@ for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
     
     % Build PES
-    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2))./U.r + B.(int).*exp(-alpha.(int).*U.r) - C.(int)./(U.r.^6);
+    [f,~]= Coulomb_Potential(Settings,U.r,int);
+    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2)).*f + B.(int).*exp(-alpha.(int).*U.r) - C.(int)./(U.r.^6);
     
     % vdw cutoff shift
     if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)

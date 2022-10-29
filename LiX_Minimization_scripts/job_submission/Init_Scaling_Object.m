@@ -111,15 +111,15 @@ function S = Init_Scaling_Object
     % Charge distribution parameters
     % Typically, cross parameters should be constructed from combining rules
     % Only used when Settings.GaussianCharge is active
-    S.beta.MM = 1;
-    S.beta.XX = 1;
-    S.beta.MX = 1;
+    S.beta.MM = 1; % nm^-1
+    S.beta.XX = 1; % nm^-1
+    S.beta.MX = 1; % nm^-1
     
     % Polarization parameters
     % Only used when Settings.Polarization is active
-    S.PM = 1; % polarizibility parameter alpha for the metal ions
-    S.PX = 1; % polarizibility parameter alpha for the halide ions
-    S.QM = 1; % Sets metal core charge. Total charge is given by S.Q such that Q_core + Q_shell = S.Q for metals
-    S.QX = -1; % Sets halide core charge. Total charge is given by S.Q such that Q_core + Q_shell = -S.Q for halides
+    S.PM = 1; % polarizibility parameter alpha for the metal ions in nm^3
+    S.PX = 1; % polarizibility parameter alpha for the halide ions in nm^3
+    S.QcoreM = 1; % Sets metal core charge. Total charge is given by S.Q such that Q_core + Q_shell = S.Q for metals
+    S.QcoreX = 1; % Sets halide core charge. Total charge is given by S.Q such that Q_core + Q_shell = -S.Q for halides
 
 end

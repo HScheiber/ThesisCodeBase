@@ -54,12 +54,12 @@ gamma.XX = Settings.S.G.XX;
 %% Generate range (r) in nm
 r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 
-%% If Damping at close range, affects all attractive interactions
+%% Generate PES
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
     
     Kappa = 2*epsilon.(int)/(1 - (3/(gamma.(int) + 3)));
-    Beta = Kappa*(3/(gamma.(int) + 3));
+    Prefactor = Kappa*(3/(gamma.(int) + 3));
     D = (sigma.(int)^6)./((sigma.(int)^6) + (r.^6));
     dD = (6*(sigma.(int)^6).*(r.^5))./(((sigma.(int)^6) + (r.^6)).^2);
     
@@ -75,21 +75,20 @@ for interaction = {'MX' 'XX' 'MM'}
     %% Build PES
     
     % Components of potential
-    U.(int).f = 1./r; % Electrostatics function f(r)
+    [U.(int).f,U.(int).df] = Coulomb_Potential(Settings,r,int);
     U.(int).g = - C6./(sigma.(int)^6 + r.^6); % Dispersion g(r)
-    U.(int).h = Beta.*D.*exp(gamma.(int).*(1 - (r./sigma.(int)))); % Short range repulsion (with possible close-range coulomb damping)
+    U.(int).h = Prefactor.*D.*exp(gamma.(int).*(1 - (r./sigma.(int)))); % Short range repulsion (with possible close-range coulomb damping)
     
     % Negative components of derivative
-    U.(int).df = 1./(r.^2); % Electrostatics function (not including Coulomb constant or charges)
     U.(int).dg = (-C6.*6.*(r.^5))./((sigma.(int)^6 + r.^6).^2); % Dispersion -dg(r)/dr
-    U.(int).dh = Beta.*dD.*exp(gamma.(int).*(1 - (r./sigma.(int)))) ...
-               + Beta.*D.*(gamma.(int)./sigma.(int)).*exp(gamma.(int).*(1 - (r./sigma.(int)))); % Short range repulsion
+    U.(int).dh = Prefactor.*dD.*exp(gamma.(int).*(1 - (r./sigma.(int)))) ...
+               + Prefactor.*D.*(gamma.(int)./sigma.(int)).*exp(gamma.(int).*(1 - (r./sigma.(int)))); % Short range repulsion
     
     % Shift the potential to zero at the cutoff
     if contains(Settings.(MDP).vdw_modifier,'potential-shift','IgnoreCase',true)
         D_VDW = (sigma.(int)^6)./((sigma.(int)^6) + (Settings.(MDP).RVDW_Cutoff.^6));
         C6_VDW = Kappa*(sigma.(int)^6);
-        EVDW_Cutoff = Beta.*D_VDW.*exp(gamma.(int).*(1 - (Settings.(MDP).RVDW_Cutoff./sigma.(int)))) ...
+        EVDW_Cutoff = Prefactor.*D_VDW.*exp(gamma.(int).*(1 - (Settings.(MDP).RVDW_Cutoff./sigma.(int)))) ...
                     - C6_VDW./(sigma.(int)^6 + Settings.(MDP).RVDW_Cutoff.^6);
         
         % Shift by the dispersion energy at vdw cutoff radius. only affects one
@@ -165,6 +164,18 @@ if Plotswitch
             h{3} = plot(r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.df + U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-600 1000];
             ttxt = 'Derivative of Full Potential';
+        case 'coulomb'
+            h{1} = plot(r.*10,k_0*(e_c^2).*q.M*q.X.*U.MX.f,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(r.*10,k_0*(e_c^2).*q.M*q.M.*U.MM.f,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.f,'Color','g','LineWidth',lw,'Linestyle','-');
+            yl = [-600 1000];
+            ttxt = 'Coulomb Potential';
+        case 'coulomb-derivative'
+            h{1} = plot(r.*10,k_0*(e_c^2).*q.M*q.X.*U.MX.df,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(r.*10,k_0*(e_c^2).*q.M*q.M.*U.MM.df,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.df,'Color','g','LineWidth',lw,'Linestyle','-');
+            yl = [-600 1000];
+            ttxt = 'Derivative of Coulomb Potential';
         case 'lj'
             h{1} = plot(r.*10,U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
             h{2} = plot(r.*10,U.MM.g + U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');

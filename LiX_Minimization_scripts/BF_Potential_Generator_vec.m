@@ -34,7 +34,8 @@ for interaction = {'MX' 'XX' 'MM'}
     C6 = Kappa.*(sigma.(int).^6);
     
     %% Build PES
-    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2))./U.r + Beta.*D.*exp(gamma.(int).*(1 - (U.r./sigma.(int)))) - C6./(sigma.(int).^6 + U.r.^6);
+    [f,~]= Coulomb_Potential(Settings,U.r,int);
+    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2)).*f + Beta.*D.*exp(gamma.(int).*(1 - (U.r./sigma.(int)))) - C6./(sigma.(int).^6 + U.r.^6);
     
     % Shift the potential to zero at the cutoff
     if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)

@@ -35,6 +35,10 @@ if ~Settings.Expand_LP
     Settings.Expand_c = 1;
 end
 
+if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
+    Settings.MDP.CoulombType = 'PME-User';
+end
+
 %% Preliminary calculation parameters
 
 % Initialize cluster size to 0, it will be updated to a finite number as needed

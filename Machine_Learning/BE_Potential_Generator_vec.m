@@ -43,8 +43,9 @@ for interaction = {'MX' 'XX' 'MM'}
     
     % First build the potential
     r_all = repmat(U.r,numel(alpha.(int)),1); % matrix of distances
-    U_Total_all  = QQ_prefactor.*q.(int(1)).*q.(int(2))./r_all + B.(int).*exp(-alpha.(int).*U.r) - C.(int)./(U.r.^6);
-    dU_Total_all = -QQ_prefactor.*q.(int(1)).*q.(int(2))./(r_all.^2) - alpha.(int).*B.(int).*exp(-alpha.(int).*U.r) + 6.*C.(int)./(U.r.^7);
+    [f,df]= Coulomb_Potential(Settings,r_all,int);
+    U_Total_all  = QQ_prefactor.*q.(int(1)).*q.(int(2)).*f + B.(int).*exp(-alpha.(int).*U.r) - C.(int)./(U.r.^6);
+    dU_Total_all = -QQ_prefactor.*q.(int(1)).*q.(int(2)).*df - alpha.(int).*B.(int).*exp(-alpha.(int).*U.r) + 6.*C.(int)./(U.r.^7);
     
     % Locate the peaks in the total potential
     peaks_idx = islocalmax(U_Total_all,2,'MinProminence',1e-8);

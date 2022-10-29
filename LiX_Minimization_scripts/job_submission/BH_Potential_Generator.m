@@ -503,7 +503,7 @@ for interaction = {'MX' 'XX' 'MM'}
     end
     
     % Components of potential
-    U.(int).f = 1./r; % Electrostatics function f(r)
+    [U.(int).f,U.(int).df] = Coulomb_Potential(Settings,r,int); % Electrostatics function f(r) and derivative
     U.(int).g = - f6.(int).*C6./(r.^6) ...
                 + G_r.(int)./C6_out.(int) ...
                 + U_add./C6_out.(int); % Dispersion g(r)
@@ -511,7 +511,6 @@ for interaction = {'MX' 'XX' 'MM'}
                 + U_Qdamp; % Short range repulsion (with possible close-range coulomb damping)
     
     % Negative components of derivative
-    U.(int).df = 1./(r.^2); % Electrostatics function (not including Coulomb constant or charges)
     U.(int).dg = - f6.(int).*C6.*6./(r.^7) ...
                  + df6.(int).*C6./(r.^6) ...
                  - dG_r.(int)./C6_out.(int) ...

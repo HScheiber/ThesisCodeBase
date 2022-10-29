@@ -99,7 +99,7 @@ Settings.MDP.integrator = 'md'; % What type of calculation is run for single poi
 Settings.MDP.LJtol = 1e-5; % When doing PME for VdW-interactions, this is used to control the relative strength of the dispersion potential at rvdw in the same way as ewald-rtol controls the electrostatic potential.
 Settings.MDP.CutOffScheme = 'Verlet'; % Either 'group' or 'Verlet' (does NOT apply to tabulated potentials, these are set to group)
 Settings.MDP.VerletBT = 0.005; %  (0.005) [kJ mol-1 ps-1]This sets the maximum allowed error for pair interactions per particle caused by the Verlet buffer, which indirectly sets rlist unless set to -1, in which case rlist will be used.
-Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
+Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME', 'PME-User', or 'Cut-off'
 Settings.MDP.VDWType = 'Cut-off'; % Define the type of van der waals potential used. One of 'PME' or 'Cut-off'
 Settings.MDP.RList_Cutoff = 1.5; % 1.5 % nm. This should be larger or equal to RCoulomb/RVDW
 Settings.MDP.RCoulomb_Cutoff = 1.5; % nm. if set to less than 0, then Rc = a;
