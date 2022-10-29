@@ -114,15 +114,14 @@ else
     Settings.Table_StepSize = 0.0005; % 0.0005 Step size of tabulated potentials in nm
 end
 
-if ~isfield(Settings,'gmx')
-    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
-end
-
 % Get default system geometry
 Settings.Use_Conv_cell = Settings.MinMDP.Use_Conv_cell;
 Settings.Geometry = Default_Crystal(Settings,'Scale',Settings.S);
 
 if gmx_serial % Since using matlab parallel, make sure gromacs runs in serial
+    if ~isfield(Settings,'gmx')
+        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
+    end
     env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
     env.GMX_PME_NUM_THREADS = getenv('GMX_PME_NUM_THREADS');
     env.GMX_PME_NTHREADS = getenv('GMX_PME_NTHREADS');
