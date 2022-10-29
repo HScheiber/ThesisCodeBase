@@ -148,9 +148,11 @@ if ~isempty(p.Results.Continuation)
     Settings.Geometry.b = p.Results.Continuation(2);
     Settings.Geometry.c = p.Results.Continuation(3);
     AddRepWall = false;
-elseif Find_Min_Params
-    [Settings,~] = FindMinLatticeParam(Settings,...
-        'Find_Similar_Params',Find_Similar_Params);
+else
+    if Find_Min_Params
+        [Settings,~] = FindMinLatticeParam(Settings,...
+            'Find_Similar_Params',Find_Similar_Params);
+    end
     switch Settings.Theory
         case {'JC' 'BD' 'BE' 'Mie' 'HS'}
             AddRepWall = false;

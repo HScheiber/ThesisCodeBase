@@ -8,8 +8,8 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
 Theories = {'BF'};
 Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
 
-Settings.JobSettings.Cores = 8;
-Settings.JobSettings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings.JobSettings.Cores = 1;
+Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
 Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Settings.MinMDP.Energy_Tol = 1e-3; % kJ/mol
 Settings.MinMDP.Gradient_Tol_RMS = 1e-3; % kJ/(mol A)
