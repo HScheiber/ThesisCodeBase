@@ -69,6 +69,7 @@ for idx = 1:N
     Settings.Salt = Salts{indexes(1,idx)};
     Settings.Theory = Theories{indexes(2,idx)};
     Settings.Structure = Structures{indexes(3,idx)};
+    Settings.S = Init_Scaling_Object;
     switch Settings.Theory
         case 'BF'
             Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
@@ -76,7 +77,6 @@ for idx = 1:N
             Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','BK');
         case 'JC'
             PotSettings = Settings;
-            Settings.S = Init_Scaling_Object;
             [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(PotSettings);
             Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','LJ_12-6');
             
