@@ -18,7 +18,7 @@ Settings.Cutoff_Buffer = 1.02;
 Settings.MinMDP.RList_Cutoff = 2;
 Settings.MinMDP.RCoulomb_Cutoff = 2;
 Settings.MinMDP.RVDW_Cutoff = 2;
-Settings.GaussianCharge = true;
+Settings.GaussianCharge = false;
 Settings.initial_opt_type = true;
 
 [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
@@ -121,4 +121,4 @@ for idx = 1:N
     end
 end
 
-save(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data')
+save(fullfile(Settings.home,'data','MX_Alexandria_PointQ_Min_Data.mat'),'Data')
