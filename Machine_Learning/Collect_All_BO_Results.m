@@ -46,7 +46,11 @@ for idx = 1:length(Salts)
                     full_data = fullopt_dat;
                     if isfile(inpfile)
                         input_model = load(inpfile,'-mat');
-                        full_data.Settings = input_model.Model;
+                        if isfield(input_model,'Model')
+                            full_data.Settings = input_model.Model;
+                        else
+                            full_data.Settings = input_model.Settings;
+                        end
                     end
                     if ~isempty(fullopt_history)
                         fullopt_hist_dat = load(fullfile(Current_Model_dir,fullopt_history.name));
@@ -101,7 +105,11 @@ for idx = 1:length(Salts)
                     full_data = fullopt_dat;
                     if isfile(inpfile)
                         input_model = load(inpfile,'-mat');
-                        full_data.Settings = input_model.Model;
+                        if isfield(input_model,'Model')
+                            full_data.Settings = input_model.Model;
+                        else
+                            full_data.Settings = input_model.Settings;
+                        end
                     end
                     if ~isempty(fullopt_history)
                         fullopt_hist_dat = load(fullfile(Current_Model_dir,fullopt_history.name));

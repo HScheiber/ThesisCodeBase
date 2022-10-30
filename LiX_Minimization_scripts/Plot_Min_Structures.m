@@ -5,7 +5,7 @@ Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').
 
 fs = 24;
 
-Theory = 'BF';
+Theory = 'Mie'; % {'BF' 'BH' 'JC' 'Mie'}
 %Salts = {'NaCl'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...
