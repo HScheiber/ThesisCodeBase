@@ -18,6 +18,13 @@ N_atoms = p.Results.N_atoms; % Minimum number of atoms to include in super cell
 Find_Min_Params = p.Results.Find_Min_Params; % When true, finds lowest energy parameters for IC based on Data_Types. When false, uses input IC
 Find_Similar_Params = p.Results.Find_Similar_Params; % When true, finds lowest energy parameters for IC if possible, but if no data is available, also looks for the same IC with non-scaled model
 
+if ~isfield(Settings,'GaussianCharge')
+    Settings.GaussianCharge = false;
+end
+if ~isfield(Settings,'Polarization')
+    Settings.Polarization = false;
+end
+
 % Type of optimization limited to Cellopt
 if Settings.MinMDP.Maintain_Symmetry
     OptTxt = 'CELLOPT';

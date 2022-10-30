@@ -40,6 +40,12 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
     save(Input_File,'Settings')
     
+    if ~isfield(Settings,'GaussianCharge')
+        Settings.GaussianCharge = false;
+    end
+    if ~isfield(Settings,'Polarization')
+        Settings.Polarization = false;
+    end
     if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
         Settings.MDP.CoulombType = 'PME-User';
     end

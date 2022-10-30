@@ -1,6 +1,6 @@
 % Generates Coulomb potential for tables
 function [f,df]= Coulomb_Potential(Settings,r,int)
-    if Settings.GaussianCharge
+    if isfield(Settings,'GaussianCharge') && Settings.GaussianCharge
         beta_ij = Settings.S.beta.(int);
         f = erf(beta_ij.*r)./r;
         f(r == 0) = beta_ij*2/sqrt(pi);

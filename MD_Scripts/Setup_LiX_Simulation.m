@@ -35,6 +35,13 @@ if ~Settings.Expand_LP
     Settings.Expand_c = 1;
 end
 
+if ~isfield(Settings,'GaussianCharge')
+    Settings.GaussianCharge = false;
+end
+if ~isfield(Settings,'Polarization')
+    Settings.Polarization = false;
+end
+
 if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
     Settings.MDP.CoulombType = 'PME-User';
 end

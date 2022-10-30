@@ -1,5 +1,10 @@
 function Table_Req = IsGmxTableRequired(Settings)
-    
+if ~isfield(Settings,'GaussianCharge')
+    Settings.GaussianCharge = false;
+end
+if ~isfield(Settings,'Polarization')
+    Settings.Polarization = false;
+end
 if strncmp(Settings.Theory,'JC',2)
     Table_Req = Settings.GaussianCharge || Settings.Polarization || ...
         (Settings.S.D.All <= 0) || (Settings.S.R.All <= 0) ...
