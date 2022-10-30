@@ -57,6 +57,13 @@ end
 Settings.Minimization_Data = Initialize_Minimization_Data(Settings);
 Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 
+if ~isfield(Settings,'GaussianCharge')
+    Settings.GaussianCharge = false;
+end
+if ~isfield(Settings,'Polarization')
+    Settings.Polarization = false;
+end
+
 % Convert Params to table form
 if ~istable(Param) && ~isstruct(Param)
     List_par = bayesopt_params(Settings);
