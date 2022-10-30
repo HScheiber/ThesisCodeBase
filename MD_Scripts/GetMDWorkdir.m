@@ -17,6 +17,8 @@ if isfield(Settings,'initial_opt_type')
     Hashobj.GAdjust_MM = Settings.GAdjust_MM;
     Hashobj.GAdjust_MX = Settings.GAdjust_MX;
     Hashobj.GAdjust_XX = Settings.GAdjust_XX;
+    Hashobj.GaussianCharge = Settings.GaussianCharge;
+    Hashobj.Polarization = Settings.Polarization;
     
     WorkDir = fullfile(Settings.scratch_dir,DataHash(Hashobj));
     JobName = 'Test_MP';
