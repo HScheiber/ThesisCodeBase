@@ -50,13 +50,17 @@ Settings.Liquid_Interface = false; % When true, creates an system with half STRU
 Settings.Liquid_Fraction = 0.5; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
 Settings.Theory = ''; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
 Settings.Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
-Settings.GaussianCharge = false; % Turn on Gaussian distributed charges when true
-Settings.Polarization = false; % Turn on polarizible Drude model when true
 Settings.WaterModel = 'SPC/E'; % For use with JC model
 Settings.JobID = ''; % An ID that is tacked onto the folder name of all current jobs
 Settings.N_atoms = 5000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
 Settings.Cutoff_Buffer = 1.2; % Set this value to some fraction greater than 1 to allow NPT simulation boxes to shrink without making the box size minimal axis smaller than the cutoff. Also allows for dynamic setting of rlist.
 Settings.ScaleInitialLiqDensity = 1; % Scale initial guess liquid density by this amount
+
+% Advanced forcefield options
+Settings.GaussianCharge = false; % Turn on Gaussian distributed charges when true
+Settings.Polarization = false; % Turn on polarizible Drude model when true
+Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
 % Only active for 'previous' structures:
 Settings.Prev_geom_loc = '';

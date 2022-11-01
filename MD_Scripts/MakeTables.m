@@ -1,7 +1,7 @@
-function [TableFile_MX,C6] = MakeTables(Settings,varargin)
+function [TableFile_Out,C6,Energygrptables] = MakeTables(Settings,varargin)
     
     if isfield(Settings,'JobName') && ~isempty(Settings.JobName)
-        TabName = Settings.JobName;
+        TabName = [Settings.JobName '_Table'];
     else
         TabName = [Settings.Salt '_' Settings.Theory '_Table'];
     end
@@ -31,58 +31,85 @@ function [TableFile_MX,C6] = MakeTables(Settings,varargin)
                     Settings.WaterModel = 'SD';
             end
             
-            [U_MX, U_MM, U_XX,C6] = JC_Potential_Generator(Settings,...
+            [U,C6] = JC_Potential_Generator(Settings,...
                 'MDP_Minimize',MDP_Minimize,...
                 'Include_Dispersion_Scale',false);
         case 'TF'
-            [U_MX, U_MM, U_XX,C6] = TF_Potential_Generator(Settings,...
+            [U,C6] = TF_Potential_Generator(Settings,...
                 'MDP_Minimize',MDP_Minimize,...
                 'Include_Dispersion_Scale',false);
         case 'HS'
             C6.MX = 1;C6.MM = 1;C6.XX = 1;
-            [U_MX, U_MM, U_XX] = HS_Potential_Generator(Settings,...
+            U = HS_Potential_Generator(Settings,...
                 'MDP_Minimize',true);
         case 'BH'
-            [U_MX, U_MM, U_XX,C6] = BH_Potential_Generator(Settings,...
+            [U,C6] = BH_Potential_Generator(Settings,...
                 'MDP_Minimize',MDP_Minimize,...
                 'Include_Dispersion_Scale',false);
         case 'BD'
-            [U_MX, U_MM, U_XX,C6] = BD_Potential_Generator(Settings,...
+            [U,C6] = BD_Potential_Generator(Settings,...
                 'MDP_Minimize',MDP_Minimize,...
                 'Include_Dispersion_Scale',false);
         case 'BE'
-            [U_MX, U_MM, U_XX,C6] = BE_Potential_Generator(Settings,...
+            [U,C6] = BE_Potential_Generator(Settings,...
                 'MDP_Minimize',MDP_Minimize,...
                 'Include_Dispersion_Scale',false);
         case 'BF'
-            [U_MX, U_MM, U_XX,C6] = BF_Potential_Generator(Settings,...
+            [U,C6] = BF_Potential_Generator(Settings,...
                 'MDP_Minimize',MDP_Minimize,...
                 'Include_Dispersion_Scale',false);
         case 'Mie'
-            [U_MX, U_MM, U_XX,C6] = Mie_Potential_Generator(Settings,...
+            [U,C6] = Mie_Potential_Generator(Settings,...
                 'MDP_Minimize',MDP_Minimize,...
                 'Include_Dispersion_Scale',false);
         otherwise
             error(['Warning: Unknown model type: "' Settings.Theory '.'])
     end
     
-	TableFile_MX = fullfile(Settings.WorkDir,[TableName '.xvg']);
-    TableFile_MM = fullfile(Settings.WorkDir,[TableName '_' Metal '_' Metal '.xvg']);
-    TableFile_XX = fullfile(Settings.WorkDir,[TableName '_' Halide '_' Halide '.xvg']);
-    
-    % Save tables into current directory
-    if SaveTables
-        fidMX = fopen(TableFile_MX,'wt');
-        fwrite(fidMX,regexprep(U_MX,{'\r', '\n\n+'}',{'', '\n'}));
-        fclose(fidMX);
-        
-        fidMM = fopen(TableFile_MM,'wt');
-        fwrite(fidMM,regexprep(U_MM,{'\r', '\n\n+'}',{'', '\n'}));
-        fclose(fidMM);
-        
-        fidXX = fopen(TableFile_XX,'wt');
-        fwrite(fidXX,regexprep(U_XX,{'\r', '\n\n+'}',{'', '\n'}));
-        fclose(fidXX);
+    U_zero = zeros(size(U.r));
+    ints = {'MX' 'MM' 'XX'};
+    if Settings.Polarization
+        subints = {'cc' 'sc' 'cs' 'ss'};
+    else
+        subints = {'cc'};
     end
+    Energygrptables = cell(length(ints),length(subints));
+    
+    if SaveTables
+        % First make blank table
+        Uo = [U.r ; U_zero ; U_zero ; U_zero ; U_zero ; U_zero ; U_zero];
+        U_out = deblank( sprintf(['%16.12e  %16.12e  %16.12e  %16.12e  %16.12e  %16.12e  %16.12e' newline],Uo(:)) );
+        
+        % Save table into current directory
+        TableFile_Out = fullfile(Settings.WorkDir,[TableName '.xvg']);
+        fid = fopen(TableFile_Out,'wt');
+        fwrite(fid,regexprep(U_out,'\r',''));
+        fclose(fid);
+        
+        for idx = 1:length(ints)
+            int = ints{idx};
+            for jdx = 1:length(subints)
+                subint = subints{jdx};
 
+                if strcmp(subint(1),'c') && strcmp(subint(2),'c') % core-core interactions
+                    Uo = [U.r ; U.(int).f0 ; U.(int).df0 ; U.(int).g ; U.(int).dg ; U.(int).h ; U.(int).dh];
+                else % shell interactions
+                    % Output into gromacs format
+                    Uo = [U.r ; U.(int).f0 ; U.(int).df0 ; U_zero ; U_zero ; U_zero ; U_zero];
+                end
+                
+                Energygrptables{idx,jdx} = replace([int(1) '_' subint(1) ' ' int(2) '_' subint(2)],{'M' 'X' '_c'},{Metal Halide ''});
+                U_out = deblank( sprintf(['%16.12e  %16.12e  %16.12e  %16.12e  %16.12e  %16.12e  %16.12e' newline],Uo(:)) );
+                TableFile = fullfile(Settings.WorkDir,[TableName '_' strrep(Energygrptables{idx,jdx},' ','_') '.xvg']);
+                
+                % Save tables into current directory
+                fid = fopen(TableFile,'wt');
+                fwrite(fid,regexprep(U_out,'\r',''));
+                fclose(fid);
+            end
+        end
+    end
+    
+    Energygrptables = reshape(Energygrptables,1,[]);
+    Energygrptables = sort(Energygrptables(~cellfun('isempty',Energygrptables)));
 end

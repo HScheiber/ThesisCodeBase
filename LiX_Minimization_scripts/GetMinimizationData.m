@@ -18,8 +18,11 @@ Settings.Cutoff_Buffer = 1.02;
 Settings.MinMDP.RList_Cutoff = 2;
 Settings.MinMDP.RCoulomb_Cutoff = 2;
 Settings.MinMDP.RVDW_Cutoff = 2;
-Settings.GaussianCharge = false;
+Settings.GaussianCharge = true;
 Settings.initial_opt_type = true;
+Settings.Polarization = true;
+Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
 [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
 Settings.MinMDP.Parallel_Min = false;
@@ -121,4 +124,4 @@ for idx = 1:N
     end
 end
 
-save(fullfile(Settings.home,'data','MX_Alexandria_PointQ_Min_Data.mat'),'Data')
+save(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data')

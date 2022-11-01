@@ -1,17 +1,15 @@
-function [U_MX_out, U_MM_out, U_XX_out,C6_out] = BD_Potential_Generator(Settings,varargin)
+function [U,C6_out] = BD_Potential_Generator(Settings,varargin)
 
 % Optional inputs
 p = inputParser;
 p.FunctionName = 'BD_Potential_Generator';
 addOptional(p,'PlotType','full')
-addOptional(p,'ReturnAsStructure',false);
 addOptional(p,'Startpoint',0);
 addOptional(p,'Plotswitch',false);
 addOptional(p,'MDP_Minimize',false);
 addOptional(p,'Include_Dispersion_Scale',true);
 parse(p,varargin{:});
 PlotType = p.Results.PlotType;
-ReturnAsStructure = p.Results.ReturnAsStructure;
 Startpoint = p.Results.Startpoint;
 Plotswitch = p.Results.Plotswitch;
 Incl_Disp = p.Results.Include_Dispersion_Scale;
@@ -81,7 +79,7 @@ for interaction = {'MX' 'XX' 'MM'}
     end
     
     % Components of potential
-    [U.(int).f,U.(int).df] = Coulomb_Potential(Settings,r,int); % Electrostatics function f(r) and derivative
+    [U.(int).f0,U.(int).df0] = Coulomb_Potential(Settings,r,int); % Electrostatics function f(r) and derivative
     U.(int).g = - C6./(r.^6); % Dispersion g(r)
     U.(int).h = B.(int)*exp(-alpha.(int).*r); % Short range repulsion (with possible close-range coulomb damping)
     
@@ -177,46 +175,10 @@ for interaction = {'MX' 'XX' 'MM'}
     U.(int) = Remove_Infinities(U.(int));
     
     % Print
-    U_out = [r ; U.(int).f ; U.(int).df ; U.(int).g ; U.(int).dg ; U.(int).h ; U.(int).dh];
-    U.(int).out = deblank( sprintf(['%16.10e   %16.10e %16.10e   %16.10e %16.10e   %16.10e %16.10e' newline],U_out(:)) );
-end
-
-if ReturnAsStructure
-	U.MX.f0 = U.MX.f;
-    U.MM.f0 = U.MM.f;
-    U.XX.f0 = U.XX.f;
-    
-	U.MX.df0 = U.MX.df;
-    U.MM.df0 = U.MM.df;
-    U.XX.df0 = U.XX.df;
-    
-	U.MX.f = k_0*(e_c^2).*q.M*q.X.*U.MX.f;
-    U.MM.f = k_0*(e_c^2).*q.M*q.M.*U.MM.f;
-    U.XX.f = k_0*(e_c^2).*q.X*q.X.*U.XX.f;
-    
-	U.MX.df = k_0*(e_c^2).*q.M*q.X.*U.MX.df;
-    U.MM.df = k_0*(e_c^2).*q.M*q.M.*U.MM.df;
-    U.XX.df = k_0*(e_c^2).*q.X*q.X.*U.XX.df;
-    
-    U.MX.Total = U.MX.f + C6_out.MX.*U.MX.g + U.MX.h;
-    U.MM.Total = U.MM.f + C6_out.MM.*U.MM.g + U.MM.h;
-    U.XX.Total = U.XX.f + C6_out.XX.*U.XX.g + U.XX.h;
-    
-    U.MX.dTotal = -(U.MX.df + C6_out.MX.*U.MX.dg + U.MX.dh);
-    U.MM.dTotal = -(U.MM.df + C6_out.MM.*U.MM.dg + U.MM.dh);
-    U.XX.dTotal = -(U.XX.df + C6_out.XX.*U.XX.dg + U.XX.dh);
-    
-    U_MX_out = U.MX;
-    U_MM_out = U.MM;
-    U_XX_out = U.XX;
-
-    U_MX_out.r = r;
-    U_MM_out.r = r;
-    U_XX_out.r = r;
-else
-    U_MX_out = U.MX.out;
-    U_MM_out = U.MM.out;
-    U_XX_out = U.XX.out;
+    U.(int).f  = k_0*(e_c^2)*q.(int(1))*q.(int(2)).*U.(int).f0;
+    U.(int).df = k_0*(e_c^2)*q.(int(1))*q.(int(2)).*U.(int).df0;
+    U.(int).Total = U.(int).f + C6_out.(int).*U.(int).g + U.(int).h;
+    U.(int).dTotal = -(U.(int).df + C6_out.(int).*U.(int).dg + U.(int).dh);
 end
 
 %% PLOT if plotswitch chosen

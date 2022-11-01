@@ -2,8 +2,8 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BH';
-ModelID = 'MG';
-BestOnly = false;
+ModelID = 'MH';
+BestOnly = true;
 SelectOnly = [];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
@@ -242,7 +242,8 @@ if N_MinPlot_Rows
                     end
                     Total_loss(idx,iidx) = min(optimvals);
                 else
-                    Total_loss(idx,iidx) = data.bayesopt_results.MinObjective;
+                    %Total_loss(idx,iidx) = data.bayesopt_results.MinObjective;
+                    Total_loss(idx,iidx) = min(data.bayesopt_results.ObjectiveTrace);
                 end
             catch
                 disp(['Could not obtain crystal minimization data for: ' Salt ', ' Theory ', Model ' Model '.']);

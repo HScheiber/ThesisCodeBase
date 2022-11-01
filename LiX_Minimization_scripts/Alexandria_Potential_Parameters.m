@@ -4,7 +4,7 @@
 % Output units: Sigma is nanometers, epsilon is kJ/mol
 % DS is the dispersion scaling factor (should only affect the r6 term)
 % ES is the epsilon scaling factor (increases well depth)
-function Settings = Alexandria_Potential_Parameters(Settings,varargin)
+function [Settings,AltParam] = Alexandria_Potential_Parameters(Settings,varargin)
 
 % Optional inputs
 p = inputParser;
@@ -19,6 +19,7 @@ vdW_Type = p.Results.vdW_Type;
 % 'repulsive-derivative'
 
 [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
+AltParam = struct();
 
 switch lower(vdW_Type)
     case 'wbk'
@@ -121,6 +122,21 @@ switch lower(vdW_Type)
         Settings.S.D6D.MM = C.(Metal);
         Settings.S.D6D.XX = C.(Halide);
         Settings.S.D6D.MX = sqrt(C.(Metal)*C.(Halide));
+        
+        % Gamma
+        AltParam.G.MM = -7*lambertw((-1/7)*(6*Settings.S.D6D.MM*(Settings.S.A.MM^6)/Settings.S.R.MM)^(1/7));
+        AltParam.G.XX = -7*lambertw((-1/7)*(6*Settings.S.D6D.XX*(Settings.S.A.XX^6)/Settings.S.R.XX)^(1/7));
+        AltParam.G.MX = -7*lambertw((-1/7)*(6*Settings.S.D6D.MX*(Settings.S.A.MX^6)/Settings.S.R.MX)^(1/7));
+        
+        % Sigma (nm)
+        AltParam.S.MM = AltParam.G.MM/Settings.S.A.MM;
+        AltParam.S.XX = AltParam.G.XX/Settings.S.A.XX;
+        AltParam.S.MX = AltParam.G.MX/Settings.S.A.MX;
+        
+        % Epsilon (kJ/mol)
+        AltParam.E.MM = Settings.S.D6D.MM*(AltParam.G.MM - 6)/(AltParam.G.MM*(AltParam.S.MM^6));
+        AltParam.E.XX = Settings.S.D6D.XX*(AltParam.G.XX - 6)/(AltParam.G.XX*(AltParam.S.XX^6));
+        AltParam.E.MX = Settings.S.D6D.MX*(AltParam.G.MX - 6)/(AltParam.G.MX*(AltParam.S.MX^6));
         
     case 'lj_12-6'
         Settings.SigmaEpsilon = true;

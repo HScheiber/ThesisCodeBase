@@ -109,6 +109,13 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoop(Settings
     fwrite(fidTOP,regexprep(Topology_text_new,'\r',''));
     fclose(fidTOP);
     
+    % If model is polarizable, add in shell positions
+    if Settings.Polarization
+        ndx_add = add_polarization_shells(Settings,SuperCellFile);
+    else
+        ndx_add = '';
+    end
+    
     % Create name for mdpout file
     MDPout_File = fullfile(Settings.WorkDir,...
         [Settings.FileBase '_out.mdp']);
@@ -130,7 +137,7 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoop(Settings
     GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(SuperCellFile) ...
         ' -f ' windows2unix(MDP_File) ' -p ' windows2unix(Topology_File) ...
         ' -o ' windows2unix(Trajectory_File) ' -po ' windows2unix(MDPout_File) ...
-        passlog windows2unix(GrompLog_File)];
+        ndx_add passlog windows2unix(GrompLog_File)];
     [state,~] = system(GROMPP_command);
     
     % Catch error in grompp
@@ -167,7 +174,6 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoop(Settings
     end
     
     % Remove files if requested
-    
     if Settings.Delete_MDlog
         delete(Log_File) %#ok<*UNRCH>
     end

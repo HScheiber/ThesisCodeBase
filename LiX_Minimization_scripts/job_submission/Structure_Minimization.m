@@ -80,6 +80,8 @@ elseif isfield(Settings,'Parallel_Bayesopt') && Settings.Parallel_Bayesopt
     gmx_serial = true;
 elseif Settings.MinMDP.Parallel_Min
     gmx_serial = true;
+elseif Settings.Polarization % Polarization cannot run with gmx parallel
+    gmx_serial = true;
 else
     gmx_serial = false;
 end   
@@ -214,16 +216,20 @@ end
 Settings.Topology_Template = strrep(Settings.Topology_Template,'##MET##',pad(Metal,2));
 Settings.Topology_Template = strrep(Settings.Topology_Template,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
 Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
-Settings.Topology_Template = strrep(Settings.Topology_Template,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+if Settings.Polarization
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##MCHRG##',pad(num2str(Settings.S.QcoreM),2));
+else
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+end
 
 Settings.Topology_Template = strrep(Settings.Topology_Template,'##HAL##',pad(Halide,2));
 Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
 Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
-Settings.Topology_Template = strrep(Settings.Topology_Template,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
-
-% Insert salt components into MDP template
-Settings.MDP_Template = strrep(Settings.MDP_Template,'##MET##',Metal);
-Settings.MDP_Template = strrep(Settings.MDP_Template,'##HAL##',Halide);
+if Settings.Polarization
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##XCHRG##',pad(num2str(Settings.S.QcoreX),2));
+else
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+end
 
 % Select symmetry settings
 if Settings.MinMDP.Maintain_Symmetry
@@ -345,6 +351,8 @@ end
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##FOURIER##',pad(num2str(Settings.MinMDP.Fourier_Spacing),18));
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##PMEORDER##',pad(num2str(Settings.MinMDP.PME_Order),18));
 Settings.MDP_Template = strrep(Settings.MDP_Template,'##EWALDTOL##',pad(num2str(Settings.MinMDP.Ewald_rtol),18));
+Settings.MDP_Template = strrep(Settings.MDP_Template,'##MET##',Metal);
+Settings.MDP_Template = strrep(Settings.MDP_Template,'##HAL##',Halide);
 
 if AddRepWall
     
@@ -364,7 +372,8 @@ if AddRepWall
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##','1.0');
     
     Settings.JobName = [Settings.Salt '_' Model];
-    [Settings.TableFile_MX,C6] = MakeTablesWithWall(Settings,'MDP_Minimize',true);
+    [Settings.TableFile_MX,C6,Energygrptables] = MakeTablesWithWall(Settings,'MDP_Minimize',true);
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
     
     % Dispersion coefficients
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',num2str(C6.MM,'%.10e'));
@@ -383,10 +392,10 @@ elseif Table_Req
     
     % Define the function type as 1 (needed for custom functions)
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##NBFUNC##','1');
-
+    
     % Define the combination rules (Lorenz-berthelot)
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##COMBR##','1');
-
+    
     % Define all the repulsive parameters as 1.0 (already included in potentials)
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##','1.0');
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##','1.0');
@@ -394,8 +403,9 @@ elseif Table_Req
     
     % Generate tables
     TableName = [Settings.Salt '_' Model '_Table'];
-    [Settings.TableFile_MX,C6] = MakeTables(Settings,'MDP_Minimize',true,...
+    [Settings.TableFile_MX,C6,Energygrptables] = MakeTables(Settings,'MDP_Minimize',true,...
     	'TableName',TableName);
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
     
     % Dispersion coefficients
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',num2str(C6.MM,'%.10e'));
@@ -464,6 +474,13 @@ if Settings.MinMDP.Disp_Correction
     Settings.MDP_Template = [Settings.MDP_Template newline newline...
         '; Long-range dispersion correction' newline ...
         'DispCorr                 = Ener          ; apply long range dispersion corrections for Energy'];
+end
+
+if Settings.Polarization
+    [Settings.Topology_Template,Settings.MDP_Template] = ...
+        Polarize_Inputs(Settings,Settings.Topology_Template,Settings.MDP_Template);
+else
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##ENERGYGRPS##',[Met ' ' Hal]);
 end
 
 if Settings.MinMDP.Verbose

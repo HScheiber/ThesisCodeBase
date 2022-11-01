@@ -24,21 +24,19 @@
 % are the same)
 
 % CRDamping = Close Range Damping
-function [U_MX_out, U_MM_out, U_XX_out,C6_out] = JC_Potential_Generator(Settings,varargin)
+function [U,C6_out] = JC_Potential_Generator(Settings,varargin)
 
 
 % Optional inputs
 p = inputParser;
 p.FunctionName = 'JC_Potential_Generator';
 addOptional(p,'PlotType','full')
-addOptional(p,'ReturnAsStructure',false);
 addOptional(p,'Startpoint',0);
 addOptional(p,'Plotswitch',false);
 addOptional(p,'MDP_Minimize',false);
 addOptional(p,'Include_Dispersion_Scale',true);
 parse(p,varargin{:});
 PlotType = p.Results.PlotType;
-ReturnAsStructure = p.Results.ReturnAsStructure;
 Startpoint = p.Results.Startpoint;
 Plotswitch = p.Results.Plotswitch;
 Incl_Disp = p.Results.Include_Dispersion_Scale;
@@ -177,16 +175,8 @@ else
 end
 
 %% Parameter: q (charge)
-q.Li =  Settings.S.Q; % atomic
-q.Na =  Settings.S.Q; % atomic
-q.K  =  Settings.S.Q; % atomic
-q.Rb =  Settings.S.Q; % atomic
-q.Cs =  Settings.S.Q; % atomic
-
-q.F  = -Settings.S.Q; % atomic
-q.Cl = -Settings.S.Q; % atomic
-q.Br = -Settings.S.Q; % atomic
-q.I  = -Settings.S.Q; % atomic
+q.M =  Settings.S.Q; % atomic
+q.X  = -Settings.S.Q; % atomic
 
 %% Calculate parameters of interest for LJ potential
 sigma_MM = Settings.S.S.All*Settings.S.S.MM*Param.(Metal).sigma;
@@ -209,7 +199,7 @@ C.MX = Settings.S.D.All*Settings.S.D.MX*4*epsilon_MX*(sigma_MX^6);
 
 
 %% Generate range (r) in nm
-r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
+U.r = Startpoint:Settings.Table_StepSize:Settings.Table_Length;
 
 %% If Damping at close range, affects all attractive interactions
 for interaction = {'MX' 'XX' 'MM'}
@@ -218,8 +208,8 @@ for interaction = {'MX' 'XX' 'MM'}
         r_d = Settings.CR_Damp.(int).r_d;
         b  = Settings.CR_Damp.(int).b; 
         
-        f_r.(int) = 1./(1 + exp(-b.*(r - r_d))); % sigmoid damping function
-        df_r.(int) = (b.*exp(-b.*(r - r_d)))./((1 + exp(-b.*(r - r_d))).^2); % sigmoid damping function derivative
+        f_r.(int) = 1./(1 + exp(-b.*(U.r - r_d))); % sigmoid damping function
+        df_r.(int) = (b.*exp(-b.*(U.r - r_d)))./((1 + exp(-b.*(U.r - r_d))).^2); % sigmoid damping function derivative
         f_cutoff.(int) = 1./(1 + exp(-b.*(Settings.(MDP).RVDW_Cutoff - r_d)));  % value of f at vdw cutoff
     else
         f_r.(int) = 1; % No damping
@@ -284,13 +274,13 @@ for interaction = {'MX' 'XX' 'MM'}
         end
 
         % Damping functions (unitless)
-        f6.(int) = f_r.(int)./( 1 + ( R0.(int) ./ r ).^6 );
+        f6.(int) = f_r.(int)./( 1 + ( R0.(int) ./ U.r ).^6 );
 
         % Values of damping function at vdw cutoff
         f6_cutoff.(int) = f_cutoff.(int)/( 1 + ( R0.(int) / Settings.(MDP).RVDW_Cutoff )^6 );
 
         % Derivative of damping functions
-        df6.(int) = f_r.(int).*(6.*(R0.(int).^6).*(r.^5)./(((r.^6) + (R0.(int).^6)).^2)) + df_r.(int)./( 1 + ( R0.(int) ./ r ).^6 );
+        df6.(int) = f_r.(int).*(6.*(R0.(int).^6).*(U.r.^5)./(((U.r.^6) + (R0.(int).^6)).^2)) + df_r.(int)./( 1 + ( R0.(int) ./ U.r ).^6 );
 
     %% Tang and Toennies Damping function. Cite:
     % "An improved simple model for the van der Waals potential based on universal damping functions for the dispersion coefficients."
@@ -329,17 +319,17 @@ for interaction = {'MX' 'XX' 'MM'}
         % C6 damping functions
         f6sum = 0;
         for k = 0:6
-            f6sum = f6sum + ((alpha.*r).^k)./factorial(k); 
+            f6sum = f6sum + ((alpha.*U.r).^k)./factorial(k); 
         end
-        f6.(int) = f_r.(int).*(1 - f6sum.*exp(-alpha.*r));
+        f6.(int) = f_r.(int).*(1 - f6sum.*exp(-alpha.*U.r));
 
         % Calculate C6 damping derivatives
         df6sum = 0;
         for k = 1:6
-            df6sum = df6sum + k.*(alpha.^k).*(r.^(k-1))./factorial(k);
+            df6sum = df6sum + k.*(alpha.^k).*(U.r.^(k-1))./factorial(k);
         end
-        df6.(int) = f_r.(int).*((alpha.*exp(-alpha.*r)).*f6sum ...
-            - (exp(-alpha.*r)).*df6sum) + df_r.(int).*(1 - f6sum.*exp(-alpha.*r));
+        df6.(int) = f_r.(int).*((alpha.*exp(-alpha.*U.r)).*f6sum ...
+            - (exp(-alpha.*U.r)).*df6sum) + df_r.(int).*(1 - f6sum.*exp(-alpha.*U.r));
 
         % Values of damping function at vdw cutoff
         f6_cutoff.(int) = f_cutoff.(int)*(1 - sum(((alpha.*Settings.(MDP).RVDW_Cutoff).^(0:6))./factorial(0:6)).*exp(-alpha.*Settings.(MDP).RVDW_Cutoff));
@@ -403,11 +393,11 @@ for interaction = {'MX' 'XX' 'MM'}
         R0.(int) = R0.(Y1) + R0.(Y2);
 
         % Damping functions
-        f6.(int) = f_r.(int).*((1 + a.*exp(-b.*(r./R0.(int)).^m) ).^n);
+        f6.(int) = f_r.(int).*((1 + a.*exp(-b.*(U.r./R0.(int)).^m) ).^n);
 
         % Derivative parts of damping functions
-        df6.(int) = f_r.(int).*(-(a.*b.*m.*n.*(r./R0.(int)).^(m - 1).*exp(-b.*(r./R0.(int)).^m).*(a.*exp(-b.*(r/R0.(int)).^m) + 1).^(n - 1))./R0.(int)) ...
-            + df_r.(int).*((1 + a.*exp(-b.*(r./R0.(int)).^m) ).^n);
+        df6.(int) = f_r.(int).*(-(a.*b.*m.*n.*(U.r./R0.(int)).^(m - 1).*exp(-b.*(U.r./R0.(int)).^m).*(a.*exp(-b.*(U.r/R0.(int)).^m) + 1).^(n - 1))./R0.(int)) ...
+            + df_r.(int).*((1 + a.*exp(-b.*(U.r./R0.(int)).^m) ).^n);
 
         % Values at vdw cutoff
         f6_cutoff.(int) = f_cutoff.(int)*((1 + a*exp(-b*(Settings.(MDP).RVDW_Cutoff/R0.(int))^m) )^n);
@@ -459,13 +449,13 @@ for interaction = {'MX' 'XX' 'MM'}
 
         % Damping functions (unitless)
         NV = Settings.S.N.(int).Value;
-        fN.(int) = f_r.(int)./( 1 + ( R0.(int) ./ r ).^NV );
+        fN.(int) = f_r.(int)./( 1 + ( R0.(int) ./ U.r ).^NV );
 
         % Values of damping function at vdw cutoff
         fN_cutoff.(int) = f_cutoff.(int)/( 1 + ( R0.(int) / Settings.(MDP).RVDW_Cutoff )^NV );
 
         % Derivative of damping functions
-        dfN.(int) = f_r.(int).*(NV.*(R0.(int).^NV).*(r.^(NV-1))./(((r.^NV) + (R0.(int).^NV)).^2)) + df_r.(int)./( 1 + ( R0.(int) ./ r ).^NV );
+        dfN.(int) = f_r.(int).*(NV.*(R0.(int).^NV).*(U.r.^(NV-1))./(((U.r.^NV) + (R0.(int).^NV)).^2)) + df_r.(int)./( 1 + ( R0.(int) ./ U.r ).^NV );
 
     %% Tang and Toennies Damping function. Cite:
     % "An improved simple model for the van der Waals potential based on universal damping functions for the dispersion coefficients."
@@ -506,17 +496,17 @@ for interaction = {'MX' 'XX' 'MM'}
         
         fNsum = 0;
         for k = 0:NV
-            fNsum = fNsum + ((alpha.*r).^k)./factorial(k); 
+            fNsum = fNsum + ((alpha.*U.r).^k)./factorial(k); 
         end
-        fN.(int) = f_r.(int).*(1 - fNsum.*exp(-alpha.*r));
+        fN.(int) = f_r.(int).*(1 - fNsum.*exp(-alpha.*U.r));
 
         % Calculate C6 damping derivatives
         dfNsum = 0;
         for k = 1:NV
-            dfNsum = dfNsum + k.*(alpha.^k).*(r.^(k-1))./factorial(k);
+            dfNsum = dfNsum + k.*(alpha.^k).*(U.r.^(k-1))./factorial(k);
         end
-        dfN.(int) = f_r.(int).*((alpha.*exp(-alpha.*r)).*fNsum ...
-            - (exp(-alpha.*r)).*dfNsum) + df_r.(int).*(1 - fNsum.*exp(-alpha.*r));
+        dfN.(int) = f_r.(int).*((alpha.*exp(-alpha.*U.r)).*fNsum ...
+            - (exp(-alpha.*U.r)).*dfNsum) + df_r.(int).*(1 - fNsum.*exp(-alpha.*U.r));
 
         % Values of damping function at vdw cutoff
         fN_cutoff.(int) = f_cutoff.(int)*(1 - sum(((alpha.*Settings.(MDP).RVDW_Cutoff).^(0:NV))./factorial(0:NV)).*exp(-alpha.*Settings.(MDP).RVDW_Cutoff));
@@ -580,39 +570,39 @@ for interaction = {'MX' 'XX' 'MM'}
         R0.(int) = R0.(Y1) + R0.(Y2);
 
         % Damping functions
-        fN.(int) = f_r.(int).*((1 + a.*exp(-b.*(r./R0.(int)).^m) ).^n);
+        fN.(int) = f_r.(int).*((1 + a.*exp(-b.*(U.r./R0.(int)).^m) ).^n);
 
         % Derivative parts of damping functions
-        dfN.(int) = f_r.(int).*(-(a.*b.*m.*n.*(r./R0.(int)).^(m - 1).*exp(-b.*(r./R0.(int)).^m).*(a.*exp(-b.*(r/R0.(int)).^m) + 1).^(n - 1))./R0.(int)) ...
-            + df_r.(int).*((1 + a.*exp(-b.*(r./R0.(int)).^m) ).^n);
+        dfN.(int) = f_r.(int).*(-(a.*b.*m.*n.*(U.r./R0.(int)).^(m - 1).*exp(-b.*(U.r./R0.(int)).^m).*(a.*exp(-b.*(U.r/R0.(int)).^m) + 1).^(n - 1))./R0.(int)) ...
+            + df_r.(int).*((1 + a.*exp(-b.*(U.r./R0.(int)).^m) ).^n);
 
         % Values at vdw cutoff
         fN_cutoff.(int) = f_cutoff.(int)*((1 + a*exp(-b*(Settings.(MDP).RVDW_Cutoff/R0.(int))^m) )^n);
     end
     
     %% Modify potential with Gaussian Adjustments
-    G_r.(int) = zeros(1,length(r));
-    dG_r.(int) = zeros(1,length(r));
+    G_r.(int) = zeros(1,length(U.r));
+    dG_r.(int) = zeros(1,length(U.r));
     G_r_cutoff.(int) = 0;
     for i = 1:length(G_a.(int))
-        G_r.(int) = G_r.(int) + G_a.(int)(i).*exp((-(r - G_b.(int)(i)).^2)./(2.*(G_c.(int)(i).^2)));
+        G_r.(int) = G_r.(int) + G_a.(int)(i).*exp((-(U.r - G_b.(int)(i)).^2)./(2.*(G_c.(int)(i).^2)));
         G_r_cutoff.(int) = G_r_cutoff.(int) + G_a.(int)(i)*exp((-(Settings.(MDP).RVDW_Cutoff - G_b.(int)(i))^2)/(2*(G_c.(int)(i)^2)));
-        dG_r.(int) = dG_r.(int) - (G_a.(int)(i).*(r - G_b.(int)(i))).*(exp((-(r - G_b.(int)(i)).^2)./(2.*(G_c.(int)(i).^2))))/(G_c.(int)(i).^2);
+        dG_r.(int) = dG_r.(int) - (G_a.(int)(i).*(U.r - G_b.(int)(i))).*(exp((-(U.r - G_b.(int)(i)).^2)./(2.*(G_c.(int)(i).^2))))/(G_c.(int)(i).^2);
     end
     
     %% Build PES
     if strcmp(int,'MX')
         % Place a CR damping function for the attractive coulomb potential
-        U_Qdamp = - k_0*(e_c^2)*q.(Y1)*q.(Y2)./(r) ...
-                  + f_r.(int).*k_0*(e_c^2)*q.(Y1)*q.(Y2)./(r);
+        U_Qdamp = - k_0*(e_c^2)*q.(int(1))*q.(int(2))./(U.r) ...
+                  + f_r.(int).*k_0*(e_c^2)*q.(int(1))*q.(int(2))./(U.r);
 
         % Negative Derivative of CR damping function
-        dU_Qdamp = - k_0*(e_c^2)*q.(Y1)*q.(Y2)./(r.^2) ...
-                   + f_r.(int).*k_0*(e_c^2)*q.(Y1)*q.(Y2)./(r.^2) ...
-                   - df_r.(int).*k_0*(e_c^2)*q.(Y1)*q.(Y2)./(r);
+        dU_Qdamp = - k_0*(e_c^2)*q.(int(1))*q.(int(2))./(U.r.^2) ...
+                   + f_r.(int).*k_0*(e_c^2)*q.(int(1))*q.(int(2))./(U.r.^2) ...
+                   - df_r.(int).*k_0*(e_c^2)*q.(int(1))*q.(int(2))./(U.r);
        
-        U_Qdamp_cutoff = - k_0*(e_c^2)*q.(Y1)*q.(Y2)/(Settings.(MDP).RVDW_Cutoff) ...
-                         + f_cutoff.(int)*k_0*(e_c^2)*q.(Y1)*q.(Y2)/(Settings.(MDP).RVDW_Cutoff);
+        U_Qdamp_cutoff = - k_0*(e_c^2)*q.(int(1))*q.(int(2))/(Settings.(MDP).RVDW_Cutoff) ...
+                         + f_cutoff.(int)*k_0*(e_c^2)*q.(Y1)*q.(int(2))/(Settings.(MDP).RVDW_Cutoff);
     else
         % No close-range coulomb damping
         U_Qdamp = 0;
@@ -624,9 +614,9 @@ for interaction = {'MX' 'XX' 'MM'}
     if Settings.S.N.(int).Value > 0
         NV = Settings.S.N.(int).Value; % Exponent
         NS = Settings.S.N.(int).Scale; % Scaling
-        U_add  = - fN.(int).*NS./(r.^NV);
-        dU_add = + fN.(int).*NS.*NV./(r.^(NV+1)) ...
-                 - dfN.(int).*NS./(r.^NV);
+        U_add  = - fN.(int).*NS./(U.r.^NV);
+        dU_add = + fN.(int).*NS.*NV./(U.r.^(NV+1)) ...
+                 - dfN.(int).*NS./(U.r.^NV);
         U_add_cutoff = - fN_cutoff.(int)*NS/(Settings.(MDP).RVDW_Cutoff^NV);
     else
         U_add = 0;
@@ -644,19 +634,19 @@ for interaction = {'MX' 'XX' 'MM'}
     end
     
     % Components of potential
-    [U.(int).f,U.(int).df] = Coulomb_Potential(Settings,r,int); % Electrostatics function f(r) and derivative
-    U.(int).g = - f6.(int).*C6./(r.^6) ...
+    [U.(int).f0,U.(int).df0] = Coulomb_Potential(Settings,U.r,int); % Electrostatics function f(r) and derivative
+    U.(int).g = - f6.(int).*C6./(U.r.^6) ...
                 + G_r.(int)./C6_out.(int) ...
                 + U_add./C6_out.(int); % Dispersion g(r)
-    U.(int).h = A.(int)./(r.^12) ...
+    U.(int).h = A.(int)./(U.r.^12) ...
                 + U_Qdamp; % Short range repulsion h(r) (with possible close-range coulomb damping)
     
     % Negative components of derivative
-    U.(int).dg = - f6.(int).*C6.*6./(r.^7) ...
-                 + df6.(int).*C6./(r.^6) ...
+    U.(int).dg = - f6.(int).*C6.*6./(U.r.^7) ...
+                 + df6.(int).*C6./(U.r.^6) ...
                  - dG_r.(int)./C6_out.(int) ...
                  + dU_add./C6_out.(int); % Dispersion -dg(r)/dr
-    U.(int).dh = A.(int).*12./(r.^13) ...
+    U.(int).dh = A.(int).*12./(U.r.^13) ...
                  + dU_Qdamp; % Short range repulsion
     
     % Shift the potential to zero at the cutoff
@@ -676,46 +666,10 @@ for interaction = {'MX' 'XX' 'MM'}
     U.(int) = Remove_Infinities(U.(int));
     
     % Print
-    U_out = [r ; U.(int).f ; U.(int).df ; U.(int).g ; U.(int).dg ; U.(int).h ; U.(int).dh];
-    U.(int).out = deblank( sprintf(['%16.10e   %16.10e %16.10e   %16.10e %16.10e   %16.10e %16.10e' newline],U_out(:)) );
-end
-
-if ReturnAsStructure
-	U.MX.f0 = U.MX.f;
-    U.MM.f0 = U.MM.f;
-    U.XX.f0 = U.XX.f;
-    
-	U.MX.df0 = U.MX.df;
-    U.MM.df0 = U.MM.df;
-    U.XX.df0 = U.XX.df;
-    
-	U.MX.f = k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.f;
-    U.MM.f = k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.f;
-    U.XX.f = k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.f;
-    
-	U.MX.df = k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.df;
-    U.MM.df = k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.df;
-    U.XX.df = k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.df;
-    
-    U.MX.Total = U.MX.f + C6_out.MX.*U.MX.g + U.MX.h;
-    U.MM.Total = U.MM.f + C6_out.MM.*U.MM.g + U.MM.h;
-    U.XX.Total = U.XX.f + C6_out.XX.*U.XX.g + U.XX.h;
-    
-    U.MX.dTotal = -(U.MX.df + C6_out.MX.*U.MX.dg + U.MX.dh);
-    U.MM.dTotal = -(U.MM.df + C6_out.MM.*U.MM.dg + U.MM.dh);
-    U.XX.dTotal = -(U.XX.df + C6_out.XX.*U.XX.dg + U.XX.dh);
-    
-    U_MX_out = U.MX;
-    U_MM_out = U.MM;
-    U_XX_out = U.XX;
-
-    U_MX_out.r = r;
-    U_MM_out.r = r;
-    U_XX_out.r = r;
-else
-    U_MX_out = U.MX.out;
-    U_MM_out = U.MM.out;
-    U_XX_out = U.XX.out;
+    U.(int).f  = k_0*(e_c^2)*q.(int(1))*q.(int(2)).*U.(int).f0;
+    U.(int).df = k_0*(e_c^2)*q.(int(1))*q.(int(2)).*U.(int).df0;
+    U.(int).Total = U.(int).f + C6_out.(int).*U.(int).g + U.(int).h;
+    U.(int).dTotal = -(U.(int).df + C6_out.(int).*U.(int).dg + U.(int).dh);
 end
 
 %% PLOT if plotswitch chosen
@@ -729,51 +683,51 @@ if Plotswitch
     hold on
     switch lower(PlotType)
         case 'full'
-            h{1} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.f + U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.f + U.MM.g + U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.f + U.XX.g + U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(U.r.*10,k_0*(e_c^2).*q.M*q.X.*U.MX.f + U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(U.r.*10,k_0*(e_c^2).*q.M*q.M.*U.MM.f + U.MM.g + U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(U.r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.f + U.XX.g + U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-600 1000];
             ttxt = 'Full Potential';
         case 'full-derivative'
-            h{1} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Halide).*U.MX.df + U.MX.dg + U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,k_0*(e_c^2).*q.(Metal)*q.(Metal).*U.MM.df + U.MM.dg + U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,k_0*(e_c^2).*q.(Halide)*q.(Halide).*U.XX.df + U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(U.r.*10,k_0*(e_c^2).*q.M*q.X.*U.MX.df + U.MX.dg + U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(U.r.*10,k_0*(e_c^2).*q.M*q.M.*U.MM.df + U.MM.dg + U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(U.r.*10,k_0*(e_c^2).*q.X*q.X.*U.XX.df + U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-600 1000];
             ttxt = 'Derivative of Full Potential';
         case 'lj'
-            h{1} = plot(r.*10,U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,U.MM.g + U.MM.h,'Color','g','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,U.XX.g + U.XX.h,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(U.r.*10,U.MX.g + U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(U.r.*10,U.MM.g + U.MM.h,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(U.r.*10,U.XX.g + U.XX.h,'Color','b','LineWidth',lw,'Linestyle','-');
             yl = [-50 10];
             ttxt = 'Lennard-Jones Potential';
         case 'lj-derivative'
-            h{1} = plot(r.*10,U.MX.dg + U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,U.MM.dg + U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(U.r.*10,U.MX.dg + U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(U.r.*10,U.MM.dg + U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(U.r.*10,U.XX.dg + U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-50 10];
             ttxt = 'Derivative of Lennard-Jones Potential';
         case 'dispersion'
-            h{1} = plot(r.*10,U.MX.g,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,U.MM.g,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,U.XX.g,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(U.r.*10,U.MX.g,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(U.r.*10,U.MM.g,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(U.r.*10,U.XX.g,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-50 10];
             ttxt = 'Dispersion Potential';
         case 'dispersion-derivative'
-            h{1} = plot(r.*10,U.MX.dg,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,U.MM.dg,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,U.XX.dg,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(U.r.*10,U.MX.dg,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(U.r.*10,U.MM.dg,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(U.r.*10,U.XX.dg,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-50 10];
             ttxt = 'Derivative of Dispersion Potential';
         case 'repulsive'
-            h{1} = plot(r.*10,U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(U.r.*10,U.MX.h,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(U.r.*10,U.MM.h,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(U.r.*10,U.XX.h,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-50 10];
             ttxt = 'Repulsive Potential';
         case 'repulsive-derivative'
-            h{1} = plot(r.*10,U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
-            h{2} = plot(r.*10,U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
-            h{3} = plot(r.*10,U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
+            h{1} = plot(U.r.*10,U.MX.dh,'Color','r','LineWidth',lw,'LineStyle','-');
+            h{2} = plot(U.r.*10,U.MM.dh,'Color','b','LineWidth',lw,'Linestyle','-');
+            h{3} = plot(U.r.*10,U.XX.dh,'Color','g','LineWidth',lw,'Linestyle','-');
             yl = [-50 10];
             ttxt = 'Derivative of Repulsive Potential';
     end
