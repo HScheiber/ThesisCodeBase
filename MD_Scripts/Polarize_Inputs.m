@@ -30,7 +30,8 @@ function [Topology_Template,MDP_Template] = Polarize_Inputs(Settings,Topology_Te
     %% Deal with topology
     
     % atomtypes
-    atomtypes = regexp(Topology_Template,'\[ *atomtypes *\].+?[\n\r|\r\n|\n]{3}','match','once');
+    Topology_Template = regexprep(Topology_Template,'\r','');
+    atomtypes = regexp(Topology_Template,'\[ *atomtypes *\].+?\n{2}','match','once');
     metal_info = regexp(atomtypes,['  ' Metal ' *' Metal '.+?\n'],'match','once');
     metal_info = [metal_info '  ' pad([Metal '_s'],6) 'X          0          0.000   ' ...
         num2str(q.shell.M,'%+.3f') '       S      0.0              0.0' newline];
@@ -41,26 +42,26 @@ function [Topology_Template,MDP_Template] = Polarize_Inputs(Settings,Topology_Te
     
     atomtypes = regexprep(atomtypes,['  ' Metal ' *' Metal '.+?\n'],metal_info);
     atomtypes = regexprep(atomtypes,['  ' Halide ' *' Halide '.+?\n'],halide_info);
-    Topology_Template = regexprep(Topology_Template,'\[ *atomtypes *\].+?[\n|\r]{2}\n',atomtypes);
+    Topology_Template = regexprep(Topology_Template,'\[ *atomtypes *\].+?\n{2}',atomtypes);
     
     % Metal Molecule and polarization
-    moleculetypes = regexp(Topology_Template,['\[ *moleculetype *\].+?' Metal ' +' Metal '.+?[\n\r|\r\n|\n]{3}'],'match','once');
+    moleculetypes = regexp(Topology_Template,['\[ *moleculetype *\].+?' Metal ' +' Metal '.+?\n{2}'],'match','once');
     metal_info = regexp(moleculetypes,['1 *' Metal '.+?\n'],'match','once');
     metal_info = [metal_info '2           ' pad([Metal '_s'],11) '1          ' pad(Metal,11) pad([Metal '_s'],11) ...
         '2         ' pad(num2str(q.shell.M,'%+.3f'),11) newline newline ...
         '[ polarization ]' newline ';atom shell type alpha' newline '1     2     1    ' ...
         num2str(alpha.M,'%.4E') newline];
     moleculetypes = regexprep(moleculetypes,['1 *' Metal '.+?\n'],metal_info);
-    Topology_Template = regexprep(Topology_Template,['\[ *moleculetype *\].+?' Metal ' +' Metal '.+?[\n\r|\r\n|\n]{3}'],moleculetypes);
+    Topology_Template = regexprep(Topology_Template,['\[ *moleculetype *\].+?' Metal ' +' Metal '.+?\n{2}'],moleculetypes);
     
     % Halide molecule and polarization
-    moleculetypes = regexp(Topology_Template,['\[ *moleculetype *\].+?' Halide ' +' Halide '.+?[\n\r|\r\n|\n]{3}'],'match','once');
+    moleculetypes = regexp(Topology_Template,['\[ *moleculetype *\].+?' Halide ' +' Halide '.+?\n{2}'],'match','once');
     halide_info = regexp(moleculetypes,['1 *' Halide '.+?\n'],'match','once');
     halide_info = [halide_info '2           ' pad([Halide '_s'],11) '1          ' pad(Halide,11) pad([Halide '_s'],11) ...
         '2         ' pad(num2str(q.shell.X,'%+.3f'),11) newline newline ...
         '[ polarization ]' newline ';atom shell type alpha' newline '1     2     1    ' ...
         num2str(alpha.X,'%.4E') newline];
     moleculetypes = regexprep(moleculetypes,['1 *' Halide '.+?\n'],halide_info);
-    Topology_Template = regexprep(Topology_Template,['\[ *moleculetype *\].+?' Halide ' +' Halide '.+?[\n\r|\r\n|\n]{3}'],moleculetypes);
+    Topology_Template = regexprep(Topology_Template,['\[ *moleculetype *\].+?' Halide ' +' Halide '.+?\n{2}'],moleculetypes);
     
 end
