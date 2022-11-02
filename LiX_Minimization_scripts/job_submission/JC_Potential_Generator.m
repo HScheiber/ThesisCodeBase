@@ -602,7 +602,7 @@ for interaction = {'MX' 'XX' 'MM'}
                    - df_r.(int).*k_0*(e_c^2)*q.(int(1))*q.(int(2))./(U.r);
        
         U_Qdamp_cutoff = - k_0*(e_c^2)*q.(int(1))*q.(int(2))/(Settings.(MDP).RVDW_Cutoff) ...
-                         + f_cutoff.(int)*k_0*(e_c^2)*q.(Y1)*q.(int(2))/(Settings.(MDP).RVDW_Cutoff);
+                         + f_cutoff.(int)*k_0*(e_c^2)*q.(int(1))*q.(int(2))/(Settings.(MDP).RVDW_Cutoff);
     else
         % No close-range coulomb damping
         U_Qdamp = 0;
