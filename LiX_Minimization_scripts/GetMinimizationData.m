@@ -25,7 +25,7 @@ Settings.niter_polarization = 1000; % Maximum number of iterations for optimizin
 Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
 [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
-Settings.MinMDP.Parallel_Min = true;
+Settings.MinMDP.Parallel_Min = false;
 Settings.Parallel_LiX_Minimizer = false;
 % setenv('OMP_NUM_THREADS','1');
 % setenv('GMX_PME_NUM_THREADS','1');
