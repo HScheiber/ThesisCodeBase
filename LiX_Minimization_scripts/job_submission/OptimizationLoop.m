@@ -110,11 +110,7 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoop(Settings
     fclose(fidTOP);
     
     % If model is polarizable, add in shell positions
-    if Settings.Polarization
-        ndx_add = add_polarization_shells(Settings,SuperCellFile);
-    else
-        ndx_add = '';
-    end
+    ndx_add = add_polarization_shells(Settings,SuperCellFile);
     
     % Create name for mdpout file
     MDPout_File = fullfile(Settings.WorkDir,...
