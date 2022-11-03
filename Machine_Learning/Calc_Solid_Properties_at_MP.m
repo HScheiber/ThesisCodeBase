@@ -34,12 +34,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
     save(Input_File,'Settings')
     
-    if ~isfield(Settings,'GaussianCharge')
-        Settings.GaussianCharge = false;
-    end
-    if ~isfield(Settings,'Polarization')
-        Settings.Polarization = false;
-    end
     if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
         Settings.MDP.CoulombType = 'PME-User';
     end
@@ -114,9 +108,19 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             disp(output);
             error(['Error creating supercell with genconf. Problem command: ' newline Supercell_command]);
         end
+        
+        Settings.FileBase = 'Equil_Sol';
+        ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile);
+        
     else
         Supercell_file_data = load_gro_file(Settings.SuperCellFile);
-        nmol_solid = Supercell_file_data.N_atoms/2;
+        if Settings.Polarization
+            nmol_solid = Supercell_file_data.N_atoms/4;
+        else
+            nmol_solid = Supercell_file_data.N_atoms/2;
+        end
+        Settings.FileBase = 'Equil_Sol';
+        ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,'add_shells',false);
     end
     
     % Set the number of steps
@@ -166,12 +170,20 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##MET##',pad(Settings.Metal,2));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+    if Settings.Polarization
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.QcoreM),2));
+    else
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+    end
     
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HAL##',pad(Settings.Halide,2));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+    if Settings.Polarization
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(Settings.S.QcoreX),2));
+    else
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+    end
     
     if Table_Req
         % Define the function type as 1 (required for custom functions)
@@ -186,8 +198,9 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##','1.0');
         
         % Generate tables of the potential
-        TableName = [Settings.JobName '_Table'];
-        [Settings.TableFile_MX,C6] = MakeTables(Settings,'TableName',TableName);
+        [Settings.TableFile_MX,C6,Energygrptables] = MakeTables(Settings,...
+            'TableName',[Settings.JobName '_Table']);
+        MDP_Template = strrep(MDP_Template,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
         
         % Dispersion coefficients
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',num2str(C6.MM,'%.10e'));
@@ -302,7 +315,14 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     MDP_Template = regexprep(MDP_Template,'annealing-time +.+?\n','');
     MDP_Template = regexprep(MDP_Template,'annealing-temp +.+?\n','');
     
-    MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' BH_TestModel']);
+    MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' ' Settings.Theory ' TestModel']);
+    
+    if Settings.Polarization
+        [Settings.Topology_Text,MDP_Template] = Polarize_Inputs(Settings,...
+            Settings.Topology_Text,MDP_Template);
+    else
+        MDP_Template = strrep(MDP_Template,'##ENERGYGRPS##',[Settings.Metal ' ' Settings.Halide]);
+    end
     
     % Save MDP file
     MDP_Filename = fullfile(Settings.WorkDir,'Equil_Sol.mdp');
@@ -376,7 +396,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
                 ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
                 ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-                ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+                ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
             [state,~] = system(FEquil_Grompp);
 
             % Catch errors in grompp
@@ -503,7 +523,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
     
-    en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
+    en_opts = regexp(outpt,'-+\n.+','match','once');
     En_set = '';
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Enthalpy','tokens','once'))];

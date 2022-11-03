@@ -596,7 +596,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     MDP_Template = regexprep(MDP_Template,'annealing-time +.+?\n','');
     MDP_Template = regexprep(MDP_Template,'annealing-temp +.+?\n','');
     
-    MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' BH_TestModel']);
+    MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' ' Settings.Theory ' TestModel']);
     
     if Settings.Polarization
         [Settings.Topology_Text,MDP_Template] = Polarize_Inputs(Settings,...
