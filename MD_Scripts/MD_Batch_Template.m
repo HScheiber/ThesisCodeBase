@@ -437,12 +437,12 @@ else
     end
     
     mdrun_opts = ' -v';
-    if MPI_Ranks_Per_Node > 1
-        mdrun_opts = [mdrun_opts ' -ntmpi ' num2str(MPI_Ranks_Per_Node)];
+    mdrun_opts = [mdrun_opts ' -ntmpi ' num2str(MPI_Ranks_Per_Node)];
+    mdrun_opts = [mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
+    if MPI_Ranks_Per_Node == 1 && Settings.OMP_Threads == 1
+        mdrun_opts = [mdrun_opts ' -pin on'];
     end
-    if Settings.OMP_Threads > 1
-        mdrun_opts = [mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
-    end
+    
     if ~Settings.DLB
         mdrun_opts = [mdrun_opts ' -dlb no'];
     end

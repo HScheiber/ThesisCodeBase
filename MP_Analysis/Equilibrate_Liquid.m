@@ -142,7 +142,9 @@ function Output = Equilibrate_Liquid(Settings)
         else
             TableFile_MX_old = '';
         end
-        [Settings.TableFile_MX,~] = MakeTablesWithWall(Settings);
+        TableName = [Settings.JobName '_Table'];
+        [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
+            'Add_Wall',true);
     else
         % Modify the MDP file
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad(MDP.VDWType,18));

@@ -40,12 +40,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
     save(Input_File,'Settings')
     
-    if ~isfield(Settings,'GaussianCharge')
-        Settings.GaussianCharge = false;
-    end
-    if ~isfield(Settings,'Polarization')
-        Settings.Polarization = false;
-    end
     if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
         Settings.MDP.CoulombType = 'PME-User';
     end
@@ -159,6 +153,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             error('Not all requested liquid atoms were added!')
         end
         
+        % If model is polarizable, add in shell positions
+        Settings.FileBase = 'Prep_Liq';
+        ndx_add = add_polarization_shells(Settings,Prep_Liq_Random_Liq);
+        
         %% Minimize the randomly-generated liquid: build MDP file
         MDP = Settings.MDP;
         MDP.Minimization_txt = fileread(fullfile(Settings.home,'templates','Gromacs_Templates',...
@@ -189,9 +187,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             MDP.Minimization_txt = regexprep(MDP.Minimization_txt,'lj-pme-comb-rule.+?\n','');
             MDP.Minimization_txt = regexprep(MDP.Minimization_txt,'verlet-buffer-tolerance.+?\n','');
             
-            % For minimization, add in a close-range repulsive wall to the
-            % potential with the following function
-            [Settings.TableFile_MX,C6] = MakeTablesWithWall(Settings);
+            % For minimization, add in a close-range repulsive wall to the potential with the following function
+            [Settings.TableFile_MX,C6,Energygrptables] = MakeTables(Settings,'MDP_Minimize',true,...
+                'TableName',[Settings.JobName '_Table'],'Add_Wall',~Settings.Polarization);
+            
+            MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
         else
             % Modify the MDP file
             MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad(MDP.VDWType,18));
@@ -218,12 +218,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
         end
         
-        % Save MDP file
-        MDP_Filename = fullfile(Settings.WorkDir,'Prep_Liq.mdp');
-        fidMDP = fopen(MDP_Filename,'wt');
-        fwrite(fidMDP,regexprep(MDP.Minimization_txt,'\r',''));
-        fclose(fidMDP);
-        
         % Create a topology file for the liquid box to be minimized
         % Load topology template location
         Topology_Template_file = fullfile(Settings.home,'templates','Gromacs_Templates',...
@@ -244,12 +238,20 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##MET##',pad(Settings.Metal,2));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+        if Settings.Polarization
+            Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.QcoreM),2));
+        else
+            Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+        end
         
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HAL##',pad(Settings.Halide,2));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
-        Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+        if Settings.Polarization
+            Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(Settings.S.QcoreX),2));
+        else
+            Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+        end
         
         % Add number of unit cells to topology file
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##N##x##N##x##N##',num2str(nmol_liquid));
@@ -309,6 +311,19 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
         Top_Filename = fullfile(Settings.WorkDir,'Prep_Liq.top');
         
+        if Settings.Polarization
+            [Settings.Topology_Text,MDP.Minimization_txt] = ...
+                Polarize_Inputs(Settings,Settings.Topology_Text,MDP.Minimization_txt);
+        else
+            MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##ENERGYGRPS##',[Settings.Metal ' ' Settings.Halide]);
+        end
+        
+        % Save MDP file
+        MDP_Filename = fullfile(Settings.WorkDir,'Prep_Liq.mdp');
+        fidMDP = fopen(MDP_Filename,'wt');
+        fwrite(fidMDP,regexprep(MDP.Minimization_txt,'\r',''));
+        fclose(fidMDP);
+        
         % Save topology file
         fidTOP = fopen(Top_Filename,'wt');
         fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
@@ -321,8 +336,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         FMin_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Prep_Liq_Random_Liq) ...
             ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
             ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-            ' -maxwarn ' num2str(Settings.MaxWarn) ...
-             Settings.passlog windows2unix(GrompLog_File)];
+            ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) ...
+            Settings.passlog windows2unix(GrompLog_File)];
         [state,~] = system(FMin_Grompp);
         % Catch error in grompp
         if state ~= 0
@@ -446,12 +461,20 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##MET##',pad(Settings.Metal,2));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+    if Settings.Polarization
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.QcoreM),2));
+    else
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+    end
     
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HAL##',pad(Settings.Halide,2));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
-    Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+    if Settings.Polarization
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(Settings.S.QcoreX),2));
+    else
+        Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+    end
     
     if Table_Req
         % Define the function type as 1 (required for custom functions)
@@ -466,8 +489,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##','1.0');
         
         % Generate tables of the potential
-        TableName = [Settings.JobName '_Table'];
-        [Settings.TableFile_MX,C6] = MakeTables(Settings,'TableName',TableName);
+        [Settings.TableFile_MX,C6] = MakeTables(Settings,'TableName',[Settings.JobName '_Table']);
                                 
         % Dispersion coefficients
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',num2str(C6.MM,'%.10e'));

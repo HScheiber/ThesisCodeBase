@@ -1,6 +1,6 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-Theory = 'JC';
-ModelID = 'KA';
+Theory = 'BF';
+ModelID = 'MG';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
@@ -13,7 +13,7 @@ plot_ref_model = true;
 savefile = true; % switch to save the final plots to file
 
 %% Find model in results
-ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
+ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed';
 % Find reps of models
 N_Salts = numel(Salts);
 Models = cell(1,N_Salts);
@@ -48,6 +48,18 @@ switch Theory
             NX = 5;
         else
             ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX'};
+            NPars = 7;
+            NY = 2;
+            NX = 4;
+        end
+    case 'BF'
+        if show_as_C6
+            ParNames = {'C_MX' 'C_MM' 'C_XX' 'B_MX' 'B_MM' 'B_XX' 'alpha_MX' 'alpha_MM' 'alpha_XX'};
+            NPars = 9;
+            NY = 2;
+            NX = 5;
+        else
+            ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'sigma_MX' 'sigma_MM' 'sigma_XX' 'gamma_MX'};
             NPars = 7;
             NY = 2;
             NX = 4;
@@ -139,6 +151,11 @@ for idx = 1:N_Salts
         Param.n_MX = 12;
     else
         [OutputMX,OutputMM,OutputXX] = TF_Potential_Parameters(RefSettings);
+        if show_as_C6
+            ParNamesTF = ParNames;
+        else
+            ParNamesTF = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX'};
+        end
         Param.C_MX = OutputMX.C;
         Param.C_MM = OutputMM.C;
         Param.C_XX = OutputXX.C;
@@ -174,7 +191,7 @@ for idx = 1:N_Salts
         end
     end
     for kdx = 1:NPars
-        RefModeData(idx,kdx) = Param.(ParNames{kdx});
+        RefModeData(idx,kdx) = Param.(ParNamesTF{kdx});
     end
     
     for jdx = 1:N_Models
@@ -190,12 +207,19 @@ for idx = 1:N_Salts
         % Load data
         try
             data = load(dat_file).full_data;
-
-            optimvals = nan(1,length(data.secondary_result));
-            for kdx = 1:length(data.secondary_result)
-                optimvals(kdx) = [data.secondary_result(kdx).optimValues.fval];
+            
+            if isfield(data,'secondary_result')
+                
+                optimvals = nan(1,length(data.secondary_result));
+                for kdx = 1:length(data.secondary_result)
+                    optimvals(kdx) = [data.secondary_result(kdx).optimValues.fval];
+                end
+                [Total_loss(idx,jdx),midx] = min(optimvals);
+            else
+                optimvals = data.bayesopt_results.ObjectiveTrace;
+                [Total_loss(idx,jdx),midx] = min(optimvals);
+                full_opt_point = data.bayesopt_results.XTrace{midx,:};
             end
-            Total_loss(idx,jdx) = min(optimvals);
             
             Param = data.full_opt_point;
             ParTable = Gen_Param_Table(data.Settings,Param);
@@ -221,6 +245,8 @@ switch Theory
         PubTheoryName = 'Coulomb-Mie';
     case 'BH'
         PubTheoryName = 'CBH';
+    case 'BF'
+        PubTheoryName = 'Coulomb Wang-Buckingham';
     case 'TF'
         PubTheoryName = 'CBHM';
 end

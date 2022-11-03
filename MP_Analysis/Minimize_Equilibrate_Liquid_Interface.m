@@ -151,7 +151,10 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         else
             TableFile_MX_old = '';
         end
-        [Settings.TableFile_MX,~] = MakeTablesWithWall(Settings);
+        TableName = [Settings.JobName '_Table'];
+        [Settings.TableFile_MX,~,Energygrptables] = MakeTables(Settings,'TableName',TableName,...
+            'Add_Wall',~Settings.Polarization,'SaveTables',~Settings.Polarization);
+        MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
     else
         % Modify the MDP file
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad(MDP.VDWType,18));
@@ -175,12 +178,6 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             '; Long-range dispersion correction' newline ...
             'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
     end
-    
-    % Save MDP file
-    MDP_Filename = fullfile(Settings.WorkDir,'Prep_Liq.mdp');
-    fidMDP = fopen(MDP_Filename,'wt');
-    fwrite(fidMDP,regexprep(MDP.Minimization_txt,'\r',''));
-    fclose(fidMDP);
 
     % Complete a topology file for the liquid box to be minimized
     Atomlist = copy_atom_order(Prep_Liq_Random_Liq);
@@ -190,6 +187,20 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     Topology_Text_Min = Settings.Topology_Text;
     Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
     
+    % Polarization options
+    if Settings.Polarization
+        [~,MDP.Minimization_txt] = ...
+            Polarize_Inputs(Settings,Settings.Topology_Text,MDP.Minimization_txt);
+    else
+        MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##ENERGYGRPS##',[Settings.Metal ' ' Settings.Halide]);
+    end
+    
+    % Save MDP file
+    MDP_Filename = fullfile(Settings.WorkDir,'Prep_Liq.mdp');
+    fidMDP = fopen(MDP_Filename,'wt');
+    fwrite(fidMDP,regexprep(MDP.Minimization_txt,'\r',''));
+    fclose(fidMDP);
+    
     % Save topology file
     fidTOP = fopen(Top_Filename,'wt');
     fwrite(fidTOP,regexprep(Topology_Text,'\r',''));
@@ -198,11 +209,16 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     TPR_File = fullfile(Settings.WorkDir,'Prep_Liq.tpr');
     MDPout_File = fullfile(Settings.WorkDir,'Prep_Liq_out.mdp');
     GrompLog_File = fullfile(Settings.WorkDir,'Prep_Liq_Grompplog.log');
-
+    
+    % If model is polarizable, add in shell positions
+    ndx_filename = fullfile(Settings.WorkDir,'Prep_Liq.ndx');
+    ndx_add = add_polarization_shells(Settings,Prep_Liq_Random_Liq,...
+        'ndx_filename',ndx_filename);
+    
     FMin_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Prep_Liq_Random_Liq) ...
         ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
         ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-        ' -maxwarn ' num2str(Settings.MaxWarn) ...
+        ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) ...
          Settings.passlog windows2unix(GrompLog_File)];
     [state,~] = system(FMin_Grompp);
     % Catch error in grompp
@@ -217,17 +233,17 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     Energy_file = fullfile(Settings.WorkDir,'Prep_Liq.edr');
     TRR_File = fullfile(Settings.WorkDir,'Prep_Liq.trr');
     Minimized_Geom_File = fullfile(Settings.WorkDir,['Prep_Liq_Min.' Settings.CoordType]);
-
+    
     mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
         ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
         ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Minimized_Geom_File) ...
         ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq')) ...
         Settings.mdrun_opts];
-
+    
     if Settings.Table_Req
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
-
+    
     % Liquid Minimization
     if Settings.Verbose
         disp('Beginning Liquid Minimization...')
@@ -279,7 +295,9 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     xyz_out = num2str(0.1 / Settings.MDP.dt); % Output coords every 0.1 ps
     MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
-    MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$1100$3;');
+    if ~Settings.Polarization
+        MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$1100$3;');
+    end
     MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);',['$1' xyz_out '$3;']);
     MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
     MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);','$1semiisotropic$3;');
@@ -307,7 +325,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Minimized_Geom_File) ...
         ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
         ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-        ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+        ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
     [state,~] = system(FEquil_Grompp);
     
     % Catch errors in grompp
@@ -446,7 +464,9 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     xyz_out = num2str(0.1 / Settings.MDP.dt); % Output coords every 0.1 ps
     MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(MD_nsteps) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
-    MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$1100$3;');
+    if ~Settings.Polarization
+        MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$1100$3;');
+    end
     MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);',['$1' xyz_out '$3;']);
     MDP_Template = regexprep(MDP_Template,'(dt += *)(.+?)( *);',['$1' num2str(Settings.MDP.dt) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(gen-vel += *)(.+?)( *);','$1no$3;');
@@ -467,7 +487,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Equilibrated_Geom_File) ...
         ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
         ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-        ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+        ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
     [state,~] = system(FEquil_Grompp);
 
     % Catch errors in grompp
@@ -702,9 +722,18 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         disp('*** Attaching Equilibrated Liquid to Solid and Minimizing Interface ***')
     end
     Settings.WorkDir = MinDir;
-    
+    add_polarization_shells(Settings,Settings.SuperCellFile,'make_index',false); % only applies to polarizable models
     Solid_file_data = load_gro_file(Settings.SuperCellFile);
     Liquid_file_data = load_gro_file(Equilibrated_Geom_File);
+%     if Settings.Polarization
+%         Liquid_file_data.N_atoms = Liquid_file_data.N_atoms/2;
+%         Liquid_file_data.res_number = Liquid_file_data.res_number(1:2:end-1);
+%         Liquid_file_data.res_name = Liquid_file_data.res_name(1:2:end-1);
+%         Liquid_file_data.atom_name = Liquid_file_data.atom_name(1:2:end-1);
+%         Liquid_file_data.atom_number = int32(transpose(1:Liquid_file_data.N_atoms));
+%         Liquid_file_data.xyz = Liquid_file_data.xyz(1:2:end-1,:);
+%         Liquid_file_data.vel = Liquid_file_data.vel(1:2:end-1,:);
+%     end
     
     MinInterfaceWidth = Settings.Geometry.c/10; % Convert to nm. Minimize the liquid one unit cell above/below the solid
     
@@ -756,43 +785,68 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     
     % Freeze all atoms except those near the edge
     Atoms_at_Edge = [Sol_atoms_at_edge; Liq_atoms_at_edge];
+    if Settings.Polarization % Do not freeze shells
+        Atoms_at_Edge = Atoms_at_Edge | contains(Combined_file_data.atom_name,'_s');
+    end
     Freeze_atnums = double(Combined_file_data.atom_number(~Atoms_at_Edge));
     
     % Create an index file to keep track of frozen atom numbers
     system_atnums = double(Combined_file_data.atom_number);
     
     % Get indeces for the metal and halide
-    M_idx = find(contains(Combined_file_data.atom_name,Settings.Metal));
+    M_idx = find(strcmp(strtrim(Combined_file_data.atom_name),Settings.Metal));
     M_atnums = double(Combined_file_data.atom_number(M_idx));
-    X_idx = find(contains(Combined_file_data.atom_name,Settings.Halide));
+    X_idx = find(strcmp(strtrim(Combined_file_data.atom_name),Settings.Halide));
     X_atnums = double(Combined_file_data.atom_number(X_idx));
     
     % Create index file
     addnan = 15 - mod(length(system_atnums),15);
     system_atnums(end+1:end+addnan) = nan;
     system_atnums = reshape(system_atnums,15,[])';
-    system_atnum_txt = strtrim(char(regexprep(strjoin(string(num2str(system_atnums)),newline),' *NaN','')));
+    system_atnum_txt = char(regexprep(strjoin(string(num2str(system_atnums)),newline),{' *NaN' '\n\n'},{'' '\n'}));
     
     addnan = 15 - mod(length(Freeze_atnums),15);
     Freeze_atnums(end+1:end+addnan) = nan;
     Freeze_atnums = reshape(Freeze_atnums,15,[])';
-    sol_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(Freeze_atnums)),newline),' *NaN','')));
+    sol_atnums_txt = char(regexprep(strjoin(string(num2str(Freeze_atnums)),newline),{' *NaN' '\n\n'},{'' '\n'}));
     
     addnan = 15 - mod(length(M_atnums),15);
     M_atnums(end+1:end+addnan) = nan;
     M_atnums = reshape(M_atnums,15,[])';
-    M_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(M_atnums)),newline),' *NaN','')));
+    M_atnums_txt = char(regexprep(strjoin(string(num2str(M_atnums)),newline),{' *NaN' '\n\n'},{'' '\n'}));
     
     addnan = 15 - mod(length(X_atnums),15);
     X_atnums(end+1:end+addnan) = nan;
     X_atnums = reshape(X_atnums,15,[])';
-    X_atnums_txt = strtrim(char(regexprep(strjoin(string(num2str(X_atnums)),newline),' *NaN','')));
+    X_atnums_txt = char(regexprep(strjoin(string(num2str(X_atnums)),newline),{' *NaN' '\n\n'},{'' '\n'}));
     
-    ndx_text = ['[ System ]'     newline system_atnum_txt newline ...
-    '[ Freeze ]'      newline sol_atnums_txt newline ...
+    ndx_text = ['[ System ]' newline system_atnum_txt newline ...
+    '[ Freeze ]' newline sol_atnums_txt newline ...
     '[ ' Settings.Metal ' ]'  newline M_atnums_txt newline ...
     '[ ' Settings.Halide ' ]' newline X_atnums_txt newline];
     
+    if Settings.Polarization
+        % Get indeces for the metal and halide shells
+        Ms_idx = find(strcmp(strtrim(Combined_file_data.atom_name),[Settings.Metal '_s']));
+        Ms_atnums = double(Combined_file_data.atom_number(Ms_idx));
+        Xs_idx = find(strcmp(strtrim(Combined_file_data.atom_name),[Settings.Halide '_s']));
+        Xs_atnums = double(Combined_file_data.atom_number(Xs_idx));
+        
+        addnan = 15 - mod(length(Ms_atnums),15);
+        Ms_atnums(end+1:end+addnan) = nan;
+        Ms_atnums = reshape(Ms_atnums,15,[])';
+        Ms_atnums_txt = char(regexprep(strjoin(string(num2str(Ms_atnums)),newline),{' *NaN' '\n\n'},{'' '\n'}));
+        
+        addnan = 15 - mod(length(Xs_atnums),15);
+        Xs_atnums(end+1:end+addnan) = nan;
+        Xs_atnums = reshape(Xs_atnums,15,[])';
+        Xs_atnums_txt = char(regexprep(strjoin(string(num2str(Xs_atnums)),newline),{' *NaN' '\n\n'},{'' '\n'}));
+        
+        ndx_text = [ndx_text ...
+        '[ ' Settings.Metal '_s ]'  newline Ms_atnums_txt newline ...
+        '[ ' Settings.Halide '_s ]' newline Xs_atnums_txt newline];
+    end
+
     % Save index file
     NDX_Filename = fullfile(Settings.WorkDir,'Comb_Equil.ndx');
     fidNDX = fopen(NDX_Filename,'wt');
@@ -843,7 +897,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     Log_File = fullfile(Settings.WorkDir,'Comb_Equil.log');
     Energy_file = fullfile(Settings.WorkDir,'Comb_Equil.edr');
     TRR_File = fullfile(Settings.WorkDir,'Comb_Equil.trr');
-
+    
     mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
         ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
         ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Settings.SuperCellFile) ...
@@ -851,7 +905,8 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         Settings.mdrun_opts];
     
     if Settings.Table_Req
-        [Settings.TableFile_MX,~] = MakeTablesWithWall(Settings);
+        [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
+            'Add_Wall',~Settings.Polarization,'SaveTables',~Settings.Polarization);        
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
 

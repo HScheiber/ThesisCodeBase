@@ -50,7 +50,7 @@ case 'TF'
         Output.Q = Settings.Q_value;
     end
     
-case {'BH' 'BD'} % Buckingham model
+case {'BH' 'BD' 'BE'} % Buckingham model
     if Settings.Additivity
         Output.r0_MX = (Output.r0_MM + Output.r0_XX)/2; % nm
         Output.epsilon_MX = sqrt(Output.epsilon_MM*Output.epsilon_XX); % kJ/mol
@@ -80,6 +80,31 @@ case {'BH' 'BD'} % Buckingham model
     Output.C_MM = Output.epsilon_MM*Output.gamma_MM*(Output.r0_MM^6)/(Output.gamma_MM - 6); % kJ/mol nm^6
     Output.C_XX = Output.epsilon_XX*Output.gamma_XX*(Output.r0_XX^6)/(Output.gamma_XX - 6); % kJ/mol nm^6
     Output.C_MX = Output.epsilon_MX*Output.gamma_MX*(Output.r0_MX^6)/(Output.gamma_MX - 6); % kJ/mol nm^6
+
+    % Scaling Coulombic Charge
+    if Settings.Fix_Charge
+        Output.Q = Settings.Q_value;
+    end
+case 'BF' % Buckingham model
+    if Settings.Additivity
+        Output.sigma_MX = (Output.sigma_MM + Output.sigma_XX)/2; % nm
+        Output.epsilon_MX = sqrt(Output.epsilon_MM*Output.epsilon_XX); % kJ/mol
+        Output.gamma_MM = Output.gamma_MX; % Unitless
+        Output.gamma_XX = Output.gamma_MX; % Unitless
+    end
+
+    % Convert to Condensed form
+    Output.alpha_MM = Output.gamma_MM/Output.sigma_MM; % nm^(-1)
+    Output.alpha_XX = Output.gamma_XX/Output.sigma_XX; % nm^(-1)
+    Output.alpha_MX = Output.gamma_MX/Output.sigma_MX; % nm^(-1)
+
+    Output.B_MM = 6*Output.epsilon_MM*exp(Output.gamma_MM)/(Output.gamma_MM - 6); % kJ/mol
+    Output.B_XX = 6*Output.epsilon_XX*exp(Output.gamma_XX)/(Output.gamma_XX - 6); % kJ/mol
+    Output.B_MX = 6*Output.epsilon_MX*exp(Output.gamma_MX)/(Output.gamma_MX - 6); % kJ/mol
+
+    Output.C_MM = Output.epsilon_MM*Output.gamma_MM*(Output.sigma_MM^6)/(Output.gamma_MM - 6); % kJ/mol nm^6
+    Output.C_XX = Output.epsilon_XX*Output.gamma_XX*(Output.sigma_XX^6)/(Output.gamma_XX - 6); % kJ/mol nm^6
+    Output.C_MX = Output.epsilon_MX*Output.gamma_MX*(Output.sigma_MX^6)/(Output.gamma_MX - 6); % kJ/mol nm^6
 
     % Scaling Coulombic Charge
     if Settings.Fix_Charge

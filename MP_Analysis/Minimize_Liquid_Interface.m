@@ -146,7 +146,9 @@ function Minimize_Liquid_Interface(Settings)
 
         % For minimization, add in a close-range repulsive wall to the
         % potential with the following function
-        [Settings.TableFile_MX,~] = MakeTablesWithWall(Settings);
+        TableName = [Settings.JobName '_Table'];
+        [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
+            'Add_Wall',true);
     else
         % Modify the MDP file
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad(MDP.VDWType,18));

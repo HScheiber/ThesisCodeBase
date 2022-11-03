@@ -65,11 +65,16 @@ fclose(fidMDP);
 TPR_File = fullfile(Settings.WorkDir,'Equil_System.tpr');
 MDPout_File = fullfile(Settings.WorkDir,'Equil_System_out.mdp');
 GrompLog_File = fullfile(Settings.WorkDir,'Equil_System_Grompplog.log');
-    
+
+% Only applies to polarizable models
+ndx_filename = fullfile(Settings.WorkDir,'Equil_System.ndx');
+ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
+    'ndx_filename',ndx_filename,'add_shells',false);
+
 FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
     ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Settings.Topology_File) ...
     ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-    ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+    ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
 [state,~] = system(FEquil_Grompp);
     
 % Catch errors in grompp
@@ -166,7 +171,7 @@ end
 GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
     ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
     ' -o ' windows2unix(Settings.Traj_Conf_File) ' -po ' windows2unix(Settings.MDP_out_File) ...
-    ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
+    ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
 [errcode,~] = system(GROMPP_command);
 
 % Catch error in grompp

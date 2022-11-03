@@ -4,7 +4,7 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                               SavePredictions=False, SavePredictionsImage=False,
                               InitialRefFrac=None, RefChangeThreshold=0.25, 
                               SlopeThreshold=0.0125, SlopeCheckBegin=0.1,
-                              ML_TimeLength=20, ML_TimeStep=5, TimePerFrame=5, 
+                              ML_TimeLength=0, ML_TimeStep=0, TimePerFrame=1, 
                               FileType='gro', Verbose=False, Version = 2,
                               Temporal_Cutoff = 0,Voronoi = False, Qlm_Average = True,
                               Prob_Interfacial = None,Spatial_Reassignment = False,
@@ -376,6 +376,11 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             t = md.Universe(grofile, trajfile)
+            
+    # Remove any virtual/shell atoms that may exist
+    ag = t.select_atoms('name ' + Metal + '+ or name ' + Halide + '- or name ' + Metal + ' or name ' + Halide)
+    t.atoms = ag
+    core_indeces = ag.indices
     
     traj_timestep = (t.trajectory[-1].time - t.trajectory[0].time)/(t.trajectory.n_frames-1) # ps, time per trajectory frame
     if CheckFullTrajectory:
@@ -489,8 +494,8 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
             
             # Select out the atoms
             
-            point_data = ts.positions/10 # in nm
-            system = [box_data,ts.positions/10]
+            point_data = ts.positions[core_indeces]/10 # in nm
+            system = [box_data,ts.positions[core_indeces]/10]
             
             # Loop through the N_neighbour_list to built up a set of features
             fidx = 0
@@ -693,8 +698,8 @@ def Calculate_Liquid_Fraction(WorkDir, Salt, SystemName=None, T=None,
                 box_data = freud.box.Box(1e5,1e5,1e5,0,0,0)
             
             # Select out the atoms
-            point_data = ts.positions/10 # in nm
-            system = [box_data,ts.positions/10]
+            point_data = ts.positions[core_indeces]/10 # in nm
+            system = [box_data,ts.positions[core_indeces]/10]
             
             # Loop through the N_neighbour_list to built up a set of features
             fidx = 0

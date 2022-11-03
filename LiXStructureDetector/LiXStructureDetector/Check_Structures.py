@@ -313,7 +313,12 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         os.remove(npz_file)
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            t = md.Universe(grofile, trajfile)
+            t = md.Universe(grofile, trajfile)\
+    
+    # Remove any virtual/shell atoms that may exist
+    ag = t.select_atoms('name ' + Metal + ' or name ' + Halide)
+    t.atoms = ag
+    core_indeces = ag.indices
     
     traj_timestep = (t.trajectory[-1].time - t.trajectory[0].time)/(t.trajectory.n_frames-1) # ps, time per trajectory frame
     if StartPoint is None:
@@ -432,8 +437,8 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
                     box_data = freud.box.Box(1e5,1e5,1e5,0,0,0)
                 
                 # Select out the atoms
-                point_data = ts.positions/10 # in nm
-                system = [box_data,ts.positions/10]
+                point_data = ts.positions[core_indeces]/10 # in nm
+                system = [box_data,ts.positions[core_indeces]/10]
                 
                 # Loop through the N_neighbour_list to built up a set of features
                 fidx = 0

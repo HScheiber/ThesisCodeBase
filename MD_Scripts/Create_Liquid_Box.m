@@ -272,7 +272,10 @@ if Settings.Table_Req
     % potential with the following function
     Settings.Geometry = Settings.Geometry;
     Settings.WorkDir = WorkDir;
-    [Settings.TableFile_MX,~] = MakeTablesWithWall(Settings);
+    TableName = [Settings.JobName '_Table'];
+    [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
+        'Add_Wall',true);
+    
 else
     % Modify the MDP file
     MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));

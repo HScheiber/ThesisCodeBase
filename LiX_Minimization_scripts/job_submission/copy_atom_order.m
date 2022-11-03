@@ -14,6 +14,14 @@ if strcmp(ext,'.gro')
     cnt = 0;
     idx = 1;
     for i=1:N
+        if contains(Input_data{3}{i},'_s')
+            if i == N % last one but same as previous
+                Outcell{idx} = [Current ' ' num2str(cnt)];
+                break
+            else
+                continue
+            end
+        end
         Current = strtrim(Input_data{3}{i});
         if ~strcmp(Current,Previous)
             if i == N % last one but different from previous
@@ -49,6 +57,14 @@ elseif strcmp(ext,'.g96')
     cnt = 0;
     idx = 1;
     for i=1:N
+        if contains(Input_data{3}(i,:),'_s')
+            if i == N % last one but same as previous
+                Outcell{idx} = [Current ' ' num2str(cnt)];
+                break
+            else
+                continue
+            end
+        end
         Current = strtrim(Input_data{3}(i,:));
         if ~strcmp(Current,Previous)
             if i == N % last one but different from previous

@@ -224,7 +224,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
     % Delete any corrupted checkpoint files
     for idx = length(cpt_check):-1:1
         cptch = fullfile(WorkDir,cpt_check(idx).name);
-        [errc,~] = system([Settings.gmx_loc ' check -f ' cptch]);
+        [errc,~] = system([Settings.gmx_loc ' check -f ' windows2unix(cptch)]);
         if errc ~= 0
             if Settings.Verbose
                 disp(['Detected and deleted corrupted checkpoint file: ' cptch])
@@ -526,12 +526,17 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         fidMDP = fopen(MDP_in_File,'wt');
         fwrite(fidMDP,regexprep(MDP_txt,'\r',''));
         fclose(fidMDP);
-
+        
+        % Only applies to polarizable models
+        ndx_filename = fullfile(WorkDir,[Settings.JobName '_' num2str(T_dat.T_ref,'%.4f') '.ndx']);
+        ndx_add = add_polarization_shells(Settings,Strucure_In_File,...
+            'ndx_filename',ndx_filename,'add_shells',false);
+        
         % Run gmx grompp
         GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Strucure_In_File) ...
             ' -f ' windows2unix(MDP_in_File) ' -p ' windows2unix(Topology_File) ...
             ' -o ' windows2unix(Traj_Conf_File) ' -po ' windows2unix(MDP_out_File) ...
-            ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GromppLog_File)];
+            ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GromppLog_File)];
         [errcode,~] = system(GROMPP_command);
 
         % Catch error in grompp

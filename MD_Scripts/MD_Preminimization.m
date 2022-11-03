@@ -348,6 +348,12 @@ if Settings.Liquid_Interface
     end
 end
 
+% If model is polarizable, add in shell positions
+ndx_filename = fullfile(Settings.OuterDir,[Settings.JobName '.ndx']);
+ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
+    'ndx_filename',ndx_filename,'add_shells',false);
+
+
 % Generate final topology file for molecular dynamics
 Atomlist = copy_atom_order(Settings.SuperCellFile);
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
@@ -362,7 +368,7 @@ end
 GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
     ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
     ' -o ' windows2unix(Settings.Traj_Conf_File) ' -po ' windows2unix(Settings.MDP_out_File) ...
-    ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
+    ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
 [errcode,~] = system(GROMPP_command);
 
 % Catch error in grompp

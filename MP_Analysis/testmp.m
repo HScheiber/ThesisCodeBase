@@ -3,28 +3,40 @@ Settings.BatchMode = false; % Sets up batch job when true, or runs immediately w
 Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
 Settings.Liquid_Fraction = 0.50; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
-Settings.MP_Liquid_Test_Time = 100; % ps. Time used for calculation of liquid MSD in melting point calculations.
+Settings.MP_Liquid_Test_Time = 5;%100; % ps. Time used for calculation of liquid MSD in melting point calculations.
 Settings.MP_Equilibrate_Liquid = 20; % ps
 Settings.MP_Equilibrate_Solid = 15; % ps
 Settings.PreEquilibration = 0.3; % ps
+Settings.JobSettings.Cores = 1;
 Settings.JobSettings.MPI_Ranks = 8;
 Settings.JobSettings.OMP_Threads = 1;
 setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
 
 Settings.Skip_Minimization = false;
-Settings.Theory = 'TF'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-Settings.S.D8D.All = 0;
+Settings.Theory = 'JC'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
 Settings.Salt = 'NaCl'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
+[JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
+Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','LJ_12-6');
+Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
+Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
+Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
+Settings.S.S.MM = Settings.S.S.MM/JCMM.sigma;
+Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
+Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
+Settings.GaussianCharge = false;
+Settings.Polarization = false;
 Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'
 Settings.RefStructure = 'Rocksalt'; % Reference structure used for determination of melting or freezing (usually liquid)
-Settings.Model = ''; % Name of the current model. Leave blank for the default JC/TF/BH model
+Settings.Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
 Settings.JobID = 'Test'; % An ID that is tacked onto the folder name of all current jobs
 Settings.N_atoms = 2000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
 Settings.Thermal_Solid = false;
 Settings.MDP.Disp_Correction = true;
+Settings.MDP.vdw_modifier = 'none';
 Settings.MinMDP.Disp_Correction = true;
 Settings.Find_Min_Params = true;
 Settings.Delete_Equil = false;
+Settings.initial_opt_type = true;
 
 % Barostat options
 Settings.Isotropy = 'semiisotropic';
@@ -55,7 +67,7 @@ Settings.c_over_a = 2;
 Settings.MaxTDiff = 0.01; % Max change in temperature before generating new initial conditions
 
 % Debugging
-Settings.Output_Coords = 5000; % Number of steps between outputting coordinates
+Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
 Settings.Output_Coords_Compressed = 0; % Number of steps between outputting coordinates in compressed format
 Settings.Output_Velocity = 0; % Number of steps between outputting velocities
 Settings.Expand_LP = true; % when true, allows expansion of lattice parameters of the solid.

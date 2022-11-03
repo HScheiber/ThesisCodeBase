@@ -18,13 +18,6 @@ N_atoms = p.Results.N_atoms; % Minimum number of atoms to include in super cell
 Find_Min_Params = p.Results.Find_Min_Params; % When true, finds lowest energy parameters for IC based on Data_Types. When false, uses input IC
 Find_Similar_Params = p.Results.Find_Similar_Params; % When true, finds lowest energy parameters for IC if possible, but if no data is available, also looks for the same IC with non-scaled model
 
-if ~isfield(Settings,'GaussianCharge')
-    Settings.GaussianCharge = false;
-end
-if ~isfield(Settings,'Polarization')
-    Settings.Polarization = false;
-end
-
 % Type of optimization limited to Cellopt
 if Settings.MinMDP.Maintain_Symmetry
     OptTxt = 'CELLOPT';
@@ -166,7 +159,11 @@ else
         case {'JC' 'BD' 'BE' 'Mie' 'HS'}
             AddRepWall = false;
         otherwise
-            AddRepWall = true;
+            if Settings.Polarization
+                AddRepWall = false;
+            else
+                AddRepWall = true;
+            end
     end
 end
 
@@ -371,8 +368,9 @@ if AddRepWall
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##','1.0');
     Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##','1.0');
     
-    Settings.JobName = [Settings.Salt '_' Model];
-    [Settings.TableFile_MX,C6,Energygrptables] = MakeTablesWithWall(Settings,'MDP_Minimize',true);
+    TableName = [Settings.Salt '_' Model '_Table'];
+    [Settings.TableFile_MX,C6,Energygrptables] = MakeTables(Settings,'MDP_Minimize',true,...
+        'TableName',TableName,'Add_Wall',true);
     Settings.MDP_Template = strrep(Settings.MDP_Template,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
     
     % Dispersion coefficients

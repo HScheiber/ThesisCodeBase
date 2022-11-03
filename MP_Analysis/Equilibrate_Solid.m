@@ -89,7 +89,9 @@ function Output = Equilibrate_Solid(Settings,varargin)
     % Ensure fast equilibration with Berendsen barostat + small time constant
     MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
-    MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$1100$3;');
+    if ~Settings.Polarization
+        MDP_Template = regexprep(MDP_Template,'(nstcalcenergy += *)(.+?)( *);','$1100$3;');
+    end
     MDP_Template = regexprep(MDP_Template,'(nstxout += *)(.+?)( *);',['$1' num2str(round(0.1/Settings.MDP.dt)) '$3;']);
     MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
     MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);',['$1' isotropy '$3;']);
@@ -120,6 +122,18 @@ function Output = Equilibrate_Solid(Settings,varargin)
     fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
     fclose(fidTOP);
     
+    % If model is polarizable, add in shell positions
+    if Settings.Polarization && ~Settings.Skip_Cell_Construction
+        ndx_filename = fullfile(WorkDir,'Equil_Sol.ndx');
+        ndx_add = add_polarization_shells(Settings,SuperCell_File,...
+            'ndx_filename',ndx_filename);
+    elseif Settings.Polarization && Settings.Skip_Cell_Construction
+        ndx_filename = fullfile(WorkDir,'Equil_Sol.ndx');
+        ndx_add = [' -n ' windows2unix(ndx_filename)];
+    else
+        ndx_add = '';
+    end
+    
     TPR_File = fullfile(WorkDir,'Equil_Sol.tpr');
     MDPout_File = fullfile(WorkDir,'Equil_Sol_out.mdp');
     GrompLog_File = fullfile(WorkDir,'Equil_Sol_Grompplog.log');
@@ -127,7 +141,7 @@ function Output = Equilibrate_Solid(Settings,varargin)
     FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(SuperCell_File) ...
         ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
         ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-        ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+        ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
     [state,~] = system(FEquil_Grompp);
     
     % Catch errors in grompp

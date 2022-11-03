@@ -35,13 +35,6 @@ if ~Settings.Expand_LP
     Settings.Expand_c = 1;
 end
 
-if ~isfield(Settings,'GaussianCharge')
-    Settings.GaussianCharge = false;
-end
-if ~isfield(Settings,'Polarization')
-    Settings.Polarization = false;
-end
-
 if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
     Settings.MDP.CoulombType = 'PME-User';
 end
@@ -125,12 +118,20 @@ Settings.Topology_Text = strrep(Settings.Topology_Text,'##FUDGEQQ##',num2str(Set
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##MET##',pad(Settings.Metal,2));
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##METZ##',pad(num2str(Metal_Info.atomic_number),3));
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMASS##',pad(num2str(Metal_Info.atomic_mass),7));
-Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+if Settings.Polarization
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.QcoreM),2));
+else
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##MCHRG##',pad(num2str(Settings.S.Q),2));
+end
 
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##HAL##',pad(Settings.Halide,2));
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALZ##',pad(num2str(Halide_Info.atomic_number),3));
 Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALMASS##',pad(num2str(Halide_Info.atomic_mass),7));
-Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+if Settings.Polarization
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(Settings.S.QcoreX),2));
+else
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##XCHRG##',pad(num2str(-Settings.S.Q),2));
+end
 
 if Settings.Table_Req
 
@@ -147,7 +148,8 @@ if Settings.Table_Req
 
     % Generate tables of the potential
     TableName = [Settings.JobName '_Table'];
-    [TableFile_MX,C6] = MakeTables(Settings,'TableName',TableName);
+    [TableFile_MX,C6,Energygrptables] = MakeTables(Settings,'TableName',TableName);
+    MDP_Template = strrep(MDP_Template,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
     
     % Dispersion coefficients
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',num2str(C6.MM,'%.10e'));
@@ -366,6 +368,13 @@ MDP_Title = [Settings.Structure ' ' Settings.Salt ' with ' Settings.Full_Model_N
     ' model, ' Settings.Thermostat ...
     ' thermostat, and ' Settings.Barostat ' barostat.'];
 MDP_Template = strrep(MDP_Template,'##TITLE##',MDP_Title);
+
+if Settings.Polarization
+    [Settings.Topology_Text,MDP_Template] = ...
+        Polarize_Inputs(Settings,Settings.Topology_Text,MDP_Template);
+else
+    MDP_Template = strrep(MDP_Template,'##ENERGYGRPS##',[Settings.Metal ' ' Settings.Halide]);
+end
 
 % Create name for mdp output file
 Settings.MDP_out_File = fullfile(Settings.WorkDir,[Settings.JobName '_out.mdp']);

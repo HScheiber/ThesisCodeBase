@@ -1,15 +1,15 @@
-function params = bayesopt_params(Model)
+function params = bayesopt_params(Settings)
     
 
-    switch Model.Theory
+    switch Settings.Theory
     case 'TF'
-        if ~isfield(Model,'InnerRange')
-            Model.InnerRange = true;
+        if ~isfield(Settings,'InnerRange')
+            Settings.InnerRange = true;
         end
-        SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
+        SQ = optimizableVariable('SQ',Settings.Q_Range,'Type','real');
         
-        if Model.SigmaEpsilon
-            if Model.InnerRange % For TF model, inner range is when gamma is [0, 48/7]
+        if Settings.SigmaEpsilon
+            if Settings.InnerRange % For TF model, inner range is when gamma is [0, 48/7]
                 % r_0
                 Sr0MM = optimizableVariable('r0_MM',[0 1],'Type','real'); % Units: nm
                 Sr0XX = optimizableVariable('r0_XX',[0 1],'Type','real'); % Units: nm
@@ -43,7 +43,7 @@ function params = bayesopt_params(Model)
             end
             
             
-            if Model.Additivity
+            if Settings.Additivity
                 params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
             else
                 params = [Sr0MM,Sr0XX,Sr0MX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
@@ -69,30 +69,30 @@ function params = bayesopt_params(Model)
             SRXX = optimizableVariable('SRXX',[0.1 50],'Type','real');
             SRMX = optimizableVariable('SRMX',[0.1 50],'Type','real');
             
-            if Model.Fix_C8
+            if Settings.Fix_C8
                 params = [SD6MM,SD6XX,SD6MX];
             else
                 params = [SD6MM,SD6XX,SD6MX,SD8MM,SD8XX,SD8MX];
             end
             
-            if ~Model.Fix_Alpha
+            if ~Settings.Fix_Alpha
                 params = [params,SAMM,SAXX,SAMX];
             end
             
             params = [params,SRMM,SRXX,SRMX];
         end
         
-        if ~Model.Fix_Charge
+        if ~Settings.Fix_Charge
             params = [params,SQ];
         end
     case {'BH' 'BD' 'BE'}
-        if ~isfield(Model,'InnerRange')
-            Model.InnerRange = false;
+        if ~isfield(Settings,'InnerRange')
+            Settings.InnerRange = false;
         end
-        SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
+        SQ = optimizableVariable('SQ',Settings.Q_Range,'Type','real');
         
-        if Model.SigmaEpsilon
-            if Model.InnerRange % For BH model, inner range is when gamma is [0, 6]
+        if Settings.SigmaEpsilon
+            if Settings.InnerRange % For BH model, inner range is when gamma is [0, 6]
 
                 % r_0
                 Sr0MM = optimizableVariable('r0_MM',[0 0.15],'Type','real'); % Units: nm
@@ -124,13 +124,13 @@ function params = bayesopt_params(Model)
                 SgammaXX = optimizableVariable('gamma_XX',[7 20],'Type','real'); % Units: kJ/mol
                 SgammaMX = optimizableVariable('gamma_MX',[7 20],'Type','real'); % Units: kJ/mol
             end
-            if Model.Additivity
+            if Settings.Additivity
                 params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
             else
                 params = [Sr0MM,Sr0XX,Sr0MX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
             end
             
-            if ~Model.Fix_Charge
+            if ~Settings.Fix_Charge
                 params = [params,SQ];
             end
         else
@@ -149,26 +149,26 @@ function params = bayesopt_params(Model)
             SAXX = optimizableVariable('SAXX',[0.1 10],'Type','real');
             SAMX = optimizableVariable('SAMX',[0.1 10],'Type','real');
 
-            if Model.Additivity
+            if Settings.Additivity
                 params = [SDMM,SDXX,SRMM,SRXX];
             else
                 params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX];
             end
 
-            if ~Model.Fix_Alpha
+            if ~Settings.Fix_Alpha
                 params = [params,SAMM,SAXX,SAMX];
             end
 
-            if ~Model.Fix_Charge
+            if ~Settings.Fix_Charge
                 params = [params,SQ];
             end
 
-            if Model.Additivity && Model.Additional_MM_Disp
+            if Settings.Additivity && Settings.Additional_MM_Disp
                 params = [params,SDMM2];
             end
         end    
     case 'BF'
-        SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
+        SQ = optimizableVariable('SQ',Settings.Q_Range,'Type','real');
         
         % sigma
         SsigmaMM = optimizableVariable('sigma_MM',[0.05 0.5],'Type','real'); % Units: nm
@@ -179,23 +179,30 @@ function params = bayesopt_params(Model)
         SepsilonMM = optimizableVariable('epsilon_MM',[0 1000],'Type','real'); % Units: kJ/mol
         SepsilonXX = optimizableVariable('epsilon_XX',[0 220],'Type','real'); % Units: kJ/mol
         SepsilonMX = optimizableVariable('epsilon_MX',[0 400],'Type','real'); % Units: kJ/mol
-
-        % gamma
-        SgammaMM = optimizableVariable('gamma_MM',[0 10],'Type','real'); % Units: kJ/mol
-        SgammaXX = optimizableVariable('gamma_XX',[0 10],'Type','real'); % Units: kJ/mol
-        SgammaMX = optimizableVariable('gamma_MX',[0 10],'Type','real'); % Units: kJ/mol
         
-        if Model.Additivity
+        if Settings.InnerRange
+            % gamma
+            SgammaMM = optimizableVariable('gamma_MM',[0 10],'Type','real'); % Units: kJ/mol
+            SgammaXX = optimizableVariable('gamma_XX',[0 10],'Type','real'); % Units: kJ/mol
+            SgammaMX = optimizableVariable('gamma_MX',[0 10],'Type','real'); % Units: kJ/mol
+        else
+            % gamma
+            SgammaMM = optimizableVariable('gamma_MM',[10 20],'Type','real'); % Units: kJ/mol
+            SgammaXX = optimizableVariable('gamma_XX',[10 20],'Type','real'); % Units: kJ/mol
+            SgammaMX = optimizableVariable('gamma_MX',[10 20],'Type','real'); % Units: kJ/mol
+        end
+        
+        if Settings.Additivity
             params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMX];
         else
             params = [SsigmaMM,SsigmaXX,SsigmaMX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
         end
 
-        if ~Model.Fix_Charge
+        if ~Settings.Fix_Charge
             params = [params,SQ];
         end
     case {'JC' 'Mie'}
-        if Model.SigmaEpsilon
+        if Settings.SigmaEpsilon
             SDMM = optimizableVariable('sigma_MM',[0.05 0.46],'Type','real'); % Units: nm
             SDXX = optimizableVariable('sigma_XX',[0.13 0.55],'Type','real'); % Units: nm
             SDMX = optimizableVariable('sigma_MX',[0 0.6],'Type','real'); % Units: nm
@@ -222,9 +229,9 @@ function params = bayesopt_params(Model)
         SnXX = optimizableVariable('n_XX',[6 12],'Type','real');
         SnMX = optimizableVariable('n_MX',[6 12],'Type','real');
         
-        if Model.Fix_Charge
-            if Model.Additivity
-                if Model.Additional_MM_Disp
+        if Settings.Fix_Charge
+            if Settings.Additivity
+                if Settings.Additional_MM_Disp
                     params = [SDMM,SDXX,SRMM,SRXX,SDMM2];
                 else
                     params = [SDMM,SDXX,SRMM,SRXX];
@@ -233,9 +240,9 @@ function params = bayesopt_params(Model)
                 params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX];
             end
         else
-            SQ = optimizableVariable('SQ',Model.Q_Range,'Type','real');
-            if Model.Additivity
-                if Model.Additional_MM_Disp
+            SQ = optimizableVariable('SQ',Settings.Q_Range,'Type','real');
+            if Settings.Additivity
+                if Settings.Additional_MM_Disp
                     params = [SDMM,SDXX,SRMM,SRXX,SQ,SDMM2];
                 else
                     params = [SDMM,SDXX,SRMM,SRXX,SQ];
@@ -244,8 +251,8 @@ function params = bayesopt_params(Model)
                 params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX,SQ];
             end
         end
-        if strcmp(Model.Theory,'Mie') && ~Model.Fix_Mie_n
-            if Model.Additivity
+        if strcmp(Settings.Theory,'Mie') && ~Settings.Fix_Mie_n
+            if Settings.Additivity
                 params = [params,SnMX];
             else
                 params = [params,SnMM,SnXX,SnMX];
@@ -253,32 +260,32 @@ function params = bayesopt_params(Model)
         end
     end
 
-    if ~isempty(Model.Additional_GAdjust)
+    if ~isempty(Settings.Additional_GAdjust)
         % GAdjust are N x 3 arrays of gaussian parameters
         % (i , 1) is the Gaussian height of the ith adjustment (may be negative or
         % positive)
         % (i , 2) is the center point of the ith Gaussian (should be positive)
         % (i , 3) is the standard deviation or width (negative and positive values
         % are the same)
-        for idx = 1:length(Model.Additional_GAdjust)
-            int = [Model.Additional_GAdjust{idx} '_' num2str(idx)];
-            GA = optimizableVariable(['GA_' int],Model.Additional_GAdjust_Ranges{idx}(1,:),'Type','real'); % Gaussian depth in kJ/mol (should be negative)
-            GB = optimizableVariable(['GB_' int],Model.Additional_GAdjust_Ranges{idx}(2,:),'Type','real'); % Gaussian center in nm (should be positive)
-            GC = optimizableVariable(['GC_' int],Model.Additional_GAdjust_Ranges{idx}(3,:),'Type','real'); % Gaussian width in nm(positive)
+        for idx = 1:length(Settings.Additional_GAdjust)
+            int = [Settings.Additional_GAdjust{idx} '_' num2str(idx)];
+            GA = optimizableVariable(['GA_' int],Settings.Additional_GAdjust_Ranges{idx}(1,:),'Type','real'); % Gaussian depth in kJ/mol (should be negative)
+            GB = optimizableVariable(['GB_' int],Settings.Additional_GAdjust_Ranges{idx}(2,:),'Type','real'); % Gaussian center in nm (should be positive)
+            GC = optimizableVariable(['GC_' int],Settings.Additional_GAdjust_Ranges{idx}(3,:),'Type','real'); % Gaussian width in nm(positive)
             params = [params,GA,GB,GC];
         end
     end
     
-    if ~isempty(Model.Additional_Function.MM.Range) && Model.Additional_Function.MM.N >= 0
-        SNMM = optimizableVariable('SNMM',Model.Additional_Function.MM.Range,'Type','real');
+    if ~isempty(Settings.Additional_Function.MM.Range) && Settings.Additional_Function.MM.N >= 0
+        SNMM = optimizableVariable('SNMM',Settings.Additional_Function.MM.Range,'Type','real');
         params = [params,SNMM];
     end
-    if ~isempty(Model.Additional_Function.XX.Range) && Model.Additional_Function.XX.N >= 0
-        SNXX = optimizableVariable('SNXX',Model.Additional_Function.XX.Range,'Type','real');
+    if ~isempty(Settings.Additional_Function.XX.Range) && Settings.Additional_Function.XX.N >= 0
+        SNXX = optimizableVariable('SNXX',Settings.Additional_Function.XX.Range,'Type','real');
         params = [params,SNXX];
     end
-    if ~isempty(Model.Additional_Function.MX.Range) && Model.Additional_Function.MX.N >= 0
-        SNMX = optimizableVariable('SNMX',Model.Additional_Function.MX.Range,'Type','real');
+    if ~isempty(Settings.Additional_Function.MX.Range) && Settings.Additional_Function.MX.N >= 0
+        SNMX = optimizableVariable('SNMX',Settings.Additional_Function.MX.Range,'Type','real');
         params = [params,SNMX];
     end
     

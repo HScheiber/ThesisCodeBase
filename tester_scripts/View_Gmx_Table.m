@@ -86,11 +86,11 @@ function View_Gmx_Table(Table_Loc,Q,C)
     %ref_U = %k_0*(e_c^2).*Q.*(1./U.r);
     
     hold on
-    plot(U.r,U_Total,'k')
+    plot(U.r,U_Total,'-k','linewidth',1)
     hold on
-    plot(U.r,dU_Total,'r')
+    plot(U.r,dU_Total,'-r','linewidth',1)
     %hold on
     %plot(U.r,ref_U)
-    ylim([-800 100])
-    xlim([0 1])
+    ylim([-500 500])
+    xlim([0 2])
 end
