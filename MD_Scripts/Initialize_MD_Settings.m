@@ -161,8 +161,7 @@ Settings.MinMDP.PME_Order = 4; % Interpolation order for PME. 4 equals cubic int
 Settings.MinMDP.Ewald_rtol = 1e-7; %1e-7 Default (1e-5) The relative strength of the Ewald-shifted direct potential at rcoulomb. Decreasing this will give a more accurate direct sum, but then you need more wave vectors for the reciprocal sum.
 Settings.MinMDP.vdw_modifier = 'Potential-shift'; % Potential-shift-Verlet, Potential-shift, None, Force-switch, Potential-switch
 Settings.MinMDP.CoordType = 'g96';
-Settings.MinMDP.Disp_Correction = false; % Adds in a long-range dispersion correction when true
-Settings.MinMDP.Disp_Correction_Tables = false; % ONLY TURN THIS ON FOR DEBUGGING, can be used to enable disp correction for tables
+Settings.MinMDP.Disp_Correction = true; % Adds in a long-range dispersion correction when true
 Settings.MinMDP.Use_Conv_cell = false; % When true, use the conventional unit cell, when false use the primitive unit cell
 
 
