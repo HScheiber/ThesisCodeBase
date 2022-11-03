@@ -356,7 +356,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq')) ...
             Settings.mdrun_opts];
         
-        if Table_Req || strncmp(Settings.Theory,'BH',2)
+        if Table_Req
             mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
         end
         
@@ -379,7 +379,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Minimized_Geom_File) ...
                 ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq')) ' -ntmpi 1'];
             
-            if Table_Req || strncmp(Settings.Theory,'BH',2)
+            if Table_Req
                 mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
             end
             [state,mdrun_output] = system(mdrun_command);
@@ -400,10 +400,16 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Table_Req = IsGmxTableRequired(Settings);
         Settings.JobName = [Settings.Theory '_TestModel'];
         dat = load_gro_file(Minimized_Geom_File);
-        nmol_liquid = dat.N_atoms/2;
+        if Settings.Polarization
+            nmol_liquid = dat.N_atoms/4;
+        else
+            nmol_liquid = dat.N_atoms/2;
+        end
+        Settings.FileBase = 'Prep_Liq';
+        ndx_add = add_polarization_shells(Settings,Minimized_Geom_File,'add_shells',false);
 	end
     
-%     system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
+%     system(['wsl source ~/.bashrc; echo "5 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(strrep(Energy_file,'.edr','.xvg'))])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
 %     Data = import_xvg(En_xvg_file);
 %     plot(Data(:,1),Data(:,2)./nmol_liquid) % Potential
@@ -489,7 +495,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##','1.0');
         
         % Generate tables of the potential
-        [Settings.TableFile_MX,C6] = MakeTables(Settings,'TableName',[Settings.JobName '_Table']);
+        [Settings.TableFile_MX,C6,Energygrptables] = MakeTables(Settings,'TableName',[Settings.JobName '_Table']);
+        MDP_Template = strrep(MDP_Template,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
                                 
         % Dispersion coefficients
         Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',num2str(C6.MM,'%.10e'));
@@ -591,6 +598,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     MDP_Template = strrep(MDP_Template,'##TITLE##',[Settings.Salt ' BH_TestModel']);
     
+    if Settings.Polarization
+        [Settings.Topology_Text,MDP_Template] = Polarize_Inputs(Settings,...
+            Settings.Topology_Text,MDP_Template);
+    else
+        MDP_Template = strrep(MDP_Template,'##ENERGYGRPS##',[Settings.Metal ' ' Settings.Halide]);
+    end
+    
     % Save MDP Template
     MDP_Template_sv = MDP_Template;
     
@@ -656,7 +670,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Minimized_Geom_File) ...
                 ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
                 ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-                ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+                ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
             [state,~] = system(FEquil_Grompp);
 
             % Catch errors in grompp
@@ -670,13 +684,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         % Prepare Equilibration mdrun command
         Log_File = fullfile(Settings.WorkDir,'Equil_Liq.log');
         Energy_file = fullfile(Settings.WorkDir,'Equil_Liq.edr');
-
+        
         mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
             ' -o ' windows2unix(Equilibrate_TRR_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Equilibrated_Geom_File) add_cpt ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Liq')) ...
             Settings.mdrun_opts];
-
+        
         if Table_Req
             mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
         end
@@ -867,7 +881,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Equilibrated_Geom_File) ...
                 ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
                 ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-                ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+                ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
             [state,~] = system(FEquil_Grompp);
             
             % Catch errors in grompp
@@ -1051,7 +1065,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
     
-    en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
+    en_opts = regexp(outpt,'-+\n.+','match','once');
     En_set = '';
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Enthalpy','tokens','once'))];
