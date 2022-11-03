@@ -72,8 +72,19 @@ for interaction = {'MX' 'XX' 'MM'}
     [f,~]= Coulomb_Potential(Settings,U.r,int);
     U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2)).*f ...
         + B.(int).*exp(-alpha.(int).*U.r) ...
-        - C.(Settings.Salt).(int)./(U.r.^6) ...
-        - D.(Settings.Salt).(int)./(U.r.^8);
+        - C.(int)./(U.r.^6) ...
+        - D.(int)./(U.r.^8);
+    
+    % vdw cutoff shift
+    if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)
+        EVDW_Cutoff = B.(int).*exp(-alpha.(int).*Settings.MDP.RVDW_Cutoff) ...
+                      - C.(int)./(Settings.MDP.RVDW_Cutoff.^6) ...
+                      - D.(int)./(Settings.MDP.RVDW_Cutoff.^8);
+        
+        % Shift by the dispersion energy at vdw cutoff radius. only affects one
+        % energy component, not derivatives (i.e. forces)
+        U.(int) = U.(int) - EVDW_Cutoff;
+    end
 end
 
 end

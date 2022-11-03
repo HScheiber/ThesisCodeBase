@@ -31,14 +31,8 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     Settings.Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]);
     [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
     
-    Finite_T_Calc = any([Settings.Loss_Options.Fusion_Enthalpy Settings.Loss_Options.MP_Volume_Change Settings.Loss_Options.Liquid_MP_Volume ...
+    Deterministic = ~any([Settings.Loss_Options.Fusion_Enthalpy Settings.Loss_Options.MP_Volume_Change Settings.Loss_Options.Liquid_MP_Volume ...
         Settings.Loss_Options.Solid_MP_Volume Settings.Loss_Options.Liquid_DM_MP Settings.Loss_Options.MP ] > sqrt(eps));
-    
-    if Finite_T_Calc
-        Deterministic = false; % Thermal properties are not deterministic
-    else
-        Deterministic = true; % Lattice energy calculations are deterministic
-    end
     
     if Settings.UseCoupledConstraint
         NumCC = 1;

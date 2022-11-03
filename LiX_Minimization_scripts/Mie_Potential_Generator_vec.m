@@ -44,7 +44,9 @@ U.r = Settings.Table_StepSize:Settings.Table_StepSize:Settings.Table_Length;
 for interaction = {'MX' 'XX' 'MM'}
     int = interaction{1};
     
-    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2))./U.r + A.(int)./(U.r.^n.(int)) - C.(int)./(U.r.^6);
+    % Build PES
+    [f,~]= Coulomb_Potential(Settings,U.r,int);
+    U.(int) = QQ_prefactor.*q.(int(1)).*q.(int(2)).*f + A.(int)./(U.r.^n.(int)) - C.(int)./(U.r.^6);
     
     % Shift the potential to zero at the cutoff
     if contains(Settings.MDP.vdw_modifier,'potential-shift','IgnoreCase',true)

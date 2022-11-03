@@ -594,7 +594,7 @@ if Settings.EnforceRR && Settings.SigmaEpsilon && Settings.Additivity
     switch Settings.Theory
         case {'JC' 'Mie' 'BF'}
             RR_Walls = Param.sigma_MM./Param.sigma_XX; % Ratio of M/X size, should be < 1
-        case {'BH' 'BD' 'BE'}
+        case {'BH' 'BD' 'BE' 'TF'}
             RR_Walls = Param.r0_MM./Param.r0_XX; % Ratio of M/X size, should be < 1
     end
     Loss = Loss + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect

@@ -57,13 +57,6 @@ end
 Settings.Minimization_Data = Initialize_Minimization_Data(Settings);
 Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 
-if ~isfield(Settings,'GaussianCharge')
-    Settings.GaussianCharge = false;
-end
-if ~isfield(Settings,'Polarization')
-    Settings.Polarization = false;
-end
-
 % Convert Params to table form
 if ~istable(Param) && ~isstruct(Param)
     List_par = bayesopt_params(Settings);
@@ -198,7 +191,6 @@ case 'TF'
         end
     end
 case {'BH' 'BD' 'BE'}
-
     % Loose form of exp-C6 model
     if Settings.SigmaEpsilon
         
@@ -287,8 +279,7 @@ case {'BH' 'BD' 'BE'}
         else
             Settings.S.Q = Param.SQ;
         end
-    end
-    
+    end    
 case 'BF'
     % Input parameters
     Settings.S.S.MM = Param.sigma_MM; % nm
@@ -300,7 +291,7 @@ case 'BF'
     Settings.S.G.MX = Param.gamma_MX; % Unitless
     
     if Settings.Additivity
-        Settings.S.S.MX = (Settings.S.S.MM + Settings.S.S.XX)./2; % nm
+        Settings.S.S.MX = (Settings.S.S.MM + Settings.S.S.XX)/2; % nm
         Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX); % kJ/mol
         Settings.S.G.MM = Settings.S.G.MX; % Unitless
         Settings.S.G.XX = Settings.S.G.MX; % Unitless
@@ -317,7 +308,6 @@ case 'BF'
     else
         Settings.S.Q = Param.SQ;
     end
-    
 case 'JC' % JC models
 
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
@@ -506,38 +496,38 @@ if Settings.CheckBadFcn
     Settings.Table_Length = 10; % nm
     Settings.Table_StepSize = 0.01;
     if strcmp(Settings.Theory,'BH')
-        [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
+        [U,~] = BH_Potential_Generator(Settings,'Include_Dispersion_Scale',true,...
+            'Startpoint',0.01);
     elseif strcmp(Settings.Theory,'TF')
-        [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
+        [U,~] = TF_Potential_Generator(Settings,'Include_Dispersion_Scale',true,...
+            'Startpoint',0.01);
     elseif strcmp(Settings.Theory,'JC')
-        [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
+        [U,~] = JC_Potential_Generator(Settings,'Include_Dispersion_Scale',true,...
+            'Startpoint',0.01);
     elseif strcmp(Settings.Theory,'Mie')
-        [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
+        [U,~] = Mie_Potential_Generator(Settings,'Include_Dispersion_Scale',true,...
+            'Startpoint',0.01);
     elseif strcmp(Settings.Theory,'BD')
-        [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
+        [U,~] = BD_Potential_Generator(Settings,'Include_Dispersion_Scale',true,...
+            'Startpoint',0.01);
     elseif strcmp(Settings.Theory,'BE')
-        [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
+        [U,~] = BE_Potential_Generator(Settings,'Include_Dispersion_Scale',true,...
+            'Startpoint',0.01);
     elseif strcmp(Settings.Theory,'BF')
-        [U_MX, U_MM, U_XX] = BF_Potential_Generator(Settings,...
-            'Startpoint',0.01,'ReturnAsStructure',true);
+        [U,~] = BF_Potential_Generator(Settings,'Include_Dispersion_Scale',true,...
+            'Startpoint',0.01);
     end
     Settings.Table_Length = tl; % nm
     Settings.Table_StepSize = ss;
     
     %% Grab the peaks and valleys of the MX attractive potential
-    peaks_idx = islocalmax(U_MX.Total,'MinProminence',1e-8);
-    valleys_idx = islocalmin(U_MX.Total,'MinProminence',1e-8);
+    peaks_idx = islocalmax(U.MX.Total,'MinProminence',1e-8);
+    valleys_idx = islocalmin(U.MX.Total,'MinProminence',1e-8);
     
-    U_peak = U_MX.Total(peaks_idx);
-    U_valley = U_MX.Total(valleys_idx);
-    r_peak = U_MX.r(peaks_idx);
-    r_valley = U_MX.r(valleys_idx);
+    U_peak = U.MX.Total(peaks_idx);
+    U_valley = U.MX.Total(valleys_idx);
+    r_peak = U.r(peaks_idx);
+    r_valley = U.r(valleys_idx);
     U_valley(r_valley<=r_peak) = [];
     r_valley(r_valley<=r_peak) = [];
     
@@ -560,30 +550,30 @@ if Settings.CheckBadFcn
         Loss_add = Loss_add + max(r_valley - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty;
         Loss_add = Loss_add + max((Settings.MinMXWellR/10) - r_valley,0).*Settings.BadFcnLossPenalty;
     end
-%     plot(U_MX.r,U_MX.Total)
+%     plot(U.r,U.MX.Total)
 %     hold on
-%     scatter(U_MX.r(peaks_idx),U_MX.Total(peaks_idx))
-%     scatter(U_MX.r(valleys_idx),U_MX.Total(valleys_idx))
+%     scatter(U.r(peaks_idx),U.MX.Total(peaks_idx))
+%     scatter(U.r(valleys_idx),U.MX.Total(valleys_idx))
 %     ylim([-1000 1000])
     
     %% Grab the peaks and valleys of the MM/XX potentials
     r_wall_sv = nan(2,1);
-    idx = 0;
-    for U = [U_MM,U_XX]
-        idx = idx+1;
-        peaks_idx = islocalmax(U.Total,'MinProminence',1e-8);
-        valleys_idx = islocalmin(U.Total,'MinProminence',1e-8);
+    ints = {'MM' 'XX'};
+    for idx = 1:numel(ints)
+        int = ints{idx};
+        peaks_idx = islocalmax(U.(int).Total,'MinProminence',1e-8);
+        valleys_idx = islocalmin(U.(int).Total,'MinProminence',1e-8);
         
-        U_peak = U.Total(peaks_idx);
-        U_valley = U.Total(valleys_idx);
+        U_peak = U.(int).Total(peaks_idx);
+        U_valley = U.(int).Total(valleys_idx);
         
         r_peak = U.r(peaks_idx);
         r_valley = U.r(valleys_idx);
 
-%         plot(U.r,U.Total)
+%         plot(U.r,U.(int).Total)
 %         hold on
-%         scatter(U.r(peaks_idx),U.Total(peaks_idx))
-%         scatter(U.r(valleys_idx),U.Total(valleys_idx))
+%         scatter(U.r(peaks_idx),U.(int).Total(peaks_idx))
+%         scatter(U.r(valleys_idx),U.(int).Total(valleys_idx))
 %         ylim([-1000 1000])
 
         if isempty(U_peak) % No peak exists
@@ -609,7 +599,7 @@ if Settings.CheckBadFcn
             else % peak closer set
                 % Case of hidden peak to the right
                 % Ensure valley depth is not greater than the threshold
-                dU = U.Total(end) - U_valley;
+                dU = U.(int).Total(end) - U_valley;
                 Loss_add = Loss_add + max(dU - Settings.MaxRepWellDepth,0)*Settings.BadFcnLossPenalty;
                 
                 % Also check the repulsive peak height
@@ -618,7 +608,7 @@ if Settings.CheckBadFcn
             end
             
         elseif length(U_valley) == 1 % valley exists but no peaks are visible, there must be a hidden peak to the right
-            dU = U.Total(end) - U_valley;
+            dU = U.(int).Total(end) - U_valley;
             Loss_add = Loss_add + max(dU - Settings.MaxRepWellDepth,0)*Settings.BadFcnLossPenalty;
         else
             % This should never be reached...
@@ -626,8 +616,8 @@ if Settings.CheckBadFcn
         end
         
         % Check that the repulsive wall is not too far out or close in
-        if any(U.Total >= Settings.MinExpWallHeight)
-            r_above = U.r(U.Total >= Settings.MinExpWallHeight);
+        if any(U.(int).Total >= Settings.MinExpWallHeight)
+            r_above = U.r(U.(int).Total >= Settings.MinExpWallHeight);
             r_wall = r_above(end);
             r_wall_sv(idx) = r_wall;
             Loss_add = Loss_add + max(r_wall - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % wall too far
