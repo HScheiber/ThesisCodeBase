@@ -83,7 +83,7 @@ Settings.MinSkipLoss = 2; % Minimum loss value required before skipping further 
 Settings.BadFcnLossPenalty = 1000; % Penalty to give bad potentials
 Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Settings.MaxRepWellDepth = 0; % [kJ/mol] This is the maximum allowed depth of a well between like-like interactions before a loss penalty is applied
-Settings.MaxAttWellDepth = -1500; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
+Settings.MaxAttWellDepth = -1000; % [kJ/mol] This is the maximum allowed depth of a well between MX interactions before a loss penalty is applied
 Settings.MinModelVolume = 10; % [A^3/molecule] minimum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MaxModelVolume = 1024; % [A^3/molecule] maximum allowed volume per molecule of the model solid before finite T calculations are skipped
 Settings.MinMDP.E_Unphys = -2000; % [kJ/mol] Unphysical energy cutoff
@@ -129,6 +129,7 @@ Settings.MDP.RCoulomb_Cutoff = 1.1; % nm
 Settings.MDP.RList_Cutoff = 1.1; % nm
 Settings.Cutoff_Buffer = 1.20;
 Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
+Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
 Settings.N_atoms = 2000;
 
 % Barostat Options
@@ -156,7 +157,7 @@ idx = 0;
 Settings.Salt = 'LiBr';
 Settings.Theory = 'BF';
 Settings.InnerRange = false;
-Settings.Trial_ID = 'XX2';
+Settings.Trial_ID = 'XX4';
 Settings.UseCoupledConstraint = false;
 Settings.Initialize_From_Model = {};
 
