@@ -85,6 +85,7 @@ Shared_Settings.MDP.VerletBT = -1;
 
 
 Exp = Load_Experimental_Data;
+[JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(Settings);
 
 % Initial calculation index
 idx=0;
@@ -112,6 +113,14 @@ switch lower(computer)
                 Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
                 Settings_array(idx).JobID = [Theory '_Alexandria']; % An ID that is tacked onto the folder name of all current jobs
                 Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
+                if strcmp(Theory,'JC')
+                    Settings_array(idx).S.S.MM = Settings_array(idx).S.S.MM/JC_MM.sigma;
+                    Settings_array(idx).S.S.XX = Settings_array(idx).S.S.XX/JC_XX.sigma;
+                    Settings_array(idx).S.S.MX = Settings_array(idx).S.S.MX/JC_MX.sigma;
+                    Settings_array(idx).S.E.MM = Settings_array(idx).S.E.MM/JC_MM.epsilon;
+                    Settings_array(idx).S.E.XX = Settings_array(idx).S.E.XX/JC_XX.epsilon;
+                    Settings_array(idx).S.E.MX = Settings_array(idx).S.E.MX/JC_MX.epsilon;
+                end
                 Settings_array(idx).GaussianCharge = true;
                 Settings_array(idx).Polarization = false;
 
@@ -123,38 +132,6 @@ switch lower(computer)
             end
         end
     otherwise
-        %% Alexandria Model (Gaussian charge but no polarization)
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
-         'NaF' 'NaCl' 'NaBr' 'NaI' ...
-         'KF' 'KCl' 'KBr' 'KI' ...
-         'RbF' 'RbCl' 'RbBr' 'RbI' ...
-         'CsF' 'CsCl' 'CsBr' 'CsI'};
-        Theories = {'BF' 'BH' 'JC'};
-        vdW_Type = {'WBK' 'BK' 'LJ_12-6'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
-        for jdx = 1:length(Salts)
-            Salt = Salts{jdx};
-            for kdx = 1:length(Theories)
-                Theory = Theories{kdx};
-
-                idx = idx+1;
-                Settings_array(idx) = Shared_Settings;
-                Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                Settings_array(idx).JobID = [Theory '_Alexandria']; % An ID that is tacked onto the folder name of all current jobs
-                Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
-                Settings_array(idx).GaussianCharge = true;
-                Settings_array(idx).Polarization = false;
-
-                % Initial T
-                Settings_array(idx).Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                Settings_array(idx).MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
-                Settings_array(idx).T0 = Exp.(Salt).mp; % K, Initial temperature
-
-            end
-        end
-
 end
 
 %% Check for already running jobs
