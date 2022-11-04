@@ -1141,34 +1141,42 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         return
     end
     
-    if Settings.CheckAmorphousLiquid && Settings.CheckAmorphousHalide
+    if Settings.CheckAmorphousHalide
         MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.xvg');
         MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.log');
-        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  ...
-            strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(Dynamics_TRR_File) ...   
-            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
+        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+            ' msd -f ' windows2unix(Dynamics_TRR_File)         ' -s ' windows2unix(TPR_File) ...
+            ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
             ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.Liquid_Test_Time) ...
             ' -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
         [~,~] = system(msd_command);
         outp = fileread(MSD_Log_File);
-        Diff_txt = regexp(outp,['D\[ *' Settings.Halide '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
-        Output.Liquid_DX_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
-        
-        if Output.Liquid_DX_MP <= Settings.AmorphousDiffThreshold
-            if Settings.Verbose
-                disp('Detected halide in liquid is amorphous.')
+        try
+            Diff_txt = regexp(outp,['D\[ *' Settings.Halide '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
+            Output.Liquid_DX_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+        catch
+            if isfield(Settings,'Retry') && Settings.Retry
+                if Settings.Verbose
+                    error('Failed to gather halide diffusion constant on retry attempt!')
+                end
+            else
+                if Settings.Verbose
+                    disp('Failed to gather halide diffusion constant, retrying...')
+                end
+                try % Clean up
+                    [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ' Settings.pipe ' xargs rm']);
+                    [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
+                catch me
+                    disp(me.message)
+                end
+                WorkDir = Settings.WorkDir;
+                Settings = Inp_Settings;
+                Settings.WorkDir = WorkDir;
+                Settings.Retry = true;
+                Output = Calc_Liquid_Properties_at_MP(Settings);
+                return
             end
-            Output.Liquid_V_MP = nan;
-            Output.Liquid_H_MP = nan;
-            save(Output_File,'Output');
-            diary off
-            if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-                diary(Settings.Diary_Loc)
-            end
-            return
         end
-    else
-        Output.Liquid_DX_MP = nan;
     end
     
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)

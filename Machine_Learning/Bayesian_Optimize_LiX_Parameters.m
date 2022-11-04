@@ -909,6 +909,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     Settings.Delete_Equil = false; % save the final MP calculation directories
     Settings.Structures = {'Rocksalt' 'Wurtzite' 'Sphalerite' 'NiAs' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
     Settings.Verbose = true;
+    Settings.CheckAmorphousHalide = true;
     [loss,~,UserData] = LiX_Minimizer(Settings,full_opt_point,...
         'Extra_Properties',true,'Therm_Prop_Override',true);
     
