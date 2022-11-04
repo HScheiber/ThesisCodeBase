@@ -358,6 +358,7 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
+        Shared_Settings.Initialize_From_Model = {};
         
         %% BF [Gamma>10] without gaussian charge Models: MH
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
@@ -440,6 +441,7 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = true;
         Shared_Settings.Polarization = false;
+        Shared_Settings.Initialize_From_Model = {};
         
         %% BF [Gamma>10] WITH gaussian charge Models: MI
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
@@ -667,6 +669,7 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = true;
         Shared_Settings.Polarization = false;
+        Shared_Settings.Initialize_From_Model = {};
         
         %% JC WITH gaussian charge Models: MI
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
@@ -749,6 +752,7 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = true;
         Shared_Settings.Polarization = false;
+        Shared_Settings.Initialize_From_Model = {};
         
         %% BH [Gamma<6] WITH gaussian charge Models: MI
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
