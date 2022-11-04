@@ -97,8 +97,8 @@ switch lower(computer)
          'KF' 'KCl' 'KBr' 'KI' ...
          'RbF' 'RbCl' 'RbBr' 'RbI' ...
          'CsF' 'CsCl' 'CsBr' 'CsI'};
-        Theories = {'BF' 'BH' 'JC'};
-        vdW_Type = {'WBK' 'BK' 'LJ_12-6'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
+        Theories = {'BF' 'BH' 'JC' 'Mie'};
+        vdW_Type = {'WBK' 'BK' 'LJ_12-6' 'LJ_8-6'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
         for jdx = 1:length(Salts)
             Salt = Salts{jdx};
             for kdx = 1:length(Theories)
