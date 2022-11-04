@@ -1177,6 +1177,8 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
                 return
             end
         end
+    else
+        Output.Liquid_DX_MP = nan;
     end
     
     % plot(Data(:,1),(10^3).*Data(:,2)./nmol_liquid)
