@@ -6,28 +6,29 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'RbF' 'RbCl' 'RbBr' 'RbI' ...
          'CsF' 'CsCl' 'CsBr' 'CsI'};
 Theories = {'BF' 'BH' 'JC' 'Mie'};
-Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+Structures = {'Rocksalt'};%{'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data').Data;
 
-Settings.JobSettings.Cores = 8;
-Settings.JobSettings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings.JobSettings.Cores = 1;
+Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
 Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Settings.MinMDP.Energy_Tol = 1e-3; % kJ/mol
 Settings.MinMDP.Gradient_Tol_RMS = 1e-3; % kJ/(mol A)
 Settings.MinMDP.Gradient_Tol_Max = 1e-3; % kJ/(mol A)
 Settings.Cutoff_Buffer = 1.01;
-Settings.MinMDP.RList_Cutoff = 2;
-Settings.MinMDP.RCoulomb_Cutoff = 2;
-Settings.MinMDP.RVDW_Cutoff = 2;
-Settings.GaussianCharge = false;
+Settings.MinMDP.RList_Cutoff = 1.8;
+Settings.MinMDP.RCoulomb_Cutoff = 1.8;
+Settings.MinMDP.RVDW_Cutoff = 1.8;
+Settings.GaussianCharge = true;
 Settings.initial_opt_type = true;
-Settings.Polarization = false;
+Settings.Polarization = true;
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
 Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 Settings.MinMDP.Disp_Correction = true;
 
 [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
 Settings.MinMDP.Parallel_Min = false;
-Settings.Parallel_LiX_Minimizer = true;
+Settings.Parallel_LiX_Minimizer = false;
 % setenv('OMP_NUM_THREADS','1');
 % setenv('GMX_PME_NUM_THREADS','1');
 % setenv('GMX_PME_NTHREADS','1');
@@ -114,7 +115,6 @@ if Settings.Parallel_LiX_Minimizer
     wait(f); % Wait for parallel jobs to finish
 
     % Collect outputs into cell array
-    Data = struct();
     for idx = 1:N
 
         Salt = Salts{indexes(1,idx)};
@@ -127,7 +127,6 @@ if Settings.Parallel_LiX_Minimizer
         end
     end
 else
-    Data = struct();
     indexes = combvec(1:length(Salts),1:length(Theories),1:length(Structures));
     for idx = 1:N
         Salt = Salts{indexes(1,idx)};
@@ -173,4 +172,4 @@ else
     end
 end
 
-save(fullfile(Settings.home,'data','MX_Alexandria_PointQ_Min_Data.mat'),'Data')
+save(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data')
