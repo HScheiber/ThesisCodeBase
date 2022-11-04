@@ -85,7 +85,6 @@ Shared_Settings.MDP.VerletBT = -1;
 
 
 Exp = Load_Experimental_Data;
-[JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(Settings);
 
 % Initial calculation index
 idx=0;
@@ -114,6 +113,9 @@ switch lower(computer)
                 Settings_array(idx).JobID = [Theory '_Alexandria']; % An ID that is tacked onto the folder name of all current jobs
                 Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
                 if strcmp(Theory,'JC')
+                    pset = Initialize_MD_Settings;
+                    pset.Salt = Salt;
+                    [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(pset);
                     Settings_array(idx).S.S.MM = Settings_array(idx).S.S.MM/JC_MM.sigma;
                     Settings_array(idx).S.S.XX = Settings_array(idx).S.S.XX/JC_XX.sigma;
                     Settings_array(idx).S.S.MX = Settings_array(idx).S.S.MX/JC_MX.sigma;
