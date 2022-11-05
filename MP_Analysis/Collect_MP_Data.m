@@ -2,8 +2,8 @@
 
 %% Initialize directories of input and output data
 Settings = Initialize_MD_Settings;
-Settings.Project_Directory_Name = 'Melting_Point_Studies';
-DataSetName = 'Melting_Point_Data.mat';
+Settings.Project_Directory_Name = 'Alexandria_Model_MPs';
+DataSetName = 'Alexandria_Melting_Point_Data.mat';
 DataKeyword = '';
 ProjectDir = fullfile(Settings.project,Settings.Project_Directory_Name);
 SaveDataDir = fullfile(Settings.home,'data',DataSetName);
@@ -12,27 +12,7 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'KF' 'KCl' 'KBr' 'KI' ...
          'RbF' 'RbCl' 'RbBr' 'RbI' ...
          'CsF' 'CsCl' 'CsBr' 'CsI'};
-Renew_all_data = false;
-
-fileID = fopen(fullfile(ProjectDir,'Melting_Point_Data.csv'),'wt');
-fprintf(fileID, [strjoin(repmat({'%s'},1,14),',') '\n'],...
-    'Salt',...
-    'Theory',...
-    'Model',...
-    'Job Name',...
-    'Tm [K]',...
-    'Tm Lower Bound [K]',...
-    'Tm Upper Bound [K]',...
-    'dTm Experiment [K]',...
-    'N Total',...
-    'N Liquid',...
-    'N Solid',...
-    'Box length a [A]',...
-    'Box length b [A]',...
-    'Box length c [A]',...    
-    'Solid a [A]',...
-    'Solid b [A]',...
-    'Solid c [A]');
+Renew_all_data = true;
 
 % Load previously collected data
 if isfile(SaveDataDir) && ~Renew_all_data
@@ -56,26 +36,6 @@ for Salt_idx = 1:length(Salts)
     disp('************************************')
     Warn_summary = [Warn_summary newline '************************************' ...
         newline Salt newline '************************************']; %#ok<*AGROW>
-
-    % Put experimental data on the first line
-    Out = {Salt,...
-          'Experiment',...
-          '',...
-          '',...
-          Experiment.(Salt).mp,...
-          Experiment.(Salt).mp-Experiment.(Salt).dmp,...
-          Experiment.(Salt).mp+Experiment.(Salt).dmp,...
-          0,...
-          '',...
-          '',...
-          '',...
-          '',...
-          '',...
-          '',...
-          '',...
-          '',...
-          ''};
-    fprintf(fileID, '%s,%s,%s,%s,%f,%f,%f,%f,%s,%s,%s,%s,%s,%s\n',Out{:});
     
     % List all inner directories
     d_jobs = dir(SaltDataDir);
@@ -98,18 +58,9 @@ for Salt_idx = 1:length(Salts)
         end
         JobDir = fullfile(d_jobs(job_idx).folder,JobName);
         
-        Theory_info = regexp(JobName,'(.+?)_[A-Z]_(JC|JC3P|JC4P|JCSD|TF|BH)(_Model_.+?)*_(NPT|NVT|NVE)','tokens','once');
-        JobNametxt = ['MP_' strrep(strrep(Theory_info{1},'-','_'),'.','_')];
-        Theory = Theory_info{2};
-        if ~isempty(Theory_info{3})
-            Model = regexp(Theory_info{3},'_Model_(.+)','tokens','once');
-            Model = Model{1};
-            Modeltxt = [Theory '_Model_' Model];
-        else
-            Model = '';
-            Modeltxt = Theory;
-        end
-        disp(['Current Job: ' Modeltxt ' / ' strrep(JobNametxt,'MP_','')])
+        Theory_info = regexp(JobName,'(.+?)_Alexandria','tokens','once');
+        Theory = Theory_info{1};
+        disp(['Current Job: ' Salt ' ' Theory])
         
         % Search for MPResults and Density profile files 
         ResultsFile = fullfile(JobDir,[JobName '_MPResults.mat']);
@@ -212,28 +163,28 @@ for Salt_idx = 1:length(Salts)
         N_atoms_solid = N_atoms_total - N_atoms_liquid;
 
         % Create a data structure and add the data
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt) = T_dat;
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).N_Total = N_atoms_total;
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).N_Solid = N_atoms_solid;
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).N_Liquid = N_atoms_liquid;
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).a = norm(Final_geom.a_vec)*10; % Angstroms, final size of box in a-direction
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).b = norm(Final_geom.b_vec)*10; % Angstroms
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c = norm(Final_geom.c_vec)*10; % Angstroms
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Tm = Tm;
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).IsBubble = Settings.GenCluster;
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).MP_confirmed = MP_confirmed;
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).JobName = JobName;
+        Data.(Salt).(Theory).(Structure) = T_dat;
+        Data.(Salt).(Theory).(Structure).N_Total = N_atoms_total;
+        Data.(Salt).(Theory).(Structure).N_Solid = N_atoms_solid;
+        Data.(Salt).(Theory).(Structure).N_Liquid = N_atoms_liquid;
+        Data.(Salt).(Theory).(Structure).a = norm(Final_geom.a_vec)*10; % Angstroms, final size of box in a-direction
+        Data.(Salt).(Theory).(Structure).b = norm(Final_geom.b_vec)*10; % Angstroms
+        Data.(Salt).(Theory).(Structure).c = norm(Final_geom.c_vec)*10; % Angstroms
+        Data.(Salt).(Theory).(Structure).Tm = Tm;
+        Data.(Salt).(Theory).(Structure).IsBubble = Settings.GenCluster;
+        Data.(Salt).(Theory).(Structure).MP_confirmed = MP_confirmed;
+        Data.(Salt).(Theory).(Structure).JobName = JobName;
         
         % Difference between experimental and calculated melting points
-        Data.(Salt).(Modeltxt).(Structure).(JobNametxt).dT_Exp = Tm - Experiment.(Salt).mp;
+        Data.(Salt).(Theory).(Structure).dT_Exp = Tm - Experiment.(Salt).mp;
         
         % Load in the density profile if it exists
         if isfile(DensityProfileFile)
             dat = import_xvg(DensityProfileFile);
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).DensityProfile = dat;
+            Data.(Salt).(Theory).(Structure).DensityProfile = dat;
         else
             Warn_summary = [Warn_summary newline Salt ' ' JobName ': No density profile found.'];
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).DensityProfile = [];
+            Data.(Salt).(Theory).(Structure).DensityProfile = [];
         end
         
         % If the calculation is a interface, find the initial length of the solid portion of the box
@@ -241,23 +192,23 @@ for Salt_idx = 1:length(Salts)
         if isfile(Sol_info_file)
             dat = load(Sol_info_file,'Solid_Geometry');
             Solid_Geometry = dat.Solid_Geometry;
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).a_vec_sol = Solid_Geometry.a_vec;
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).b_vec_sol = Solid_Geometry.b_vec;
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_vec_sol = Solid_Geometry.c_vec;
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_vec_tot = Solid_Geometry.c_vec_tot;
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Liq_L     = Solid_Geometry.L;
+            Data.(Salt).(Theory).(Structure).a_vec_sol = Solid_Geometry.a_vec;
+            Data.(Salt).(Theory).(Structure).b_vec_sol = Solid_Geometry.b_vec;
+            Data.(Salt).(Theory).(Structure).c_vec_sol = Solid_Geometry.c_vec;
+            Data.(Salt).(Theory).(Structure).c_vec_tot = Solid_Geometry.c_vec_tot;
+            Data.(Salt).(Theory).(Structure).Liq_L     = Solid_Geometry.L;
             if isfield(Solid_Geometry,'Liquid_Vol')
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Liquid_Vol= Solid_Geometry.Liquid_Vol;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Solid_Vol = Solid_Geometry.Solid_Vol;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Solid_R   = Solid_Geometry.Solid_R;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Total_Vol = Solid_Geometry.Solid_Vol + Solid_Geometry.Liquid_Vol;
+                Data.(Salt).(Theory).(Structure).Liquid_Vol= Solid_Geometry.Liquid_Vol;
+                Data.(Salt).(Theory).(Structure).Solid_Vol = Solid_Geometry.Solid_Vol;
+                Data.(Salt).(Theory).(Structure).Solid_R   = Solid_Geometry.Solid_R;
+                Data.(Salt).(Theory).(Structure).Total_Vol = Solid_Geometry.Solid_Vol + Solid_Geometry.Liquid_Vol;
             else
                 V_Liquid = Cell_Volume(Solid_Geometry.a_vec,Solid_Geometry.b_vec,Solid_Geometry.c_vec_tot - Solid_Geometry.c_vec);
                 V_Solid = Cell_Volume(Solid_Geometry.a_vec,Solid_Geometry.b_vec,Solid_Geometry.c_vec);
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Liquid_Vol= V_Liquid;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Solid_Vol = V_Solid;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Solid_R   = ( 3*V_Solid/(4*pi) )^(1/3);
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Total_Vol = V_Liquid + V_Solid;
+                Data.(Salt).(Theory).(Structure).Liquid_Vol= V_Liquid;
+                Data.(Salt).(Theory).(Structure).Solid_Vol = V_Solid;
+                Data.(Salt).(Theory).(Structure).Solid_R   = ( 3*V_Solid/(4*pi) )^(1/3);
+                Data.(Salt).(Theory).(Structure).Total_Vol = V_Liquid + V_Solid;
             end
         else
             MinJobInpFile = fullfile(JobDir,'Minimization','TempJobInfo.mat');
@@ -271,35 +222,35 @@ for Salt_idx = 1:length(Salts)
                 Solid_R = ( 3*Solid_Vol/(4*pi) )^(1/3); % nm
                 Total_Vol = Cell_Volume(Final_geom.a_vec,Final_geom.b_vec,Final_geom.c_vec); % nm^3
                 
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).a_vec_sol = dat.a_vec; % nm
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).b_vec_sol = dat.b_vec; % nm
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_vec_sol = dat.c_vec; % nm
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_vec_tot = Final_geom.c_vec;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Liq_L     = norm(Final_geom.c_vec) - norm(dat.c_vec);
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Liquid_Vol= Total_Vol - Solid_Vol;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Solid_Vol = Solid_Vol;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Solid_R   = Solid_R;   % radius of solid (if it is a cluster)
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Total_Vol = Total_Vol; % nm^3
+                Data.(Salt).(Theory).(Structure).a_vec_sol = dat.a_vec; % nm
+                Data.(Salt).(Theory).(Structure).b_vec_sol = dat.b_vec; % nm
+                Data.(Salt).(Theory).(Structure).c_vec_sol = dat.c_vec; % nm
+                Data.(Salt).(Theory).(Structure).c_vec_tot = Final_geom.c_vec;
+                Data.(Salt).(Theory).(Structure).Liq_L     = norm(Final_geom.c_vec) - norm(dat.c_vec);
+                Data.(Salt).(Theory).(Structure).Liquid_Vol= Total_Vol - Solid_Vol;
+                Data.(Salt).(Theory).(Structure).Solid_Vol = Solid_Vol;
+                Data.(Salt).(Theory).(Structure).Solid_R   = Solid_R;   % radius of solid (if it is a cluster)
+                Data.(Salt).(Theory).(Structure).Total_Vol = Total_Vol; % nm^3
             else
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).a_vec_sol = nan; % nm
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).b_vec_sol = nan; % nm
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_vec_sol = nan; % nm
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_vec_tot = nan;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Liq_L     = nan;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Liquid_Vol= nan;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Solid_Vol = nan;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Solid_R   = nan;
-                Data.(Salt).(Modeltxt).(Structure).(JobNametxt).Total_Vol = nan;
+                Data.(Salt).(Theory).(Structure).a_vec_sol = nan; % nm
+                Data.(Salt).(Theory).(Structure).b_vec_sol = nan; % nm
+                Data.(Salt).(Theory).(Structure).c_vec_sol = nan; % nm
+                Data.(Salt).(Theory).(Structure).c_vec_tot = nan;
+                Data.(Salt).(Theory).(Structure).Liq_L     = nan;
+                Data.(Salt).(Theory).(Structure).Liquid_Vol= nan;
+                Data.(Salt).(Theory).(Structure).Solid_Vol = nan;
+                Data.(Salt).(Theory).(Structure).Solid_R   = nan;
+                Data.(Salt).(Theory).(Structure).Total_Vol = nan;
             end
         end
         if Settings.GenCluster
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_over_a = 1;
+            Data.(Salt).(Theory).(Structure).c_over_a = 1;
         else
-            Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_over_a = Settings.c_over_a;
+            Data.(Salt).(Theory).(Structure).c_over_a = Settings.c_over_a;
         end
         
         Tm_dt = T_dat.dT;
-        dT_Exp = Data.(Salt).(Modeltxt).(Structure).(JobNametxt).dT_Exp;
+        dT_Exp = Data.(Salt).(Theory).(Structure).dT_Exp;
         if length(Tm_dt) == 1
             if Tm_dt < Tm
                 Lower_Bound = Tm_dt;
@@ -316,25 +267,6 @@ for Salt_idx = 1:length(Salts)
             Lower_Bound = Tm_dt(1);
             Upper_Bound = Tm_dt(2);
         end
-        
-        Out = {Salt,...
-              Theory,...
-              Model,...
-              JobName,...
-              Tm,...
-              Lower_Bound,...
-              Upper_Bound,...
-              dT_Exp,...
-              N_atoms_total,...
-              N_atoms_liquid,...
-              N_atoms_solid,...
-              Data.(Salt).(Modeltxt).(Structure).(JobNametxt).a,...
-              Data.(Salt).(Modeltxt).(Structure).(JobNametxt).b,...
-              Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c,...
-              norm(Data.(Salt).(Modeltxt).(Structure).(JobNametxt).a_vec_sol),...
-              norm(Data.(Salt).(Modeltxt).(Structure).(JobNametxt).b_vec_sol),...
-              norm(Data.(Salt).(Modeltxt).(Structure).(JobNametxt).c_vec_sol)};
-        fprintf(fileID, '%s,%s,%s,%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n',Out{:});
     end
         
     Warn_summary = [Warn_summary newline '************************************'];
@@ -344,7 +276,6 @@ disp('Finished collecting Data.')
 
 disp('Finished Calculaing Differences in Lattice Energy Between Structures.')
 disp('Saving Data.')
-fclose(fileID);
 
 % Save the dataset
 save(SaveDataDir,'Data')
