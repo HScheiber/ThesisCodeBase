@@ -2,7 +2,7 @@
 
 %% Initialize directories of input and output data
 Settings = Initialize_MD_Settings;
-Settings.Project_Directory_Name = 'Alexandria_Model_MPs';
+Settings.Project_Directory_Name = 'Alexandria_Polarized_Model_MPs';
 DataSetName = 'Alexandria_Melting_Point_Data.mat';
 DataKeyword = '';
 ProjectDir = fullfile(Settings.project,Settings.Project_Directory_Name);
