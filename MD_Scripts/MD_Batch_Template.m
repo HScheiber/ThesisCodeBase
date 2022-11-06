@@ -277,13 +277,12 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         Settings.g_density = 'g_density_mpi_d';
         Settings.editconf = 'editconf_mpi_d';
         Settings.g_traj = 'g_traj_mpi_d';
-        Settings.convert_tpr = 'tpbconv';
+        Settings.convert_tpr = 'tpbconv_mpi_d';
         if Settings.SinglePrecision
             Settings.insert_molecules = 'gmx_d insert-molecules';
         else
             Settings.insert_molecules = 'gmx insert-molecules';
         end
-        
         
         Settings.mdrun_opts = [Settings.mdrun_opts ' -pd'];
     else
