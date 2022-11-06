@@ -22,10 +22,10 @@ Shared_Settings.Cores = 12; % Minimum number of cores to request for calculation
 Shared_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
 Shared_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.MPI_Ranks = 16; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
 Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.dd = [2 1 5]; % Domain decomposition
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Shared_Settings.MaxWarn = 2;
 Shared_Settings.SigmaEpsilon = true;
 
@@ -91,6 +91,45 @@ idx=0;
 
 switch lower(computer)
     case 'graham'
+        %% Alexandria Model (Gaussian charge + polarization)
+        Salts = {'NaCl'};
+        Theories = {'BF'};
+        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
+        for jdx = 1:length(Salts)
+            Salt = Salts{jdx};
+            for kdx = 1:length(Theories)
+                Theory = Theories{kdx};
+
+                idx = idx+1;
+                Settings_array(idx) = Shared_Settings;
+                Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
+                Settings_array(idx).JobID = [Theory '_Alexandria']; % An ID that is tacked onto the folder name of all current jobs
+                Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
+                if strcmp(Theory,'JC')
+                    pset = Initialize_MD_Settings;
+                    pset.Salt = Salt;
+                    [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(pset);
+                    Settings_array(idx).S.S.MM = Settings_array(idx).S.S.MM/JC_MM.sigma;
+                    Settings_array(idx).S.S.XX = Settings_array(idx).S.S.XX/JC_XX.sigma;
+                    Settings_array(idx).S.S.MX = Settings_array(idx).S.S.MX/JC_MX.sigma;
+                    Settings_array(idx).S.E.MM = Settings_array(idx).S.E.MM/JC_MM.epsilon;
+                    Settings_array(idx).S.E.XX = Settings_array(idx).S.E.XX/JC_XX.epsilon;
+                    Settings_array(idx).S.E.MX = Settings_array(idx).S.E.MX/JC_MX.epsilon;
+                end
+                Settings_array(idx).GaussianCharge = true;
+                Settings_array(idx).Polarization = false;
+
+                % Initial T
+                Settings_array(idx).Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                Settings_array(idx).MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                Settings_array(idx).T0 = Exp.(Salt).mp; % K, Initial temperature
+
+            end
+        end
+    otherwise
         %% Alexandria Model (Gaussian charge but no polarization)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...
@@ -133,7 +172,6 @@ switch lower(computer)
 
             end
         end
-    otherwise
 end
 
 %% Check for already running jobs
