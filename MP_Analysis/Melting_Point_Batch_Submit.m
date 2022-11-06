@@ -11,7 +11,7 @@ check_running = true; % Checks if a job is already running, skips running jobs
 
 % Load shared resource and mdrun settings
 Shared_Settings = Initialize_MD_Settings;
-Shared_Settings.Project_Directory_Name = 'Alexandria_Model_MPs';
+Shared_Settings.Project_Directory_Name = 'Alexandria_Polarized_Model_MPs';
 Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Shared_Settings.N_Calc = 1; % Number of chained calculations
