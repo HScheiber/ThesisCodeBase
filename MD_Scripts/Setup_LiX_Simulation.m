@@ -72,7 +72,7 @@ end
 % end
 
 % Load Batch script (if applicable) settings and gromacs stuff
-[Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.postprocess] = MD_Batch_Template(Settings.JobSettings);
+[Batch_Template,Settings] = MD_Batch_Template(Settings);
 
 % Calculate the largest cutoff distance
 Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]); % nm
@@ -84,7 +84,7 @@ MD_nsteps = Settings.MDP.Trajectory_Time*1000/Settings.MDP.dt; % Number of steps
 Settings.Table_Req = IsGmxTableRequired(Settings);
 
 % If required, step size of tabulated potentials in nm
-if Settings.JobSettings.SinglePrecision
+if Settings.SinglePrecision
     Settings.Table_StepSize = 0.002;
 else
     Settings.Table_StepSize = 0.0005;
@@ -233,7 +233,6 @@ MDP_Template = strrep(MDP_Template,'##PMEORDER##',pad(num2str(Settings.MDP.PME_O
 MDP_Template = strrep(MDP_Template,'##EWALDTOL##',pad(num2str(Settings.MDP.Ewald_rtol),18));
 MDP_Template = strrep(MDP_Template,'##LISTUPDATE##',pad(num2str(Settings.Update_NeighbourList),18));
 MDP_Template = strrep(MDP_Template,'##POSOUT##',pad(num2str(Settings.Output_Coords),18));
-MDP_Template = strrep(MDP_Template,'##POSOUTCOMP##',pad(num2str(Settings.Output_Coords_Compressed),18));
 MDP_Template = strrep(MDP_Template,'##VELOUT##',pad(num2str(Settings.Output_Velocity),18));
 MDP_Template = strrep(MDP_Template,'##FORCEOUT##',pad(num2str(Settings.Output_Forces),18));
 MDP_Template = strrep(MDP_Template,'##ENOUT##',pad(num2str(Settings.Output_Energies),18));
@@ -656,7 +655,7 @@ if DoGeomEdit
             fwrite(fid,regexprep(Coordinate_Text,'\r',''));
             fclose(fid);
             
-            Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
+            Supercell_command = [Settings.gmx_loc Settings.genconf ' -f ' windows2unix(Settings.UnitCellFile) ...
                  ' -o ' windows2unix(Settings.SuperCellFile) ' -nbox ' Na ' ' Nb ' ' Nc];
             
             if isfile(Settings.SuperCellFile)
@@ -705,7 +704,7 @@ if DoGeomEdit
             ac = num2str(Settings.Geometry.beta,'%10.4e');
             ab = num2str(Settings.Geometry.gamma,'%10.4e');
             
-            Expand_command = [Settings.gmx_loc ' editconf -f ' windows2unix(Settings.SuperCellFile) ...
+            Expand_command = [Settings.gmx_loc Settings.editconf ' -f ' windows2unix(Settings.SuperCellFile) ...
                  ' -o ' windows2unix(Settings.SuperCellFile) ' -box ' a_sc ' ' b_sc ' ' c_sc ...
                  ' -angles ' bc ' ' ac ' ' ab];
             [errcode,output] = system(Expand_command);
@@ -739,7 +738,7 @@ if DoGeomEdit
             fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
             fclose(fidTOP);
 
-            GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
+            GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
                 ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
                 ' -o ' windows2unix(Settings.Traj_Conf_File) ' -po ' windows2unix(Settings.MDP_out_File) ...
                 ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
@@ -807,7 +806,7 @@ Energy_file = fullfile(Settings.WorkDir,[Settings.JobName '.edr']);
 Trajectory_File = fullfile(Settings.WorkDir,[Settings.JobName '.trr']);
 ConfOut_File = fullfile(Settings.WorkDir,[Settings.JobName '_OutConf.' Settings.CoordType]);
 CheckPoint_File = fullfile(Settings.WorkDir,[Settings.JobName '.cpt']);
-mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(Settings.Traj_Conf_File) ...
+mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(Settings.Traj_Conf_File) ...
     ' -o ' windows2unix(Trajectory_File) ' -g ' windows2unix(Log_File) ...
     ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(ConfOut_File) ...
     ' -cpo ' windows2unix(CheckPoint_File) Settings.mdrun_opts];
@@ -849,7 +848,7 @@ end
 % Ensure the initial geometry file is available in gro format for post-processing
 if ~strcmp(Settings.CoordType,'gro')
     SuperCellFileGro = fullfile(Settings.WorkDir,[Settings.JobName '.gro']);
-    trjconv_command = [Settings.gmx_loc ' trjconv -s ' windows2unix(Settings.Traj_Conf_File) ...
+    trjconv_command = [Settings.gmx_loc Settings.trjconv ' -s ' windows2unix(Settings.Traj_Conf_File) ...
         ' -f ' windows2unix(Settings.SuperCellFile) ' -o ' windows2unix(SuperCellFileGro)];
 
     trjconv_command = regexprep(trjconv_command,'gmx',['echo 0 ' Settings.pipe ' gmx'],'once');
@@ -949,9 +948,9 @@ elseif Settings.BatchMode && ~isempty(Settings.qsub) % Running job in batch mode
 
     % Shorten max time to allow for pre-minimization
     if ~Found_DataMatch || Settings.Liquid_Interface || Settings.PreEquilibration > 0
-        Batch_Text = regexprep(Batch_Text,'-maxh ([0-9]|\.)',['-maxh ' num2str(Settings.JobSettings.Hours-0.17)]); % ~10 minutes
+        Batch_Text = regexprep(Batch_Text,'-maxh ([0-9]|\.)',['-maxh ' num2str(Settings.Hours-0.17)]); % ~10 minutes
     elseif strcmpi(Settings.Structure,'liquid')
-        Batch_Text = regexprep(Batch_Text,'-maxh ([0-9]|\.)',['-maxh ' num2str(Settings.JobSettings.Hours-0.017)]); % ~1 minute
+        Batch_Text = regexprep(Batch_Text,'-maxh ([0-9]|\.)',['-maxh ' num2str(Settings.Hours-0.017)]); % ~1 minute
     end
 
     % Open and save batch script
@@ -978,7 +977,7 @@ elseif Settings.BatchMode && ~isempty(Settings.qsub) % Running job in batch mode
         cpt_output_prev = CheckPoint_File;
 
         % Make additional links
-        for jdx = 2:Settings.JobSettings.N_Calc 
+        for jdx = 2:Settings.N_Calc 
 
             Index = ['-' num2str(jdx,'%03.0f')];
 

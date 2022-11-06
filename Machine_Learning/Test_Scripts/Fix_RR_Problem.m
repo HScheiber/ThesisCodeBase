@@ -112,7 +112,7 @@ for mdx = 1:numel(Models_cell)
                     [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
                         Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
                     Settings.scratch_dir = pwd;
-                    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.MLModelDir] = MD_Batch_Template(Settings.JobSettings);
+                    [~,Settings] = MD_Batch_Template(Settings);
                     bBeO_Energies = Structure_Minimization(Settings,'Extra_Properties',true);
                     Minimization_Data{bBeO_idx} = bBeO_Energies;
                     
@@ -178,7 +178,7 @@ for mdx = 1:numel(Models_cell)
                     [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
                         Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
                     Settings.scratch_dir = pwd;
-                    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.MLModelDir] = MD_Batch_Template(Settings.JobSettings);
+                    [~,Settings] = MD_Batch_Template(Settings);
                     bBeO_Energies = Structure_Minimization(Settings,'Extra_Properties',true);
                     Minimization_Data{bBeO_idx} = bBeO_Energies;
                     

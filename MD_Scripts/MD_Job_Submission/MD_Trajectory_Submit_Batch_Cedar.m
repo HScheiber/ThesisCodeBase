@@ -10,20 +10,20 @@ check_running = true; % Checks if a job is already running, skips running jobs. 
 
 % Load Settings object and set some shared calculation settings
 Shared_Settings = Initialize_MD_Settings;
-Shared_Settings.JobSettings.N_Calc = 8; % Number of jobs to link together.
+Shared_Settings.N_Calc = 8; % Number of jobs to link together.
 Shared_Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Shared_Settings.BatchMode = true; % Sets up batch job when true, or runs immediately when false
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
-Shared_Settings.JobSettings.Nodes = 1; % Minimum number of cores to request for calculation.
-Shared_Settings.JobSettings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.Mins = 0; % Max time for job (minutes)
+Shared_Settings.Nodes = 1; % Minimum number of cores to request for calculation.
+Shared_Settings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
 Shared_Settings.MPI_Ranks = -1;
 Shared_Settings.OMP_Threads = 1;
-Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Shared_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+Shared_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Shared_Settings.Project_Directory_Name = 'Molten_Salts_MD'; % Name of project directory to contain job within the main project folder
 Shared_Settings.MinMDP.nsteps_min = 2000;
 Shared_Settings.TimePerFrame = 20; % post-processing time per frame check in ps
@@ -44,10 +44,10 @@ idx = idx+1;
 Settings_array(idx) = Shared_Settings;
 
 Settings_array(idx).Output_Coords = 1000; % output coords every 1 ps
-Settings_array(idx).JobSettings.N_Calc = 10; % Number of chained calculations
-Settings_array(idx).JobSettings.Hours = 3; % Max time for each job (hours)
-Settings_array(idx).JobSettings.MPI_Ranks = 4; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Settings_array(idx).JobSettings.OMP_Threads = 8; % Set the number of OMP threads per MPI rank
+Settings_array(idx).N_Calc = 10; % Number of chained calculations
+Settings_array(idx).Hours = 3; % Max time for each job (hours)
+Settings_array(idx).MPI_Ranks = 4; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings_array(idx).OMP_Threads = 8; % Set the number of OMP threads per MPI rank
 
 Settings_array(idx).MDP.RVDW_Cutoff = 1.4; % nm
 Settings_array(idx).MDP.RCoulomb_Cutoff = 1.4; % nm
@@ -94,10 +94,10 @@ idx = idx+1;
 Settings_array(idx) = Shared_Settings;
 
 Settings_array(idx).Output_Coords = 1000; % output coords every 1 ps
-Settings_array(idx).JobSettings.N_Calc = 14; % Number of chained calculations
-Settings_array(idx).JobSettings.Hours = 3; % Max time for each job (hours)
-Settings_array(idx).JobSettings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Settings_array(idx).JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Settings_array(idx).N_Calc = 14; % Number of chained calculations
+Settings_array(idx).Hours = 3; % Max time for each job (hours)
+Settings_array(idx).MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings_array(idx).OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 
 Settings_array(idx).MDP.RVDW_Cutoff = 1.4; % nm
 Settings_array(idx).MDP.RCoulomb_Cutoff = 1.4; % nm
@@ -144,10 +144,10 @@ idx = idx+1;
 Settings_array(idx) = Shared_Settings;
 
 Settings_array(idx).Output_Coords = 1000; % output coords every 1 ps
-Settings_array(idx).JobSettings.N_Calc = 14; % Number of chained calculations
-Settings_array(idx).JobSettings.Hours = 3; % Max time for each job (hours)
-Settings_array(idx).JobSettings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Settings_array(idx).JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Settings_array(idx).N_Calc = 14; % Number of chained calculations
+Settings_array(idx).Hours = 3; % Max time for each job (hours)
+Settings_array(idx).MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings_array(idx).OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 
 Settings_array(idx).MDP.RVDW_Cutoff = 1.9; % nm
 Settings_array(idx).MDP.RCoulomb_Cutoff = 1.9; % nm
@@ -192,10 +192,10 @@ idx = idx+1;
 Settings_array(idx) = Shared_Settings;
 
 Settings_array(idx).Output_Coords = 1000; % output coords every 1 ps
-Settings_array(idx).JobSettings.N_Calc = 14; % Number of chained calculations
-Settings_array(idx).JobSettings.Hours = 3; % Max time for each job (hours)
-Settings_array(idx).JobSettings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Settings_array(idx).JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Settings_array(idx).N_Calc = 14; % Number of chained calculations
+Settings_array(idx).Hours = 3; % Max time for each job (hours)
+Settings_array(idx).MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings_array(idx).OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 
 Settings_array(idx).MDP.RVDW_Cutoff = 1.9; % nm
 Settings_array(idx).MDP.RCoulomb_Cutoff = 1.9; % nm
@@ -310,7 +310,7 @@ for sidx = 1:length(Salts)
         Settings_array(idx).MDP.Trajectory_Time = 31; % ns
         Settings_array(idx).Cutoff_Buffer = 1.25;
         if strcmp(Salt,'LiF')
-            Settings_array(idx).JobSettings.N_Calc = Settings_array(idx).JobSettings.N_Calc + 4;
+            Settings_array(idx).N_Calc = Settings_array(idx).N_Calc + 4;
         end
     end
 end
@@ -344,7 +344,7 @@ for sidx = 1:length(Salts)
         Settings_array(idx).MDP.Trajectory_Time = 31; % ns
         Settings_array(idx).Cutoff_Buffer = 1.25;
         if strcmp(Salt,'LiF')
-            Settings_array(idx).JobSettings.N_Calc = Settings_array(idx).JobSettings.N_Calc + 4;
+            Settings_array(idx).N_Calc = Settings_array(idx).N_Calc + 4;
         end
     end
 end
@@ -426,7 +426,7 @@ for idx = 1:length(Settings_array)
     PostProcessFlagFile = fullfile(WorkDir,'POSTPROCESS_COMPLETE');
     PostProcessFlagFile2 = strrep(PostProcessFlagFile,'scratch','project');
     if check_complete && ( isfile(OutConfFile) || isfile(OutConfFile2) )
-        Settings.JobSettings.N_Calc = 1;
+        Settings.N_Calc = 1;
         if (Settings.RunPostProcessor && (isfile(PostProcessFlagFile) || isfile(PostProcessFlagFile2)) ) || ~Settings.RunPostProcessor
             disp([TaskName ': Job already completed. Skipping Job Submission.'])
             continue

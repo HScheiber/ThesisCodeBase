@@ -22,23 +22,23 @@ function Settings = Initialize_MD_Settings
 Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Settings.BatchMode = true; % Sets up batch job when true, or runs immediately when false
 Settings.Continue = false; % Where possible, continue a FINISHED calculation when true
-Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Settings.JobSettings.N_Calc = 1; % Number of jobs to link together.
-Settings.JobSettings.Mins = 0; % Max time for job (minutes)
-Settings.JobSettings.Nodes = 1; % Minimum number of cores to request for calculation.
-Settings.JobSettings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-Settings.JobSettings.MPI_Ranks = -1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Settings.JobSettings.npme = []; % Number of MPI ranks assigned to PME
-Settings.JobSettings.dd = []; % Sets the domain decomposition cells. Requires 3 numbers, X, Y, and Z corresponding to the number of cells in each direction.
+Settings.Hours = 3; % Max time for each job (hours)
+Settings.N_Calc = 1; % Number of jobs to link together.
+Settings.Mins = 0; % Max time for job (minutes)
+Settings.Nodes = 1; % Minimum number of cores to request for calculation.
+Settings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+Settings.MPI_Ranks = -1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Settings.npme = []; % Number of MPI ranks assigned to PME
+Settings.dd = []; % Sets the domain decomposition cells. Requires 3 numbers, X, Y, and Z corresponding to the number of cells in each direction.
 % Leave dd empty to not use.
-Settings.JobSettings.dds = 0.8; % default = 0.8. Fraction in (0,1) by whose reciprocal the initial DD cell size will be increased in order to provide a margin in which dynamic load balancing can act while preserving the minimum cell size.
+Settings.dds = 0.8; % default = 0.8. Fraction in (0,1) by whose reciprocal the initial DD cell size will be increased in order to provide a margin in which dynamic load balancing can act while preserving the minimum cell size.
 % dds may need to be set lower for cluster jobs due to high inhomogeniety in the system
-Settings.JobSettings.DLB = true; % Turns on Gromacs dynamic load balancing when true
-Settings.JobSettings.TunePME = true; % Optimizes PME load between PP/PME ranks or GPU/CPU
+Settings.DLB = true; % Turns on Gromacs dynamic load balancing when true
+Settings.TunePME = true; % Optimizes PME load between PP/PME ranks or GPU/CPU
 Settings.Verbose = true;
 
 %% Interaction and Structure Settings
@@ -121,7 +121,6 @@ Settings.CoordType = 'gro'; % Either pdb, gro, or g96 (use g96 for extra precisi
 
 %% Trajectory update/output options: larger number of steps decreases resolution
 Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
-Settings.Output_Coords_Compressed = 0; % Number of steps between outputting coordinates in compressed format
 Settings.Output_Velocity = 0; % Number of steps between outputting velocities
 Settings.Output_Forces = 0; % Number of steps between outputting forces
 Settings.Calc_Energies = 100; % Number of steps that elapse between calculating the energies.

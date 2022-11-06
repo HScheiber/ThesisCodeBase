@@ -224,7 +224,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
     % Delete any corrupted checkpoint files
     for idx = length(cpt_check):-1:1
         cptch = fullfile(WorkDir,cpt_check(idx).name);
-        [errc,~] = system([Settings.gmx_loc ' check -f ' windows2unix(cptch)]);
+        [errc,~] = system([Settings.gmx_loc Settings.g_check ' -f ' windows2unix(cptch)]);
         if errc ~= 0
             if Settings.Verbose
                 disp(['Detected and deleted corrupted checkpoint file: ' cptch])
@@ -266,7 +266,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         end
         
         Trajectory_File = fullfile(WorkDir,[Settings.JobName '.trr']);
-        gmx_check_cmd = [Settings.gmx_loc ' check -f ' windows2unix(Trajectory_File)];
+        gmx_check_cmd = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Trajectory_File)];
         [errcode,outchk] = system(gmx_check_cmd);
         if errcode ~= 0
             ContinueFromCheckPoint = false;
@@ -312,7 +312,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             end
         else
             % If not, continue the current segment of the simulation
-            mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(Traj_Conf_File) ...
+            mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(Traj_Conf_File) ...
                 ' -o ' windows2unix(Trajectory_File) ' -g ' windows2unix(Log_File) ...
                 ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Structure_Out_File) ...
                 ' -cpi ' windows2unix(CheckPoint_File) ' -cpo ' windows2unix(CheckPoint_File) ...
@@ -362,14 +362,32 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         CheckStructureTimer = tic;
         try
             % Check volume has not exploded
-            XZCheck_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.xvg']);
-            XZCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.log']);
-            XZCheck_command = [Settings.wsl 'echo "15 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
-                ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File) ' -o ' ...
-                windows2unix(XZCheck_File) ' ' Settings.passlog windows2unix(XZCheck_Log_File)];
-            [~,~] = system(XZCheck_command);
-            XZCheck_Data = import_xvg(XZCheck_File);
-            dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
+            VolCheck_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.xvg']);
+            VolCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.log']);
+            
+            % Check energy options
+            gmx_command = [Settings.wsl 'echo "0" ' Settings.pipe ...
+                ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+                ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File)];
+            [~,outpt] = system(gmx_command);
+            en_opts = regexp(outpt,'-+\n.+','match','once');
+            En_set = '';
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
+            En_set = [En_set ' 0'];
+            En_set = regexprep(En_set,' +',' ');
+            
+            % Grab data from results
+            VolCheck_command = [Settings.wsl 'echo ' En_set ' ' Settings.pipe ...
+                ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+                ' -f ' windows2unix(Energy_file) ' -o ' windows2unix(VolCheck_File) ...
+                ' -s ' windows2unix(Traj_Conf_File) ' ' Settings.passlog windows2unix(VolCheck_Log_File)];
+            [err,~] = system(VolCheck_command);
+            if err ~= 0
+                error('Failed to collect energy data.')
+            end
+            
+            VolCheck_Data = import_xvg(VolCheck_File);
+            dev_from_init = VolCheck_Data(:,2)./VolCheck_Data(1,2);
             max_dev = max(abs(dev_from_init));
             
             if max_dev >= 1.5
@@ -405,8 +423,8 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 end
                 return
             else
-                delete(XZCheck_File)
-                delete(XZCheck_Log_File)
+                delete(VolCheck_File)
+                delete(VolCheck_Log_File)
             end
             
             PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
@@ -533,7 +551,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             'ndx_filename',ndx_filename,'add_shells',false);
         
         % Run gmx grompp
-        GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Strucure_In_File) ...
+        GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Strucure_In_File) ...
             ' -f ' windows2unix(MDP_in_File) ' -p ' windows2unix(Topology_File) ...
             ' -o ' windows2unix(Traj_Conf_File) ' -po ' windows2unix(MDP_out_File) ...
             ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GromppLog_File)];
@@ -550,7 +568,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         Trajectory_File = fullfile(WorkDir,[Settings.JobName '.trr']);
         Structure_Out_File = fullfile(WorkDir,[Settings.JobName '_OutConf_001.' Settings.CoordType]);
         CheckPoint_File = fullfile(WorkDir,[Settings.JobName '_001.cpt']);
-        mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(Traj_Conf_File) ...
+        mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(Traj_Conf_File) ...
             ' -o ' windows2unix(Trajectory_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Structure_Out_File) ...
             ' -cpo ' windows2unix(CheckPoint_File) Settings.mdrun_opts];
@@ -662,7 +680,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                     ' (' num2str(CheckTime,'%.0f') '/' num2str(Settings.MaxCheckTime,'%.0f') ...
                     ' ps) complete. Time elapsed: ' datestr(seconds(toc(MDtimer)),'HH:MM:SS')])
             end
-
+            
             % Check the final frame of the simulation chunk
             if Settings.Verbose
                 disp('Checking melting/freezing status...')
@@ -670,14 +688,32 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             CheckStructureTimer = tic;
             
             % Check volume has not exploded
-            XZCheck_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.xvg']);
-            XZCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.log']);
-            XZCheck_command = [Settings.wsl 'echo "15 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
-                ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File) ' -o ' ...
-                windows2unix(XZCheck_File) ' ' Settings.passlog windows2unix(XZCheck_Log_File)];
-            [~,~] = system(XZCheck_command);
-            XZCheck_Data = import_xvg(XZCheck_File);
-            dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
+            VolCheck_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.xvg']);
+            VolCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_001_VolCheck.log']);
+            
+            % Check energy options
+            gmx_command = [Settings.wsl 'echo "0" ' Settings.pipe ...
+                ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+                ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File)];
+            [~,outpt] = system(gmx_command);
+            en_opts = regexp(outpt,'-+\n.+','match','once');
+            En_set = '';
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
+            En_set = [En_set ' 0'];
+            En_set = regexprep(En_set,' +',' ');
+            
+            % Grab data from results
+            VolCheck_command = [Settings.wsl 'echo ' En_set ' ' Settings.pipe ...
+                ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+                ' -f ' windows2unix(Energy_file) ' -o ' windows2unix(VolCheck_File) ...
+                ' -s ' windows2unix(Traj_Conf_File) ' ' Settings.passlog windows2unix(VolCheck_Log_File)];
+            [err,~] = system(VolCheck_command);
+            if err ~= 0
+                error('Failed to collect energy data.')
+            end
+            
+            VolCheck_Data = import_xvg(VolCheck_File);
+            dev_from_init = VolCheck_Data(:,2)./VolCheck_Data(1,2);
             max_dev = max(abs(dev_from_init));
             
             if max_dev >= 1.5
@@ -713,8 +749,8 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 end
                 return
             else
-                delete(XZCheck_File)
-                delete(XZCheck_Log_File)
+                delete(VolCheck_File)
+                delete(VolCheck_Log_File)
             end
             
             PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...
@@ -752,7 +788,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         Structure_Out_File_idx = fullfile(WorkDir,[Settings.JobName '_OutConf_' num2str(ext_idx,'%03.f') '.' Settings.CoordType]);
 
         % Extend simulation by converting tpr file with gmx convert-tpr
-        convert_tpr_command = [Settings.gmx_loc ' convert-tpr -s ' windows2unix(Traj_Conf_File) ...
+        convert_tpr_command = [Settings.gmx_loc Settings.convert_tpr ' -s ' windows2unix(Traj_Conf_File) ...
             ' -o ' windows2unix(Traj_Conf_File_idx) ' -extend ' num2str(CheckTime)];
 
         [errcode,~] = system(convert_tpr_command);
@@ -762,7 +798,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         end
 
         % Set up next gmx mdrun command
-        mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(Traj_Conf_File_idx) ...
+        mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(Traj_Conf_File_idx) ...
             ' -o ' windows2unix(Trajectory_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Structure_Out_File_idx) ...
             ' -cpi ' windows2unix(CheckPoint_File) ' -cpo ' windows2unix(Checkpoint_File_idx) ...
@@ -806,14 +842,32 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         CheckStructureTimer = tic;
         try            
             % Check volume has not exploded
-            XZCheck_File = fullfile(WorkDir,[Settings.JobName '_' num2str(ext_idx,'%03.f') '_VolCheck.xvg']);
-            XZCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_' num2str(ext_idx,'%03.f') '_VolCheck.log']);
-            XZCheck_command = [Settings.wsl 'echo "15 0" ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
-                ' energy -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File_idx) ' -o ' ...
-                windows2unix(XZCheck_File) ' ' Settings.passlog windows2unix(XZCheck_Log_File)];
-            [~,~] = system(XZCheck_command);
-            XZCheck_Data = import_xvg(XZCheck_File);
-            dev_from_init = XZCheck_Data(:,2)./XZCheck_Data(1,2);
+            VolCheck_File = fullfile(WorkDir,[Settings.JobName '_' num2str(ext_idx,'%03.f') '_VolCheck.xvg']);
+            VolCheck_Log_File = fullfile(WorkDir,[Settings.JobName '_' num2str(ext_idx,'%03.f') '_VolCheck.log']);
+            
+            % Check energy options
+            gmx_command = [Settings.wsl 'echo "0" ' Settings.pipe ...
+                ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+                ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File_idx)];
+            [~,outpt] = system(gmx_command);
+            en_opts = regexp(outpt,'-+\n.+','match','once');
+            En_set = '';
+            En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))]; %#ok<AGROW>
+            En_set = [En_set ' 0']; %#ok<AGROW>
+            En_set = regexprep(En_set,' +',' ');
+            
+            % Grab data from results
+            VolCheck_command = [Settings.wsl 'echo ' En_set ' ' Settings.pipe ...
+                ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+                ' -f ' windows2unix(Energy_file) ' -o ' windows2unix(VolCheck_File) ...
+                ' -s ' windows2unix(Traj_Conf_File_idx) ' ' Settings.passlog windows2unix(VolCheck_Log_File)];
+            [err,~] = system(VolCheck_command);
+            if err ~= 0
+                error('Failed to collect energy data.')
+            end
+            
+            VolCheck_Data = import_xvg(VolCheck_File);
+            dev_from_init = VolCheck_Data(:,2)./VolCheck_Data(1,2);
             max_dev = max(abs(dev_from_init));
             
             if max_dev >= 1.5
@@ -849,8 +903,8 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 end
                 return
             else
-                delete(XZCheck_File)
-                delete(XZCheck_Log_File)
+                delete(VolCheck_File)
+                delete(VolCheck_Log_File)
             end
             
             % Check the final frame of the simulation chunk for phase change

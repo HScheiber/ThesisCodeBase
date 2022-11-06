@@ -450,15 +450,15 @@ for kdx = 1:length(R_Sizes)
         Settings_array(idx) = Shared_Settings;
         
         
-        Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-        Settings_array(idx).JobSettings.Hours = 12; % Max time for each job (hours)
-        Settings_array(idx).JobSettings.Mins = 0; % Max time for job (minutes)
-        Settings_array(idx).JobSettings.Nodes = 1; % Number of nodes to request for calculation.
-        Settings_array(idx).JobSettings.Cores = 32; % Number of cores to request for calculation. Set to -1 for entire node
-        Settings_array(idx).JobSettings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Settings_array(idx).JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Settings_array(idx).JobSettings.npme = []; % Number of rank assigned to PME
-        Settings_array(idx).JobSettings.dd = []; %[5 3 2] Domain decomposition
+        Settings_array(idx).N_Calc = 2; % Number of chained calculations
+        Settings_array(idx).Hours = 12; % Max time for each job (hours)
+        Settings_array(idx).Mins = 0; % Max time for job (minutes)
+        Settings_array(idx).Nodes = 1; % Number of nodes to request for calculation.
+        Settings_array(idx).Cores = 32; % Number of cores to request for calculation. Set to -1 for entire node
+        Settings_array(idx).MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Settings_array(idx).OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Settings_array(idx).npme = []; % Number of rank assigned to PME
+        Settings_array(idx).dd = []; %[5 3 2] Domain decomposition
         
         Settings_array(idx).BracketThreshold = 5;
         Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -1073,15 +1073,15 @@ for kdx = 1:length(Reps)
     Settings_array(idx) = Shared_Settings;
     
     % MPI not usable here, change up the job settings
-    Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
-    Settings_array(idx).JobSettings.Mins = 0; % Max time for job (minutes)
-    Settings_array(idx).JobSettings.Nodes = 0; % Number of nodes to request for calculation.
-    Settings_array(idx).JobSettings.Cores = 8; % Number of cores to request for calculation. Set to -1 for entire node
-    Settings_array(idx).JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-    Settings_array(idx).JobSettings.OMP_Threads = 8; % Set the number of OMP threads per MPI rank
-    Settings_array(idx).JobSettings.npme = []; % Number of rank assigned to PME
-    Settings_array(idx).JobSettings.dd = []; %[5 3 2] Domain decomposition
+    Settings_array(idx).N_Calc = 2; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).Mins = 0; % Max time for job (minutes)
+    Settings_array(idx).Nodes = 0; % Number of nodes to request for calculation.
+    Settings_array(idx).Cores = 8; % Number of cores to request for calculation. Set to -1 for entire node
+    Settings_array(idx).MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+    Settings_array(idx).OMP_Threads = 8; % Set the number of OMP threads per MPI rank
+    Settings_array(idx).npme = []; % Number of rank assigned to PME
+    Settings_array(idx).dd = []; %[5 3 2] Domain decomposition
 
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -1468,8 +1468,8 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).N_Calc = 2; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -1508,8 +1508,8 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).N_Calc = 2; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3022,8 +3022,8 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).N_Calc = 2; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3257,8 +3257,8 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).N_Calc = 2; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3306,8 +3306,8 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).N_Calc = 2; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3359,8 +3359,8 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).N_Calc = 2; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3412,8 +3412,8 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.N_Calc = 3; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).N_Calc = 3; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3461,8 +3461,8 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.N_Calc = 2; % Number of chained calculations
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).N_Calc = 2; % Number of chained calculations
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3588,7 +3588,7 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3653,7 +3653,7 @@ for kdx = 1:length(Reps)
     
     idx = idx+1;
     Settings_array(idx) = Shared_Settings;
-    Settings_array(idx).JobSettings.Hours = 6; % Max time for each job (hours)
+    Settings_array(idx).Hours = 6; % Max time for each job (hours)
     Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
     Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
@@ -3739,13 +3739,13 @@ for jdx = 1:length(Salts)
         switch Theory
             case 'TF'
                 Theory_Settings = Shared_Settings;
-                Theory_Settings.JobSettings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Theory_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-                Theory_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-                Theory_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-                Theory_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-                Theory_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-                Theory_Settings.JobSettings.dd = [2 3 5]; % Domain decomposition
+                Theory_Settings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+                Theory_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+                Theory_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+                Theory_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+                Theory_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+                Theory_Settings.npme = 2; % Number of rank assigned to PME
+                Theory_Settings.dd = [2 3 5]; % Domain decomposition
                 
                 Theory_Settings.MDP.RVDW_Cutoff = 1.9; % nm
                 Theory_Settings.MDP.RCoulomb_Cutoff = 1.9; % nm
@@ -3754,13 +3754,13 @@ for jdx = 1:length(Salts)
                 
             otherwise
                 Theory_Settings = Shared_Settings;
-                Theory_Settings.JobSettings.MPI_Ranks = 4; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Theory_Settings.JobSettings.OMP_Threads = 8; % Set the number of OMP threads per MPI rank
-                Theory_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-                Theory_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-                Theory_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-                Theory_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-                Theory_Settings.JobSettings.dd = [1 1 2]; %[5 3 2] Domain decomposition
+                Theory_Settings.MPI_Ranks = 4; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+                Theory_Settings.OMP_Threads = 8; % Set the number of OMP threads per MPI rank
+                Theory_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+                Theory_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+                Theory_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+                Theory_Settings.npme = 2; % Number of rank assigned to PME
+                Theory_Settings.dd = [1 1 2]; %[5 3 2] Domain decomposition
                 
                 Theory_Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
                 Theory_Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
@@ -3863,13 +3863,13 @@ for jdx = 1:length(Salts)
         switch Theory
             case 'TF'
                 Theory_Settings = Shared_Settings;
-                Theory_Settings.JobSettings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Theory_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-                Theory_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-                Theory_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-                Theory_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-                Theory_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-                Theory_Settings.JobSettings.dd = [2 3 5]; % Domain decomposition
+                Theory_Settings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+                Theory_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+                Theory_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+                Theory_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+                Theory_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+                Theory_Settings.npme = 2; % Number of rank assigned to PME
+                Theory_Settings.dd = [2 3 5]; % Domain decomposition
                 
                 Theory_Settings.MDP.RVDW_Cutoff = 1.9; % nm
                 Theory_Settings.MDP.RCoulomb_Cutoff = 1.9; % nm
@@ -3878,13 +3878,13 @@ for jdx = 1:length(Salts)
                 
             otherwise
                 Theory_Settings = Shared_Settings;
-                Theory_Settings.JobSettings.MPI_Ranks = 4; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-                Theory_Settings.JobSettings.OMP_Threads = 8; % Set the number of OMP threads per MPI rank
-                Theory_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-                Theory_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-                Theory_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-                Theory_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-                Theory_Settings.JobSettings.dd = [1 1 2]; %[5 3 2] Domain decomposition
+                Theory_Settings.MPI_Ranks = 4; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+                Theory_Settings.OMP_Threads = 8; % Set the number of OMP threads per MPI rank
+                Theory_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+                Theory_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+                Theory_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+                Theory_Settings.npme = 2; % Number of rank assigned to PME
+                Theory_Settings.dd = [1 1 2]; %[5 3 2] Domain decomposition
                 
                 Theory_Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
                 Theory_Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction

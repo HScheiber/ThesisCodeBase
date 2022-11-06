@@ -5359,10 +5359,10 @@ for tidx = 1:length(Theories)
 end
 
 %% BH Models JA, JB, JC
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -5438,10 +5438,10 @@ for tidx = 1:length(Theories)
     end
 end
 %% JC Models JA, JB, JC
-Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+Shared_Settings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 0; % Number of rank assigned to PME
+Shared_Settings.dd = [1 1 2]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -5939,10 +5939,10 @@ end
 %% BH Models JD, JE, JF, JG
 Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Shared_Settings.ub = 2200; % K, upper bound on MP search
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -6050,10 +6050,10 @@ end
 %% JC Models JD, JE, JF
 Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Shared_Settings.ub = 2200; % K, upper bound on MP search
-Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+Shared_Settings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 0; % Number of rank assigned to PME
+Shared_Settings.dd = [1 1 2]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -6356,12 +6356,12 @@ for tidx = 1:length(Theories)
     end
 end
 %% BH Models JH, JI, JJ, JK, [not JL], JM
-Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.N_Calc = 10; % Number of chained calculations
+Shared_Settings.Hours = 12; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -6465,12 +6465,12 @@ for tidx = 1:length(Theories)
     end
 end
 %% JC Models JH, JI, JJ, JK, [not JL], JM
-Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Shared_Settings.N_Calc = 10; % Number of chained calculations
+Shared_Settings.Hours = 12; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -6574,12 +6574,12 @@ for tidx = 1:length(Theories)
     end
 end
 %% BH Models JL
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -6621,12 +6621,12 @@ for tidx = 1:length(Theories)
     end
 end
 %% JC Models JL
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Shared_Settings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -6668,12 +6668,12 @@ for tidx = 1:length(Theories)
     end
 end
 %% BH Models JN, JO, JP
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -6757,12 +6757,12 @@ for tidx = 1:length(Theories)
     end
 end
 %% JC Models JN, JO, JP
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Shared_Settings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -6854,8 +6854,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
 %% NaCl - JC/BH Models: KA, KB, KC, KD, KE on NaCl
 Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
@@ -6967,8 +6967,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
 %% LiX - JC/BH Models: KA, KE
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' };
@@ -7028,8 +7028,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 %% NaCl - TF Model: KB and KF
 Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
@@ -7092,8 +7092,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 
 %% BH Models: MA, MB, MC on NaCl
@@ -7182,8 +7182,8 @@ Shared_Settings.Parallel_Bayesopt = true;
 Shared_Settings.Parallel_Struct_Min = false;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
 
 %% JC/BH Models: LA, LB, LC, LD
@@ -7276,8 +7276,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 %% BH Models: MD, ME on LiX
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
@@ -7345,8 +7345,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 Shared_Settings.EnforceRR = true;
 
@@ -7414,8 +7414,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
 Shared_Settings.EnforceRR = true;
 
@@ -7469,8 +7469,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = false;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 Shared_Settings.EnforceRR = false;
 Shared_Settings.final_opt_type = 'none';
@@ -7546,8 +7546,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 Shared_Settings.EnforceRR = false;
 Shared_Settings.final_opt_type = 'patternsearch';
@@ -7661,8 +7661,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = false;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
 Shared_Settings.EnforceRR = true;
 
@@ -7733,8 +7733,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = false;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 Shared_Settings.EnforceRR = false;
 Shared_Settings.final_opt_type = 'none';
@@ -7809,8 +7809,8 @@ Shared_Settings.Parallel_Bayesopt = true;
 Shared_Settings.Parallel_Struct_Min = false;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH/TF
 Shared_Settings.EnforceRR = false;
 
@@ -7973,8 +7973,8 @@ Shared_Settings.Parallel_Bayesopt = true;
 Shared_Settings.Parallel_Struct_Min = false;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = false;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH/TF
 Shared_Settings.EnforceRR = true;
 

@@ -26,7 +26,7 @@ Modules = ['# set EXE environment' newline ...
            'export PYTHONPATH=''/arc/home/haydensc/ThesisCodeBase/LiXStructureDetector''' newline newline];
 
 SubmDir = '/home/haydensc/scratch/Molten_Salts_MD'; % Name of project directory to contain job within the main project folder
-Batch_Template = MD_Batch_Template(Settings,'log');
+Batch_Template = MD_Batch_Template(Settings,'sockeye');
 
 Batch_Template = strrep(Batch_Template,'mpiprocs=32','mpiprocs=1');
 Batch_Template = strrep(Batch_Template,'##DIRECTORY##',SubmDir);

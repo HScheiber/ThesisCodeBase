@@ -883,18 +883,18 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.85 solid
         Settings.Verbose = Verbose;
     else
-        dd = Settings.JobSettings.dd;
-        npme = Settings.JobSettings.npme;
-        Settings.JobSettings.dd = [];
-        Settings.JobSettings.npme = [];
-        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        dd = Settings.dd;
+        npme = Settings.npme;
+        Settings.dd = [];
+        Settings.npme = [];
+        [~,Settings] = MD_Batch_Template(Settings);
         Verbose = Settings.Verbose;
         Settings.Verbose = true;
         Liq_Output = Calc_Liquid_Properties_at_MP(Settings); % Output is nan if liquid converts to >0.85 solid
         Settings.Verbose = Verbose;
-        Settings.JobSettings.dd = dd;
-        Settings.JobSettings.npme = npme;
-        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        Settings.dd = dd;
+        Settings.npme = npme;
+        [~,Settings] = MD_Batch_Template(Settings);
     end
     
     if Settings.Therm_Prop_Override && ~isfolder(ThermFolder)
@@ -957,18 +957,18 @@ if ( any([Settings.Loss_Options.Fusion_Enthalpy ...
         Sol_Output = Calc_Solid_Properties_at_MP(Settings);
         Settings.Verbose = Verbose;
     else
-        dd = Settings.JobSettings.dd;
-        npme = Settings.JobSettings.npme;
-        Settings.JobSettings.dd = [];
-        Settings.JobSettings.npme = [];
-        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        dd = Settings.dd;
+        npme = Settings.npme;
+        Settings.dd = [];
+        Settings.npme = [];
+        [~,Settings] = MD_Batch_Template(Settings);
         Verbose = Settings.Verbose;
         Settings.Verbose = true;
         Sol_Output = Calc_Solid_Properties_at_MP(Settings);
         Settings.Verbose = Verbose;
-        Settings.JobSettings.dd = dd;
-        Settings.JobSettings.npme = npme;
-        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+        Settings.dd = dd;
+        Settings.npme = npme;
+        [~,Settings] = MD_Batch_Template(Settings);
     end
     
     if Settings.Therm_Prop_Override && ~isfolder(ThermFolder)

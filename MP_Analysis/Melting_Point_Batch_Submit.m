@@ -14,18 +14,18 @@ Shared_Settings = Initialize_MD_Settings;
 Shared_Settings.Project_Directory_Name = 'Alexandria_Model_MPs';
 Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
-Shared_Settings.JobSettings.N_Calc = 1; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 6; % Max time for each job (hours)
-Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
-Shared_Settings.JobSettings.Nodes = 0; % Minimum number of cores to request for calculation.
-Shared_Settings.JobSettings.Cores = 12; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [2 1 5]; % Domain decomposition
+Shared_Settings.N_Calc = 1; % Number of chained calculations
+Shared_Settings.Hours = 6; % Max time for each job (hours)
+Shared_Settings.Mins = 0; % Max time for job (minutes)
+Shared_Settings.Nodes = 0; % Minimum number of cores to request for calculation.
+Shared_Settings.Cores = 12; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Shared_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+Shared_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [2 1 5]; % Domain decomposition
 Shared_Settings.MaxWarn = 2;
 Shared_Settings.SigmaEpsilon = true;
 
@@ -171,7 +171,7 @@ for idx = 1:length(Settings_array)
     Settings = Settings_array(idx);
     
     % Load the batch script template and remove unnecessary fields
-    Batch_Template = MD_Batch_Template(Settings.JobSettings);
+    Batch_Template = MD_Batch_Template(Settings);
     Batch_Template = strrep(Batch_Template,['##PREMIN##' newline],'');
     Batch_Template = strrep(Batch_Template,['##CLEANUP##' newline],'');
     Batch_Template = strrep(Batch_Template,['##EXT1##' newline],'');
@@ -214,7 +214,7 @@ for idx = 1:length(Settings_array)
     calc_cmd_idx = strrep(calc_cmd_idx,'##LOGFILE##',[Settings.JobName '.MPlog']);
     
     % Set up job links
-    for jdx = 1:Settings.JobSettings.N_Calc
+    for jdx = 1:Settings.N_Calc
         
         if jdx == 1
             calc_cmd_idx_jdx = calc_cmd_idx;
