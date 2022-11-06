@@ -183,7 +183,8 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoop(Settings
         ' -f ' windows2unix(Energy_file)];
     [~,outpt] = system(gmx_command);
     
-    en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
+    en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+    en_opts = en_opts{1};
     if Extra_Properties
         if ~isempty(regexp(en_opts,'Buck.ham','once'))
             En_set = char(regexp(en_opts,'([0-9]{1,2})  Buck.ham-\(SR\)','tokens','once'));

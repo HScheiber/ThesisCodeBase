@@ -442,8 +442,8 @@ function Output = Equilibrate_Liquid(Settings)
         ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
 
-    en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
-    En_set = '';
+    en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+    en_opts = en_opts{1};
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
     En_set = [En_set ' 0'];
     En_set = regexprep(En_set,' +',' ');

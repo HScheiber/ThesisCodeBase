@@ -183,7 +183,8 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoopFC(Settin
     
     [~,outpt] = system(gmx_command);
     
-    en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
+    en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+    en_opts = en_opts{1};
     En_set = char(regexp(en_opts,'([0-9]{1,2})  Potential','tokens','once'));
     En_set = regexprep([En_set ' 0'],' +',' ');
     

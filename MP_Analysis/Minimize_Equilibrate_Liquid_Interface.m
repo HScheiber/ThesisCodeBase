@@ -580,7 +580,8 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
             ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File)];
         [~,outpt] = system(gmx_command);
         
-        en_opts = regexp(outpt,'-+\n.+','match','once');
+        en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+        en_opts = en_opts{1};
         En_set = '';
         En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Box-X','tokens','once'))];
         En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Box-Z','tokens','once'))];

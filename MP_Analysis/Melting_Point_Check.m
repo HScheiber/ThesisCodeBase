@@ -370,7 +370,8 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
                 ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File)];
             [~,outpt] = system(gmx_command);
-            en_opts = regexp(outpt,'-+\n.+','match','once');
+            en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+            en_opts = en_opts{1};
             En_set = '';
             En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
             En_set = [En_set ' 0'];
@@ -696,7 +697,8 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
                 ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File)];
             [~,outpt] = system(gmx_command);
-            en_opts = regexp(outpt,'-+\n.+','match','once');
+            en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+            en_opts = en_opts{1};
             En_set = '';
             En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
             En_set = [En_set ' 0'];
@@ -850,7 +852,8 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
                 ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
                 ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(Traj_Conf_File_idx)];
             [~,outpt] = system(gmx_command);
-            en_opts = regexp(outpt,'-+\n.+','match','once');
+            en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+            en_opts = en_opts{1};
             En_set = '';
             En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))]; %#ok<AGROW>
             En_set = [En_set ' 0']; %#ok<AGROW>
