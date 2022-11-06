@@ -28,6 +28,7 @@ Shared_Settings.npme = []; % Number of rank assigned to PME
 Shared_Settings.dd = []; % Domain decomposition
 Shared_Settings.MaxWarn = 2;
 Shared_Settings.SigmaEpsilon = true;
+Shared_Settings.MinMDP.Parallel_Min = false;
 
 % MP-specific calculation settings
 Shared_Settings.c_over_a = 2;

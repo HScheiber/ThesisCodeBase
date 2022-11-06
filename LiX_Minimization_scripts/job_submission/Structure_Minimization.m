@@ -73,8 +73,6 @@ elseif isfield(Settings,'Parallel_Bayesopt') && Settings.Parallel_Bayesopt
     gmx_serial = true;
 elseif Settings.MinMDP.Parallel_Min
     gmx_serial = true;
-elseif Settings.Polarization % Polarization cannot run with gmx parallel
-    gmx_serial = true;
 else
     gmx_serial = false;
 end   
