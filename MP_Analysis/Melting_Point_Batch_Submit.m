@@ -262,7 +262,7 @@ for idx = 1:length(Settings_array)
         if jdx == 1
             calc_cmd_idx_jdx = calc_cmd_idx;
         else
-            EXT1 = ['if [[ ! -f "' FlagCompleteFile '" ]]; then'];
+            EXT1 = ['if [[ ! -f "' ResultsFile '" ]]; then'];
             EXT2 = 'fi';
             calc_cmd_idx_jdx = [EXT1 newline calc_cmd_idx newline EXT2];
         end
