@@ -59,6 +59,7 @@ Shared_Settings.Manual_Box = false; % When set to true, rather than setting the 
 Shared_Settings.MDP.RVDW_Cutoff = 1.00; % nm
 Shared_Settings.MDP.RCoulomb_Cutoff = 1.1; % nm
 Shared_Settings.MDP.RList_Cutoff = 1.1; % nm
+Shared_Settings.MDP.vdw_modifier = 'None';
 Shared_Settings.Cutoff_Buffer = 1.20;
 Shared_Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
 Shared_Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
@@ -82,7 +83,6 @@ Shared_Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential 
 Shared_Settings.MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of the Ewald-shifted direct potential at rcoulomb. Decreasing this will give a more accurate direct sum, but then you need more wave vectors for the reciprocal sum.
 Shared_Settings.MDP.Fourier_Spacing = 0.12;
 Shared_Settings.MDP.VerletBT = -1;
-
 
 Exp = Load_Experimental_Data;
 
@@ -120,7 +120,7 @@ switch lower(computer)
                     Settings_array(idx).S.E.MX = Settings_array(idx).S.E.MX/JC_MX.epsilon;
                 end
                 Settings_array(idx).GaussianCharge = true;
-                Settings_array(idx).Polarization = false;
+                Settings_array(idx).Polarization = true;
 
                 % Initial T
                 Settings_array(idx).Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
