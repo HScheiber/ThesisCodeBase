@@ -14,15 +14,15 @@ Shared_Settings = Initialize_MD_Settings;
 Shared_Settings.Project_Directory_Name = 'Alexandria_Polarized_Model_MPs';
 Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
-Shared_Settings.N_Calc = 1; % Number of chained calculations
+Shared_Settings.N_Calc = 2; % Number of chained calculations
 Shared_Settings.Hours = 6; % Max time for each job (hours)
 Shared_Settings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.Nodes = 0; % Minimum number of cores to request for calculation.
-Shared_Settings.Cores = 16; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Shared_Settings.Cores = 32; % Minimum number of cores to request for calculation. Set to -1 for entire node
 Shared_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
 Shared_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-Shared_Settings.MPI_Ranks = 16; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
 Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.npme = []; % Number of rank assigned to PME
 Shared_Settings.dd = []; % Domain decomposition
@@ -93,9 +93,13 @@ idx=0;
 switch lower(computer)
     case 'graham'
         %% Alexandria Model (Gaussian charge + polarization)
-        Salts = {'NaCl'};
-        Theories = {'BF'};
-        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
+         'NaF' 'NaCl' 'NaBr' 'NaI' ...
+         'KF' 'KCl' 'KBr' 'KI' ...
+         'RbF' 'RbCl' 'RbBr' 'RbI' ...
+         'CsF' 'CsCl' 'CsBr' 'CsI'};
+        Theories = {'BF' 'BH' 'JC' 'Mie'};
+        vdW_Type = {'WBK' 'BK' 'LJ_12-6', 'LJ_8-6'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
         for jdx = 1:length(Salts)
             Salt = Salts{jdx};
             for kdx = 1:length(Theories)
