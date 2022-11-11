@@ -542,6 +542,26 @@ Experiment.LiI.Rocksalt.dE = 1.3; % Error in Lattice energy (kJ/mol)
 Experiment.NaCl.Rocksalt.E = -791.3; % Lattice energy (kJ/mol)
 Experiment.NaCl.Rocksalt.dE = 0.8; % Error in Lattice energy (kJ/mol)
 
+% Data source for other alkali halides: CRC handbook
+Experiment.NaF.Rocksalt.E = 930; % Lattice energy (kJ/mol)
+Experiment.NaBr.Rocksalt.E = 754; % Lattice energy (kJ/mol)
+Experiment.NaI.Rocksalt.E = 705; % Lattice energy (kJ/mol)
+
+Experiment.KF.Rocksalt.E = 829; % Lattice energy (kJ/mol)
+Experiment.KCl.Rocksalt.E = 720; % Lattice energy (kJ/mol)
+Experiment.KBr.Rocksalt.E = 691; % Lattice energy (kJ/mol)
+Experiment.KI.Rocksalt.E = 650; % Lattice energy (kJ/mol)
+
+Experiment.RbF.Rocksalt.E = 795; % Lattice energy (kJ/mol)
+Experiment.RbCl.Rocksalt.E = 695; % Lattice energy (kJ/mol)
+Experiment.RbBr.Rocksalt.E = 668; % Lattice energy (kJ/mol)
+Experiment.RbI.Rocksalt.E = 632; % Lattice energy (kJ/mol)
+
+Experiment.CsF.Rocksalt.E = 759; % Lattice energy (kJ/mol)
+Experiment.CsCl.Rocksalt.E = 670; % Lattice energy (kJ/mol)
+Experiment.CsBr.Rocksalt.E = 647; % Lattice energy (kJ/mol)
+Experiment.CsI.Rocksalt.E = 613; % Lattice energy (kJ/mol)
+
 %% Save data
 home = find_home;
 Data_Directory = [home filesep 'data'];

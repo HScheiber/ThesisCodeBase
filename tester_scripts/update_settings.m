@@ -3,11 +3,28 @@
 % Settings.T0 = 1133.9;
 % Settings.Target_T = 1133.9;
 
-% Settings.Cores = 8;
-% Settings.MPI_Ranks = 8;
-% Settings.OMP_Threads = 1;
-% Settings.dd  = [];
-% Settings.npme = [];
+
+Settings.dd  = [];
+Settings.npme = [];
+Settings.Hours= 3;
+Settings.N_Calc= 8;
+Settings.Mins= 0;
+Settings.Nodes=0;
+Settings.Cores=12;
+Settings.Mempernode='0';
+Settings.SinglePrecision= 0;
+Settings.BigNode= 0;
+Settings.MPI_Ranks= 12;
+Settings.OMP_Threads= 1;
+Settings.npme= [];
+Settings.dd= [];
+Settings.dds= 0.8000;
+Settings.DLB= 1;
+Settings.TunePME= 1;
+
+Settings.Cores = 8;
+Settings.MPI_Ranks = 8;
+Settings.OMP_Threads = 1;
 
 % Settings.MP_Liquid_Test_Time = 100; % ps
 % Settings.MP_Equilibrate_Solid = Settings.Equilibrate_Solid; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
@@ -15,7 +32,7 @@
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
     Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
 Settings.scratch_dir = pwd;
-[~,Settings] = MD_Batch_Template(Settings.JobSettings);
+[~,Settings] = MD_Batch_Template(Settings);
 %[WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
 Settings.WorkDir = pwd;
 Settings.OuterDir = pwd;

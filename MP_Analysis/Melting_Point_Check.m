@@ -61,7 +61,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         CheckTime_closest_above = Settings.MaxCheckTime/2;
     end
     
-    if isempty(CheckTime_closest_below) || isempty(CheckTime_closest_above)
+    if Settings.StaticCheckTime || (isempty(CheckTime_closest_below) || isempty(CheckTime_closest_above))
         CheckTime = Settings.CheckTime; % ps
     else
         w_bel = 1 - abs(T_closest_below)/(abs(T_closest_below) + abs(T_closest_above));
@@ -291,6 +291,7 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             disp(['Usable checkpoint file found for T = ' num2str(T,'%.4f')])
             disp(['Previously, simulation stopped at ' num2str(telpse,'%.1f') ' ps'])
         end
+        
         CheckTime = max(PrevCheckTime,Settings.CheckTime);
         
         % Maximum number of time segments

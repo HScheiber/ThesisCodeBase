@@ -527,6 +527,9 @@ if Settings.CheckBadFcn
     U_peak = U.MX.Total(peaks_idx);
     U_valley = U.MX.Total(valleys_idx);
     r_peak = U.r(peaks_idx);
+    if numel(r_peak) > 1
+        r_peak = r_peak(end);
+    end
     r_valley = U.r(valleys_idx);
     U_valley(r_valley<=r_peak) = [];
     r_valley(r_valley<=r_peak) = [];

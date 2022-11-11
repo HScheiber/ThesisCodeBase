@@ -215,7 +215,7 @@ Settings.Table_StepSize = 0.0005; % nm, suitable for double precision
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,...
     Settings.BO_Models,Settings.qsub,Settings.passlog,Settings.pipe,...
     Settings.wsl,Settings.MLModelDir,Settings.scratch_dir] = find_home;
-Settings.Project_Directory_Name = 'Melting_Point_Studies'; % Name of project directory to contain job within the main project folder
+Settings.Project_Directory_Name = ''; % Name of project directory to contain job within the main project folder
 
 %% Settings for melting point calculations
 Settings.CheckTime = 25; % ps. Time between checking for melting/freezing
@@ -237,6 +237,11 @@ Settings.QECompressibility = 1e-6; % Compressibility used during the rapid-equil
 Settings.CheckAmorphousLiquid = true; % When true, this enables a check for liquid -> amorphous based on the mean-squared displacement
 Settings.CheckAmorphousHalide = false; % (specific to non-MP liquid calc) When false, only check the metal diffusion, when true: check both metal and halide diffusion
 Settings.AmorphousDiffThreshold = 1e-6; % [cm^2/s] When CheckAmorphousLiquid is true, this sets the threshold for amorphous vs liquid
+Settings.MP_Liquid_Test_Time = 100; % ps. Time used for calculation of liquid MSD in melting point calculations.
+Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MinTimeStep = 0.00025; % [ps] minimum time step
+Settings.StaticCheckTime = true; % When true, always use CheckTime. When false, expand CheckTime dynamically to reduce number of checks.
 
 % optimizer settings
 Settings.Optimizer = 'MPSearcher'; % One of fmincon, patternsearch, MPSearcher, or bayesopt
@@ -265,7 +270,6 @@ Settings.TimePerFrame = 5; % ps
 Settings.Qlm_Average = true;
 Settings.Voronoi = false;
 
-
 % Default model modification parameters
 Settings.S = Init_Scaling_Object;
 Settings.CR_Damp = Init_CRDamping_Object; % note: b = steepness of damping, r_d = position in nm.
@@ -278,9 +282,6 @@ Settings.Liquid_Equilibrate_Time = 25; % ps
 Settings.Solid_Test_Time = 30; % ps. Sets time for combination of solid equilibration + test time
 
 % MP settings
-Settings.MP_Liquid_Test_Time = 100; % ps. Time used for calculation of liquid MSD in melting point calculations.
-Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
-Settings.MinTimeStep = 0.00025; % [ps] minimum time step
+
 
 end

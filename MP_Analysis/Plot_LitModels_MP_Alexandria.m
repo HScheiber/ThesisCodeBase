@@ -5,7 +5,8 @@ fs = 32;
 mkrsz = 14;
 linestyles = {'-',':','-.','--'};
 mkrshapes = {'s' 'd' '^' 'o'};
-DataSetName = 'Alexandria_Melting_Point_Data.mat';
+%DataSetName = 'Alexandria_Melting_Point_Data.mat';
+DataSetName = 'Alexandria_Polarized_Melting_Point_Data.mat';
 Models = {'BF' 'BH' 'JC' 'Mie'};
 Legend_Labels = {'Experiment' 'WBK' 'BK' 'Lennard Jones [12-6]' 'Lennard Jones [8-6]'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
@@ -13,6 +14,11 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'KF' 'KCl' 'KBr' 'KI' ...
          'RbF' 'RbCl' 'RbBr' 'RbI' ...
          'CsF' 'CsCl' 'CsBr' 'CsI'};
+if strcmp(DataSetName,'Alexandria_Melting_Point_Data.mat')
+    titleg = 'Alexandria Models - No Polarization';
+elseif strcmp(DataSetName,'Alexandria_Polarized_Melting_Point_Data.mat')
+    titleg = 'Alexandria Models - With Polarization';
+end
 DefStructure = 'Rocksalt';
 Structures = {'Rocksalt'};
 
@@ -61,6 +67,9 @@ for idx = X
                         end
                         
                         if any(cellfun(@(x) all(strcmpi(x,{Salt Model Structure})),Exclude))
+                            continue
+                        end
+                        if Data.(Salt).(Model).(Structure).Alt_Structure
                             continue
                         end
                          
@@ -182,9 +191,10 @@ xticks(axh,X);
 xticklabels(axh,Salts);
 set(axh,'FontSize',fs,'Box','On','TickLabelInterpreter','latex')
 ylabel(axh,'T [K]','Interpreter','latex');
-legend(p,Legend_Labels,'FontSize',fs,'Box','On','Interpreter','latex','NumColumns',2)
+legend(p,Legend_Labels,'FontSize',fs,'Box','On','Interpreter','latex','NumColumns',2,'location','southeast')
 grid(axh,'on')
 
+title(axh,titleg,'FontSize',fs,'Interpreter','latex')
 
-exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
-    'ContentType','vector','BackgroundColor','none')
+% exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
+%     'ContentType','vector','BackgroundColor','none')
