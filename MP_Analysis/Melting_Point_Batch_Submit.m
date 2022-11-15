@@ -11,27 +11,28 @@ check_running = true; % Checks if a job is already running, skips running jobs
 
 % Load shared resource and mdrun settings
 Shared_Settings = Initialize_MD_Settings;
-Shared_Settings.Project_Directory_Name = 'Alexandria_Model_MPs';
+Shared_Settings.Project_Directory_Name = 'Alexandria_Polarized_Model_MPs';
 Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
-Shared_Settings.JobSettings.N_Calc = 1; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 6; % Max time for each job (hours)
-Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
-Shared_Settings.JobSettings.Nodes = 0; % Minimum number of cores to request for calculation.
-Shared_Settings.JobSettings.Cores = 12; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [2 1 5]; % Domain decomposition
+Shared_Settings.N_Calc = 4; % Number of chained calculations
+Shared_Settings.Hours = 6; % Max time for each job (hours)
+Shared_Settings.Mins = 0; % Max time for job (minutes)
+Shared_Settings.Nodes = 0; % Minimum number of cores to request for calculation.
+Shared_Settings.Cores = 32; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Shared_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+Shared_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+Shared_Settings.MPI_Ranks = 32; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Shared_Settings.MaxWarn = 2;
 Shared_Settings.SigmaEpsilon = true;
+Shared_Settings.MinMDP.Parallel_Min = false;
 
 % MP-specific calculation settings
 Shared_Settings.c_over_a = 2;
-Shared_Settings.MaxCheckTime = 5000; % ps. Max time for MP simulation points
+Shared_Settings.MaxCheckTime = 2000; % ps. Max time for MP simulation points
 Shared_Settings.BracketThreshold = 10; % [K] Sets the target bracket for the melting point
 Shared_Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearcher algorithm
 Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
@@ -59,6 +60,7 @@ Shared_Settings.Manual_Box = false; % When set to true, rather than setting the 
 Shared_Settings.MDP.RVDW_Cutoff = 1.00; % nm
 Shared_Settings.MDP.RCoulomb_Cutoff = 1.1; % nm
 Shared_Settings.MDP.RList_Cutoff = 1.1; % nm
+Shared_Settings.MDP.vdw_modifier = 'None';
 Shared_Settings.Cutoff_Buffer = 1.20;
 Shared_Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
 Shared_Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
@@ -83,7 +85,6 @@ Shared_Settings.MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of
 Shared_Settings.MDP.Fourier_Spacing = 0.12;
 Shared_Settings.MDP.VerletBT = -1;
 
-
 Exp = Load_Experimental_Data;
 
 % Initial calculation index
@@ -91,6 +92,49 @@ idx=0;
 
 switch lower(computer)
     case 'graham'
+        %% Alexandria Model (Gaussian charge + polarization)
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
+         'NaF' 'NaCl' 'NaBr' 'NaI' ...
+         'KF' 'KCl' 'KBr' 'KI' ...
+         'RbF' 'RbCl' 'RbBr' 'RbI' ...
+         'CsF' 'CsCl' 'CsBr' 'CsI'};
+        Theories = {'BF' 'BH' 'JC' 'Mie'};
+        vdW_Type = {'WBK' 'BK' 'LJ_12-6', 'LJ_8-6'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
+        for jdx = 1:length(Salts)
+            Salt = Salts{jdx};
+            for kdx = 1:length(Theories)
+                Theory = Theories{kdx};
+
+                idx = idx+1;
+                Settings_array(idx) = Shared_Settings;
+                Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
+                Settings_array(idx).JobID = [Theory '_Alexandria']; % An ID that is tacked onto the folder name of all current jobs
+                Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
+                if strcmp(Theory,'JC')
+                    pset = Initialize_MD_Settings;
+                    pset.Salt = Salt;
+                    [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(pset);
+                    Settings_array(idx).S.S.MM = Settings_array(idx).S.S.MM/JC_MM.sigma;
+                    Settings_array(idx).S.S.XX = Settings_array(idx).S.S.XX/JC_XX.sigma;
+                    Settings_array(idx).S.S.MX = Settings_array(idx).S.S.MX/JC_MX.sigma;
+                    Settings_array(idx).S.E.MM = Settings_array(idx).S.E.MM/JC_MM.epsilon;
+                    Settings_array(idx).S.E.XX = Settings_array(idx).S.E.XX/JC_XX.epsilon;
+                    Settings_array(idx).S.E.MX = Settings_array(idx).S.E.MX/JC_MX.epsilon;
+                end
+                Settings_array(idx).GaussianCharge = true;
+                Settings_array(idx).Polarization = true;
+
+                % Initial T
+                Settings_array(idx).Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                Settings_array(idx).MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                Settings_array(idx).T0 = Exp.(Salt).mp; % K, Initial temperature
+
+            end
+        end
+    otherwise
         %% Alexandria Model (Gaussian charge but no polarization)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...
@@ -133,7 +177,6 @@ switch lower(computer)
 
             end
         end
-    otherwise
 end
 
 %% Check for already running jobs
@@ -171,7 +214,7 @@ for idx = 1:length(Settings_array)
     Settings = Settings_array(idx);
     
     % Load the batch script template and remove unnecessary fields
-    Batch_Template = MD_Batch_Template(Settings.JobSettings);
+    Batch_Template = MD_Batch_Template(Settings);
     Batch_Template = strrep(Batch_Template,['##PREMIN##' newline],'');
     Batch_Template = strrep(Batch_Template,['##CLEANUP##' newline],'');
     Batch_Template = strrep(Batch_Template,['##EXT1##' newline],'');
@@ -214,12 +257,12 @@ for idx = 1:length(Settings_array)
     calc_cmd_idx = strrep(calc_cmd_idx,'##LOGFILE##',[Settings.JobName '.MPlog']);
     
     % Set up job links
-    for jdx = 1:Settings.JobSettings.N_Calc
+    for jdx = 1:Settings.N_Calc
         
         if jdx == 1
             calc_cmd_idx_jdx = calc_cmd_idx;
         else
-            EXT1 = ['if [[ ! -f "' FlagCompleteFile '" ]]; then'];
+            EXT1 = ['if [[ ! -f "' ResultsFile '" ]]; then'];
             EXT2 = 'fi';
             calc_cmd_idx_jdx = [EXT1 newline calc_cmd_idx newline EXT2];
         end

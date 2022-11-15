@@ -100,7 +100,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         end
         
         Settings.SuperCellFile = fullfile(Settings.WorkDir,['Equil_Sol.' Settings.CoordType]);
-        Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
+        Supercell_command = [Settings.gmx_loc Settings.genconf ' -f ' windows2unix(Settings.UnitCellFile) ...
              ' -o ' windows2unix(Settings.SuperCellFile) ' -nbox ' num2str(Na) ' ' num2str(Nb) ' ' num2str(Nc)];
         [errcode,output] = system(Supercell_command);
         
@@ -286,7 +286,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     MDP_Template = strrep(MDP_Template,'##EWALDTOL##',pad(num2str(Settings.MDP.Ewald_rtol),18));
     MDP_Template = strrep(MDP_Template,'##LISTUPDATE##',pad(num2str(Settings.Update_NeighbourList),18));
     MDP_Template = strrep(MDP_Template,'##POSOUT##',pad(num2str(Settings.Output_Coords),18));
-    MDP_Template = strrep(MDP_Template,'##POSOUTCOMP##',pad(num2str(Settings.Output_Coords_Compressed),18));
     MDP_Template = strrep(MDP_Template,'##VELOUT##',pad(num2str(Settings.Output_Velocity),18));
     MDP_Template = strrep(MDP_Template,'##FORCEOUT##',pad(num2str(Settings.Output_Forces),18));
     MDP_Template = strrep(MDP_Template,'##ENOUT##',pad(num2str(Settings.Output_Energies),18));
@@ -351,7 +350,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
             % Check integrity of minimized geom file
             Data = load_gro_file(Final_Geom_File);
             if Data.N_atoms >= Settings.N_atoms
-                gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Equilibrate_TRR_File)];
+                gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Equilibrate_TRR_File)];
                 [state,outp] = system(gmx_check);
                 lf = regexp(outp,'Step *([0-9]|\.)+ *([0-9]|\.)+\nTime','tokens','once');
                 if state == 0 || ~isempty(lf)
@@ -375,12 +374,12 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         
         add_cpt = '';
         if isfile(cpt_file) || isfile(prev_cpt_file)
-            gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(cpt_file)];
+            gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(cpt_file)];
             [state,~] = system(gmx_check);
             if state == 0
                 add_cpt = [' -cpi ' windows2unix(cpt_file)];
             elseif isfile(prev_cpt_file)
-                gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(prev_cpt_file)];
+                gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(prev_cpt_file)];
                 [state,~] = system(gmx_check);
                 if state == 0
                     add_cpt = [' -cpi ' windows2unix(prev_cpt_file)];
@@ -393,7 +392,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         GrompLog_File = fullfile(Settings.WorkDir,'Equil_Sol_Grompplog.log');
         
         if ~isfile(TPR_File) || isempty(add_cpt)
-            FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
+            FEquil_Grompp = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
                 ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
                 ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
                 ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
@@ -411,7 +410,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         Log_File = fullfile(Settings.WorkDir,'Equil_Sol.log');
         Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
 
-        mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
+        mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(TPR_File) ...
             ' -o ' windows2unix(Equilibrate_TRR_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Final_Geom_File) add_cpt ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Sol')) ...
@@ -518,12 +517,13 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     En_xvg_file = fullfile(Settings.WorkDir,'Equil_Sol_Energy.xvg');
     
     % Check energy options
-    gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo 0 ' Settings.pipe ' gmx']) ...
-        ' energy -f ' windows2unix(Energy_file) ...
-        ' -s ' windows2unix(TPR_File)];
+    gmx_command = [Settings.wsl 'echo "0" ' Settings.pipe ...
+        ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+        ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
     
-    en_opts = regexp(outpt,'-+\n.+','match','once');
+    en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+    en_opts = en_opts{1};
     En_set = '';
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Enthalpy','tokens','once'))];
@@ -532,11 +532,11 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     
     % Grab second half of data from results
     startpoint = Settings.Solid_Test_Time*0.5; % ps
-    gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
-    ' energy -f ' windows2unix(Energy_file)...
-    ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
-    ' -b ' num2str(startpoint) ' -e ' num2str(Settings.Solid_Test_Time)];
-    
+    gmx_command = [Settings.wsl 'echo ' En_set ' ' Settings.pipe ...
+        ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+        ' -f ' windows2unix(Energy_file) ' -o ' windows2unix(En_xvg_file) ...
+        ' -s ' windows2unix(TPR_File) ' -b ' num2str(startpoint) ...
+        ' -e ' num2str(Settings.Solid_Test_Time)];
     [err,~] = system(gmx_command);
     if err ~= 0
         error('Failed to collect energy data.')

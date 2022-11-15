@@ -89,6 +89,7 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
     import warnings
     import logging
     import collections
+    import pickle
     from itertools import groupby
     
     if SavePredictionsImage:
@@ -96,8 +97,6 @@ def Check_Structures(WorkDir, Salt, SystemName=None,
         import seaborn as sns
         import matplotlib.pyplot as plt
     
-    if SaveFeatures or SavePredictions:
-        import pickle
     
     physical_devices = tf.config.list_physical_devices('GPU')
     if len(physical_devices) > 0:

@@ -4,16 +4,16 @@ Settings = load('Calc_Settings.mat').Settings;
 
 N_Reps = 1000;
 Settings.Verbose = true;
-Settings.JobSettings.Cores = 8;
-Settings.JobSettings.MPI_Ranks = 8;
-Settings.JobSettings.OMP_Threads = 1;
-Settings.JobSettings.dd  = [];
-Settings.JobSettings.npme = [];
+Settings.Cores = 8;
+Settings.MPI_Ranks = 8;
+Settings.OMP_Threads = 1;
+Settings.dd  = [];
+Settings.npme = [];
 Settings.Diary_Loc='';
 
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,Settings.BO_Models,...
     Settings.qsub,Settings.passlog,Settings.pipe,Settings.wsl,~] = find_home;
-[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,Settings.MLModelDir] = MD_Batch_Template(Settings.JobSettings);
+[~,Settings] = MD_Batch_Template(Settings);
 
 workdir = pwd;
 load(fullfile(workdir,'Reproducibility.mat'),'Output_Sol','Output_Liq');

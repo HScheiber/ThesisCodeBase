@@ -10,9 +10,9 @@ skip_calculations = [];
 Shared_Settings = Initialize_MD_Settings;
 Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
-Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 4; % Set the number of OMP threads per MPI rank
+Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+Shared_Settings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 4; % Set the number of OMP threads per MPI rank
 
 % Shared calculation parameters
 Shared_Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
@@ -58,16 +58,16 @@ for jdx = 1:length(JobStuff)
     Theory_Settings = Shared_Settings;
     switch Theory
         case 'TF'
-            Theory_Settings.JobSettings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-            Theory_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+            Theory_Settings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+            Theory_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
             Theory_Settings.MDP.RVDW_Cutoff = 1.9; % nm
             Theory_Settings.MDP.RCoulomb_Cutoff = 1.9; % nm
             Theory_Settings.MDP.RList_Cutoff = 1.9; % nm
             Theory_Settings.Cutoff_Buffer = 1.05; % Not using verlet-buffer-tolerance
 
         otherwise
-            Theory_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-            Theory_Settings.JobSettings.OMP_Threads = 4; % Set the number of OMP threads per MPI rank
+            Theory_Settings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+            Theory_Settings.OMP_Threads = 4; % Set the number of OMP threads per MPI rank
             Theory_Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
             Theory_Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
             Theory_Settings.MDP.RVDW_Cutoff = 1.4; % nm
@@ -129,7 +129,7 @@ for idx = 1:length(Settings_array)
         continue
     end
     Settings = Settings_array(idx);
-    setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
+    setenv('OMP_NUM_THREADS',num2str(Settings.OMP_Threads))
     Find_Melting_Point(Settings);
     %save('Prod2_R_TF_NPT.inp','Settings','-mat')
 end

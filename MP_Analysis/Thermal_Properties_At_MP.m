@@ -9,7 +9,7 @@ end
 % Initialize some global settings for later
 [Settings.Metal,Settings.Halide] = Separate_Metal_Halide(Settings.Salt);
 Settings.Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]);
-[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+[~,Settings] = MD_Batch_Template(Settings);
 Settings.Finite_T_Data = Initialize_Finite_T_Data(Settings);
 Settings.RefStructure = Settings.Finite_T_Data.Structure;
 Settings.Structure = Settings.Finite_T_Data.Structure;
@@ -47,7 +47,7 @@ Settings.GAdjust_MM = BO_Settings.GAdjust_MM;
 Settings.GAdjust_XX = BO_Settings.GAdjust_XX;
 
 % Melting point
-[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+[~,Settings] = MD_Batch_Template(Settings);
 Settings.WorkDir = fullfile(WorkDir,'Melting_Point');
 Settings.BatchMode = false;
 Settings.Submit_Jobs = false;
@@ -62,9 +62,9 @@ else
 end
 
 % Liquid properties
-Settings.JobSettings.dd = [];
-Settings.JobSettings.npme = [];
-[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+Settings.dd = [];
+Settings.npme = [];
+[~,Settings] = MD_Batch_Template(Settings);
 Settings.WorkDir = fullfile(WorkDir,'Liq_Properties_at_MP');
 Liq_Output = Calc_Liquid_Properties_at_MP(Settings);
 Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;

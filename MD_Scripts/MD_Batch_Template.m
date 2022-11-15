@@ -1,116 +1,28 @@
-function [TemplateText,gmx,gmx_loc,mdrun_opts,postprocess] = MD_Batch_Template(Settings,varargin)
+function [TemplateText,Settings] = MD_Batch_Template(Settings,varargin)
 
 if nargin > 1
     Server = varargin{1};
 else
-    if ispc
-        Server = getenv('COMPUTERNAME');
-    else
-        [~,Servertxt] = system('hostname -s | cut -c 1-3');
-        Server = strtrim(Servertxt);
-    end
+    [~,~,Server] = find_home;
 end
+Settings.postprocess = '';
 
-if strcmpi(Server,'ced') || strcmpi(Server,'cdr') % cedar
-    Account = 'rrg-patey-ad';
-elseif ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') % sockeye
+switch Server
+case 'sockeye' 
     Account = 'st-gpatey-1';
-else
-    Account = 'def-patey';
-end
-
-postprocess = '';
-
-% if strcmpi(Server,'sea') || strcmpi(Server,'pod') % Orcinus
-%     if Settings.Cores < 0
-%         Cores_per_node = 12;
-%     else
-%         Cores_per_node = Settings.Cores;
-%     end
-%     
-%     if strcmp(Settings.Mempernode,'-1')
-%         memline = '';
-%     elseif strcmp(Settings.Mempernode,'0')
-%         memline = '';
-%     else
-%         memline = ['#PBS -l pmem=' Settings.Mempernode newline];
-%     end
-%     
-%     if Settings.Nodes > 1 && Settings.openMP
-%         mdrun_opts = ['mpiexec -np ' num2str(Settings.Nodes*2) ...
-%             ' --npernode $MPI_PPN --mca mpi_paffinity_alone 0 ##MDRUN## -v -notunepme -ntomp $OMP_NUM_THREADS -maxh ' ...
-%             num2str(Settings.Hours)];
-%         if Settings.SinglePrecision
-%             gmx = 'gmx_mpi';
-%             gmx_loc = 'gmx';
-%         else
-%             gmx = 'gmx_mpi_d';
-%             gmx_loc = 'gmx_d';
-%         end
-%         MPI_PPN = 2;
-%         OMP_NUM_THREADS = 6;
-%     elseif Settings.Nodes > 1 && ~Settings.openMP
-%         mdrun_opts = ['mpiexec -machinefile $PBS_NODEFILE -np ' num2str(Settings.Nodes*Cores_per_node) ...
-%             ' --npernode $MPI_PPN --mca mpi_paffinity_alone 0 ##MDRUN## -v -notunepme -ntomp $OMP_NUM_THREADS -maxh ' ...
-%             num2str(Settings.Hours)];
-%         if Settings.SinglePrecision
-%             gmx = 'gmx_mpi';
-%             gmx_loc = 'gmx';
-%         else
-%             gmx = 'gmx_mpi_d';
-%             gmx_loc = 'gmx_d';
-%         end
-%         MPI_PPN = Cores_per_node;
-%         OMP_NUM_THREADS = 1;
-%     else
-%         mdrun_opts = ['mpiexec -machinefile $PBS_NODEFILE -np ' num2str(Cores_per_node) ...
-%             ' --mca mpi_paffinity_alone 0 ##MDRUN## -v -notunepme -ntomp $OMP_NUM_THREADS -maxh ' ...
-%             num2str(Settings.Hours)];
-%         if Settings.SinglePrecision
-%             gmx = 'gmx_mpi';
-%             gmx_loc = 'gmx';
-%         else
-%             gmx = 'gmx_mpi_d';
-%             gmx_loc = 'gmx_d';
-%         end
-%         MPI_PPN = Cores_per_node;
-%         OMP_NUM_THREADS = 1;
-%     end
-%     
-%     TemplateText = ['#!/bin/bash' newline ...
-%         '#PBS -S /bin/bash' newline ...
-%         '#PBS -l walltime=' num2str(Settings.Hours) ':' num2str(Settings.Mins) ':00' newline ...
-%         '#PBS -l nodes=' num2str(Settings.Nodes) ':ppn=' num2str(Cores_per_node) newline ...
-%         memline ...
-%         '#PBS -V' newline ...
-%         '#PBS -N ##TASKNAME##' newline ...
-%         '#PBS -e ##ERROR##.stde' newline ...
-%         '#PBS -o ##ERROR##.stdo' newline ...
-%         '#PBS -l partition=QDR' newline ...
-%         newline newline ...
-%         '# Check on some basics:' newline ...
-%         'echo "Running on host: " `hostname`' newline ...
-%         'echo "Changing to directory from which PBS script was submitted."' newline ...
-%         'cd ##DIRECTORY##' newline ...
-%         'echo "Current working directory is now: " `pwd`' newline ...
-%         newline newline ...
-%         '# set EXE environment' newline ...
-%         'module load gromacs/5.1.4' newline ...
-%         'module load matlab/matlab_2015b' newline ...
-%         'export MPI_PPN=' num2str(MPI_PPN) newline ...
-%         'export OMP_NUM_THREADS=' num2str(OMP_NUM_THREADS) newline ...
-%         newline newline ...
-%         '# Run Job' newline ...
-%         '##PREMIN##' newline ...
-%         '##EXT1##' newline ...
-%         mdrun_opts newline ...
-%         '##EXT2##' newline ...
-%         '##CLEANUP##' newline ...
-%         'echo "Job completed at `date`"' newline ... 
-%         'exit 0'];
-if ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') % sockeye
-    
     new_modules = true; % Set this back to true if the bugs in the new modules get fixed
+    Settings.grompp = 'grompp';
+    Settings.mdrun = 'mdrun';
+    Settings.g_energy = 'energy';
+    Settings.g_msd = 'msd';
+    Settings.trjconv = 'trjconv';
+    Settings.g_check = 'check';
+    Settings.genconf = 'genconf';
+    Settings.g_density = 'density';
+    Settings.editconf = 'editconf';
+    Settings.insert_molecules = 'insert-molecules';
+    Settings.convert_tpr = 'convert-tpr';
+    Settings.g_traj = 'traj';
     
     if Settings.Cores < 1
         if Settings.BigNode
@@ -142,44 +54,44 @@ if ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') % sockeye
     % Deal with the executable to call
     if Settings.MPI_Ranks == 1
         if Settings.SinglePrecision
-            gmx = 'gmx_mpi';
-            gmx_loc = 'gmx_mpi';
+            Settings.gmx = 'gmx_mpi ';
+            Settings.gmx_loc = 'gmx_mpi ';
         else
-            gmx = 'gmx_mpi_d';
-            gmx_loc = 'gmx_mpi_d';
+            Settings.gmx = 'gmx_mpi_d ';
+            Settings.gmx_loc = 'gmx_mpi_d ';
         end
     else
         if Settings.SinglePrecision
-            gmx = ['mpiexec -machinefile $PBS_NODEFILE -np ' num2str(MPI_Ranks_Per_Node*max(Settings.Nodes,1)) ...
-            ' --map-by ppr:' num2str(MPI_Ranks_Per_Node) ':node gmx_mpi'];
-            gmx_loc = 'gmx_mpi';
+            Settings.gmx = ['mpiexec -machinefile $PBS_NODEFILE -np ' num2str(MPI_Ranks_Per_Node*max(Settings.Nodes,1)) ...
+            ' --map-by ppr:' num2str(MPI_Ranks_Per_Node) ':node gmx_mpi '];
+            Settings.gmx_loc = 'gmx_mpi ';
         else
-            gmx = ['mpiexec -machinefile $PBS_NODEFILE -np ' num2str(MPI_Ranks_Per_Node*max(Settings.Nodes,1)) ...
-            ' --map-by ppr:' num2str(MPI_Ranks_Per_Node) ':node gmx_mpi_d'];
-            gmx_loc = 'gmx_mpi_d';
+            Settings.gmx = ['mpiexec -machinefile $PBS_NODEFILE -np ' num2str(MPI_Ranks_Per_Node*max(Settings.Nodes,1)) ...
+            ' --map-by ppr:' num2str(MPI_Ranks_Per_Node) ':node gmx_mpi_d '];
+            Settings.gmx_loc = 'gmx_mpi_d ';
         end
     end
 
-    mdrun_opts = '';
+    Settings.mdrun_opts = '';
     if Settings.OMP_Threads > 1
-        mdrun_opts = [mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
     end
     if ~Settings.DLB
-        mdrun_opts = [mdrun_opts ' -dlb no'];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dlb no'];
     end
     if ~Settings.TunePME
-        mdrun_opts = [mdrun_opts ' -notunepme'];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -notunepme'];
     end
     if length(Settings.dd) == 3
-        mdrun_opts = [mdrun_opts ' -dd ' regexprep(num2str(Settings.dd),' +',' ')];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dd ' regexprep(num2str(Settings.dd),' +',' ')];
     end
     if ~isempty(Settings.npme)
-        mdrun_opts = [mdrun_opts ' -npme ' num2str(Settings.npme)];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -npme ' num2str(Settings.npme)];
     end
     if abs(Settings.dds - 0.8) > sqrt(eps)
-        mdrun_opts = [mdrun_opts ' -dds ' num2str(Settings.dds)];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dds ' num2str(Settings.dds)];
     end
-    mdrun_opts = [mdrun_opts ' -maxh ' num2str(Settings.Hours)];
+    Settings.mdrun_opts = [Settings.mdrun_opts ' -maxh ' num2str(Settings.Hours)];
     
     if Settings.SinglePrecision
         if new_modules
@@ -191,7 +103,7 @@ if ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') % sockeye
             gmx_module = 'gromacs/2019.2';
             matlab_module = 'matlab/R2021a';
         else
-            postprocess =  ['    module load Software_Collection/2021' newline ...
+            Settings.postprocess =  ['    module load Software_Collection/2021' newline ...
                             '    module load gcc/9.4.0' newline ...
                             '    module load python/3.8.10' newline ...
                             '    module load matlab/R2021a' newline];
@@ -213,7 +125,7 @@ if ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') % sockeye
             gmx_module = 'gromacs/2019.6-double';
             matlab_module = 'matlab/R2021a';
         else
-            postprocess =  ['    module purge all' newline ...
+            Settings.postprocess =  ['    module purge all' newline ...
                             '    module load Software_Collection/2021' newline ...
                             '    module load gcc/9.4.0' newline ...
                             '    module load python/3.8.10' newline ...
@@ -258,11 +170,13 @@ if ~isempty(regexp(Server,'se[0-9]','ONCE')) || strcmpi(Server,'log') % sockeye
         '##CLEANUP##' newline ...
         'echo "Job completed at `date`"' newline ... 
         'exit 0'];
-elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') ...
-        || strcmpi(Server,'nar') || ~isempty(regexp(Server,'nc[0-9]','ONCE'))% Cedar, graham, and narval
+
+case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
     
     % Number of cores per node
-    if strcmpi(Server,'ced') || strcmpi(Server,'cdr') % Cedar
+    switch Server
+    case 'cedar'
+        Account = 'rrg-patey-ad';
         if Settings.Cores < 1
             if Settings.BigNode
                 Cores_per_node = 48;
@@ -272,15 +186,17 @@ elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') .
         else
             Cores_per_node = Settings.Cores/max(Settings.Nodes,1);
         end
-    elseif strcmpi(Server,'nar') || ~isempty(regexp(Server,'nc[0-9]','ONCE'))
+    case 'graham'
+        Account = 'def-patey';
         if Settings.Cores < 1
-            Cores_per_node = 64; % Narval
+            Cores_per_node = 32; % Graham
         else
             Cores_per_node = Settings.Cores/max(Settings.Nodes,1);
         end
-    else
+    case 'narval'
+        Account = 'def-patey';
         if Settings.Cores < 1
-            Cores_per_node = 32; % Graham
+            Cores_per_node = 64; % Narval
         else
             Cores_per_node = Settings.Cores/max(Settings.Nodes,1);
         end
@@ -300,21 +216,24 @@ elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') .
                      '#SBATCH --cpus-per-task=' num2str(Settings.OMP_Threads) newline];
         
         % Deal with the executable to call
-        if Settings.MPI_Ranks == 1
+        if Settings.Polarization % Use version 4.6.7
+            Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes)];
+            Settings.gmx_loc = '';
+        elseif Settings.MPI_Ranks == 1
             if Settings.SinglePrecision
-                gmx = 'gmx';
-                gmx_loc = 'gmx';
+                Settings.gmx = 'gmx ';
+                Settings.gmx_loc = 'gmx ';
             else
-                gmx = 'gmx_d';
-                gmx_loc = 'gmx_d';
+                Settings.gmx = 'gmx_d ';
+                Settings.gmx_loc = 'gmx_d ';
             end
         else
             if Settings.SinglePrecision
-                gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes) ' gmx_mpi'];
-                gmx_loc = 'gmx';
+                Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes) ' gmx_mpi '];
+                Settings.gmx_loc = 'gmx ';
             else
-                gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes) ' gmx_mpi_d'];
-                gmx_loc = 'gmx_d';
+                Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes) ' gmx_mpi_d '];
+                Settings.gmx_loc = 'gmx_d ';
             end
         end
         
@@ -324,45 +243,81 @@ elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') .
                      '#SBATCH --cpus-per-task=' num2str(Settings.OMP_Threads) newline];
         
         % Deal with the executable to call
-        if Settings.MPI_Ranks == 1
+        if Settings.Polarization % Use version 4.6.7
+            Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node) ' '];
+            Settings.gmx_loc = '';
+        elseif Settings.MPI_Ranks == 1
             if Settings.SinglePrecision
-                gmx = 'gmx';
-                gmx_loc = 'gmx';
+                Settings.gmx = 'gmx ';
+                Settings.gmx_loc = 'gmx ';
             else
-                gmx = 'gmx_d';
-                gmx_loc = 'gmx_d';
+                Settings.gmx = 'gmx_d ';
+                Settings.gmx_loc = 'gmx_d ';
             end
         else
             if Settings.SinglePrecision
-                gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node) ' gmx_mpi'];
-                gmx_loc = 'gmx';
+                Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node) ' gmx_mpi '];
+                Settings.gmx_loc = 'gmx ';
             else
-                gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node) ' gmx_mpi_d'];
-                gmx_loc = 'gmx_d';
+                Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node) ' gmx_mpi_d '];
+                Settings.gmx_loc = 'gmx_d ';
             end
         end
     end
     
-    mdrun_opts = '';
+    Settings.mdrun_opts = '';
+    if Settings.Polarization
+        Settings.grompp = 'grompp_mpi_d';
+        Settings.mdrun = 'mdrun_mpi_d';
+        Settings.g_energy = 'g_energy_mpi_d';
+        Settings.g_msd = 'g_msd_mpi_d';
+        Settings.trjconv = 'trjconv_mpi_d';
+        Settings.g_check = 'gmxcheck_mpi_d';
+        Settings.genconf = 'genconf_mpi_d';
+        Settings.g_density = 'g_density_mpi_d';
+        Settings.editconf = 'editconf_mpi_d';
+        Settings.g_traj = 'g_traj_mpi_d';
+        Settings.convert_tpr = 'tpbconv_mpi_d';
+        if Settings.SinglePrecision
+            Settings.insert_molecules = 'gmx_d insert-molecules';
+        else
+            Settings.insert_molecules = 'gmx insert-molecules';
+        end
+        
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -pd'];
+    else
+        Settings.grompp = 'grompp';
+        Settings.mdrun = 'mdrun';
+        Settings.g_energy = 'energy';
+        Settings.g_msd = 'msd';
+        Settings.trjconv = 'trjconv';
+        Settings.g_check = 'check';
+        Settings.genconf = 'genconf';
+        Settings.g_density = 'density';
+        Settings.editconf = 'editconf';
+        Settings.insert_molecules = 'insert-molecules';
+        Settings.convert_tpr = 'convert-tpr';
+        Settings.g_traj = 'traj';
+    end
     if Settings.OMP_Threads > 1
-        mdrun_opts = [mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
     end
     if ~Settings.DLB
-        mdrun_opts = [mdrun_opts ' -dlb no'];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dlb no'];
     end
     if ~Settings.TunePME
-        mdrun_opts = [mdrun_opts ' -notunepme'];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -notunepme'];
     end
     if length(Settings.dd) == 3
-        mdrun_opts = [mdrun_opts ' -dd ' regexprep(num2str(Settings.dd),' +',' ')];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dd ' regexprep(num2str(Settings.dd),' +',' ')];
     end
     if ~isempty(Settings.npme)
-        mdrun_opts = [mdrun_opts ' -npme ' num2str(Settings.npme)];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -npme ' num2str(Settings.npme)];
     end
     if abs(Settings.dds - 0.8) > sqrt(eps)
-        mdrun_opts = [mdrun_opts ' -dds ' num2str(Settings.dds)];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dds ' num2str(Settings.dds)];
     end
-    mdrun_opts = [mdrun_opts ' -maxh ' num2str(Settings.Hours)];
+    Settings.mdrun_opts = [Settings.mdrun_opts ' -maxh ' num2str(Settings.Hours)];
     
     % Deal with memory allocation
     if strcmp(Settings.Mempernode,'-1') % Default
@@ -371,6 +326,14 @@ elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') .
         memline = ['#SBATCH --mem-per-cpu=3800M' newline];
     else % Custom memory per node
         memline = ['#SBATCH --mem=' Settings.Mempernode newline];
+    end
+    
+    if Settings.Polarization
+        Gromacs_Module = ['module load gromacs-plumed/2019.6' newline ...
+                          'module load fftw/3.3.8' newline ...
+                          'source /home/scheiber/.local/bin/GMXRC' newline];
+    else
+        Gromacs_Module = ['module load gromacs-plumed/2019.6' newline];
     end
     
     TemplateText = ['#!/bin/bash' newline ... 
@@ -394,7 +357,7 @@ elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') .
         'module purge --all' newline ...
         'source $HOME/ml/bin/activate' newline ...
         'module load StdEnv/2020 gcc/9.3.0 openmpi/4.0.3' newline ...
-        'module load gromacs-plumed/2019.6' newline ...
+        Gromacs_Module ...
         'module load tbb/2020.2 python/3.8' newline ...
         'module load matlab/2022a' newline ...
         newline newline...
@@ -411,17 +374,29 @@ elseif strcmpi(Server,'ced') || strcmpi(Server,'cdr') || strcmpi(Server,'gra') .
         '##CLEANUP##' newline ...
         'echo "Job completed at `date`"' newline ... 
         'exit 0'];
-else
+otherwise
     if ispc
-        gmx = 'wsl source ~/.bashrc; gmx_d';
+        Settings.gmx = 'wsl source ~/.bashrc; gmx_d ';
     else
         if Settings.SinglePrecision
-            gmx = 'gmx';
+            Settings.gmx = 'gmx ';
         else
-            gmx = 'gmx_d';
+            Settings.gmx = 'gmx_d ';
         end
     end
-    gmx_loc = gmx;
+    Settings.gmx_loc = Settings.gmx;
+    Settings.grompp = 'grompp';
+    Settings.mdrun = 'mdrun';
+    Settings.g_energy = 'energy';
+    Settings.g_msd = 'msd';
+    Settings.trjconv = 'trjconv';
+    Settings.g_check = 'check';
+    Settings.genconf = 'genconf';
+    Settings.g_density = 'density';
+    Settings.editconf = 'editconf';
+    Settings.insert_molecules = 'insert-molecules';
+    Settings.convert_tpr = 'convert-tpr';
+    Settings.g_traj = 'traj';
     
     if Settings.Cores < 1
         Cores_per_node = feature('numcores');
@@ -436,30 +411,30 @@ else
         MPI_Ranks_Per_Node = Settings.MPI_Ranks;
     end
     
-    mdrun_opts = ' -v';
-    mdrun_opts = [mdrun_opts ' -ntmpi ' num2str(MPI_Ranks_Per_Node)];
-    mdrun_opts = [mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
+    Settings.mdrun_opts = ' -v';
+    Settings.mdrun_opts = [Settings.mdrun_opts ' -ntmpi ' num2str(MPI_Ranks_Per_Node)];
+    Settings.mdrun_opts = [Settings.mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
     if MPI_Ranks_Per_Node == 1 && Settings.OMP_Threads == 1
-        mdrun_opts = [mdrun_opts ' -pin on'];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -pin on'];
     end
     
     if ~Settings.DLB
-        mdrun_opts = [mdrun_opts ' -dlb no'];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dlb no'];
     end
     if ~Settings.TunePME
-        mdrun_opts = [mdrun_opts ' -notunepme'];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -notunepme'];
     end
     if length(Settings.dd) == 3
-        mdrun_opts = [mdrun_opts ' -dd ' regexprep(num2str(Settings.dd),' +',' ')];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dd ' regexprep(num2str(Settings.dd),' +',' ')];
     end
     if ~isempty(Settings.npme)
-        mdrun_opts = [mdrun_opts ' -npme ' num2str(Settings.npme)];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -npme ' num2str(Settings.npme)];
     end
     if abs(Settings.dds - 0.8) > sqrt(eps)
-        mdrun_opts = [mdrun_opts ' -dds ' num2str(Settings.dds)];
+        Settings.mdrun_opts = [Settings.mdrun_opts ' -dds ' num2str(Settings.dds)];
     end
     
-    [TemplateText,~,~] = MD_Batch_Template(Settings,'ced');
+    [TemplateText,~] = MD_Batch_Template(Settings,'cedar');
 end
 
 end

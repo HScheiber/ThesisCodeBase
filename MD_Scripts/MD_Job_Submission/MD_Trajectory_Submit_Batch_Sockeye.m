@@ -6,16 +6,16 @@ clear;
 Shared_Settings = Initialize_MD_Settings;
 Shared_Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Shared_Settings.BatchMode = true; % Sets up batch job when true, or runs immediately when false
-Shared_Settings.JobSettings.N_Calc = 1; % Number of jobs to link together.
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.Mins = 0; % Max time for job (minutes)
-Shared_Settings.JobSettings.Nodes = 1; % Minimum number of cores to request for calculation.
-Shared_Settings.JobSettings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Shared_Settings.JobSettings.MPI_Ranks = 32; % MPI ranks PER NODE!!!
-Shared_Settings.JobSettings.OMP_Threads = 1; % OMP threads per MPI rank
-Shared_Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-Shared_Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-Shared_Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+Shared_Settings.N_Calc = 1; % Number of jobs to link together.
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.Mins = 0; % Max time for job (minutes)
+Shared_Settings.Nodes = 1; % Minimum number of cores to request for calculation.
+Shared_Settings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Shared_Settings.MPI_Ranks = 32; % MPI ranks PER NODE!!!
+Shared_Settings.OMP_Threads = 1; % OMP threads per MPI rank
+Shared_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+Shared_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
 Shared_Settings.npme = []; % Number of rank assigned to PME
 Shared_Settings.dd = []; % Domain decomposition
 Shared_Settings.Project_Directory_Name = 'Molten_Salts_MD'; % Name of project directory to contain job within the main project folder
@@ -145,7 +145,7 @@ for idx = 1:length(Settings_array)
     PostProcessFlagFile = fullfile(WorkDir,'POSTPROCESS_COMPLETE');
     PostProcessFlagFile2 = strrep(PostProcessFlagFile,'scratch','project');
     if check_complete && ( isfile(OutConfFile) || isfile(OutConfFile2) )
-        Settings.JobSettings.N_Calc = 1;
+        Settings.N_Calc = 1;
         if (Settings.RunPostProcessor && (isfile(PostProcessFlagFile) || isfile(PostProcessFlagFile2)) ) || ~Settings.RunPostProcessor
             disp([TaskName ': Job already completed. Skipping Job Submission.'])
             continue

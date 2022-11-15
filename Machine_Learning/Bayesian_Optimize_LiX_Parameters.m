@@ -29,7 +29,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     % Initialize some global settings for later
     [Settings.Metal,Settings.Halide] = Separate_Metal_Halide(Settings.Salt);
     Settings.Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]);
-    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+    [~,Settings] = MD_Batch_Template(Settings);
     
     Deterministic = ~any([Settings.Loss_Options.Fusion_Enthalpy Settings.Loss_Options.MP_Volume_Change Settings.Loss_Options.Liquid_MP_Volume ...
         Settings.Loss_Options.Solid_MP_Volume Settings.Loss_Options.Liquid_DM_MP Settings.Loss_Options.MP ] > sqrt(eps));

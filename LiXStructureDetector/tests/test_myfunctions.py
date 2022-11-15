@@ -189,21 +189,21 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\e69d32bd6271d83f7192af1681c82d91\Minimization\Equil_Sol'
+WorkDir = r'D:\Example_Nucleations\NaCl\Interface_at_MP'
 Salt = 'NaCl'
-SystemName = 'Equil_Sol'
+SystemName = 'Interface_at_MP'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
 SavePredictions=False 
 SavePredictionsImage=True
-ML_TimeLength=0
-ML_TimeStep=0
-TimePerFrame=1
+ML_TimeLength=50
+ML_TimeStep=5
+TimePerFrame=5
 FileType='gro'
 Verbose=True
-StartPoint = None
-EndPoint = None
+StartPoint = 1000
+EndPoint = 1100
 Version = 2
 SaveDir = None
 InMemory = False
@@ -222,29 +222,29 @@ CheckFullTrajectory = True
 
 
 
-[system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt] = LiXStructureDetector.Calculate_Liquid_Fraction(
-                              WorkDir, Salt, SystemName=SystemName, T=T,
-                              T_Ref=T_Ref, RefStructure=RefStructure, CheckFullTrajectory=CheckFullTrajectory, 
-                              SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
-                              SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage,
-                              InitialRefFrac=None, RefChangeThreshold=RefChangeThreshold, 
-                              SlopeThreshold=1e10, SlopeCheckBegin=0.1,
-                              ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
-                              FileType=FileType, Verbose=Verbose, Version=Version,
-                              Temporal_Cutoff=Temporal_Cutoff, Voronoi=Voronoi, Qlm_Average=Qlm_Average,
-                              Prob_Interfacial=Prob_Interfacial, Spatial_Reassignment=Spatial_Reassignment,
-                              Spatial_Interfacial=Spatial_Interfacial,SaveTrajectoryAux=SaveTrajectoryAux)
+# [system_froze,system_melted,time_to_phase_change,final_ref_frac,final_liq_frac,system_frz_alt] = LiXStructureDetector.Calculate_Liquid_Fraction(
+#                               WorkDir, Salt, SystemName=SystemName, T=T,
+#                               T_Ref=T_Ref, RefStructure=RefStructure, CheckFullTrajectory=CheckFullTrajectory, 
+#                               SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
+#                               SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage,
+#                               InitialRefFrac=None, RefChangeThreshold=RefChangeThreshold, 
+#                               SlopeThreshold=1e10, SlopeCheckBegin=0.1,
+#                               ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
+#                               FileType=FileType, Verbose=Verbose, Version=Version,
+#                               Temporal_Cutoff=Temporal_Cutoff, Voronoi=Voronoi, Qlm_Average=Qlm_Average,
+#                               Prob_Interfacial=Prob_Interfacial, Spatial_Reassignment=Spatial_Reassignment,
+#                               Spatial_Interfacial=Spatial_Interfacial,SaveTrajectoryAux=SaveTrajectoryAux)
 
-# LiXStructureDetector.Check_Structures(WorkDir, Salt, SystemName=SystemName,
-#                         SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
-#                         SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage, 
-#                         ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
-#                         FileType=FileType, Verbose=Verbose, StartPoint = StartPoint,
-#                         EndPoint=EndPoint, Version=Version, SaveDir=SaveDir,
-#                         InMemory=InMemory, Temporal_Cutoff=Temporal_Cutoff,
-#                         Voronoi=Voronoi, Qlm_Average=Qlm_Average,
-#                         Prob_Interfacial=Prob_Interfacial,
-#                         Spatial_Reassignment=Spatial_Reassignment,
-#                         Spatial_Interfacial=Spatial_Interfacial,
-#                         SaveTrajectoryAux=SaveTrajectoryAux,
-#                         LoadFeatures=LoadFeatures)
+LiXStructureDetector.Check_Structures(WorkDir, Salt, SystemName=SystemName,
+                        SaveTrajectory=SaveTrajectory, SaveFeatures=SaveFeatures, 
+                        SavePredictions=SavePredictions, SavePredictionsImage=SavePredictionsImage, 
+                        ML_TimeLength=ML_TimeLength, ML_TimeStep=ML_TimeStep, TimePerFrame=TimePerFrame, 
+                        FileType=FileType, Verbose=Verbose, StartPoint = StartPoint,
+                        EndPoint=EndPoint, Version=Version, SaveDir=SaveDir,
+                        InMemory=InMemory, Temporal_Cutoff=Temporal_Cutoff,
+                        Voronoi=Voronoi, Qlm_Average=Qlm_Average,
+                        Prob_Interfacial=Prob_Interfacial,
+                        Spatial_Reassignment=Spatial_Reassignment,
+                        Spatial_Interfacial=Spatial_Interfacial,
+                        SaveTrajectoryAux=SaveTrajectoryAux,
+                        LoadFeatures=LoadFeatures)
