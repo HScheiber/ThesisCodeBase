@@ -11,8 +11,8 @@ for idx = 1:numel(Structures)
 
     Shared_Settings = Initialize_MD_Settings;
     Shared_Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
-    Shared_Settings.JobSettings.MPI_Ranks = 1;
-    Shared_Settings.JobSettings.OMP_Threads = 8;
+    Shared_Settings.MPI_Ranks = 1;
+    Shared_Settings.OMP_Threads = 8;
     Shared_Settings.Project_Directory_Name = 'Molten_Salts_MD'; % Name of project directory to contain job within the main project folder
     Shared_Settings.Find_Min_Params = true;
     Shared_Settings.MinMDP.Parallel_Min = false;

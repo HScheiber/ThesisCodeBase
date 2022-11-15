@@ -4,26 +4,26 @@ Settings.Submit_Jobs = false; % Set to true to submit MD jobs to batch script or
 Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
 Settings.Liquid_Fraction = 0.50; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
 Settings.MP_Liquid_Test_Time = 5;%100; % ps. Time used for calculation of liquid MSD in melting point calculations.
-Settings.MP_Equilibrate_Liquid = 20; % ps
-Settings.MP_Equilibrate_Solid = 15; % ps
+Settings.MP_Equilibrate_Liquid = 5; %20 ps
+Settings.MP_Equilibrate_Solid = 5; %15 ps
 Settings.PreEquilibration = 0.3; % ps
-Settings.JobSettings.Cores = 1;
-Settings.JobSettings.MPI_Ranks = 8;
-Settings.JobSettings.OMP_Threads = 1;
-setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
+Settings.Cores = 1;
+Settings.MPI_Ranks = 8;
+Settings.OMP_Threads = 1;
+setenv('OMP_NUM_THREADS',num2str(Settings.OMP_Threads))
 
 Settings.Skip_Minimization = false;
-Settings.Theory = 'JC'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
+Settings.Theory = 'BF'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
 Settings.Salt = 'NaCl'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-[JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
-Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','LJ_12-6');
-Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
-Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
-Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
-Settings.S.S.MM = Settings.S.S.MM/JCMM.sigma;
-Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
-Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
-Settings.GaussianCharge = false;
+%[JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
+Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
+% Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
+% Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
+% Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
+% Settings.S.S.MM = Settings.S.S.MM/JCMM.sigma;
+% Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
+% Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
+Settings.GaussianCharge = true;
 Settings.Polarization = false;
 Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'
 Settings.RefStructure = 'Rocksalt'; % Reference structure used for determination of melting or freezing (usually liquid)
@@ -68,7 +68,6 @@ Settings.MaxTDiff = 0.01; % Max change in temperature before generating new init
 
 % Debugging
 Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
-Settings.Output_Coords_Compressed = 0; % Number of steps between outputting coordinates in compressed format
 Settings.Output_Velocity = 0; % Number of steps between outputting velocities
 Settings.Expand_LP = true; % when true, allows expansion of lattice parameters of the solid.
 Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
@@ -79,7 +78,7 @@ Settings.MinInterfaceWidth = 0.075; % [nm] +- distance from the solid-liquid int
 
 % Job settings
 % dds may need to be set lower for cluster jobs due to high inhomogeniety in the system
-Settings.JobSettings.Cores = -1;
+Settings.Cores = -1;
 
 % optimizer settings
 Settings.Optimizer = 'MPSearcher';

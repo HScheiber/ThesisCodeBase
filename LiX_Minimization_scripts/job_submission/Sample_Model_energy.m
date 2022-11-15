@@ -26,14 +26,14 @@ N_atoms = p.Results.N_atoms; % Minimum number of atoms to include in super cell
 Settings.Longest_Cutoff = max([Settings.MinMDP.RList_Cutoff Settings.MinMDP.RCoulomb_Cutoff Settings.MinMDP.RVDW_Cutoff]);
 Settings.Table_Length = Settings.Longest_Cutoff + 1.01; % nm. This should be at least equal rc+1 where rc is the largest cutoff
 
-if Settings.JobSettings.SinglePrecision
+if Settings.SinglePrecision
     Settings.Table_StepSize = 0.002; % Step size of tabulated potentials in nm
 else
     Settings.Table_StepSize = 0.0005; % 0.0005 Step size of tabulated potentials in nm
 end
 
 if ~isfield(Settings,'gmx')
-    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
+    [~,Settings] = MD_Batch_Template(Settings);
 end
 
 if Settings.MinMDP.Parallel_Min % Since using matlab parallel, make sure gromacs runs in serial
