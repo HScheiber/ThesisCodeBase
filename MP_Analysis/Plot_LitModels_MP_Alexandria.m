@@ -61,16 +61,17 @@ for idx = X
                 for sdx = 1:length(Structures)
                     Structure = Structures{sdx};
                     if isfield(Data.(Salt).(Model),Structure)
-                        if cMP < mean(Data.(Salt).(Model).(Structure).dT)
-                            cMP = mean(Data.(Salt).(Model).(Structure).dT);
-                            Y(idx,jdx) = cMP;
-                        end
                         
                         if any(cellfun(@(x) all(strcmpi(x,{Salt Model Structure})),Exclude))
                             continue
                         end
                         if Data.(Salt).(Model).(Structure).Alt_Structure
                             continue
+                        end
+                        
+                        if cMP < mean(Data.(Salt).(Model).(Structure).dT)
+                            cMP = mean(Data.(Salt).(Model).(Structure).dT);
+                            Y(idx,jdx) = cMP;
                         end
                          
                         switch Structure
