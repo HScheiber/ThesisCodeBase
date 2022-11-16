@@ -189,7 +189,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             
             % For minimization, add in a close-range repulsive wall to the potential with the following function
             [Settings.TableFile_MX,C6,Energygrptables] = MakeTables(Settings,'MDP_Minimize',true,...
-                'TableName',[Settings.JobName '_Table'],'Add_Wall',~Settings.Polarization);
+                'TableName',[Settings.JobName '_Table'],'Add_Wall',true);
             
             MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
         else

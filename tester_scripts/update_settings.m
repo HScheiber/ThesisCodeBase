@@ -4,26 +4,26 @@
 % Settings.Target_T = 1133.9;
 
 
-Settings.dd  = [];
-Settings.npme = [];
-Settings.Hours= 3;
-Settings.N_Calc= 8;
-Settings.Mins= 0;
-Settings.Nodes=0;
-Settings.Cores=12;
-Settings.Mempernode='0';
-Settings.SinglePrecision= 0;
-Settings.BigNode= 0;
-Settings.MPI_Ranks= 12;
-Settings.OMP_Threads= 1;
-Settings.npme= [];
-Settings.dd= [];
-Settings.dds= 0.8000;
-Settings.DLB= 1;
-Settings.TunePME= 1;
+% Settings.dd  = [];
+% Settings.npme = [];
+% Settings.Hours= 3;
+% Settings.N_Calc= 8;
+% Settings.Mins= 0;
+% Settings.Nodes=0;
+% Settings.Cores=12;
+% Settings.Mempernode='0';
+% Settings.SinglePrecision= 0;
+% Settings.BigNode= 0;
+% Settings.MPI_Ranks= 12;
+% Settings.OMP_Threads= 1;
+% Settings.npme= [];
+% Settings.dd= [];
+% Settings.dds= 0.8000;
+% Settings.DLB= 1;
+% Settings.TunePME= 1;
 
-Settings.Cores = 8;
-Settings.MPI_Ranks = 8;
+Settings.Cores = 1;
+Settings.MPI_Ranks = 1;
 Settings.OMP_Threads = 1;
 
 % Settings.MP_Liquid_Test_Time = 100; % ps

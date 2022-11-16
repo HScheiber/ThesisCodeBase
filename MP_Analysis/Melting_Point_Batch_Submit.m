@@ -32,7 +32,7 @@ Shared_Settings.MinMDP.Parallel_Min = false;
 
 % MP-specific calculation settings
 Shared_Settings.c_over_a = 2;
-Shared_Settings.MaxCheckTime = 2000; % ps. Max time for MP simulation points
+Shared_Settings.MaxCheckTime = 1000; % ps. Max time for MP simulation points
 Shared_Settings.BracketThreshold = 10; % [K] Sets the target bracket for the melting point
 Shared_Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearcher algorithm
 Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
@@ -42,8 +42,8 @@ Shared_Settings.MP_Liquid_Test_Time = 100; % ps. simulation time to sample the l
 Shared_Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
 Shared_Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Shared_Settings.PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
-Shared_Settings.InitialMeshSize = 100; % Initial step size for MP calcs
-Shared_Settings.MeshSizeMultiplier = 2;
+Shared_Settings.InitialMeshSize = 25; % Initial step size for MP calcs
+Shared_Settings.MeshSizeMultiplier = 1;
 Shared_Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
 Shared_Settings.MeltFreezeThreshold = 0.25; % CHANGE in fraction [0,1] OR Number of atoms (1,inf) of liquid/solid required to establish a phase change
 Shared_Settings.Optimizer = 'MPSearcher';
@@ -104,34 +104,46 @@ switch lower(computer)
             Salt = Salts{jdx};
             for kdx = 1:length(Theories)
                 Theory = Theories{kdx};
-
-                idx = idx+1;
-                Settings_array(idx) = Shared_Settings;
-                Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                Settings_array(idx).Structure = 'Rocksalt'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                Settings_array(idx).JobID = [Theory '_Alexandria']; % An ID that is tacked onto the folder name of all current jobs
-                Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
-                if strcmp(Theory,'JC')
-                    pset = Initialize_MD_Settings;
-                    pset.Salt = Salt;
-                    [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(pset);
-                    Settings_array(idx).S.S.MM = Settings_array(idx).S.S.MM/JC_MM.sigma;
-                    Settings_array(idx).S.S.XX = Settings_array(idx).S.S.XX/JC_XX.sigma;
-                    Settings_array(idx).S.S.MX = Settings_array(idx).S.S.MX/JC_MX.sigma;
-                    Settings_array(idx).S.E.MM = Settings_array(idx).S.E.MM/JC_MM.epsilon;
-                    Settings_array(idx).S.E.XX = Settings_array(idx).S.E.XX/JC_XX.epsilon;
-                    Settings_array(idx).S.E.MX = Settings_array(idx).S.E.MX/JC_MX.epsilon;
+                
+                if strcmp(Salt,'LiI')
+                    Structures = {'Rocksalt' 'Wurtzite'};
+                else
+                    Structures = {'Rocksalt'};
                 end
-                Settings_array(idx).GaussianCharge = true;
-                Settings_array(idx).Polarization = true;
+                for sdx = 1:numel(Structures)
+                    Structure = Structures{sdx};
+                    
+                    idx = idx+1;
+                    Settings_array(idx) = Shared_Settings;
+                    Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                    Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                    Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                    Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
+                    if strcmp(Structure,'Rocksalt')
+                        Settings_array(idx).JobID = [Theory '_Alexandria']; % An ID that is tacked onto the folder name of all current jobs
+                    else
+                        Settings_array(idx).JobID = [Theory '_' Structure '_Alexandria']; % An ID that is tacked onto the folder name of all current jobs
+                    end
+                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
+                    if strcmp(Theory,'JC')
+                        pset = Initialize_MD_Settings;
+                        pset.Salt = Salt;
+                        [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(pset);
+                        Settings_array(idx).S.S.MM = Settings_array(idx).S.S.MM/JC_MM.sigma;
+                        Settings_array(idx).S.S.XX = Settings_array(idx).S.S.XX/JC_XX.sigma;
+                        Settings_array(idx).S.S.MX = Settings_array(idx).S.S.MX/JC_MX.sigma;
+                        Settings_array(idx).S.E.MM = Settings_array(idx).S.E.MM/JC_MM.epsilon;
+                        Settings_array(idx).S.E.XX = Settings_array(idx).S.E.XX/JC_XX.epsilon;
+                        Settings_array(idx).S.E.MX = Settings_array(idx).S.E.MX/JC_MX.epsilon;
+                    end
+                    Settings_array(idx).GaussianCharge = true;
+                    Settings_array(idx).Polarization = true;
 
-                % Initial T
-                Settings_array(idx).Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                Settings_array(idx).MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
-                Settings_array(idx).T0 = Exp.(Salt).mp; % K, Initial temperature
-
+                    % Initial T
+                    Settings_array(idx).Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+                    Settings_array(idx).MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+                    Settings_array(idx).T0 = Exp.(Salt).mp; % K, Initial temperature
+                end
             end
         end
     otherwise

@@ -157,11 +157,7 @@ else
         case {'JC' 'BD' 'BE' 'Mie' 'HS'}
             AddRepWall = false;
         otherwise
-            if Settings.Polarization
-                AddRepWall = false;
-            else
-                AddRepWall = true;
-            end
+            AddRepWall = true;
     end
 end
 

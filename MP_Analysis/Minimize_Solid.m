@@ -37,7 +37,7 @@ function Minimize_Solid(Settings)
         % potential with the following function
         TableName = [Settings.JobName '_Table'];
         [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
-            'Add_Wall',~Settings.Polarization);
+            'Add_Wall',true);
     else
         % Modify the MDP file
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##VDWTYPE##',pad(MDP.VDWType,18));

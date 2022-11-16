@@ -92,16 +92,82 @@ function [TableFile_Out,C6,Energygrptables] = MakeTables(Settings,varargin)
             int = ints{idx};
             for jdx = 1:length(subints)
                 subint = subints{jdx};
-                
                 if strcmp(subint(1),'c') && strcmp(subint(2),'c') % core-core interactions
                     
-                    if Add_Wall
+                    % If polarization is active, add wall only to the vdw interaction
+                    if Add_Wall && Settings.Polarization
+                        U_vdw  = U.(int).h + C6.(int)*U.(int).g;
+                        dU_vdw = -U.(int).dh + -C6.(int)*U.(int).dg;
+                        
+                        peaks_idx = [false islocalmax(U_vdw(2:end),'MinProminence',1e-8)];
+                        peak_r = U.r(peaks_idx);
+                        if numel(peak_r) > 1
+                            peak_r = peak_r(1);
+                        end
+                        
+                        inflex_idx = [false islocalmax(dU_vdw(2:end),'MinProminence',1e-8) | ...
+                            islocalmin(dU_vdw(2:end),'MinProminence',1e-8)];
+                        inflex_r = U.r(inflex_idx);
+                        
+                        if ~isempty(peak_r) && ~isempty(inflex_r)
+                            inflex_r(inflex_r < peak_r) = [];
+                            inflex_r = inflex_r(1);
+                            inflex_idx = find(U.r == inflex_r);
+                            
+%                             %% Visualization
+%                             hold on
+%                             plot(U.r.*10,U_vdw,'-k','Linewidth',4)
+%                             scatter(inflex_r.*10,U_vdw(inflex_idx),100,'r','Linewidth',4,'MarkerEdgeColor','r')
+%                             ylim([-10 10])
+%                             %%
+                            
+                            % Generate a steep repulsion beyond the peak
+                            below_peak_idx = (U.r <= inflex_r);
+                            r = U.r(below_peak_idx); % nm
+                            % Generate a steep repulsion beyond the inflection
+                            dU_infl = dU_vdw(inflex_idx);
+                            D = -dU_infl*(inflex_r^13)/12; % coefficient
+                            
+                            fwall = D./(r.^12) - D./(inflex_r.^12);
+                            dfwall = 12*D./(r.^13); % Wall -derivative
+                            
+                            % Kill the attractive interaction beyond the peak
+                            U_g_at_infl = C6.(int).*U.(int).g(inflex_idx);
+                            U.(int).g(below_peak_idx) = zeros(size(r));   %zeros(size(r));
+                            U.(int).dg(below_peak_idx) = zeros(size(r));
+                            
+                            % Remove infinity at 0
+                            fwall(1) = fwall(2);
+                            dfwall(1) = 0;
+                            
+                            % Add this repulsion to the repulsive part of the function
+                            U_h_at_infl = U.(int).h(inflex_idx);
+                            U.(int).h(below_peak_idx) = fwall + U_h_at_infl +  U_g_at_infl;
+                            U.(int).dh(below_peak_idx) = dfwall - U.(int).df(below_peak_idx);
+                        end
+                        
+%                         %% Testing visualization
+%                         U_vdw  = U.(int).h + C6.(int)*U.(int).g;
+%                         %plot(U.r.*10,U.Total,':r','Linewidth',4)
+%                         scatter(U.r.*10,U_vdw,'o')
+%                         ylim([-1000 1000])
+%                         xlim([0 5])
+%                         set(gca,'Fontsize',32,'TickLabelInterpreter','latex','XTick',0:1:5)
+%                         xlabel(gca,'$r_{ij}$ [\AA]','fontsize',32,'interpreter','latex')
+%                         ylabel(gca,'$u_{ij}$ [kJ mol$^{-1}$]','fontsize',32,'interpreter','latex')
+%                         set(gca,'box','on')
+%                         grid(gca,'on')
+%                         grid(gca,'minor')
+%                         exportgraphics(gca,'Augmented_Potential.eps')
+%                         %%
+                        
+                    elseif Add_Wall
                         peaks_idx = [false islocalmax(U.(int).Total(2:end),'MinProminence',1e-8)];
                         peak_r = U.r(peaks_idx);
                         if numel(peak_r) > 1
                             peak_r = peak_r(1);
                         end
-
+                        
                         inflex_idx = [false islocalmax(U.(int).dTotal(2:end),'MinProminence',1e-8) | ...
                             islocalmin(U.(int).dTotal(2:end),'MinProminence',1e-8)];
                         inflex_r = U.r(inflex_idx);
@@ -111,22 +177,24 @@ function [TableFile_Out,C6,Energygrptables] = MakeTables(Settings,varargin)
                             inflex_r = inflex_r(1);
                             inflex_idx = find(U.r == inflex_r);
 
-                %             %% Visualization
-                %             nm_per_m = 1e+9; % nm per m
-                %             NA = 6.0221409e23; % Molecules per mole
-                %             e_c = 1.60217662e-19; % Elementary charge in Coulombs
-                %             epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
-                %             k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
-                % 
-                %             if idx == 1
-                %                 U.Total = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-                %             else
-                %                 U.Total =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g ;
-                %             end
-                %             hold on
-                %             plot(U.r(2:end).*10,U.Total(2:end),'-k','Linewidth',4)
-                %             scatter(inflex_r.*10,U.Total(inflex_idx),100,'r','Linewidth',4,'MarkerEdgeColor','r')
-                %             %%
+%                             %% Visualization
+%                             if strcmp(int(1),int(2))
+%                                 QQ = Settings.S.Q^2;
+%                             else
+%                                 QQ = -Settings.S.Q^2;
+%                             end
+%                             nm_per_m = 1e+9; % nm per m
+%                             NA = 6.0221409e23; % Molecules per mole
+%                             e_c = 1.60217662e-19; % Elementary charge in Coulombs
+%                             epsilon_0 = (8.854187817620e-12)*1000/(nm_per_m*NA); % Vacuum Permittivity C^2 mol kJ^-1 nm^-1
+%                             k_0 = 1/(4*pi*epsilon_0); % Coulomb constant in kJ nm C^-2 mol^-1
+%                             
+%                             U.Total = k_0*(e_c^2).*QQ.*U.(int).f0 + U.(int).h + C6.(int)*U.(int).g ;
+%                             hold on
+%                             plot(U.r(2:end).*10,U.Total(2:end),'-k','Linewidth',4)
+%                             scatter(inflex_r.*10,U.Total(inflex_idx),100,'r','Linewidth',4,'MarkerEdgeColor','r')
+%                             ylim([-1000 1000])
+                            %%
 
                             % Generate a steep repulsion beyond the peak
                             below_peak_idx = (U.r <= inflex_r);
@@ -134,47 +202,46 @@ function [TableFile_Out,C6,Energygrptables] = MakeTables(Settings,varargin)
                             % Generate a steep repulsion beyond the inflection
                             dU_infl = U.(int).dTotal(inflex_idx);
                             D = -dU_infl*(inflex_r^13)/12; % coefficient
-
+                            
                             fwall = D./(r.^12) - D./(inflex_r.^12);
                             dfwall = 12*D./(r.^13); % Wall -derivative
-
+                            
                             % Kill the attractive interaction beyond the peak
                             U_g_at_infl = C6.(int).*U.(int).g(inflex_idx);
                             U.(int).g(below_peak_idx) = zeros(size(r));   %zeros(size(r));
                             U.(int).dg(below_peak_idx) = zeros(size(r));
-
+                            
                             % Remove infinity at 0
                             fwall(1) = fwall(2);
                             dfwall(1) = 0;
-
+                            
                             % Add this repulsion to the repulsive part of the function
                             U_h_at_infl = U.(int).h(inflex_idx);
                             U.(int).h(below_peak_idx) = fwall + U_h_at_infl +  U_g_at_infl;
                             U.(int).dh(below_peak_idx) = dfwall - U.(int).df(below_peak_idx);
                         end
 
-                %         %% Testing visualization
-                %         if idx == 1
-                %             U.Total  = -k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g;
-                %             U.dTotal = k_0*(e_c^2).*(Settings.S.Q^2).*U.df0 - U.dh - U.dg;
-                %         else
-                %             U.Total  =  k_0*(e_c^2).*(Settings.S.Q^2).*U.f0 + U.h + U.g;
-                %             U.dTotal =  -k_0*(e_c^2).*(Settings.S.Q^2).*U.df0 - U.dh - U.dg;
-                %         end
-                %         plot(U.r.*10,U.Total,':r','Linewidth',4)
-                %         ylim([-1000 4000])
-                %         xlim([0 5])
-                %         set(gca,'Fontsize',32,'TickLabelInterpreter','latex','XTick',0:1:5)
-                %         xlabel(gca,'$r_{ij}$ [\AA]','fontsize',32,'interpreter','latex')
-                %         ylabel(gca,'$u_{ij}$ [kJ mol$^{-1}$]','fontsize',32,'interpreter','latex')
-                %         set(gca,'box','on')
-                %         grid(gca,'on')
-                %         grid(gca,'minor')
-                %         exportgraphics(gca,'Augmented_Potential.eps')
-                %         %%
+%                         %% Testing visualization
+%                         if strcmp(int(1),int(2))
+%                             QQ = Settings.S.Q^2;
+%                         else
+%                             QQ = -Settings.S.Q^2;
+%                         end
+%                         U.Total  =  k_0*(e_c^2).*(QQ).*U.(int).f0 + U.(int).h + C6.(int)*U.(int).g;
+%                         U.dTotal =  -k_0*(e_c^2).*(QQ).*U.(int).df0 - U.(int).dh - C6.(int)*U.(int).dg;
+%                         %plot(U.r.*10,U.Total,':r','Linewidth',4)
+%                         scatter(U.r.*10,U.Total,'o')
+%                         ylim([-1000 1000])
+%                         xlim([0 5])
+%                         set(gca,'Fontsize',32,'TickLabelInterpreter','latex','XTick',0:1:5)
+%                         xlabel(gca,'$r_{ij}$ [\AA]','fontsize',32,'interpreter','latex')
+%                         ylabel(gca,'$u_{ij}$ [kJ mol$^{-1}$]','fontsize',32,'interpreter','latex')
+%                         set(gca,'box','on')
+%                         grid(gca,'on')
+%                         grid(gca,'minor')
+%                         exportgraphics(gca,'Augmented_Potential.eps')
+%                         %%
                     end
-                    
-                    
                     Uo = [U.r ; U.(int).f0 ; U.(int).df0 ; U.(int).g ; U.(int).dg ; U.(int).h ; U.(int).dh];
                 else % shell interactions
                     % Output into gromacs format
