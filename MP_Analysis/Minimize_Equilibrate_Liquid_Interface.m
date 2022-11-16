@@ -152,7 +152,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
         end
         TableName = [Settings.JobName '_Table'];
         [Settings.TableFile_MX,~,Energygrptables] = MakeTables(Settings,'TableName',TableName,...
-            'Add_Wall',true,'SaveTables',~Settings.Polarization);
+            'Add_Wall',true,'SaveTables',true);
         MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
     else
         % Modify the MDP file
@@ -926,7 +926,7 @@ function Output = Minimize_Equilibrate_Liquid_Interface(Settings)
     
     if Settings.Table_Req
         [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
-            'Add_Wall',true,'SaveTables',~Settings.Polarization);        
+            'Add_Wall',true,'SaveTables',true);        
         mdrun_command = [mdrun_command ' -table ' windows2unix(Settings.TableFile_MX)];
     end
 

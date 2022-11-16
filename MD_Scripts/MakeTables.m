@@ -93,11 +93,10 @@ function [TableFile_Out,C6,Energygrptables] = MakeTables(Settings,varargin)
             for jdx = 1:length(subints)
                 subint = subints{jdx};
                 if strcmp(subint(1),'c') && strcmp(subint(2),'c') % core-core interactions
-                    
                     % If polarization is active, add wall only to the vdw interaction
                     if Add_Wall && Settings.Polarization
-                        U_vdw  = U.(int).h + C6.(int)*U.(int).g;
-                        dU_vdw = -U.(int).dh + -C6.(int)*U.(int).dg;
+                        U_vdw  =  C6.(int)*U.(int).g  + U.(int).h;
+                        dU_vdw = -C6.(int)*U.(int).dg - U.(int).dh;
                         
                         peaks_idx = [false islocalmax(U_vdw(2:end),'MinProminence',1e-8)];
                         peak_r = U.r(peaks_idx);
@@ -116,9 +115,9 @@ function [TableFile_Out,C6,Energygrptables] = MakeTables(Settings,varargin)
                             
 %                             %% Visualization
 %                             hold on
-%                             plot(U.r.*10,U_vdw,'-k','Linewidth',4)
+%                             plot(U.r.*10,U_vdw,'-k','Linewidth',2)
 %                             scatter(inflex_r.*10,U_vdw(inflex_idx),100,'r','Linewidth',4,'MarkerEdgeColor','r')
-%                             ylim([-10 10])
+%                             ylim([-10 400])
 %                             %%
                             
                             % Generate a steep repulsion beyond the peak
@@ -142,8 +141,8 @@ function [TableFile_Out,C6,Energygrptables] = MakeTables(Settings,varargin)
                             
                             % Add this repulsion to the repulsive part of the function
                             U_h_at_infl = U.(int).h(inflex_idx);
-                            U.(int).h(below_peak_idx) = fwall + U_h_at_infl +  U_g_at_infl;
-                            U.(int).dh(below_peak_idx) = dfwall - U.(int).df(below_peak_idx);
+                            U.(int).h(below_peak_idx) = fwall + U_h_at_infl + U_g_at_infl;
+                            U.(int).dh(below_peak_idx) = dfwall;
                         end
                         
 %                         %% Testing visualization
@@ -217,7 +216,7 @@ function [TableFile_Out,C6,Energygrptables] = MakeTables(Settings,varargin)
                             
                             % Add this repulsion to the repulsive part of the function
                             U_h_at_infl = U.(int).h(inflex_idx);
-                            U.(int).h(below_peak_idx) = fwall + U_h_at_infl +  U_g_at_infl;
+                            U.(int).h(below_peak_idx) = fwall + U_h_at_infl + U_g_at_infl;
                             U.(int).dh(below_peak_idx) = dfwall - U.(int).df(below_peak_idx);
                         end
 
