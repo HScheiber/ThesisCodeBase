@@ -41,7 +41,7 @@ Experiment = Load_Experimental_Data;
 Salt = 'LiI';
 Structure = 'Wurtzite';
 Theory = 'JC';
-vdW_Type = 'LJ';
+vdW_Type = 'LJ_12-6';
 T0 = 600;
 
 idx = idx+1;
