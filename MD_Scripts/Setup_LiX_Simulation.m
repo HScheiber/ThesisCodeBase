@@ -761,6 +761,11 @@ if DoGeomEdit
     end
 end
 
+% Get index
+ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
+ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
+    'add_shells',false,'ndx_filename',ndx_filename);
+
 if Settings.PreEquilibration > 0
     MinDir = fullfile(Settings.WorkDir,'Minimization');
     if ~exist(MinDir,'dir')
@@ -810,7 +815,7 @@ CheckPoint_File = fullfile(Settings.WorkDir,[Settings.JobName '.cpt']);
 mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(Settings.Traj_Conf_File) ...
     ' -o ' windows2unix(Trajectory_File) ' -g ' windows2unix(Log_File) ...
     ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(ConfOut_File) ...
-    ' -cpo ' windows2unix(CheckPoint_File) Settings.mdrun_opts];
+    ' -cpo ' windows2unix(CheckPoint_File) ndx_add Settings.mdrun_opts];
 
 if Settings.Table_Req % If tabulated potential required
     mdrun_command = [mdrun_command ' -table ' windows2unix(TableFile_MX)];
