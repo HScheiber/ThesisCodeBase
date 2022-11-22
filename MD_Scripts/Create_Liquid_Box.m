@@ -273,8 +273,9 @@ if Settings.Table_Req
     Settings.Geometry = Settings.Geometry;
     Settings.WorkDir = WorkDir;
     TableName = [Settings.JobName '_Table'];
-    [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
+    [Settings.TableFile_MX,~,Energygrptables] = MakeTables(Settings,'TableName',TableName,...
         'Add_Wall',true);
+    MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
 else
     % Modify the MDP file
     MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
