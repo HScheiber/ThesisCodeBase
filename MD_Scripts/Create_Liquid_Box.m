@@ -275,7 +275,6 @@ if Settings.Table_Req
     TableName = [Settings.JobName '_Table'];
     [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
         'Add_Wall',true);
-    
 else
     % Modify the MDP file
     MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
@@ -300,11 +299,6 @@ if Settings.MDP.Disp_Correction
         'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
 end
 
-% Save MDP file
-MDP_Filename = fullfile(WorkDir,'tmp_liquid.mdp');
-fidMDP = fopen(MDP_Filename,'wt');
-fwrite(fidMDP,regexprep(MDP_Minimization_txt,'\r',''));
-fclose(fidMDP);
 
 % Complete a topology file for the liquid box to be minimized
 Atomlist = copy_atom_order(tmp_liquid_file);
@@ -314,10 +308,29 @@ Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
 Topology_Text = strrep(Topology_Text,'##N##x##N##x##N## ##GEOM##',...
     ['Liquid with ' num2str(Settings.N_atoms) ' atoms.']);
 
+% Polarization options
+if Settings.Polarization
+    [~,MDP_Minimization_txt] = ...
+        Polarize_Inputs(Settings,Settings.Topology_Text,MDP_Minimization_txt);
+else
+    MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##ENERGYGRPS##',[Settings.Metal ' ' Settings.Halide]);
+end
+
+% Save MDP file
+MDP_Filename = fullfile(WorkDir,'tmp_liquid.mdp');
+fidMDP = fopen(MDP_Filename,'wt');
+fwrite(fidMDP,regexprep(MDP_Minimization_txt,'\r',''));
+fclose(fidMDP);
+
 % Save topology file
 fidTOP = fopen(Top_Filename,'wt');
 fwrite(fidTOP,regexprep(Topology_Text,'\r',''));
 fclose(fidTOP);
+
+% If model is polarizable, add in shell positions
+ndx_filename = fullfile(Settings.WorkDir,'tmp_liquid.ndx');
+ndx_add = add_polarization_shells(Settings,tmp_liquid_file,...
+    'ndx_filename',ndx_filename);
 
 TPR_File = fullfile(WorkDir,'tmp_liquid.tpr');
 MDPout_File = fullfile(WorkDir,'tmp_liquid_out.mdp');
@@ -326,7 +339,7 @@ GrompLog_File = fullfile(WorkDir,'tmp_liquid_Grompplog.log');
 FMin_Grompp = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(tmp_liquid_file) ...
     ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
     ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-    ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+    ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
 [state,~] = system(FMin_Grompp);
 % Catch error in grompp
 if state ~= 0

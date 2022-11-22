@@ -1,3 +1,4 @@
+
 function Output = Setup_LiX_Simulation(Settings)
 
 %% Sanity checks
