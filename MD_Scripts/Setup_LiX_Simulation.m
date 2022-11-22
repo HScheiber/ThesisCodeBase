@@ -738,11 +738,16 @@ if DoGeomEdit
             fidTOP = fopen(Settings.Topology_File,'wt');
             fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
             fclose(fidTOP);
+            
+            % Get index
+            ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
+            ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
+                'add_shells',false,'ndx_filename',ndx_filename);
 
             GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
                 ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
                 ' -o ' windows2unix(Settings.Traj_Conf_File) ' -po ' windows2unix(Settings.MDP_out_File) ...
-                ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
+                ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
             [errcode,~] = system(GROMPP_command);
             
             % Catch error in grompp
@@ -760,11 +765,6 @@ if DoGeomEdit
         Premintxt = ['matlab -batch "MD_Preminimization(''' MinDir ''')"' newline];
     end
 end
-
-% Get index
-ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
-ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
-    'add_shells',false,'ndx_filename',ndx_filename);
 
 if Settings.PreEquilibration > 0
     MinDir = fullfile(Settings.WorkDir,'Minimization');
@@ -815,7 +815,7 @@ CheckPoint_File = fullfile(Settings.WorkDir,[Settings.JobName '.cpt']);
 mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(Settings.Traj_Conf_File) ...
     ' -o ' windows2unix(Trajectory_File) ' -g ' windows2unix(Log_File) ...
     ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(ConfOut_File) ...
-    ' -cpo ' windows2unix(CheckPoint_File) ndx_add Settings.mdrun_opts];
+    ' -cpo ' windows2unix(CheckPoint_File) Settings.mdrun_opts];
 
 if Settings.Table_Req % If tabulated potential required
     mdrun_command = [mdrun_command ' -table ' windows2unix(TableFile_MX)];

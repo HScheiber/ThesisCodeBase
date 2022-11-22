@@ -244,7 +244,6 @@ switch lower(computer)
         Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
         Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
 
-    case 'narval'
         %% NaCl/WBK polarized vs unpolarized Alexandria model at Tm starting in liquid vs rocksalt structure
         Salt = 'NaCl';
         Structures = {'Liquid' 'Rocksalt'};
@@ -304,6 +303,9 @@ switch lower(computer)
                 Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
             end
         end
+        
+    case 'narval'
+
 
     otherwise
 end
