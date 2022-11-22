@@ -275,13 +275,11 @@ Settings.S = Init_Scaling_Object;
 Settings.CR_Damp = Init_CRDamping_Object; % note: b = steepness of damping, r_d = position in nm.
 Settings.C6_Damp = Init_C6Damping_Object;
 [Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
+Settings.SigmaEpsilon = true;
 
 % Finite T settings
 Settings.Liquid_Test_Time = 100; % ps. Sets time for primary liquid calculation
 Settings.Liquid_Equilibrate_Time = 25; % ps
 Settings.Solid_Test_Time = 30; % ps. Sets time for combination of solid equilibration + test time
-
-% MP settings
-
 
 end
