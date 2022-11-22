@@ -1,7 +1,7 @@
 
-% Settings.MDP.Initial_T = 1133.9;
-% Settings.T0 = 1133.9;
-% Settings.Target_T = 1133.9;
+Settings.MDP.Initial_T = 1183.9;
+Settings.T0 = 1183.9;
+Settings.Target_T = 1183.9;
 
 
 % Settings.dd  = [];
@@ -69,20 +69,3 @@ Settings.MinMDP.Verbose = true;
 Output = Structure_Minimization(Settings);
 
 
-[U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
-    'Startpoint',0.001);
-
-[U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
-    'Startpoint',0.001);
-
-[U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
-    'Startpoint',0.001);
-
-[U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
-    'Startpoint',0.001);
-
-[U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
-    'Startpoint',0.001);
-
-[U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,'Plotswitch',true,'PlotType','full',...
-    'Startpoint',0.001);

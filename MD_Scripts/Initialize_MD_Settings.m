@@ -264,9 +264,9 @@ Settings.SaveTrajectory = true; % Save processed xyz trajectory file for each te
 Settings.SavePredictionsImage = true; % Save structure fraction vs time image when true for each temperature check
 Settings.SaveFeatures = false; % Save structure fraction vs time image when true for each temperature check
 Settings.SavePredictions = false; % Save structure fraction vs time image when true for each temperature check
-Settings.ML_TimeLength = 21;
-Settings.ML_TimeStep = 5;
-Settings.TimePerFrame = 5; % ps
+Settings.ML_TimeLength = 1;
+Settings.ML_TimeStep = 1;
+Settings.TimePerFrame = 1; % ps
 Settings.Qlm_Average = true;
 Settings.Voronoi = false;
 

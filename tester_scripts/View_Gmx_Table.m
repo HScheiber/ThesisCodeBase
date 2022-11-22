@@ -81,8 +81,8 @@ function View_Gmx_Table(Table_Loc,Q,C)
 
     %% Clear temporary variables
     clearvars filename formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp R;
-    U_Total = C.*U.g + U.h;%k_0*(e_c^2).*Q.*U.f + C.*U.g + U.h;
-    dU_Total = - C.*U.dg  - U.dh;%-k_0*(e_c^2).*Q.*U.df - C.*U.dg  - U.dh;
+    U_Total = k_0*(e_c^2).*Q.*U.f + C.*U.g + U.h;
+    dU_Total = -k_0*(e_c^2).*Q.*U.df - C.*U.dg  - U.dh;
     %ref_U = %k_0*(e_c^2).*Q.*(1./U.r);
     
     hold on

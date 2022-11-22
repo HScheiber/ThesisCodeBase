@@ -142,7 +142,7 @@ else
         if Settings.Verbose
             disp('Equilibration failed. Reducing time step did not resolve.')
             disp(mdrun_output);
-            disp(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
+            disp(['Error running mdrun for system pre-equilibration. Problem command: ' newline mdrun_command]);
         end
         Output.Aborted = true;
         return
