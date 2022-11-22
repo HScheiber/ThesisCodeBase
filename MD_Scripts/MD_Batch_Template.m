@@ -217,7 +217,7 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         
         % Deal with the executable to call
         if Settings.Polarization % Use version 4.6.7
-            Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes)];
+            Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes) ' '];
             Settings.gmx_loc = '';
         elseif Settings.MPI_Ranks == 1
             if Settings.SinglePrecision

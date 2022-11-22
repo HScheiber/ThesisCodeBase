@@ -188,5 +188,5 @@ for idx = 1:length(Settings_array)
     end
     
     % Finish job setup
-    Setup_LiX_Simulation(Settings)
+    Setup_LiX_Simulation(Settings);
 end
