@@ -349,10 +349,9 @@ if Settings.Liquid_Interface
 end
 
 % If model is polarizable, add in shell positions
-ndx_filename = fullfile(Settings.OuterDir,[Settings.JobName '.ndx']);
+ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
 ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
     'ndx_filename',ndx_filename,'add_shells',false);
-
 
 % Generate final topology file for molecular dynamics
 Atomlist = copy_atom_order(Settings.SuperCellFile);
