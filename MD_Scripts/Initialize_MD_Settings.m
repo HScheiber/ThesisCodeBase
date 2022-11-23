@@ -132,7 +132,7 @@ Settings.Skip_Minimization = false; % TURNED ON FOR LIQUIDS AUTOMATICALLY. When 
 Settings.Find_Min_Params = true; % When true, finds lowest energy parameters for IC based on Data_Types. When false, uses input IC
 Settings.Find_Similar_Params = false; % If no exact minimized geometry is found for the input model, find geometry for a similar model
 Settings.Data_Types = 1; % Allowed data types for automatic search of initial conditions (0 = normal, 1 = cell optimized, 2 = full optimized, 3 = atom optimized only)
-Settings.MinMDP.Parallel_Min = true; % run minimization routine using matlab parallel when true
+Settings.MinMDP.Parallel_Min = false; % run minimization routine using matlab parallel when true
 Settings.MinMDP.Verbose = false; % Sets verbosity of minimization routine
 Settings.MinMDP.OptPos = false; % Optimize both position and lattice parameters when true
 Settings.MinMDP.Maintain_Symmetry = true; % maintains cell symmetry when true

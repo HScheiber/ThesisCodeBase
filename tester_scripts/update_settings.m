@@ -22,8 +22,8 @@ Settings.Target_T = 1183.9;
 % Settings.DLB= 1;
 % Settings.TunePME= 1;
 
-Settings.Cores = 1;
-Settings.MPI_Ranks = 1;
+Settings.Cores = 12;
+Settings.MPI_Ranks = 12;
 Settings.OMP_Threads = 1;
 
 % Settings.MP_Liquid_Test_Time = 100; % ps

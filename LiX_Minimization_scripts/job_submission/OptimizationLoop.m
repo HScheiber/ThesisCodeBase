@@ -124,16 +124,10 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoop(Settings
     Trajectory_File = fullfile(Settings.WorkDir,...
         [Settings.FileBase '.tpr']);
     
-    if ispc
-        passlog = ' ^&^> ';
-    else
-        passlog = ' &> ';
-    end
-    
     GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(SuperCellFile) ...
         ' -f ' windows2unix(MDP_File) ' -p ' windows2unix(Topology_File) ...
         ' -o ' windows2unix(Trajectory_File) ' -po ' windows2unix(MDPout_File) ...
-        ndx_add passlog windows2unix(GrompLog_File)];
+        ndx_add Settings.passlog windows2unix(GrompLog_File)];
     [state,~] = system(GROMPP_command);
     
     % Catch error in grompp

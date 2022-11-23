@@ -29,6 +29,7 @@ Shared_Settings.Project_Directory_Name = 'Molten_Salts_MD'; % Name of project di
 Shared_Settings.MinMDP.nsteps_min = 1000;
 Shared_Settings.TimePerFrame = 1; % post-processing time per frame check in ps
 Shared_Settings.Output_Coords = 1000; % output coords every 1 ps
+Shared_Settings.MinMDP.Parallel_Min = false;
 
 % Initial calculation index
 idx=0;
