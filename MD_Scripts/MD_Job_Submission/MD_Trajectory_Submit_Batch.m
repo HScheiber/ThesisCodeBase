@@ -34,8 +34,6 @@ Shared_Settings.MinMDP.Parallel_Min = false;
 % Initial calculation index
 idx=0;
 
-Experiment = Load_Experimental_Data;
-
 switch lower(computer)
     case 'graham'
     case 'cedar'
