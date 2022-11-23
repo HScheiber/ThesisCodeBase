@@ -175,11 +175,6 @@ if Run_Min
             N_Supercell_b = ceil((Settings.Geometry.c/Settings.Geometry.b)*N_Supercell_c_tot/Settings.c_over_a);
         end
         
-        if Settings.Liquid_Interface && Settings.GenCluster
-            N_Supercell_c = round(N_Supercell_c_tot*Settings.Sol_fraction);
-        else
-            N_Supercell_c = N_Supercell_c_tot;
-        end
         if Settings.Verbose
             disp(['Warning: With ' num2str(old_atnum) ...
                 ' atoms, the cut-off length is longer than half the shortest box vector or longer than the smallest box diagonal element.'])
@@ -188,8 +183,25 @@ if Run_Min
     else
         N_Supercell_a = Settings.N_Supercell_a;
         N_Supercell_b = Settings.N_Supercell_b;
-        N_Supercell_c = Settings.N_Supercell_c;
         N_Supercell_c_tot = Settings.N_Supercell_c_tot;
+    end
+    
+    nmol_solid = N_Supercell_a*N_Supercell_b*N_Supercell_c_tot*Settings.Geometry.NF;
+
+    while nmol_solid < Settings.N_atoms/2 % Enforce a minimum of [Settings.N_atoms] atoms
+        La = La*1.1;
+        Lb = Lb*1.1;
+        Lc = Lc*1.1;
+        N_Supercell_a = ceil(La/(Settings.Geometry.a/10));
+        N_Supercell_b = ceil(Lb/(Settings.Geometry.b/10));
+        N_Supercell_c_tot = ceil(Lc/(Settings.Geometry.c/10));
+        nmol_solid = N_Supercell_a*N_Supercell_b*N_Supercell_c_tot*Settings.Geometry.NF;
+    end
+    
+    if Settings.Liquid_Interface && Settings.GenCluster
+        N_Supercell_c = round(N_Supercell_c_tot*Settings.Sol_fraction);
+    else
+        N_Supercell_c = N_Supercell_c_tot;
     end
     
     % Add number of unit cells to topology file (this will not change)
@@ -259,6 +271,8 @@ if Run_Min
             ReRun_OptPos = true;
         end
     end
+    add_polarization_shells(Settings,temp_SuperCellFile,...
+        'make_index',false,'add_shells',true);
     copyfile(temp_SuperCellFile,Settings.SuperCellFile);
 else
     if Settings.Verbose
