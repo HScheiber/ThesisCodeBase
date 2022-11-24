@@ -32,7 +32,7 @@ Shared_Settings.MinMDP.Parallel_Min = false;
 
 % MP-specific calculation settings
 Shared_Settings.c_over_a = 2;
-Shared_Settings.MaxCheckTime = 1000; % ps. Max time for MP simulation points
+Shared_Settings.MaxCheckTime = 2000; % ps. Max time for MP simulation points
 Shared_Settings.BracketThreshold = 10; % [K] Sets the target bracket for the melting point
 Shared_Settings.MinStepSize = 0.25; % [K] Sets the minimum step size for MPsearcher algorithm
 Shared_Settings.SlopeThreshold = 1e10; % The change in the % fraction per unit time must be smaller than the absolute value of this threshold for the system to be considered at the melting point. Units of [% Structure Fraction/ps]
