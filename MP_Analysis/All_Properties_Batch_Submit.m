@@ -109,7 +109,6 @@ switch lower(computer)
         Theory = 'BF';
         Model_BH = 'MH1';
         Model = 'MI1';
-        vdW_Type = {'WBK' 'BK' 'LJ_12-6', 'LJ_8-6'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
         for jdx = 1:length(Salts)
             Salt = Salts{jdx};
             
