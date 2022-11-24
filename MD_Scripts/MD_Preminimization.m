@@ -369,7 +369,9 @@ end
 ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
 ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
     'ndx_filename',ndx_filename,'add_shells',false);
-copyfile(ndx_filename,Settings.ndx_filename);
+if isfield(Settings,'ndx_filename')
+    copyfile(ndx_filename,Settings.ndx_filename);
+end
 
 % Generate final topology file for molecular dynamics
 Atomlist = copy_atom_order(Settings.SuperCellFile);
