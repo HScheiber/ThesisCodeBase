@@ -11,7 +11,7 @@ check_running = true; % Checks if a job is already running, skips running jobs. 
 
 % Load Settings object and set some shared calculation settings
 Shared_Settings = Initialize_MD_Settings;
-Shared_Settings.N_Calc = 4; % Number of jobs to link together.
+Shared_Settings.N_Calc = 2; % Number of jobs to link together.
 Shared_Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Shared_Settings.BatchMode = true; % Sets up batch job when true, or runs immediately when false
 Shared_Settings.Hours = 3; % Max time for each job (hours)
