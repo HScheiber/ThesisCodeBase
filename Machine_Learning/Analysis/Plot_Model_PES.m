@@ -1,14 +1,14 @@
 
-ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
+ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed';
 Settings = Initialize_MD_Settings;
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; % 'LiF' 'LiCl' 'LiBr' 'LiI'
 
 Settings.Theory = 'BH';
 ModelID = 'MF';
-PlotTypes = 'both';
+PlotTypes = 'lj';
 fs = 34; % font size
 lw = 3; % line width
-savefile = true; % switch to save the final plots to file
+savefile = false; % switch to save the final plots to file
 Startpoint = 0.08; % nm
 
 figh = figure('WindowState','Maximized');
@@ -19,8 +19,7 @@ else
     np = 2;
     plts = {PlotTypes};
 end
-T = tiledlayout(figh,2,4,'TileSpacing','compact','padding','tight');
-
+T = tiledlayout(figh,2,np,'TileSpacing','compact','padding','tight');
 
 for pts = 1:numel(plts)
     PlotType = plts{pts};
@@ -55,13 +54,13 @@ for pts = 1:numel(plts)
         Settings.Table_StepSize = 0.001;
         Settings.MDP.vdw_modifier = 'potential-shift';
         Settings.MDP.RVDW_Cutoff = 1; % nm
-
+        
         % Pre allocate graphics objects arrays
         h_MX = gobjects(N_Models,1);
         h_MM = gobjects(N_Models,1);
         h_XX = gobjects(N_Models,1);
         [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
-
+        
         % Loop through models
         %ax = axes(figh,'Position',[0.100 0.1100 0.850 0.8150]); % [left bottom width height]
         ax = nexttile(T);
@@ -79,64 +78,62 @@ for pts = 1:numel(plts)
             end
 
             if isempty(Models{idx}) && strcmp(Settings.Theory,'BH')
-                [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
-                    'Startpoint',Startpoint,'ReturnAsStructure',true);
+                U = TF_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'JC')
-                [U_MX, U_MM, U_XX] = JC_Potential_Generator(Settings,...
-                    'Startpoint',Startpoint,'ReturnAsStructure',true);
+                U = JC_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
                 disp([Settings.Salt ' ' ML_Model_Name ': Q = ' num2str(Settings.S.Q)])
             elseif strcmp(Settings.Theory,'TF')
-
-                [U_MX, U_MM, U_XX] = TF_Potential_Generator(Settings,...
-                    'Startpoint',Startpoint,'ReturnAsStructure',true);
+                U = TF_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'BH')
-
-                [U_MX, U_MM, U_XX] = BH_Potential_Generator(Settings,...
-                    'Startpoint',Startpoint,'ReturnAsStructure',true);
+                U = BH_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'BD')
-                [U_MX, U_MM, U_XX] = BD_Potential_Generator(Settings,...
-                    'Startpoint',Startpoint,'ReturnAsStructure',true);
+                U = BD_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'BE')
-                [U_MX, U_MM, U_XX] = BE_Potential_Generator(Settings,...
-                    'Startpoint',Startpoint,'ReturnAsStructure',true);
+                U = BE_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'Mie')
-                [U_MX, U_MM, U_XX] = Mie_Potential_Generator(Settings,...
-                    'Startpoint',Startpoint,'ReturnAsStructure',true);
+                U = Mie_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
             end
 
             switch lower(PlotType)
                 case 'full'
-                    h_MX(idx) = plot(ax,U_MX.r.*10,U_MX.f + U_MX.g + U_MX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
-                    h_MM(idx) = plot(ax,U_MM.r.*10,U_MM.f + U_MM.g + U_MM.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
-                    h_XX(idx) = plot(ax,U_XX.r.*10,U_XX.f + U_XX.g + U_XX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
+                    h_MX(idx) = plot(ax,U.r.*10,U.MX.f + U.MX.g + U.MX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
+                    h_MM(idx) = plot(ax,U.r.*10,U.MM.f + U.MM.g + U.MM.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
+                    h_XX(idx) = plot(ax,U.r.*10,U.XX.f + U.XX.g + U.XX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
                 case 'full-derivative'
-                    h_MX(idx) = plot(ax,U_MX.r.*10,U_MX.df + U_MX.dg + U_MX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
-                    h_MM(idx) = plot(ax,U_MM.r.*10,U_MM.df + U_MM.dg + U_MM.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
-                    h_XX(idx) = plot(ax,U_XX.r.*10,U_XX.df + U_XX.dg + U_XX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
+                    h_MX(idx) = plot(ax,U.r.*10,U.MX.df + U.MX.dg + U.MX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
+                    h_MM(idx) = plot(ax,U.r.*10,U.MM.df + U.MM.dg + U.MM.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
+                    h_XX(idx) = plot(ax,U.r.*10,U.XX.df + U.XX.dg + U.XX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
                 case 'lj'
-                    h_MX(idx) = plot(ax,U_MX.r.*10,U_MX.g + U_MX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
-                    h_MM(idx) = plot(ax,U_MM.r.*10,U_MM.g + U_MM.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
-                    h_XX(idx) = plot(ax,U_XX.r.*10,U_XX.g + U_XX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
+                    h_MX(idx) = plot(ax,U.r.*10,U.MX.g + U.MX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
+                    h_MM(idx) = plot(ax,U.r.*10,U.MM.g + U.MM.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
+                    h_XX(idx) = plot(ax,U.r.*10,U.XX.g + U.XX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
                 case 'lj-derivative'
-                    h_MX(idx) = plot(ax,U_MX.r.*10,U_MX.dg + U_MX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
-                    h_MM(idx) = plot(ax,U_MM.r.*10,U_MM.dg + U_MM.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
-                    h_XX(idx) = plot(ax,U_XX.r.*10,U_XX.dg + U_XX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
+                    h_MX(idx) = plot(ax,U.r.*10,U.MX.dg + U.MX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
+                    h_MM(idx) = plot(ax,U.r.*10,U.MM.dg + U.MM.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
+                    h_XX(idx) = plot(ax,U.r.*10,U.XX.dg + U.XX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
                 case 'dispersion'
-                    h_MX(idx) = plot(ax,U_MX.r.*10,U_MX.g,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
-                    h_MM(idx) = plot(ax,U_MM.r.*10,U_MM.g,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
-                    h_XX(idx) = plot(ax,U_XX.r.*10,U_XX.g,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
+                    h_MX(idx) = plot(ax,U.r.*10,U.MX.g,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
+                    h_MM(idx) = plot(ax,U.r.*10,U.MM.g,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
+                    h_XX(idx) = plot(ax,U.r.*10,U.XX.g,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
                 case 'dispersion-derivative'
-                    h_MX(idx) = plot(ax,U_MX.r.*10,U_MX.dg,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
-                    h_MM(idx) = plot(ax,U_MM.r.*10,U_MM.dg,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
-                    h_XX(idx) = plot(ax,U_XX.r.*10,U_XX.dg,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
+                    h_MX(idx) = plot(ax,U.r.*10,U.MX.dg,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
+                    h_MM(idx) = plot(ax,U.r.*10,U.MM.dg,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
+                    h_XX(idx) = plot(ax,U.r.*10,U.XX.dg,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
                 case 'repulsive'
-                    h_MX(idx) = plot(ax,U_MX.r.*10,U_MX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
-                    h_MM(idx) = plot(ax,U_MM.r.*10,U_MM.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
-                    h_XX(idx) = plot(ax,U_XX.r.*10,U_XX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
+                    h_MX(idx) = plot(ax,U.r.*10,U.MX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
+                    h_MM(idx) = plot(ax,U.r.*10,U.MM.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
+                    h_XX(idx) = plot(ax,U.r.*10,U.XX.h,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
                 case 'repulsive-derivative'
-                    h_MX(idx) = plot(ax,U_MX.r.*10,U_MX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
-                    h_MM(idx) = plot(ax,U_MM.r.*10,U_MM.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
-                    h_XX(idx) = plot(ax,U_XX.r.*10,U_XX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
+                    h_MX(idx) = plot(ax,U.r.*10,U.MX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'LineStyle','-');
+                    h_MM(idx) = plot(ax,U.r.*10,U.MM.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle','--');
+                    h_XX(idx) = plot(ax,U.r.*10,U.XX.dh,'Color',Col_MX(idx,:),'LineWidth',lw,'Linestyle',':');
             end
         end
 
