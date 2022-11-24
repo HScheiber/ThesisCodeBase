@@ -369,6 +369,7 @@ end
 ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
 ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
     'ndx_filename',ndx_filename,'add_shells',false);
+copyfile(ndx_filename,Settings.ndx_filename);
 
 % Generate final topology file for molecular dynamics
 Atomlist = copy_atom_order(Settings.SuperCellFile);
@@ -380,6 +381,17 @@ fclose(fidTOP);
 if isfile(Settings.Traj_Conf_File)
     delete(Settings.Traj_Conf_File)
 end
+
+% Modify mdp file
+MDP_Template = fileread(Settings.MDP_in_File);
+MDP_Template = regexprep(MDP_Template,'(gen-vel *= *)yes','$1no ','once');
+MDP_Template = regexprep(MDP_Template,'gen-temp *= *.+?\n','','once');
+
+% Save MDP file
+Settings.MDP_in_File = fullfile(Settings.WorkDir,[Settings.JobName '.mdp']);
+fidMDP = fopen(Settings.MDP_in_File,'wt');
+fwrite(fidMDP,regexprep(MDP_Template,'\r',''));
+fclose(fidMDP);
 
 GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
     ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...

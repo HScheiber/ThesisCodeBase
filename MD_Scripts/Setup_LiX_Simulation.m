@@ -740,9 +740,9 @@ if DoGeomEdit
             fclose(fidTOP);
             
             % Get index
-            ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
+            Settings.ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
             ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
-                'add_shells',false,'ndx_filename',ndx_filename);
+                'add_shells',false,'ndx_filename',Settings.ndx_filename);
 
             GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
                 ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
