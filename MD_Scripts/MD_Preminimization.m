@@ -187,6 +187,9 @@ if Run_Min
     end
     
     nmol_solid = N_Supercell_a*N_Supercell_b*N_Supercell_c_tot*Settings.Geometry.NF;
+    La = (Settings.Geometry.a/10)*N_Supercell_a; % nm, the minimum box dimension
+    Lb = (Settings.Geometry.b/10)*N_Supercell_b; % nm, the minimum box dimension
+    Lc = (Settings.Geometry.c/10)*N_Supercell_c_tot; % nm, the minimum box dimension
 
     while nmol_solid < Settings.N_atoms/2 % Enforce a minimum of [Settings.N_atoms] atoms
         La = La*1.1;

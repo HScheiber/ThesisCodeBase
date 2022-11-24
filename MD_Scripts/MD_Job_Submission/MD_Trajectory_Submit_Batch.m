@@ -183,7 +183,7 @@ switch lower(computer)
         Settings_array(idx).Isotropy = 'isotropic';
         Settings_array(idx).Target_P = 1; % Bar
         Settings_array(idx).Barostat = 'Berendsen'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
-        Settings_array(idx).Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
+        Settings_array(idx).Time_Constant_P = 10; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
         Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
         Settings_array(idx).UseMoltenCompressibility = false;
 
