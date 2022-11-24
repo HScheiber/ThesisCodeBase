@@ -103,7 +103,7 @@ Exp = Load_Experimental_Data;
 idx=0;
 
 switch lower(computer)
-    case 'unbearabull'
+    case 'cedar'
         %% WBK Models fit to BH model MH1
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theory = 'BF';
