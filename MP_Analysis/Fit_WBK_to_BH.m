@@ -14,7 +14,8 @@ if ~isfile(dat_file)
 end
 
 % Load data
-data = load(dat_file).full_data;
+data = load(dat_file);
+data = data.full_data;
 
 if isfield(data,'secondary_result')
     optimvals = nan(1,length(data.secondary_result));
