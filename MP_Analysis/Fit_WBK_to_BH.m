@@ -14,12 +14,14 @@ if ~isfile(dat_file)
 end
 
 % Load data
+warning('off','MATLAB:load:classError')
 warning('off','MATLAB:class:InvalidSuperClass')
 warning('off','MATLAB:load:classNotFound')
 data = load(dat_file);
 data = data.full_data;
 warning('on','MATLAB:class:InvalidSuperClass')
 warning('on','MATLAB:load:classNotFound')
+warning('on','MATLAB:load:classError')
 
 if isfield(data,'secondary_result')
     optimvals = nan(1,length(data.secondary_result));
