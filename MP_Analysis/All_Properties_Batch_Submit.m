@@ -108,7 +108,7 @@ switch lower(computer)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theory = 'BF';
         Model_BH = 'MH1';
-        Model = 'MI1';
+        Model = 'MJ1';
         for jdx = 1:length(Salts)
             Salt = Salts{jdx};
             
