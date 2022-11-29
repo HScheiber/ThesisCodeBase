@@ -185,7 +185,7 @@ for idx = 1:length(prev_calcs)
     end
 end
 
-Full_opt_filename = fullfile(Settings.OuterDir,[Settings.JobName '_Results.mat']);
+Full_opt_filename = fullfile(Settings.OuterDir,[Settings.JobID '_fullopt.mat']);
 UserData.Finite_T_Data = Settings.Finite_T_Data;
 UserData.Minimization_Data = Settings.Minimization_Data;
 Minimization_Data = UserData.Minimization_Data;
