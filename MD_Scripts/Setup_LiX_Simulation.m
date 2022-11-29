@@ -36,9 +36,7 @@ if ~Settings.Expand_LP
     Settings.Expand_c = 1;
 end
 
-if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
-    Settings.MDP.CoulombType = 'PME-User';
-end
+Settings = Update_MD_Settings(Settings);
 
 %% Preliminary calculation parameters
 
@@ -51,7 +49,6 @@ if ~isfield(Settings,'Geometry') || ~strcmp(Settings.Geometry.Structure,Settings
 end
 
 % Get Metal and Halide info
-[Settings.Metal,Settings.Halide] = Separate_Metal_Halide(Settings.Salt);
 Metal_Info = elements('Sym',Settings.Metal);
 Halide_Info = elements('Sym',Settings.Halide);
 
@@ -66,11 +63,6 @@ end
 if ~exist(Settings.WorkDir,'dir')
     mkdir(Settings.WorkDir)
 end
-
-% Load Model parameters
-% if ~isempty(Settings.Model)
-%     [Settings,~] = Load_Model_Params(Settings);
-% end
 
 % Load Batch script (if applicable) settings and gromacs stuff
 [Batch_Template,Settings] = MD_Batch_Template(Settings);

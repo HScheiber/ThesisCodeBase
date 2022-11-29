@@ -40,15 +40,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
     save(Input_File,'Settings')
     
-    if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
-        Settings.MDP.CoulombType = 'PME-User';
-    end
-    if ~isfield(Settings,'Longest_Cutoff')
-        Settings.Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]);
-    end
-    if ~isfield(Settings,'Metal')
-        [Settings.Metal,Settings.Halide] = Separate_Metal_Halide(Settings.Salt);
-    end
+    Settings = Update_MD_Settings(Settings);
     
     % Check for previous minimization calculation    
     Minimization_TRR_File = fullfile(Settings.WorkDir,'Prep_Liq.trr'); % mMinimizaion started
