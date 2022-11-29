@@ -277,7 +277,7 @@ switch lower(computer)
         Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
         Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
 
-        %% LiI/CLJ polarized Alexandria model at 400 K starting in wurtzite crystal structure, 
+        %% LiI/CLJ polarized Alexandria model at 400 K steep anneal starting in wurtzite crystal structure, 
         % NPT, anisotropic barostat. Anneal structure quickly to 0 kelvin.
         Salt = 'LiI';
         Structure = 'Wurtzite';

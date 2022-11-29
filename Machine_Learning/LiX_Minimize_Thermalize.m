@@ -103,12 +103,8 @@ if ~isempty(gcp('nocreate')) % close the current ppool, it will likely close on 
     delete(gcp);
 end
 
-[WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-Settings.WorkDir = [WorkDir '_MP'];
-ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Melting_Point');
-if isfolder(ThermFolder)
-    Settings.WorkDir = ThermFolder;
-end
+[~,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Melting_Point');
 
 Settings.BatchMode = false;
 Settings.Submit_Jobs = false;
@@ -119,34 +115,15 @@ Settings.Verbose = true;
 [Tm_estimate,~,Aborted,T_dat] = Find_Melting_Point(Settings);
 Settings.Verbose = Verbose;
 
-if ~isfolder(ThermFolder)
-    copyfile(Settings.WorkDir,ThermFolder)
-end
-
 Settings.Finite_T_Data.T_dat = T_dat;
 if Aborted
     Settings.Finite_T_Data.MP = nan;
 else
     Settings.Finite_T_Data.MP = Tm_estimate;
-    if Settings.Delete_Equil && isfolder(Settings.WorkDir)
-        try
-            rmdir(Settings.WorkDir,'s')
-        catch
-            if Settings.Verbose
-                warning(['Unable to remove directory: ' Settings.WorkDir])
-            end
-        end
-    end
 end
 
 %% High T liquid properties
-[WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-Settings.WorkDir = [WorkDir '_LP'];
-
-ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Liq_Properties_at_MP');
-if isfolder(ThermFolder)
-    Settings.WorkDir = ThermFolder;
-end
+Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Liq_Properties_at_MP');
 
 dd = Settings.dd;
 npme = Settings.npme;
@@ -161,23 +138,13 @@ Settings.dd = dd;
 Settings.npme = npme;
 [~,Settings] = MD_Batch_Template(Settings);
 
-if ~isfolder(ThermFolder)
-    copyfile(Settings.WorkDir,ThermFolder)
-end
-
 Settings.Finite_T_Data.Liquid_V_MP = Liq_Output.Liquid_V_MP;
 Settings.Finite_T_Data.Liquid_H_MP = Liq_Output.Liquid_H_MP;
 Settings.Finite_T_Data.Liquid_DM_MP = Liq_Output.Liquid_DM_MP; % cm^2 / s
 Settings.Finite_T_Data.Liquid_DX_MP = Liq_Output.Liquid_DX_MP;
 
 %% High T solid properties
-[WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
-Settings.WorkDir = [WorkDir '_SP'];
-
-ThermFolder = fullfile(Settings.OuterDir,'BestPoint_Thermal','Sol_Properties_at_MP');
-if isfolder(ThermFolder)
-    Settings.WorkDir = ThermFolder;
-end
+Settings.WorkDir = fullfile(Settings.OuterDir,'BestPoint_Thermal','Sol_Properties_at_MP');
 
 dd = Settings.dd;
 npme = Settings.npme;
@@ -192,9 +159,6 @@ Settings.dd = dd;
 Settings.npme = npme;
 [~,Settings] = MD_Batch_Template(Settings);
 
-if ~isfolder(ThermFolder)
-    copyfile(Settings.WorkDir,ThermFolder)
-end
 Settings.Finite_T_Data.Solid_V_MP = Sol_Output.Solid_V_MP;
 Settings.Finite_T_Data.Solid_H_MP = Sol_Output.Solid_H_MP;
 
@@ -221,7 +185,7 @@ for idx = 1:length(prev_calcs)
     end
 end
 
-Full_opt_filename = fullfile(Settings.WorkDir,[Settings.JobName '_Results.mat']);
+Full_opt_filename = fullfile(Settings.OuterDir,[Settings.JobName '_Results.mat']);
 UserData.Finite_T_Data = Settings.Finite_T_Data;
 UserData.Minimization_Data = Settings.Minimization_Data;
 Minimization_Data = UserData.Minimization_Data;
