@@ -40,8 +40,17 @@ for idx = 1:length(Salts)
             
             if ~isempty(fullopt) && ~isfile(destfile)
                 try
-                    fullopt_dat = load(fullfile(Current_Model_dir,fullopt.name));
-                    bayesopt_dat = load(fullfile(Current_Model_dir,bayesopt.name));
+                    if ~isempty(fullopt)
+                        fullopt_dat = load(fullfile(Current_Model_dir,fullopt.name));
+                    else
+                        fullopt_dat = struct;
+                    end
+                    if ~isempty(bayesopt)
+                        bayesopt_dat = load(fullfile(Current_Model_dir,bayesopt.name));
+                    else
+                        bayesopt_dat = struct;
+                        bayesopt_dat.results = [];
+                    end
                     
                     full_data = fullopt_dat;
                     if isfile(inpfile)
@@ -99,8 +108,17 @@ for idx = 1:length(Salts)
             
             if ~isempty(fullopt) && ~isfile(destfile)
                 try
-                    fullopt_dat = load(fullfile(Current_Model_dir,fullopt.name));
-                    bayesopt_dat = load(fullfile(Current_Model_dir,bayesopt.name));
+                    if ~isempty(fullopt)
+                        fullopt_dat = load(fullfile(Current_Model_dir,fullopt.name));
+                    else
+                        fullopt_dat = struct;
+                    end
+                    if ~isempty(bayesopt)
+                        bayesopt_dat = load(fullfile(Current_Model_dir,bayesopt.name));
+                    else
+                        bayesopt_dat = struct;
+                        bayesopt_dat.results = [];
+                    end
                     
                     full_data = fullopt_dat;
                     if isfile(inpfile)

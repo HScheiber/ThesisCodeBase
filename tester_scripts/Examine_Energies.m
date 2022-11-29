@@ -1,5 +1,5 @@
 Energy_file = 'Comb_Equil.edr';
-system(['wsl source ~/.bashrc; echo 6 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
+system(['wsl source ~/.bashrc; echo 9 11 15 18 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
 %     Data = import_xvg(En_xvg_file);
@@ -17,7 +17,7 @@ Data = import_xvg('energy.xvg');
 
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
-nmol_solid = 1000;
+nmol_solid = 1372;
 
 hold on %figure
 plot(Data(:,1),Data(:,2)./nmol_solid,'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
@@ -44,12 +44,18 @@ plot(Data(:,1),Data(:,5)./nmol_solid) % Enthalpy ( kJ/mol ion pairs)
 
 ylim([-2000 100])
 
-midpoint = ceil(length(Data)/2);
+startpoint = 50; %ceil(length(Data)/2);
+nmol_solid = 1372;
 
+T = Data(startpoint:end,2);
+P = Data(startpoint:end,3);
+V = Data(startpoint:end,4).*(10^3)./nmol_solid;
+H = Data(startpoint:end,5)./nmol_solid;
 
-P = Data(midpoint:end,3);
-V = Data(midpoint:end,4).*(10^3)./nmol_solid;
-H = Data(midpoint:end,5)./nmol_solid;
+% Statistics on Temperature
+SEM = std(T)/sqrt(length(T));               % Standard Error
+ts = tinv([0.025  0.975],length(T)-1);      % T-Score
+disp(['Temperature = ' num2str(mean(T),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' K'])
 
 % Statistics on Pressure
 SEM = std(P)/sqrt(length(P));               % Standard Error
