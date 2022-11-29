@@ -1,9 +1,9 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theory = 'BH';
-ModelID = 'MG';
+ModelID = 'MH';
 BestOnly = false;
 SelectOnly = [];
-Reps = [1:5];
+Reps = [1];
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed';
 PlotType = 'lj';
 lw = 2;
