@@ -30,10 +30,10 @@ function Output = Equilibrate_Liquid(Settings)
     end
 
     % Grab reference density, cutoff, and corresponding box size
-    Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
+    Settings.Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
     L = (2*Settings.Longest_Cutoff)*Settings.Cutoff_Buffer; % nm, the box dimension
     Volume = L^3;
-    nmol_liquid = round(Volume*Ref_Density);
+    nmol_liquid = round(Volume*Settings.Ref_Density);
 
     % Initialize empty box
     Box.a_vec  = [L 0 0];

@@ -209,6 +209,14 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         MPI_Ranks_Per_Node = Settings.MPI_Ranks;
     end
     
+    if stcmp(Settings.gmx_version,'4.6.7')
+        gmx_old_version = true;
+    elseif stcmp(Settings.gmx_version,'2019')
+        gmx_old_version = false;
+    else
+        gmx_old_version = Settings.Polarization;
+    end
+    
     if Settings.Nodes > 0 % Whole node or Multi-node calculation
         nodeline = ['#SBATCH --nodes=' num2str(Settings.Nodes) newline ...
                     '#SBATCH --exclusive' newline];
@@ -216,7 +224,7 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
                      '#SBATCH --cpus-per-task=' num2str(Settings.OMP_Threads) newline];
         
         % Deal with the executable to call
-        if Settings.Polarization % Use version 4.6.7
+        if gmx_old_version % Use version 4.6.7
             Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes) ' '];
             Settings.gmx_loc = '';
         elseif Settings.MPI_Ranks == 1
@@ -243,7 +251,7 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
                      '#SBATCH --cpus-per-task=' num2str(Settings.OMP_Threads) newline];
         
         % Deal with the executable to call
-        if Settings.Polarization % Use version 4.6.7
+        if gmx_old_version % Use version 4.6.7
             Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node) ' '];
             Settings.gmx_loc = '';
         elseif Settings.MPI_Ranks == 1
@@ -266,7 +274,7 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
     end
     
     Settings.mdrun_opts = '';
-    if Settings.Polarization
+    if gmx_old_version
         Settings.grompp = 'grompp_mpi_d';
         Settings.mdrun = 'mdrun_mpi_d';
         Settings.g_energy = 'g_energy_mpi_d';
@@ -283,7 +291,6 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         else
             Settings.insert_molecules = 'gmx insert-molecules';
         end
-        
         Settings.mdrun_opts = [Settings.mdrun_opts ' -pd'];
     else
         Settings.grompp = 'grompp';
@@ -328,7 +335,7 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         memline = ['#SBATCH --mem=' Settings.Mempernode newline];
     end
     
-    if Settings.Polarization
+    if gmx_old_version
         Gromacs_Module = ['module load gromacs-plumed/2019.6' newline ...
                           'module load fftw/3.3.8' newline ...
                           'source /home/scheiber/.local/bin/GMXRC' newline];

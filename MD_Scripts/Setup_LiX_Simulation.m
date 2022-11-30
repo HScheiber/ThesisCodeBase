@@ -44,7 +44,7 @@ Settings = Update_MD_Settings(Settings);
 Settings.Cluster_N = 0;
 
 % Load Default Geometry info for Salt/Structure
-if ~isfield(Settings,'Geometry') || ~strcmp(Settings.Geometry.Structure,Settings.Structure)
+if ~isfield(Settings,'Geometry') || isempty(Settings.Geometry) || ~strcmp(Settings.Geometry.Structure,Settings.Structure)
     Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true);
 end
 
@@ -386,11 +386,11 @@ Settings.UnitCellFile = fullfile(Settings.WorkDir,[Settings.JobName '_UnitCell.'
 Settings.SuperCellFile = fullfile(Settings.WorkDir,[Settings.JobName '.' Settings.CoordType]);
 
 % Find minimum lattice parameter for this salt/structure/model (or use initial ones)
-if Settings.Find_Min_Params && ~Settings.Skip_Minimization
+if Settings.Skip_Minimization || strcmpi(Settings.Structure,'liquid') || strcmpi(Settings.Structure,'previous')
+    Found_DataMatch = true;
+elseif Settings.Find_Min_Params
     [Settings,Found_DataMatch] = FindMinLatticeParam(Settings,...
         'Find_Similar_Params',Settings.Find_Similar_Params,'Center_Coordinates',true);
-elseif Settings.Skip_Minimization || strcmpi(Settings.Structure,'liquid') || strcmpi(Settings.Structure,'previous')
-    Found_DataMatch = true;
 else
     Found_DataMatch = false;
 end
@@ -734,7 +734,7 @@ if DoGeomEdit
             % Get index
             Settings.ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
             ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
-                'add_shells',false,'ndx_filename',Settings.ndx_filename);
+                'add_shells',Settings.Skip_Minimization,'ndx_filename',Settings.ndx_filename);
 
             GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
                 ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...

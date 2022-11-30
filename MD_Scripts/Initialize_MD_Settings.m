@@ -40,6 +40,7 @@ Settings.dds = 0.8; % default = 0.8. Fraction in (0,1) by whose reciprocal the i
 Settings.DLB = true; % Turns on Gromacs dynamic load balancing when true
 Settings.TunePME = true; % Optimizes PME load between PP/PME ranks or GPU/CPU
 Settings.Verbose = true;
+Settings.gmx_version = ''; % One of: '', '4.6.7' or '2019'. Autoselects when empty.
 
 %% Interaction and Structure Settings
 % These can be arrays
@@ -163,10 +164,11 @@ Settings.MinMDP.CoordType = 'g96';
 Settings.MinMDP.Disp_Correction = true; % Adds in a long-range dispersion correction when true
 Settings.MinMDP.Use_Conv_cell = false; % When true, use the conventional unit cell, when false use the primitive unit cell
 
-
 Settings.PreEquilibration = 0; % [ps] Use this to run an initial rapid equilibration
 
 %% Geometry editing and cluster settings
+Settings.Geometry = [];
+Settings.Ref_Density = nan;
 Settings.pbc = 'on'; % periodic boundary conditions
 Settings.GenCluster = false; % Turns on cluster generation when true
 Settings.Cluster_Frac = 0.5; % Fraction of the total atoms in the cluster
@@ -269,6 +271,16 @@ Settings.ML_TimeStep = 0;
 Settings.TimePerFrame = 1; % ps
 Settings.Qlm_Average = true;
 Settings.Voronoi = false;
+Settings.RunEnergyAnalysis = {}; % Activates energy analysis, case insensitive
+% Incomplete list of options:
+%   1  LJ-(SR)          2  Disper.-corr.    3  Coulomb-(SR)     4  Coul.-recip.
+%   5  Polarization     6  Potential        7  Kinetic-En.      8  Total-Energy
+%   9  Conserved-En.   10  Temperature     11  Pres.-DC        12  Pressure
+%  13  Vir-XX          14  Vir-XY          15  Vir-XZ          16  Vir-YX
+%  17  Vir-YY          18  Vir-YZ          19  Vir-ZX          20  Vir-ZY
+%  21  Vir-ZZ          22  Pres-XX         23  Pres-XY         24  Pres-XZ
+%  25  Pres-YX         26  Pres-YY         27  Pres-YZ         28  Pres-ZX
+%  29  Pres-ZY         30  Pres-ZZ         31  #Surf*SurfTen   32  Coul-SR:Na-Na
 
 % Default model modification parameters
 Settings.S = Init_Scaling_Object;

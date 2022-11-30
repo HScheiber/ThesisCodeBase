@@ -10,7 +10,7 @@ function Output = Create_Liquid_Solid_Interface(Settings)
     Settings.nmol_liquid = round((Settings.N_total/2)*Settings.Liquid_Fraction); % number of molecules needed
     
     % Find the approximate experimental density based on the temperature and pressure
-    if ~isfield(Settings,'Ref_Density')
+    if ~isfield(Settings,'Ref_Density') || isnan(Settings.Ref_Density)
         Settings.Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
     end
     

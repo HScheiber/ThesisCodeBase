@@ -1,8 +1,8 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BF';
-ModelID = 'MH';
+Theory = 'BH';
+ModelID = 'MI';
 BestOnly = true;
 SelectOnly = [];
 Reps = [1:5];
