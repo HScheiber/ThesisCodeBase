@@ -209,9 +209,9 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         MPI_Ranks_Per_Node = Settings.MPI_Ranks;
     end
     
-    if stcmp(Settings.gmx_version,'4.6.7')
+    if strcmp(Settings.gmx_version,'4.6.7')
         gmx_old_version = true;
-    elseif stcmp(Settings.gmx_version,'2019')
+    elseif strcmp(Settings.gmx_version,'2019')
         gmx_old_version = false;
     else
         gmx_old_version = Settings.Polarization;
