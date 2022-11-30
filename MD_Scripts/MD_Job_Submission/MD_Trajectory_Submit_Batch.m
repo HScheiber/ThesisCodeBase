@@ -35,8 +35,8 @@ Shared_Settings.MinMDP.Parallel_Min = false;
 idx=0;
 
 switch lower(computer)
-    case 'graham'
     case {'unbearabull' 'cedar'}
+    case 'graham'
         %% LiI/WBK polarized Alexandria model at 909 K starting in liquid crystal structure, Beredensen anisotropic barostat (tc = 10 ps)
         % NPT, isotropic barostat. Anneal structure slowly to 0 kelvin.
         Salt = 'LiI';
@@ -353,7 +353,6 @@ switch lower(computer)
             Settings_array(idx).Thermostat = 'no'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'nose-hoover' (set NO for NVE)
             Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
         end
-        
         
     case 'narval'
 
