@@ -184,7 +184,7 @@ for idx = 1:length(Settings_array)
     	mkdir(Settings.WorkDir)
     end
     Batch_Template = strrep(Batch_Template,'##DIRECTORY##',Settings.WorkDir);
-    TaskName = [Settings.Salt '_' Settings.JobName];
+    Settings.JobName = [Settings.Salt '_' Settings.JobName];
     
     % Generate and move to the submission directory
     if ~exist(Settings.WorkDir, 'dir')
@@ -195,13 +195,13 @@ for idx = 1:length(Settings_array)
     % Check if job is already complete
     ResultsFile = fullfile(Settings.WorkDir,[Settings.JobName '_Results.mat']);
     if check_complete && isfile(ResultsFile)
-        disp([TaskName ': Job already completed. Skipping Job Submission.'])
+        disp([Settings.JobName ': Job already completed. Skipping Job Submission.'])
         continue
     end
     
     % Check if Model is already running
-    if check_running && ismember(TaskName,c_jobs_unique) 
-        disp([TaskName ': Job already Running. Skipping Job Submission.'])
+    if check_running && ismember(Settings.JobName,c_jobs_unique) 
+        disp([Settings.JobName ': Job already Running. Skipping Job Submission.'])
         continue
     end
     
@@ -226,9 +226,9 @@ for idx = 1:length(Settings_array)
         Batch_Template_jdx = strrep(Batch_Template,'##MDRUN##',calc_cmd_idx_jdx);
         
         % Copy over batch template and modify
-        TaskName_jdx = [TaskName '-' num2str(jdx,'%03.f')];
-        Batch_Template_jdx = strrep(Batch_Template_jdx,'##TASKNAME##',TaskName_jdx);
-        Batch_Template_jdx = strrep(Batch_Template_jdx,'##ERROR##',TaskName_jdx);
+        JobName_jdx = [Settings.JobName '-' num2str(jdx,'%03.f')];
+        Batch_Template_jdx = strrep(Batch_Template_jdx,'##TASKNAME##',JobName_jdx);
+        Batch_Template_jdx = strrep(Batch_Template_jdx,'##ERROR##',JobName_jdx);
 
         % Save job submission script
         subm_file_jdx = fullfile(Settings.WorkDir,[Settings.JobName '-' num2str(jdx,'%03.f') '.subm']);
@@ -251,7 +251,7 @@ for idx = 1:length(Settings_array)
             end
         end
         
-        disp(['Submitting Job ' TaskName_jdx])
+        disp(['Submitting Job ' JobName_jdx])
         [errcode,output] = system(qsub_cmd);
 
         if errcode ~= 0 && ~Slurm
@@ -275,12 +275,12 @@ for idx = 1:length(Settings_array)
             end
 
             % Check if the previous job is in the queue
-            regcheck = ['([0-9]+) +' TaskName_jdx];
+            regcheck = ['([0-9]+) +' JobName_jdx];
             jobid = regexp(output,regcheck,'once','tokens');
 
             if isempty(jobid) % Job did not submit successfully
                 % Retry submitting
-                disp(['Submitting Job ' TaskName_jdx])
+                disp(['Submitting Job ' JobName_jdx])
                 [errcode,output] = system(qsub_cmd);
 
             else % Job did submit successfully (but failed to output properly)

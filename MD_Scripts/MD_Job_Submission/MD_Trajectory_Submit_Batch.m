@@ -167,6 +167,7 @@ switch lower(computer)
             Settings_array(idx).Nodes = 0; % Number of nodes to request for calculation.
             Settings_array(idx).Cores = 1; % Minimum number of cores to request for calculation. Set to -1 for entire node
             Settings_array(idx).MPI_Ranks = 1;
+            Settings_array(idx).Mempernode = '15000M';
 
             Settings_array(idx).MDP.RVDW_Cutoff = 1.0; % nm
             Settings_array(idx).MDP.RCoulomb_Cutoff = 1.1; % nm
