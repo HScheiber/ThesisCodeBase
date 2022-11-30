@@ -325,7 +325,7 @@ switch lower(computer)
             Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
 
             Settings_array(idx).Model = 'Alexandria_pol'; % Name of the current model. Leave blank for the default JC/TF/BH model
-            Settings_array(idx).JobID = 'ChkNVT_def'; % An ID that is tacked onto the folder name of all current jobs
+            Settings_array(idx).JobID = 'ChkNVE'; % An ID that is tacked onto the folder name of all current jobs
             Settings_array(idx).N_atoms = 2000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
             Settings_array(idx).c_over_a = 1;
 
