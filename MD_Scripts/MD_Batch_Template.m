@@ -217,6 +217,7 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         gmx_old_version = Settings.Polarization;
     end
     
+    Settings.mdrun_opts = '';
     if Settings.Nodes > 0 % Whole node or Multi-node calculation
         nodeline = ['#SBATCH --nodes=' num2str(Settings.Nodes) newline ...
                     '#SBATCH --exclusive' newline];
@@ -250,8 +251,6 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         nodeline = '';
         tasksline = ['#SBATCH --tasks=' num2str(MPI_Ranks_Per_Node) newline ...
                      '#SBATCH --cpus-per-task=' num2str(Settings.OMP_Threads) newline];
-        
-        Settings.mdrun_opts = '';
         
         % Deal with the executable to call
         if gmx_old_version % Use version 4.6.7
