@@ -235,6 +235,7 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
                 Settings.gmx = 'gmx_d ';
                 Settings.gmx_loc = 'gmx_d ';
             end
+            Settings.mdrun_opts = [Settings.mdrun_opts ' -ntmpi 1'];
         else
             if Settings.SinglePrecision
                 Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node*Settings.Nodes) ' gmx_mpi '];
@@ -250,6 +251,8 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         tasksline = ['#SBATCH --tasks=' num2str(MPI_Ranks_Per_Node) newline ...
                      '#SBATCH --cpus-per-task=' num2str(Settings.OMP_Threads) newline];
         
+        Settings.mdrun_opts = '';
+        
         % Deal with the executable to call
         if gmx_old_version % Use version 4.6.7
             Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node) ' '];
@@ -262,6 +265,7 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
                 Settings.gmx = 'gmx_d ';
                 Settings.gmx_loc = 'gmx_d ';
             end
+            Settings.mdrun_opts = [Settings.mdrun_opts ' -ntmpi 1'];
         else
             if Settings.SinglePrecision
                 Settings.gmx = ['mpiexec -np ' num2str(MPI_Ranks_Per_Node) ' gmx_mpi '];
@@ -273,7 +277,6 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         end
     end
     
-    Settings.mdrun_opts = '';
     if gmx_old_version
         Settings.grompp = 'grompp_mpi_d';
         Settings.mdrun = 'mdrun_mpi_d';
