@@ -366,7 +366,7 @@ if check_running && isunix
         er = 1;
         jdx = 1;
         while er ~= 0
-            [er,out] = system('squeue -u $USER -o %100Z | tail -n +2');
+            [er,out] = system('squeue -u $USER -o %200Z | tail -n +2');
             jdx = jdx+1;
             if jdx > 10
                 disp('Failed to check current running jobs.')
