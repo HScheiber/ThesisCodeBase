@@ -166,6 +166,7 @@ switch lower(computer)
             Settings_array(idx).N_Calc = 8; % Number of jobs to link together.
             Settings_array(idx).Nodes = 0; % Number of nodes to request for calculation.
             Settings_array(idx).Cores = 1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+            Settings_array(idx).Hours = 6; % Max time for each job (hours)
             Settings_array(idx).MPI_Ranks = 1;
             Settings_array(idx).Mempernode = '15000M';
 
