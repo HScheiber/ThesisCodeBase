@@ -125,7 +125,12 @@ function params = bayesopt_params(Settings)
                 SgammaMX = optimizableVariable('gamma_MX',[7 20],'Type','real'); % Units: kJ/mol
             end
             if Settings.Additivity
-                params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
+                switch lower(Settings.Comb_rule)
+                    case 'lorentz-berthelot'
+                        params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
+                    case {'kong' 'hogervorst'}
+                        params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMM,SgammaXX];
+                end
             else
                 params = [Sr0MM,Sr0XX,Sr0MX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
             end
@@ -193,7 +198,12 @@ function params = bayesopt_params(Settings)
         end
         
         if Settings.Additivity
-            params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMX];
+            switch lower(Settings.Comb_rule)
+                case 'lorentz-berthelot'
+                    params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMX];
+                case {'kong' 'hogervorst'}
+                    params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMM,SgammaXX];
+            end
         else
             params = [SsigmaMM,SsigmaXX,SsigmaMX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
         end

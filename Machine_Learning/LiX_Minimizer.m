@@ -201,13 +201,31 @@ case {'BH' 'BD' 'BE'}
         epsilon_MM = Param.epsilon_MM; % kJ/mol
         epsilon_XX = Param.epsilon_XX; % kJ/mol
 
-        gamma_MX = Param.gamma_MX; % Unitless
+        
 
         if Settings.Additivity
-            r0_MX = (r0_MM + r0_XX)/2; % nm
-            epsilon_MX = sqrt(epsilon_MM*epsilon_XX); % kJ/mol
-            gamma_MM = gamma_MX; % Unitless
-            gamma_XX = gamma_MX; % Unitless
+            switch lower(Settings.Comb_rule)
+                case 'lorentz-berthelot'
+                    gamma_MX = Param.gamma_MX; % Unitless
+                    r0_MX = (r0_MM + r0_XX)/2; % nm
+                    epsilon_MX = sqrt(epsilon_MM*epsilon_XX); % kJ/mol
+                    gamma_MM = gamma_MX; % Unitless
+                    gamma_XX = gamma_MX; % Unitless
+                case {'kong' 'hogervorst'}
+                    gamma_MM = Param.gamma_MM; % Unitless
+                    gamma_XX = Param.gamma_XX; % Unitless
+                    
+                    C_MM = epsilon_MM*gamma_MM;
+                    C_XX
+                    
+                    B_MM
+                    B_XX
+                    
+                    
+                    C_MX
+                case 'hogervorst'
+            end
+
         else
             r0_MX = Param.r0_MX; % nm
             epsilon_MX = Param.epsilon_MX; % kJ/mol
