@@ -111,9 +111,9 @@ switch lower(computer)
         Theory = 'BF';
         vdW_Type = 'WBK';
         Structures = {'Rocksalt' 'Liquid'};
-        Densities_Liq = {16.28021241 13.31010631};
-        a_RSs = {5.857263144 6.1675256591}; % Angstoms
-        T0s = {1075.168 742}; % [K] exp MPs
+        Densities_Liq = [16.28021241 13.31010631];
+        a_RSs = [5.857263144 6.1675256591]; % Angstoms
+        T0s = [1075.168 742]; % [K] exp MPs
         
         for sdx = 1:numel(Salts)
             Salt = Salts{sdx};
@@ -187,9 +187,9 @@ switch lower(computer)
         Theory = 'BF';
         vdW_Type = 'WBK';
         Structures = {'Liquid'};
-        Densities_Liq = {13.31010631};
-        a_RSs = {6.1675256591}; % Angstoms
-        T0s = {742}; % [K] exp MPs
+        Densities_Liq = 13.31010631;
+        a_RSs = 6.1675256591; % Angstoms
+        T0s = 742; % [K] exp MPs
         
         for sdx = 1:numel(Salts)
             Salt = Salts{sdx};
@@ -263,9 +263,9 @@ switch lower(computer)
         Theory = 'BF';
         vdW_Type = 'WBK';
         Structures = {'Liquid'};
-        Densities_Liq = {13.31010631};
-        a_RSs = {6.1675256591}; % Angstoms
-        T0s = {742}; % [K] exp MPs
+        Densities_Liq = 13.31010631;
+        a_RSs = 6.1675256591; % Angstoms
+        T0s = 742; % [K] exp MPs
         
         for sdx = 1:numel(Salts)
             Salt = Salts{sdx};
@@ -339,9 +339,9 @@ switch lower(computer)
         Theory = 'BF';
         vdW_Type = 'WBK';
         Structures = {'Liquid'};
-        Densities_Liq = {13.31010631};
-        a_RSs = {6.1675256591}; % Angstoms
-        T0s = {742}; % [K] exp MPs
+        Densities_Liq = 13.31010631;
+        a_RSs = 6.1675256591; % Angstoms
+        T0s = 742; % [K] exp MPs
         
         for sdx = 1:numel(Salts)
             Salt = Salts{sdx};
