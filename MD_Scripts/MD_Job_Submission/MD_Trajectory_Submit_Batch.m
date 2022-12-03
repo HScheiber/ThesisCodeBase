@@ -14,7 +14,7 @@ Shared_Settings = Initialize_MD_Settings;
 Shared_Settings.N_Calc = 4; % Number of jobs to link together.
 Shared_Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Shared_Settings.BatchMode = true; % Sets up batch job when true, or runs immediately when false
-Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.Hours = 6; % Max time for each job (hours)
 Shared_Settings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.Nodes = 1; % Minimum number of cores to request for calculation.
 Shared_Settings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
@@ -168,7 +168,7 @@ switch lower(computer)
                 Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.
                 Settings_array(idx).Output_Coords = 1000; % Number of steps between outputting coordinates
                 Settings_array(idx).MDP.dt = 0.0005; % Time step in ps for md type calculations
-                Settings_array(idx).PreEquilibration = 25; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
+                Settings_array(idx).PreEquilibration = 10; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
                 Settings_array(idx).Annealing = 'no'; % Options: 'no' 'single' 'periodic'
                 Settings_array(idx).MDP.Trajectory_Time = 1.0; % ns
 
@@ -182,7 +182,7 @@ switch lower(computer)
             end
         end
         
-        %% LiI/WBK polarized Alexandria model at Tm starting in liquid structure: NVE, 0.1 fs time step
+        %% LiI/WBK polarized Alexandria model at Tm starting in liquid structure: NVE, 0.25 fs time step
         Salts = {'LiI'};
         Theory = 'BF';
         vdW_Type = 'WBK';
@@ -227,7 +227,7 @@ switch lower(computer)
                 Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
 
                 Settings_array(idx).Model = 'Alexandria_pol'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                Settings_array(idx).JobID = 'ChkNVE_0.1ts'; % An ID that is tacked onto the folder name of all current jobs
+                Settings_array(idx).JobID = 'ChkNVE_0.25ts'; % An ID that is tacked onto the folder name of all current jobs
                 Settings_array(idx).N_atoms = 1728; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
                 Settings_array(idx).c_over_a = 1;
 
@@ -238,12 +238,88 @@ switch lower(computer)
 
                 % Polarization settings
                 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+                Settings.emtol_polarization = 0.25; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
                 % Misc settings
                 Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.
                 Settings_array(idx).Output_Coords = 1000; % Number of steps between outputting coordinates
                 Settings_array(idx).MDP.dt = 0.0001; % Time step in ps for md type calculations
+                Settings_array(idx).PreEquilibration = 10; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
+                Settings_array(idx).Annealing = 'no'; % Options: 'no' 'single' 'periodic'
+                Settings_array(idx).MDP.Trajectory_Time = 0.5; % ns
+
+                % Barostat Options
+                Settings_array(idx).Barostat = 'no'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
+
+                % Thermostat Options
+                Settings_array(idx).Thermostat = 'no'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'nose-hoover' (set NO for NVE)
+                Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
+                Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+            end
+        end
+        
+        %% LiI/WBK polarized Alexandria model at Tm starting in liquid structure: NVE, 1e-2 emtol
+        Salts = {'LiI'};
+        Theory = 'BF';
+        vdW_Type = 'WBK';
+        Structures = {'Liquid'};
+        Densities_Liq = 13.31010631;
+        a_RSs = 6.1675256591; % Angstoms
+        T0s = 742; % [K] exp MPs
+        
+        for sdx = 1:numel(Salts)
+            Salt = Salts{sdx};
+            T0 = T0s(sdx);
+            a_RS = a_RSs(sdx);
+            Density_Liq = Densities_Liq(sdx);
+            
+            for jdx = 1:numel(Structures)
+                Structure = Structures{jdx};
+
+                idx = idx+1;
+                Settings_array(idx) = Shared_Settings;
+                Settings_array(idx).RunEnergyAnalysis = {'Potential' 'Total-Energy' 'Temperature' 'Pressure'};
+                Settings_array(idx).Structure = Structure;
+
+                switch Structure
+                    case 'Rocksalt'
+                        Settings_array(idx).Geometry = Default_Crystal(Settings_array(idx),'Center_Coordinates',true);
+                        Settings_array(idx).Geometry.a = a_RS;
+                        Settings_array(idx).Geometry.b = a_RS;
+                        Settings_array(idx).Geometry.c = a_RS;
+                        Settings_array(idx).Skip_Minimization = true;
+                    case 'Liquid'
+                        Settings_array(idx).Ref_Density = Density_Liq; % ion pairs / nm^3
+                        Settings_array(idx).Skip_Minimization = false;
+                end
+
+                Settings_array(idx).MDP.RVDW_Cutoff = 1.0; % nm
+                Settings_array(idx).MDP.RCoulomb_Cutoff = 1.1; % nm
+                Settings_array(idx).MDP.RList_Cutoff = 1.1; % nm
+                Settings_array(idx).MDP.Disp_Correction = true; % Adds in long-range dispersion correction
+                Settings_array(idx).MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
+
+                Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+
+                Settings_array(idx).Model = 'Alexandria_pol'; % Name of the current model. Leave blank for the default JC/TF/BH model
+                Settings_array(idx).JobID = 'ChkNVE_1e-2_emtol'; % An ID that is tacked onto the folder name of all current jobs
+                Settings_array(idx).N_atoms = 1728; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
+                Settings_array(idx).c_over_a = 1;
+
+                % load the model
+                Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type);
+                Settings_array(idx).GaussianCharge = true; % Turn on Gaussian distributed charges when true
+                Settings_array(idx).Polarization = true; % Turn on polarizible Drude model when true
+
+                % Polarization settings
+                Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+                Settings.emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+
+                % Misc settings
+                Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.
+                Settings_array(idx).Output_Coords = 1000; % Number of steps between outputting coordinates
+                Settings_array(idx).MDP.dt = 0.001; % Time step in ps for md type calculations
                 Settings_array(idx).PreEquilibration = 10; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
                 Settings_array(idx).Annealing = 'no'; % Options: 'no' 'single' 'periodic'
                 Settings_array(idx).MDP.Trajectory_Time = 0.5; % ns
@@ -396,7 +472,7 @@ switch lower(computer)
                 Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.
                 Settings_array(idx).Output_Coords = 1000; % Number of steps between outputting coordinates
                 Settings_array(idx).MDP.dt = 0.001; % Time step in ps for md type calculations
-                Settings_array(idx).PreEquilibration = 15; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
+                Settings_array(idx).PreEquilibration = 10; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
                 Settings_array(idx).Annealing = 'no'; % Options: 'no' 'single' 'periodic'
                 Settings_array(idx).MDP.Trajectory_Time = 0.5; % ns
 
