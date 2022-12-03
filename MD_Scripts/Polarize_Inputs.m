@@ -24,15 +24,15 @@ function [Topology_Template,MDP_Template] = Polarize_Inputs(Settings,Topology_Te
         MDP_Template = [MDP_Template newline newline...
             '; maximum number of iterations for optimizing the shell positions and the flexible constraints' newline ...
             'niter                    = ' num2str(Settings.niter_polarization)];
-    else
-        MDP_Template = regexprep(MDP_Template,'(niter += *)(.+?)( *);',['$1 ' num2str(Settings.niter_polarization) '$3;']);
+%     else
+%         MDP_Template = regexprep(MDP_Template,'(niter += *)(.+?)( *);',['$1 ' num2str(Settings.niter_polarization) '$3;']);
     end
     if ~contains(MDP_Template,'emtol')
         MDP_Template = [MDP_Template newline newline...
             '; [kJ mol-1 nm-1] the minimization is converged when the maximum force is smaller than this value' newline ...
             'emtol                    = ' num2str(Settings.emtol_polarization,'%.2E')];
-    else
-        MDP_Template = regexprep(MDP_Template,'(emtol += *)(.+?)( *);',['$1 ' num2str(Settings.emtol_polarization) '$3;']);
+%     else
+%         MDP_Template = regexprep(MDP_Template,'(emtol += *)(.+?)( *);',['$1 ' num2str(Settings.emtol_polarization,'%.2E') '$3;']);
     end    
     
     %% Deal with topology

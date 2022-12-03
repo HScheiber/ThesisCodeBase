@@ -56,19 +56,19 @@ H = Data(startpoint:end,5)./nmol_solid;
 
 
 
-startpoint = round(numel(Energy.Time)*0.2);
+startpoint = 1;%round(numel(Energy.Time)*0.2);
 NF = Energy.NF;
 t = Energy.Time(startpoint:end);
 T = Energy.Temperature(startpoint:end);
 P = Energy.Pressure(startpoint:end);
-% E = Energy.Total_Energy(startpoint:end)./NF;
-% U = Energy.Potential(startpoint:end)./NF;
+E = Energy.Total_Energy(startpoint:end)./NF;
+U = Energy.Potential(startpoint:end)./NF;
 % 
-V = Energy.Volume(startpoint:end).*(10^3)./NF;
-H = Energy.Enthalpy(startpoint:end)./NF;
+% V = Energy.Volume(startpoint:end).*(10^3)./NF;
+% H = Energy.Enthalpy(startpoint:end)./NF;
 
 
-%plot(t,T,'Linewidth',4,'Color','r')
+plot(t,E,'Linewidth',4,'Color','g')
 
 %plot(conv(T,ones(3000,1)./3000),'Linewidth',4,'Color','r')
 
@@ -83,16 +83,16 @@ SEM = std(P)/sqrt(length(P));               % Standard Error
 ts = tinv([0.025  0.975],length(P)-1);      % T-Score
 disp(['Pressure = ' num2str(mean(P),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' bar'])
 
-% % Statistics on Total Energy
-% SEM = std(E)/sqrt(length(E));               % Standard Error
-% ts = tinv([0.025  0.975],length(E)-1);      % T-Score
-% disp(['Total Energy = ' num2str(mean(E),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' bar'])
-% 
-% % Statistics on Potential
-% SEM = std(U)/sqrt(length(U));               % Standard Error
-% ts = tinv([0.025  0.975],length(U)-1);      % T-Score
-% disp(['Potential = ' num2str(mean(U),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' bar'])
-% 
+% Statistics on Total Energy
+SEM = std(E)/sqrt(length(E));               % Standard Error
+ts = tinv([0.025  0.975],length(E)-1);      % T-Score
+disp(['Total Energy = ' num2str(mean(E),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' bar'])
+
+% Statistics on Potential
+SEM = std(U)/sqrt(length(U));               % Standard Error
+ts = tinv([0.025  0.975],length(U)-1);      % T-Score
+disp(['Potential = ' num2str(mean(U),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' bar'])
+
 
 
 % Statistics on Volume

@@ -390,6 +390,13 @@ case 'BF'
                     
                     sigma_MX = ( sqrt( ( epsilon_MM*epsilon_XX*gamma_MM*gamma_XX*(sigma_MM*sigma_XX)^6 )...
                         /((gamma_MM - 6)*(gamma_XX - 6)) )*(gamma_MX - 6)/(epsilon_MX*gamma_MX) )^(1/6);
+                case 'gromacs'
+                    gamma_MM = Param.gamma_MM; % Unitless
+                    gamma_XX = Param.gamma_XX; % Unitless
+                    gamma_MX = sqrt(gamma_MM.*gamma_XX);
+                    
+                    epsilon_MX = sqrt(epsilon_MM.*epsilon_XX);
+                    sigma_MX = sqrt(sigma_MM.*sigma_XX);
             end
     else
         sigma_MX = Param.sigma_MX; % nm
