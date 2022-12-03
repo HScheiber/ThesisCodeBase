@@ -79,8 +79,8 @@ switch lower(computer)
             Settings_array(idx).Polarization = true; % Turn on polarizible Drude model when true
             
             % Polarization settings
-            Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-            Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+            Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+            Settings_array(idx).emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
             
             % Misc settings
             Settings_array(idx).Output_Energies = 1; % Number of steps that else between writing energies to energy file.
@@ -161,8 +161,8 @@ switch lower(computer)
                 Settings_array(idx).Polarization = true; % Turn on polarizible Drude model when true
 
                 % Polarization settings
-                Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+                Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+                Settings_array(idx).emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
                 % Misc settings
                 Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.
@@ -237,8 +237,8 @@ switch lower(computer)
                 Settings_array(idx).Polarization = true; % Turn on polarizible Drude model when true
 
                 % Polarization settings
-                Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                Settings.emtol_polarization = 0.25; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+                Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+                Settings_array(idx).emtol_polarization = 0.25; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
                 % Misc settings
                 Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.
@@ -313,8 +313,8 @@ switch lower(computer)
                 Settings_array(idx).Polarization = true; % Turn on polarizible Drude model when true
 
                 % Polarization settings
-                Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                Settings.emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+                Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+                Settings_array(idx).emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
                 % Misc settings
                 Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.
@@ -389,8 +389,8 @@ switch lower(computer)
                 Settings_array(idx).Polarization = true; % Turn on polarizible Drude model when true
 
                 % Polarization settings
-                Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                Settings.emtol_polarization = 1e-3; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+                Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+                Settings_array(idx).emtol_polarization = 1e-3; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
                 % Misc settings
                 Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.
@@ -465,8 +465,8 @@ switch lower(computer)
                 Settings_array(idx).Polarization = true; % Turn on polarizible Drude model when true
 
                 % Polarization settings
-                Settings.niter_polarization = 5000; % Maximum number of iterations for optimizing the shell positions
-                Settings.emtol_polarization = 1e-3; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+                Settings_array(idx).niter_polarization = 5000; % Maximum number of iterations for optimizing the shell positions
+                Settings_array(idx).emtol_polarization = 1e-3; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
                 % Misc settings
                 Settings_array(idx).Output_Energies = 10; % Number of steps that else between writing energies to energy file.

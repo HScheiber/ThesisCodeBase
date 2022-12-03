@@ -19,10 +19,10 @@ Settings.MinMDP.Parallel_Min = false;
 
 %% NaCl/WBK polarized vs unpolarized Alexandria model at Tm starting in rocksalt structure: NVT
 Settings.Theory = 'BF'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-Settings.Salt = 'NaCl';
-Settings.Structure = 'Rocksalt';
+Settings.Salt = 'LiI';
+Settings.Structure = 'Liquid';
 a_RS = 5.857263144; % Angstoms
-T0 = 1075.168;
+T0 = 742;
 Settings.RunEnergyAnalysis = {'Potential' 'Total-Energy' 'Temperature' 'Pressure'};
 
 Settings.MDP.RVDW_Cutoff = 1.0; % nm
@@ -35,11 +35,9 @@ Settings.Model = 'Alexandria_pol'; % Name of the current model. Leave blank for 
 Settings.JobID = 'ChkNVT'; % An ID that is tacked onto the folder name of all current jobs
 Settings.N_atoms = 1728; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
 Settings.c_over_a = 1;
-Settings.Geometry = Default_Crystal(Settings,'Center_Coordinates',true);
-Settings.Geometry.a = a_RS;
-Settings.Geometry.b = a_RS;
-Settings.Geometry.c = a_RS;
-Settings.Skip_Minimization = true;
+Settings.Geometry = [];
+Settings.Skip_Minimization = false;
+Settings.Ref_Density = 13.31010631;
 
 % load the model
 Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
