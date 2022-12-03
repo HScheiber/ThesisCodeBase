@@ -153,23 +153,83 @@ case {'BH' 'BD' 'BE'}
         epsilon_MM = Param.epsilon_MM; % kJ/mol
         epsilon_XX = Param.epsilon_XX; % kJ/mol
         
-        gamma_MX = Param.gamma_MX; % Unitless
-        
         if Settings.Additivity
-            r0_MX = (r0_MM + r0_XX)./2; % nm
-            epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
-            gamma_MM = gamma_MX; % Unitless
-            gamma_XX = gamma_MX; % Unitless
+            switch lower(Settings.Comb_rule)
+                case 'lorentz-berthelot'
+                    gamma_MX = Param.gamma_MX; % Unitless
+                    r0_MX = (r0_MM + r0_XX)./2; % nm
+                    epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
+                    gamma_MM = gamma_MX; % Unitless
+                    gamma_XX = gamma_MX; % Unitless
+                    epsilon_MM(gamma_MM < 6) = -abs(epsilon_MM(gamma_MM < 6));
+                    epsilon_XX(gamma_XX < 6) = -abs(epsilon_XX(gamma_XX < 6));
+                    epsilon_MX(gamma_MX < 6) = -abs(epsilon_MX(gamma_MX < 6));
+                case 'hogervorst'
+                    gamma_MM = Param.gamma_MM; % Unitless
+                    gamma_XX = Param.gamma_XX; % Unitless
+                    gamma_MX = (gamma_MM + gamma_XX)./2;
+                    
+                    epsilon_MX = 2.*epsilon_MM.*epsilon_XX./(epsilon_MM + epsilon_XX);
+                    
+                    epsilon_MM(gamma_MM < 6) = -abs(epsilon_MM(gamma_MM < 6));
+                    epsilon_XX(gamma_XX < 6) = -abs(epsilon_XX(gamma_XX < 6));
+                    epsilon_MX(gamma_MX < 6) = -abs(epsilon_MX(gamma_MX < 6));
+                    
+                    r0_MX = ( sqrt( ( epsilon_MM.*epsilon_XX.*gamma_MM.*gamma_XX.*(r0_MM.*r0_XX).^6 )...
+                        ./((gamma_MM - 6).*(gamma_XX - 6)) ).*(gamma_MX - 6)./(epsilon_MX.*gamma_MX) ).^(1/6);
+                    
+                case {'kong' 'gromacs'}
+                    gamma_MM = Param.gamma_MM; % Unitless
+                    gamma_XX = Param.gamma_XX; % Unitless
+                    
+                    epsilon_MM(gamma_MM < 6) = -abs(epsilon_MM(gamma_MM < 6));
+                    epsilon_XX(gamma_XX < 6) = -abs(epsilon_XX(gamma_XX < 6));
+                    
+                    k_MM = 1 ./ ( gamma_MM - 6 );
+                    k_XX = 1 ./ ( gamma_XX - 6 );
+                    
+                    A_MM = 6.*epsilon_MM.*k_MM.*exp(gamma_MM); % prefactor
+                    A_XX = 6.*epsilon_XX.*k_XX.*exp(gamma_XX);
+                    
+                    B_MM = gamma_MM./r0_MM; % exponent
+                    B_XX = gamma_XX./r0_XX;
+                    
+                    C_MM = epsilon_MM.*gamma_MM.*k_MM.*(r0_MM.^6); % dispersion
+                    C_XX = epsilon_XX.*gamma_XX.*k_XX.*(r0_XX.^6);
+                    
+                    switch lower(Settings.Comb_rule)
+                        case 'kong'
+                            A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
+                                            A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
+                            B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
+                            C_MX = sqrt(C_MM.*C_XX);
+                        case 'gromacs'
+                            A_MX = sqrt(A_MM.*A_XX);
+                            B_MX = 2./( (1./B_MM) + (1./B_XX) );
+                            C_MX = sqrt(C_MM.*C_XX);
+                    end
+                    
+                    % Convert back to gamma/epsilon/r0
+                    gamma_MX   = -7.*lambertw((-1/7).*(6.*C_MX.*(B_MX.^6)./A_MX).^(1./7));
+                    r0_MX      = gamma_MX./B_MX;
+                    epsilon_MX = C_MX.*(gamma_MX - 6)./(gamma_MX.*(r0_MX.^6));
+                    epsilon_MX(gamma_MX < 6) = -abs(epsilon_MX(gamma_MX < 6));
+            end
         else
             r0_MX = Param.r0_MX; % nm
             epsilon_MX = Param.epsilon_MX; % kJ/mol
             gamma_MM = Param.gamma_MM; % Unitless
             gamma_XX = Param.gamma_XX; % Unitless
+            gamma_MX = Param.gamma_MX; % Unitless
+            epsilon_MM(gamma_MM < 6) = -abs(epsilon_MM(gamma_MM < 6));
+            epsilon_XX(gamma_XX < 6) = -abs(epsilon_XX(gamma_XX < 6));
+            epsilon_MX(gamma_MX < 6) = -abs(epsilon_MX(gamma_MX < 6));
         end
         
-        epsilon_MX(gamma_MX < 6) = -epsilon_MX(gamma_MX < 6);
-        epsilon_MM(gamma_MM < 6) = -epsilon_MM(gamma_MM < 6);
-        epsilon_XX(gamma_XX < 6) = -epsilon_XX(gamma_XX < 6);
+        % Remove any nonsense
+        r0_MX(abs(imag(r0_MX)) > sqrt(eps)) = nan;
+        gamma_MX(abs(imag(gamma_MX)) > sqrt(eps)) = nan;
+        epsilon_MX(abs(imag(epsilon_MX)) > sqrt(eps)) = nan;
         
         Settings.S.S.MM = r0_MM;
         Settings.S.S.XX = r0_XX;
@@ -227,25 +287,55 @@ case {'BH' 'BD' 'BE'}
     end
 case 'BF'
     % Input parameters
-    Settings.S.S.MM = Param.sigma_MM; % nm
-    Settings.S.S.XX = Param.sigma_XX; % nm
+    sigma_MM = Param.sigma_MM; % nm
+    sigma_XX = Param.sigma_XX; % nm
     
-    Settings.S.E.MM = Param.epsilon_MM; % kJ/mol
-    Settings.S.E.XX = Param.epsilon_XX; % kJ/mol
-    
-    Settings.S.G.MX = Param.gamma_MX; % Unitless
+    epsilon_MM = Param.epsilon_MM; % kJ/mol
+    epsilon_XX = Param.epsilon_XX; % kJ/mol
     
     if Settings.Additivity
-        Settings.S.S.MX = (Settings.S.S.MM + Settings.S.S.XX)./2; % nm
-        Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX); % kJ/mol
-        Settings.S.G.MM = Settings.S.G.MX; % Unitless
-        Settings.S.G.XX = Settings.S.G.MX; % Unitless
+            switch lower(Settings.Comb_rule)
+                case 'lorentz-berthelot'
+                    gamma_MX = Param.gamma_MX; % Unitless
+                    sigma_MX = (sigma_MM + sigma_XX)./2; % nm
+                    epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
+                    gamma_MM = gamma_MX; % Unitless
+                    gamma_XX = gamma_MX; % Unitless
+                case 'hogervorst'
+                    gamma_MM = Param.gamma_MM; % Unitless
+                    gamma_XX = Param.gamma_XX; % Unitless
+                    gamma_MX = (gamma_MM + gamma_XX)./2;
+                    
+                    epsilon_MX = 2.*epsilon_MM.*epsilon_XX./(epsilon_MM + epsilon_XX);
+                    
+                    sigma_MX = ( sqrt( ( epsilon_MM.*epsilon_XX.*gamma_MM.*gamma_XX.*(sigma_MM.*sigma_XX).^6 )...
+                        ./((gamma_MM - 6).*(gamma_XX - 6)) ).*(gamma_MX - 6)./(epsilon_MX.*gamma_MX) ).^(1/6);
+            end
     else
-        Settings.S.S.MX = Param.sigma_MX; % nm
-        Settings.S.E.MX = Param.epsilon_MX; % kJ/mol
-        Settings.S.G.MM = Param.gamma_MM; % Unitless
-        Settings.S.G.XX = Param.gamma_XX; % Unitless
+        sigma_MX = Param.sigma_MX; % nm
+        epsilon_MX = Param.epsilon_MX; % kJ/mol
+        gamma_MM = Param.gamma_MM; % Unitless
+        gamma_XX = Param.gamma_XX; % Unitless
+        gamma_MX = Param.gamma_MX; % Unitless
     end
+    
+    % Remove any nonsense
+    sigma_MX(abs(imag(sigma_MX)) > sqrt(eps)) = nan;
+    gamma_MX(abs(imag(gamma_MX)) > sqrt(eps)) = nan;
+    epsilon_MX(abs(imag(epsilon_MX)) > sqrt(eps)) = nan;
+
+    % Outputs
+    Settings.S.S.MM = sigma_MM;
+    Settings.S.S.XX = sigma_XX;
+    Settings.S.S.MX = sigma_MX;
+
+    Settings.S.E.MM = epsilon_MM;
+    Settings.S.E.XX = epsilon_XX;
+    Settings.S.E.MX = epsilon_MX;
+
+    Settings.S.G.MM = gamma_MM;
+    Settings.S.G.XX = gamma_XX;
+    Settings.S.G.MX = gamma_MX;
     
     % Scaling Coulombic Charge
     if Settings.Fix_Charge
@@ -403,7 +493,12 @@ elseif strcmp(Settings.Theory,'Mie')
     U = Mie_Potential_Generator_vec(Settings);
 end
 
-%% Grab the peaks and valleys of the MX attractive potential
+%% Check MX attractive potential
+% Check for NaN functions
+badfcn_idx = any(isnan(U.MX),2);
+Loss(badfcn_idx) = Loss(badfcn_idx) + Settings.BadFcnLossPenalty;
+
+% Grab the peaks and valleys of the MX attractive potential
 peaks_idx = islocalmax(U.MX,2,'MinProminence',1e-8);
 valleys_idx = islocalmin(U.MX,2,'MinProminence',1e-8);
 r = repmat(U.r,size(U.MX,1),1);
@@ -614,8 +709,8 @@ end
 % % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
 % % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
 % 
-% ax1 = 'epsilon_MM';
-% ax2 = 'sigma_MM';
+% ax1 = 'gamma_MM';
+% ax2 = 'r0_MM';
 % %ax3 = 'gamma_MX';
 % 
 % %scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')

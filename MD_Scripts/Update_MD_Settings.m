@@ -11,4 +11,10 @@ function Settings = Update_MD_Settings(Settings)
     if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
         Settings.MDP.CoulombType = 'PME-User';
     end
+    if ~isfield(Settings,'Metal')
+        [Settings.Metal,Settings.Halide] = Separate_Metal_Halide(Settings.Salt);
+    end
+    if ~isfield(Settings,'Comb_rule')
+        Settings.Comb_rule = 'Lorentz-Berthelot';
+    end
 end

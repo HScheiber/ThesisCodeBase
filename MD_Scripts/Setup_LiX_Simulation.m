@@ -55,6 +55,9 @@ Halide_Info = elements('Sym',Settings.Halide);
 if ~isfield(Settings,'WorkDir')
     [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
 end
+if ~isfield(Settings,'OuterDir')
+    Settings.OuterDir = Settings.WorkDir;
+end
 if Settings.Verbose
     disp(['Current Job: ' Settings.Salt ' ' Settings.JobName])
 end

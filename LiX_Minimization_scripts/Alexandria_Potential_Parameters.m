@@ -118,7 +118,7 @@ if ~Coulomb_Only
             % Repulsive prefactor (kj/mol)
             Settings.S.R.MM = A.(Metal);
             Settings.S.R.XX = A.(Halide);
-            Settings.S.R.MX = (1/2)*( A.(Metal)*(A.(Metal)*B.(Metal)/(A.(Halide)*B.(Halide)))^(-B.(Metal)/(B.(Metal) + B.(Halide)))  ...
+            Settings.S.R.MX = (1/2)*( A.(Metal)*(A.(Metal)*B.(Metal)/(A.(Halide)*B.(Halide)))^(-B.(Metal)/(B.(Metal) + B.(Halide))) ...
                 +  A.(Halide)*(A.(Halide)*B.(Halide)/(A.(Metal)*B.(Metal)))^(-B.(Halide)/(B.(Metal) + B.(Halide))) );
 
             % C6 parameter

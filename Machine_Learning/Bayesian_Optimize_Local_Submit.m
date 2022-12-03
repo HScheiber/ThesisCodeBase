@@ -156,7 +156,7 @@ idx = 0;
 %% Test Model Particular parameter
 Settings.Salt = 'LiBr';
 Settings.Theory = 'BF';
-Settings.InnerRange = false;
+Settings.InnerRange = true;
 Settings.Trial_ID = 'XX4';
 Settings.UseCoupledConstraint = false;
 Settings.Initialize_From_Model = {};
@@ -192,6 +192,7 @@ Settings.Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
 % Other loss options options
 Settings.Fix_Charge = true;
 Settings.Additivity = true;
+Settings.Comb_rule = 'hogervorst'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst', 'GROMACS'. Only applies to BH and BF models
 
 % Auto structure selection
 Settings.Structures = Auto_Structure_Selection(Settings);

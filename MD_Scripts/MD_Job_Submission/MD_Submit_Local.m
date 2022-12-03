@@ -7,8 +7,8 @@ Settings = Initialize_MD_Settings;
 Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Settings.Nodes = 1; % Minimum number of cores to request for calculation.
-Settings.Cores = 8; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Settings.MPI_Ranks = 8;
+Settings.Cores = 1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Settings.MPI_Ranks = 1;
 Settings.OMP_Threads = 1;
 Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Settings.SinglePrecision = false; % choose true for single precision mode, false for double
@@ -44,9 +44,11 @@ Settings.Skip_Minimization = true;
 % load the model
 Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
 Settings.GaussianCharge = true; % Turn on Gaussian distributed charges when true
-Settings.Polarization = false; % Turn on polarizible Drude model when true
+Settings.Polarization = true; % Turn on polarizible Drude model when true
+Settings.niter_polarization = 5000; % Maximum number of iterations for optimizing the shell positions
+Settings.emtol_polarization = 1e-3; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
-Settings.PreEquilibration = 25; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
+Settings.PreEquilibration = 1; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 Settings.Annealing = 'no'; % Options: 'no' 'single' 'periodic'
 Settings.MDP.Trajectory_Time = 1.0; % ns
 
@@ -68,6 +70,7 @@ Settings.TimePerFrame = 1; % ps
 Settings.SaveFeatures = false; % Save structure fraction vs time image when true for each temperature check
 Settings.SavePredictions = false; % Save structure fraction vs time image when true for each temperature check
 Settings.Qlm_Average = true;
+
 
 Setup_LiX_Simulation(Settings)
 MD_Postprocessor(Settings)
