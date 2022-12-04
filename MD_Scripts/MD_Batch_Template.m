@@ -384,28 +384,77 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         'echo "Job completed at `date`"' newline ... 
         'exit 0'];
 otherwise
+    Settings.mdrun_opts = ' -v';
     if ispc
         Settings.gmx = 'wsl source ~/.bashrc; gmx_d ';
+        Settings.gmx_loc = Settings.gmx;
+        Settings.grompp = 'grompp';
+        Settings.mdrun = 'mdrun';
+        Settings.g_energy = 'energy';
+        Settings.g_msd = 'msd';
+        Settings.trjconv = 'trjconv';
+        Settings.g_check = 'check';
+        Settings.genconf = 'genconf';
+        Settings.g_density = 'density';
+        Settings.editconf = 'editconf';
+        Settings.insert_molecules = 'insert-molecules';
+        Settings.convert_tpr = 'convert-tpr';
+        Settings.g_traj = 'traj';
     else
-        if Settings.SinglePrecision
-            Settings.gmx = 'gmx ';
+        
+        if strcmp(Settings.gmx_version,'4.6.7')
+            gmx_old_version = true;
+        elseif strcmp(Settings.gmx_version,'2019')
+            gmx_old_version = false;
         else
-            Settings.gmx = 'gmx_d ';
+            gmx_old_version = Settings.Polarization;
+        end
+        
+        % Deal with the executable to call
+        if gmx_old_version % Use version 4.6.7
+            Settings.gmx = '';
+            Settings.gmx_loc = '';
+            
+            Settings.grompp = 'grompp_d';
+            Settings.mdrun = 'mdrun_d';
+            Settings.g_energy = 'g_energy_d';
+            Settings.g_msd = 'g_msd_d';
+            Settings.trjconv = 'trjconv_d';
+            Settings.g_check = 'gmxcheck_d';
+            Settings.genconf = 'genconf_d';
+            Settings.g_density = 'g_density_d';
+            Settings.editconf = 'editconf_d';
+            Settings.g_traj = 'g_traj_d';
+            Settings.convert_tpr = 'tpbconv_d';
+            if Settings.SinglePrecision
+                Settings.insert_molecules = 'gmx_d insert-molecules';
+            else
+                Settings.insert_molecules = 'gmx insert-molecules';
+            end
+            Settings.mdrun_opts = [Settings.mdrun_opts ' -pd'];
+            
+        else
+            if Settings.SinglePrecision
+                Settings.gmx = 'gmx ';
+                Settings.gmx_loc = 'gmx ';
+            else
+                Settings.gmx = 'gmx_d ';
+                Settings.gmx_loc = 'gmx_d ';
+            end
+            Settings.grompp = 'grompp';
+            Settings.mdrun = 'mdrun';
+            Settings.g_energy = 'energy';
+            Settings.g_msd = 'msd';
+            Settings.trjconv = 'trjconv';
+            Settings.g_check = 'check';
+            Settings.genconf = 'genconf';
+            Settings.g_density = 'density';
+            Settings.editconf = 'editconf';
+            Settings.insert_molecules = 'insert-molecules';
+            Settings.convert_tpr = 'convert-tpr';
+            Settings.g_traj = 'traj';
         end
     end
-    Settings.gmx_loc = Settings.gmx;
-    Settings.grompp = 'grompp';
-    Settings.mdrun = 'mdrun';
-    Settings.g_energy = 'energy';
-    Settings.g_msd = 'msd';
-    Settings.trjconv = 'trjconv';
-    Settings.g_check = 'check';
-    Settings.genconf = 'genconf';
-    Settings.g_density = 'density';
-    Settings.editconf = 'editconf';
-    Settings.insert_molecules = 'insert-molecules';
-    Settings.convert_tpr = 'convert-tpr';
-    Settings.g_traj = 'traj';
     
     if Settings.Cores < 1
         Cores_per_node = feature('numcores');
@@ -420,13 +469,11 @@ otherwise
         MPI_Ranks_Per_Node = Settings.MPI_Ranks;
     end
     
-    Settings.mdrun_opts = ' -v';
     Settings.mdrun_opts = [Settings.mdrun_opts ' -ntmpi ' num2str(MPI_Ranks_Per_Node)];
     Settings.mdrun_opts = [Settings.mdrun_opts ' -ntomp ' num2str(Settings.OMP_Threads)];
     if MPI_Ranks_Per_Node == 1 && Settings.OMP_Threads == 1
         Settings.mdrun_opts = [Settings.mdrun_opts ' -pin on'];
     end
-    
     if ~Settings.DLB
         Settings.mdrun_opts = [Settings.mdrun_opts ' -dlb no'];
     end

@@ -56,27 +56,35 @@ H = Data(startpoint:end,5)./nmol_solid;
 
 
 
-startpoint = 1;%round(numel(Energy.Time)*0.2);
+startpoint = round(numel(Energy.Time)*0.2);
+col = 'g';
 NF = Energy.NF;
 t = Energy.Time(startpoint:end);
 T = Energy.Temperature(startpoint:end);
 P = Energy.Pressure(startpoint:end);
-E = Energy.Total_Energy(startpoint:end)./NF;
-U = Energy.Potential(startpoint:end)./NF;
-% 
-% V = Energy.Volume(startpoint:end).*(10^3)./NF;
-% H = Energy.Enthalpy(startpoint:end)./NF;
+%
+if isfield(Energy,'Total_Energy')
+    E = Energy.Total_Energy(startpoint:end)./NF;
+    U = Energy.Potential(startpoint:end)./NF;
+    hold on
+    plot(t,E,'Linewidth',4,'Color',col)
+else
+    V = Energy.Volume(startpoint:end).*(10^3)./NF;
+    H = Energy.Enthalpy(startpoint:end)./NF;
+    hold on
+    plot(t,T,'Linewidth',4,'Color',col)
+end
 
 
-plot(t,E,'Linewidth',4,'Color','g')
+
 
 %plot(conv(T,ones(3000,1)./3000),'Linewidth',4,'Color','r')
 
 
 % Statistics on Temperature
-SEM = std(T)/sqrt(length(T));               % Standard Error
-ts = tinv([0.025  0.975],length(T)-1);      % T-Score
-disp(['Temperature = ' num2str(mean(T),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' K'])
+SEM = std(T(1:1:end))/sqrt(length(T(1:1:end)));               % Standard Error
+ts = tinv([0.025  0.975],length(T(1:1:end))-1);      % T-Score
+disp(['Temperature = ' num2str(mean(T(1:1:end)),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' K'])
 
 % Statistics on Pressure
 SEM = std(P)/sqrt(length(P));               % Standard Error
