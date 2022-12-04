@@ -176,14 +176,14 @@ function params = bayesopt_params(Settings)
         SQ = optimizableVariable('SQ',Settings.Q_Range,'Type','real');
         
         % sigma
-        SsigmaMM = optimizableVariable('sigma_MM',[0.05 0.5],'Type','real'); % Units: nm
+        SsigmaMM = optimizableVariable('sigma_MM',[0.01 0.5],'Type','real'); % Units: nm
         SsigmaXX = optimizableVariable('sigma_XX',[0.15 1.2],'Type','real'); % Units: nm
         SsigmaMX = optimizableVariable('sigma_MX',[0.1 0.8],'Type','real'); % Units: nm
 
         % epsilon
-        SepsilonMM = optimizableVariable('epsilon_MM',[1e-8 100],'Type','real','Transform','log'); % Units: kJ/mol
-        SepsilonXX = optimizableVariable('epsilon_XX',[1e-8 100],'Type','real','Transform','log'); % Units: kJ/mol
-        SepsilonMX = optimizableVariable('epsilon_MX',[1e-8 100],'Type','real','Transform','log'); % Units: kJ/mol
+        SepsilonMM = optimizableVariable('epsilon_MM',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
+        SepsilonXX = optimizableVariable('epsilon_XX',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
+        SepsilonMX = optimizableVariable('epsilon_MX',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
         
         if Settings.InnerRange
             % gamma
@@ -192,9 +192,9 @@ function params = bayesopt_params(Settings)
             SgammaMX = optimizableVariable('gamma_MX',[0 10],'Type','real'); % Units: kJ/mol
         else
             % gamma
-            SgammaMM = optimizableVariable('gamma_MM',[13 18],'Type','real'); % Units: kJ/mol
-            SgammaXX = optimizableVariable('gamma_XX',[13 18],'Type','real'); % Units: kJ/mol
-            SgammaMX = optimizableVariable('gamma_MX',[13 18],'Type','real'); % Units: kJ/mol
+            SgammaMM = optimizableVariable('gamma_MM',[8 25],'Type','real'); % Units: kJ/mol
+            SgammaXX = optimizableVariable('gamma_XX',[8 25],'Type','real'); % Units: kJ/mol
+            SgammaMX = optimizableVariable('gamma_MX',[8 25],'Type','real'); % Units: kJ/mol
         end
         
         if Settings.Additivity

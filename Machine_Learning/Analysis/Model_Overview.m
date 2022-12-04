@@ -2,7 +2,7 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BF';
-ModelID = 'ML';
+ModelID = 'MK';
 BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
@@ -190,7 +190,8 @@ for idx = 1:N_Salts
     end
 end
 if ~data_found
-    error(['Unable to load targets for ' Theory ' Model ' ModelID])
+    warning(['Unable to load targets for ' Theory ' Model ' ModelID])
+    Bayesopt_Loss_Options = init_loss_options;
 elseif plot_volume && ~plot_a
     for jdx = 1:N_Structures
         if Bayesopt_Loss_Options.(Structures{jdx}).V < sqrt(eps)
@@ -241,9 +242,11 @@ if N_MinPlot_Rows
                         optimvals(jdx) = [data.secondary_result(jdx).optimValues.fval];
                     end
                     Total_loss(idx,iidx) = min(optimvals);
-                else
+                elseif isfield(data,'bayesopt_results') && ~isempty(data.bayesopt_results)
                     %Total_loss(idx,iidx) = data.bayesopt_results.MinObjective;
                     Total_loss(idx,iidx) = min(data.bayesopt_results.ObjectiveTrace);
+                else
+                    Total_loss(idx,iidx) = nan;
                 end
             catch
                 disp(['Could not obtain crystal minimization data for: ' Salt ', ' Theory ', Model ' Model '.']);

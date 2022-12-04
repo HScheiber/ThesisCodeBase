@@ -186,7 +186,7 @@ switch lower(computer)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 600;
+        Shared_Settings.Max_Bayesian_Iterations = 200;
         Shared_Settings.Max_Secondary_Iterations = 200;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
@@ -200,9 +200,9 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {};
+        Shared_Settings.Initialize_From_Model = {'MK'};
         
-        %% BF [Gamma>10] without gaussian charge Models: MK
+        %% BF [Gamma>10] without gaussian charge Models: MM
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BF'};
         Replicates = 1:5;
@@ -224,7 +224,7 @@ switch lower(computer)
                     Settings_Array(idx) = Shared_Settings;
                     Settings_Array(idx).Salt = Salt;
                     Settings_Array(idx).Theory = Theory;
-                    Settings_Array(idx).Trial_ID = ['MK' Rep];
+                    Settings_Array(idx).Trial_ID = ['MM' Rep];
                     
                     % Loss function
                     Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
@@ -281,9 +281,9 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = true;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {};
+        Shared_Settings.Initialize_From_Model = {'ML'};
         
-        %% BF [Gamma>10] WITH gaussian charge Models: ML
+        %% BF [Gamma>10] WITH gaussian charge Models: MN
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BF'};
         Replicates = 1:5;
@@ -300,12 +300,12 @@ switch lower(computer)
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
                     
-                    %% Model MH
+                    %% Model MN
                     idx = idx+1;
                     Settings_Array(idx) = Shared_Settings;
                     Settings_Array(idx).Salt = Salt;
                     Settings_Array(idx).Theory = Theory;
-                    Settings_Array(idx).Trial_ID = ['ML' Rep];
+                    Settings_Array(idx).Trial_ID = ['MN' Rep];
                     Settings_Array(idx) = Alexandria_Potential_Parameters(Settings_Array(idx),...
                         'Coulomb_Only',true);
                     
