@@ -1,8 +1,8 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'Mie';
-ModelID = 'MJ';
+Theory = 'BF';
+ModelID = 'MK';
 BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
@@ -11,7 +11,7 @@ saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Dra
 DM_Multiplier = 1e5;
 
 %% Plot options
-fs = 24; % font size
+fs = 28; % font size
 markers = {'o' 's' '^' 'v' 'd' '>' '<' 'p' 'h' 'x'};
 show_as_percent_error = false; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
 include_av_line = false;
@@ -26,7 +26,7 @@ plot_c = false;
 plot_ac = false;
 plot_volume = true;
 plot_density = false;
-plot_loss = true;
+plot_loss = false;
 plot_finite_T_data = true;
 
 %% Script begins
@@ -190,7 +190,8 @@ for idx = 1:N_Salts
     end
 end
 if ~data_found
-    error(['Unable to load targets for ' Theory ' Model ' ModelID])
+    warning(['Unable to load targets for ' Theory ' Model ' ModelID])
+    Bayesopt_Loss_Options = init_loss_options;
 elseif plot_volume && ~plot_a
     for jdx = 1:N_Structures
         if Bayesopt_Loss_Options.(Structures{jdx}).V < sqrt(eps)
@@ -241,9 +242,11 @@ if N_MinPlot_Rows
                         optimvals(jdx) = [data.secondary_result(jdx).optimValues.fval];
                     end
                     Total_loss(idx,iidx) = min(optimvals);
-                else
+                elseif isfield(data,'bayesopt_results') && ~isempty(data.bayesopt_results)
                     %Total_loss(idx,iidx) = data.bayesopt_results.MinObjective;
                     Total_loss(idx,iidx) = min(data.bayesopt_results.ObjectiveTrace);
+                else
+                    Total_loss(idx,iidx) = nan;
                 end
             catch
                 disp(['Could not obtain crystal minimization data for: ' Salt ', ' Theory ', Model ' Model '.']);

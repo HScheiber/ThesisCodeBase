@@ -1,34 +1,46 @@
 Settings = Initialize_MD_Settings;
 %Data = load(fullfile(Settings.home,'data','MX_JCTF_Min_Data.mat'),'Data').Data;
-Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
 %Data = load(fullfile(Settings.home,'data','MX_Alexandria_PointQ_Min_Data.mat'),'Data').Data;
+Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
+%Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data').Data;
 
 fs = 24;
 
-Theory = 'BH'; % {'BF' 'BH' 'JC' 'Mie'}
+Theory = 'JC'; % {'BF' 'BH' 'JC' 'Mie'}
 %Salts = {'NaCl'};
-%Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'};
-Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
-         'NaF' 'NaCl' 'NaBr' 'NaI' ...
-         'KF' 'KCl' 'KBr' 'KI' ...
-         'RbF' 'RbCl' 'RbBr' 'RbI' ...
-         'CsF' 'CsCl' 'CsBr' 'CsI'};
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'};
+% Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
+%          'NaF' 'NaCl' 'NaBr' 'NaI' ...
+%          'KF' 'KCl' 'KBr' 'KI' ...
+%          'RbF' 'RbCl' 'RbBr' 'RbI' ...
+%          'CsF' 'CsCl' 'CsBr' 'CsI'};
 Structures_legend = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' '$\beta$-BeO' 'CsCl'};
-Prop_of_intr = 'a';
+Prop_of_intr = 'E';
 
 % Load experimental energy
+refstructure = 'Wurtzite';
 Exp = Load_Experimental_Data;
+DFT = Load_Best_DFT_Data;
 
-
-
+if false
+    X = 1:length(Salts);
+    Y = nan(length(Salts),1);
+    for idx = 1:length(Salts)
+        Salt = Salts{idx};
+        if isfield(Data.(Salt),Theory)
+            if strcmp(Prop_of_intr,'a')
+                Y(idx) = DFT.(Salt).(refstructure).a_zero - Data.(Salt).(Theory).(refstructure).(Prop_of_intr);
+            else
+                Y(idx) = DFT.(Salt).(refstructure).(Prop_of_intr) - Data.(Salt).(Theory).(refstructure).(Prop_of_intr);
+            end
+        end
+    end
+else
 X = 1:length(Salts);
-Y = nan(length(Salts),1);
-for idx = 1:length(Salts)
-    Salt = Salts{idx};
-    if isfield(Data.(Salt),Theory)
-        if strcmp(Prop_of_intr,'a')
-            Y(idx) = Exp.(Salt).Rocksalt.a_zero - Data.(Salt).(Theory).Rocksalt.(Prop_of_intr);
-        else
+    Y = nan(length(Salts),1);
+    for idx = 1:length(Salts)
+        Salt = Salts{idx};
+        if isfield(Data.(Salt),Theory)
             Y(idx) = Exp.(Salt).Rocksalt.(Prop_of_intr) - Data.(Salt).(Theory).Rocksalt.(Prop_of_intr);
         end
     end

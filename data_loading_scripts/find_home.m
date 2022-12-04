@@ -3,7 +3,7 @@ function [home,project,computer,slurm,BO_Models,qsub,passlog,pipe,wsl,StrSelMode
         home = 'C:\Users\Hayden\Documents\Patey_Lab\ThesisCodeBase';
         project = 'C:\Users\Hayden\Documents\Patey_Lab';
         scratch = 'C:\Users\Hayden\Documents\Patey_Lab';
-        BO_Models = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Models';
+        BO_Models = 'C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed';
 		StrSelModels = 'C:\Users\Hayden\Documents\Patey_Lab\Machine_Learning_Structure_Finder\LiX_Structure_Selector_Optimization';
         computer = lower(getenv('COMPUTERNAME'));
         slurm = false;

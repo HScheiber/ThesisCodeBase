@@ -74,22 +74,22 @@ function View_Gmx_Table(Table_Loc,Q,C)
     U.r = cell2mat(raw(:, 1));
     U.f = cell2mat(raw(:, 2));
     U.df = cell2mat(raw(:, 3));
-    U.h = cell2mat(raw(:, 4));
-    U.dh = cell2mat(raw(:, 5));
-    U.g = cell2mat(raw(:, 6));
-    U.dg = cell2mat(raw(:, 7));
+    U.g = cell2mat(raw(:, 4));
+    U.dg = cell2mat(raw(:, 5));
+    U.h = cell2mat(raw(:, 6));
+    U.dh = cell2mat(raw(:, 7));
 
     %% Clear temporary variables
     clearvars filename formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp R;
-    U_Total = k_0*(e_c^2).*Q.*U.f + C.*U.h + U.g;
-    dU_Total = -k_0*(e_c^2).*Q.*U.df - C.*U.dh  - U.dg;
+    U_Total = k_0*(e_c^2).*Q.*U.f + C.*U.g + U.h;
+    dU_Total = -k_0*(e_c^2).*Q.*U.df - C.*U.dg  - U.dh;
     %ref_U = %k_0*(e_c^2).*Q.*(1./U.r);
     
     hold on
     plot(U.r,U_Total,'-k','linewidth',1)
     hold on
     plot(U.r,dU_Total,'-r','linewidth',1)
-    %hold on
+    hold on
     %plot(U.r,ref_U)
     ylim([-500 500])
     xlim([0 2])

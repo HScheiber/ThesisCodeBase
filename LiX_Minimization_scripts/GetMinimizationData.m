@@ -9,9 +9,9 @@ Theories = {'BF' 'BH' 'JC' 'Mie'};
 Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
 Data = struct();
 
-Settings.JobSettings.Cores = 1;
-Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Settings.Cores = 1;
+Settings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Settings.MinMDP.Energy_Tol = 1e-3; % kJ/mol
 Settings.MinMDP.Gradient_Tol_RMS = 1e-3; % kJ/(mol A)
 Settings.MinMDP.Gradient_Tol_Max = 1e-3; % kJ/(mol A)
@@ -26,7 +26,7 @@ Settings.niter_polarization = 1000; % Maximum number of iterations for optimizin
 Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 Settings.MinMDP.Disp_Correction = true;
 
-[~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
+[~,Settings] = MD_Batch_Template(Settings);
 Settings.MinMDP.Parallel_Min = false;
 Settings.Parallel_LiX_Minimizer = false;
 % setenv('OMP_NUM_THREADS','1');

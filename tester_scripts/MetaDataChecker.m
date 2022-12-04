@@ -267,7 +267,8 @@ function PlotChangeCallback(src,~)
     Y2_sel = app.PlotTypeY2.String{app.PlotTypeY2.Value};
     X_sel = app.PlotTypeX.String{app.PlotTypeX.Value};
     
-    en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
+    en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+    en_opts = en_opts{1};
     Y1_num = char(regexp(en_opts,['([0-9]{1,2})  ' replace(Y1_sel,{'(' ')'},{'\(' '\)'})],'tokens','once'));
     Y2_num = char(regexp(en_opts,['([0-9]{1,2})  ' replace(Y2_sel,{'(' ')'},{'\(' '\)'})],'tokens','once'));
     X_num =  char(regexp(en_opts,['([0-9]{1,2})  ' replace(X_sel, {'(' ')'},{'\(' '\)'})],'tokens','once'));

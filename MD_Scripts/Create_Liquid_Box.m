@@ -8,19 +8,19 @@ if Settings.GenCluster && abs(Settings.c_over_a - 1) > sqrt(eps)
     Settings.c_over_a = 1;
     disp('C/A ratio reset to 1 for liquid cluster generation')
 end
+Settings = Update_MD_Settings(Settings);
 
-[Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
-Ref_M = fullfile(Settings.home,'templates','GRO_Templates',[Metal '_Box.gro']);
-Ref_X = fullfile(Settings.home,'templates','GRO_Templates',[Halide '_Box.gro']);
+Ref_M = fullfile(Settings.home,'templates','GRO_Templates',[Settings.Metal '_Box.gro']);
+Ref_X = fullfile(Settings.home,'templates','GRO_Templates',[Settings.Halide '_Box.gro']);
 nmol = Settings.N_atoms/2; % number of atoms needed
 
 % Find the target density based on the temperature and pressure
-warning('off','MATLAB:UndefinedFunction')
-Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
-warning('on','MATLAB:UndefinedFunction')
+if ~isfield(Settings,'Ref_Density') || isnan(Settings.Ref_Density)
+    Settings.Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3 
+end
 
 % Calculate the dimensions for the box at the given density
-Vol = nmol/Ref_Density; % Volume in cubic nm
+Vol = nmol/Settings.Ref_Density; % Volume in cubic nm
 
 Settings.Geometry.a = ((Vol/Settings.c_over_a)^(1/3)); % nm
 Settings.Geometry.b = Settings.Geometry.a; % nm
@@ -36,13 +36,11 @@ LatticeLength = min([Settings.Geometry.Skew_a*norm(a_vec) ...
                     Settings.Geometry.Skew_c*norm(c_vec)]);
 
 % Calculate the largest cutoff distance
-Longest_Cutoff = max([Settings.MDP.RList_Cutoff Settings.MDP.RCoulomb_Cutoff Settings.MDP.RVDW_Cutoff]); % nm
-
-if LatticeLength/2 <= Longest_Cutoff*Settings.Cutoff_Buffer
+if LatticeLength/2 <= Settings.Longest_Cutoff*Settings.Cutoff_Buffer
     old_atnum = Settings.N_atoms;
     
-    New_a = 2*Longest_Cutoff*Settings.Cutoff_Buffer;
-    New_c_tot = 2*Longest_Cutoff*Settings.Cutoff_Buffer;
+    New_a = 2*Settings.Longest_Cutoff*Settings.Cutoff_Buffer;
+    New_c_tot = 2*Settings.Longest_Cutoff*Settings.Cutoff_Buffer;
     if Settings.c_over_a > New_c_tot/New_a
         % Expand c to maintain the user-selected c/a ratio
         New_c_tot = New_a*Settings.c_over_a;
@@ -60,7 +58,7 @@ if LatticeLength/2 <= Longest_Cutoff*Settings.Cutoff_Buffer
     
     % Update number of atoms to match the new box size
     Vol = New_a*New_b*New_c_tot;
-    nmol = ceil(Ref_Density*Vol);
+    nmol = ceil(Settings.Ref_Density*Vol);
     Settings.N_atoms = nmol*2;
     
     % Update lattice vectors
@@ -80,18 +78,7 @@ Settings.Geometry.boxcoords = {a_vec(1) b_vec(2) c_vec(3) a_vec(2) a_vec(3) b_ve
 SaveGroFile(tmp_empty_box,Settings.Geometry,true);
 
 %% Add atoms to the file
-switch Settings.Salt
-    case 'LiF'
-        r0 = 0.1;
-    case 'LiCl'
-        r0 = 0.11;
-    case 'LiBr'
-        r0 = 0.12;
-    case 'LiI'
-        r0 = 0.13;
-    otherwise
-        r0 = 0.12;
-end
+R0 = min(0.5*((3/(4*pi))*(Vol/(Settings.N_atoms*2)))^(1/3),0.57);
 
 % If making a liquid cluster (bubble)
 if Settings.GenCluster
@@ -105,13 +92,13 @@ if Settings.GenCluster
     Box_Center = norm(a_vec).*[1/2 1/2 1/2];  
     
     % Calculate the radius needed for the given density
-    Vol_cluster = nmol_cluster/Ref_Density; % Volume in cubic nm
+    Vol_cluster = nmol_cluster/Settings.Ref_Density; % Volume in cubic nm
     R_cluster = ( (3/(4*pi))*Vol_cluster )^(1/3); % Radius in nm
     Inner_Box_Length = 2*(R_cluster);
 
     %% How many atoms should fit into a box with the same side length as the sphere?
     Box_Vol = Inner_Box_Length^3; % nm^3 volume
-    nmol_box = ceil(Ref_Density*Box_Vol);
+    nmol_box = ceil(Settings.Ref_Density*Box_Vol);
 
     % Create a positions.dat file
     pos_filename = fullfile(WorkDir,'positions.dat');
@@ -125,35 +112,35 @@ if Settings.GenCluster
     
     %% Add atoms to the file
     % Add metal
-    disp(['Randomly adding ' num2str(nmol_box) ' ' Metal ' ions to liquid box...'])
+    disp(['Randomly adding ' num2str(nmol_box) ' ' Settings.Metal ' ions to liquid box...'])
     mtimer = tic;
     tmp_metal_only_file = fullfile(WorkDir,['tmp_metal_only.' Settings.CoordType]);
-    cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(tmp_empty_box) ' -ci ' windows2unix(Ref_M) ...
-        ' -o ' windows2unix(tmp_metal_only_file) ' -nmol ' num2str(nmol_box) ' -radius ' num2str(r0) ' -try 200' ...
-        ' -dr ' num2str(R_cluster) ' -ip ' windows2unix(pos_filename)];
+    cmd = [Settings.gmx_loc Settings.insert_molecules ' -f ' windows2unix(tmp_empty_box) ' -ci ' windows2unix(Ref_M) ...
+        ' -o ' windows2unix(tmp_metal_only_file) ' -nmol ' num2str(nmol_box) ' -radius ' num2str(R0) ' -try 200' ...
+        ' -scale ' num2str(R0) ' -dr ' num2str(R_cluster) ' -ip ' windows2unix(pos_filename)];
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
         disp(output);
-        error(['Error adding ' Metal ' atoms with insert-molecules. Problem command: ' newline cmd]);
+        error(['Error adding ' Settings.Metal ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
+    disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
     
     % Add Halide
     tmp_liquid_file = fullfile(WorkDir,['tmp_liquid.' Settings.CoordType]);
-    disp(['Randomly adding ' num2str(nmol_box) ' ' Halide ' ions to liquid box...'])
+    disp(['Randomly adding ' num2str(nmol_box) ' ' Settings.Halide ' ions to liquid box...'])
     htimer = tic;
-    cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(tmp_metal_only_file) ...
-        ' -o ' windows2unix(tmp_liquid_file) ' -nmol ' num2str(nmol_box) ' -radius ' num2str(r0) ' -dr ' num2str(R_cluster) ...
-        ' -try 400  -ip ' windows2unix(pos_filename)];
+    cmd = [Settings.gmx_loc Settings.insert_molecules ' -ci ' windows2unix(Ref_X) ' -f ' windows2unix(tmp_metal_only_file) ...
+        ' -o ' windows2unix(tmp_liquid_file) ' -nmol ' num2str(nmol_box) ' -radius ' num2str(R0) ' -dr ' num2str(R_cluster) ...
+        ' -scale ' num2str(R0) ' -try 400  -ip ' windows2unix(pos_filename)];
 
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
         disp(output);
-        error(['Error adding ' Halide ' atoms with insert-molecules. Problem command: ' newline cmd]);
+        error(['Error adding ' Settings.Halide ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
+    disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
 
 
     %% Carve box into a sphere
@@ -163,7 +150,7 @@ if Settings.GenCluster
     m_idx = 1;
     x_idx = 1;
     for idx = 1:data.nAtoms
-        if strcmp(atom(idx).resname{1},Metal)
+        if strcmp(atom(idx).resname{1},Settings.Metal)
             atom_M(m_idx) = atom(idx);
             m_idx = m_idx+1;
         else
@@ -204,33 +191,33 @@ if Settings.GenCluster
 else
 
     % Add metal
-    disp(['Randomly adding ' num2str(nmol) ' ' Metal ' ions to liquid box...'])
+    disp(['Randomly adding ' num2str(nmol) ' ' Settings.Metal ' ions to liquid box...'])
     mtimer = tic;
     tmp_metal_only_file = fullfile(WorkDir,['tmp_metal_only.' Settings.CoordType]);
-    cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(tmp_empty_box) ' -ci ' windows2unix(Ref_M) ...
-        ' -o ' windows2unix(tmp_metal_only_file) ' -nmol ' num2str(nmol) ' -radius ' num2str(r0) ' -try 200'];
+    cmd = [Settings.gmx_loc Settings.insert_molecules ' -f ' windows2unix(tmp_empty_box) ' -ci ' windows2unix(Ref_M) ...
+        ' -o ' windows2unix(tmp_metal_only_file) ' -nmol ' num2str(nmol) ' -scale ' num2str(R0) ' -radius ' num2str(R0) ' -try 200'];
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
         disp(output);
-        error(['Error adding ' Metal ' atoms with insert-molecules. Problem command: ' newline cmd]);
+        error(['Error adding ' Settings.Metal ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
+    disp([Settings.Metal ' atoms added. Epalsed Time: ' datestr(seconds(toc(mtimer)),'HH:MM:SS')])
 
     % Add Halide
     tmp_liquid_file = fullfile(WorkDir,['tmp_liquid.' Settings.CoordType]);
-    disp(['Randomly adding ' num2str(nmol) ' ' Halide ' ions to liquid box...'])
+    disp(['Randomly adding ' num2str(nmol) ' ' Settings.Halide ' ions to liquid box...'])
     htimer = tic;
-    cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(tmp_metal_only_file) ...
-        ' -o ' windows2unix(tmp_liquid_file) ' -nmol ' num2str(nmol) ' -radius ' num2str(r0) ' -try 400'];
+    cmd = [Settings.gmx_loc Settings.insert_molecules ' -ci ' windows2unix(Ref_X) ' -f ' windows2unix(tmp_metal_only_file) ...
+        ' -o ' windows2unix(tmp_liquid_file) ' -nmol ' num2str(nmol) ' -scale ' num2str(R0) ' -radius ' num2str(R0) ' -try 400'];
 
     [errcode,output] = system(cmd);
 
     if errcode ~= 0
         disp(output);
-        error(['Error adding ' Halide ' atoms with insert-molecules. Problem command: ' newline cmd]);
+        error(['Error adding ' Settings.Halide ' atoms with insert-molecules. Problem command: ' newline cmd]);
     end
-    disp([Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
+    disp([Settings.Halide ' atoms added. Epalsed Time: ' datestr(seconds(toc(htimer)),'HH:MM:SS')])
 
     % Load current randomly-generated liquid file data
     Liquid_file_data = load_gro_file(tmp_liquid_file);
@@ -250,8 +237,8 @@ MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##NSTEPS##',pad(num2str(Sett
 MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##INTEGR##',pad(Settings.MinMDP.min_integrator,18));
 MDP_Minimization_txt = strrep(MDP_Minimization_txt,'dt                       = ##TIMEST##; Time step (ps)',...
     ['emtol                    = ' num2str(Settings.MinMDP.emtol)]);
-MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##MET##',Metal);
-MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##HAL##',Halide);
+MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##MET##',Settings.Metal);
+MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##HAL##',Settings.Halide);
 MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##COULOMB##',pad(num2str(Settings.MDP.CoulombType),18));
 MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##FOURIER##',pad(num2str(Settings.MDP.Fourier_Spacing),18));
 MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##PMEORDER##',pad(num2str(Settings.MDP.PME_Order),18));
@@ -273,9 +260,9 @@ if Settings.Table_Req
     Settings.Geometry = Settings.Geometry;
     Settings.WorkDir = WorkDir;
     TableName = [Settings.JobName '_Table'];
-    [Settings.TableFile_MX,~,~] = MakeTables(Settings,'TableName',TableName,...
+    [Settings.TableFile_MX,~,Energygrptables] = MakeTables(Settings,'TableName',TableName,...
         'Add_Wall',true);
-    
+    MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
 else
     % Modify the MDP file
     MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##VDWTYPE##',pad(Settings.MDP.VDWType,18));
@@ -300,11 +287,6 @@ if Settings.MDP.Disp_Correction
         'DispCorr                 = EnerPres          ; apply long range dispersion corrections for Energy and pressure'];
 end
 
-% Save MDP file
-MDP_Filename = fullfile(WorkDir,'tmp_liquid.mdp');
-fidMDP = fopen(MDP_Filename,'wt');
-fwrite(fidMDP,regexprep(MDP_Minimization_txt,'\r',''));
-fclose(fidMDP);
 
 % Complete a topology file for the liquid box to be minimized
 Atomlist = copy_atom_order(tmp_liquid_file);
@@ -314,19 +296,38 @@ Topology_Text = strrep(Settings.Topology_Text,'##LATOMS##',Atomlist);
 Topology_Text = strrep(Topology_Text,'##N##x##N##x##N## ##GEOM##',...
     ['Liquid with ' num2str(Settings.N_atoms) ' atoms.']);
 
+% Polarization options
+if Settings.Polarization
+    [~,MDP_Minimization_txt] = ...
+        Polarize_Inputs(Settings,Settings.Topology_Text,MDP_Minimization_txt);
+else
+    MDP_Minimization_txt = strrep(MDP_Minimization_txt,'##ENERGYGRPS##',[Settings.Metal ' ' Settings.Halide]);
+end
+
+% Save MDP file
+MDP_Filename = fullfile(WorkDir,'tmp_liquid.mdp');
+fidMDP = fopen(MDP_Filename,'wt');
+fwrite(fidMDP,regexprep(MDP_Minimization_txt,'\r',''));
+fclose(fidMDP);
+
 % Save topology file
 fidTOP = fopen(Top_Filename,'wt');
 fwrite(fidTOP,regexprep(Topology_Text,'\r',''));
 fclose(fidTOP);
 
+% If model is polarizable, add in shell positions
+ndx_filename = fullfile(Settings.WorkDir,'tmp_liquid.ndx');
+ndx_add = add_polarization_shells(Settings,tmp_liquid_file,...
+    'ndx_filename',ndx_filename);
+
 TPR_File = fullfile(WorkDir,'tmp_liquid.tpr');
 MDPout_File = fullfile(WorkDir,'tmp_liquid_out.mdp');
 GrompLog_File = fullfile(WorkDir,'tmp_liquid_Grompplog.log');
 
-FMin_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(tmp_liquid_file) ...
+FMin_Grompp = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(tmp_liquid_file) ...
     ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
     ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
-    ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
+    ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
 [state,~] = system(FMin_Grompp);
 % Catch error in grompp
 if state ~= 0
@@ -340,7 +341,7 @@ Log_File = fullfile(WorkDir,'tmp_liquid.log');
 Energy_file = fullfile(WorkDir,'tmp_liquid.edr');
 TRR_File = fullfile(WorkDir,'tmp_liquid.trr');
 
-mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
+mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(TPR_File) ...
     ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
     ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Settings.SuperCellFile) ...
     Settings.mdrun_opts];
@@ -369,10 +370,10 @@ fidTOP = fopen(Settings.Topology_File,'wt');
 fwrite(fidTOP,regexprep(Settings.Topology_Text,'\r',''));
 fclose(fidTOP);
 
-GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
+GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
     ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
     ' -o ' windows2unix(Settings.Traj_Conf_File) ' -po ' windows2unix(Settings.MDP_out_File) ...
-    ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
+    ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];
 [errcode,~] = system(GROMPP_command);
 
 % Catch error in grompp

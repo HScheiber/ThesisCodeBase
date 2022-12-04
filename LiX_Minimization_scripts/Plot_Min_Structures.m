@@ -1,13 +1,13 @@
 Settings = Initialize_MD_Settings;
 %Data = load(fullfile(Settings.home,'data','MX_JCTF_Min_Data.mat'),'Data').Data;
-%Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
 %Data = load(fullfile(Settings.home,'data','MX_Alexandria_PointQ_Min_Data.mat'),'Data').Data;
+%Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
 Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data').Data;
 
 
 fs = 24;
 
-Theory = 'BF'; % {'BF' 'BH' 'JC' 'Mie'}
+Theory = 'JC'; % {'BF' 'BH' 'JC' 'Mie'}
 %Salts = {'NaCl'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...

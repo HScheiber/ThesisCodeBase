@@ -14,12 +14,10 @@ WorkDir = Settings.WorkDir;
 if ~isfolder(WorkDir)
     mkdir(WorkDir)
 end
-if ~isfield(Settings,'gmx')
-    [Settings.Batch_Template,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
-end
 if ~isfield(Settings,'OuterDir')
     Settings.OuterDir = WorkDir;
 end
+Settings = Update_MD_Settings(Settings);
 
 Settings.mdrun_opts = regexprep(Settings.mdrun_opts,' -maxh [0-9]+','','once');
 Settings.CurrentTFile = fullfile(Settings.WorkDir,[Settings.JobName '_MP.mat']);
@@ -327,10 +325,12 @@ end
 if Settings.FinalDensityProfile && ~T_dat.Alt_Structure && isfile(tpr_file)
     trr_file = fullfile(Tm_folder,[Settings.JobName '.trr']);
     density_file = fullfile(Settings.WorkDir,[Settings.JobName '_Density_Profile.xvg']);
-    gmx_echo = strrep(Settings.gmx_loc,'gmx',['echo "0 0" ' Settings.pipe ' gmx']);
-    gmx_density_cmd = [gmx_echo ' density -f ' windows2unix(trr_file) ' -s ' ...
+    gmx_density_cmd = [Settings.wsl 'echo "0 0" ' Settings.pipe ...
+        ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_density ...
+        ' -f ' windows2unix(trr_file) ' -s ' ...
         windows2unix(tpr_file) ' -o ' windows2unix(density_file) ...
-        ' -center -b ' num2str(Settings.MaxCheckTime/2) ' -e ' num2str(Settings.MaxCheckTime) ' -sl 200'];
+        ' -center -b ' num2str(Settings.MaxCheckTime/2) ...
+        ' -e ' num2str(Settings.MaxCheckTime) ' -sl 200'];
     [errcode,outp] = system(gmx_density_cmd);
     if errcode ~= 0
         disp(outp);

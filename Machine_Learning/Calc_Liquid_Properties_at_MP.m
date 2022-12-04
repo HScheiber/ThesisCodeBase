@@ -40,9 +40,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     Input_File = fullfile(Settings.WorkDir,'Calc_Settings.mat');
     save(Input_File,'Settings')
     
-    if strcmp(Settings.MDP.CoulombType,'PME') && Settings.GaussianCharge
-        Settings.MDP.CoulombType = 'PME-User';
-    end
+    Settings = Update_MD_Settings(Settings);
     
     % Check for previous minimization calculation    
     Minimization_TRR_File = fullfile(Settings.WorkDir,'Prep_Liq.trr'); % mMinimizaion started
@@ -55,7 +53,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             Data = load_gro_file(Minimized_Geom_File);
             if Data.N_atoms >= Settings.N_atoms
                 % Check to ensure minimization completed
-                gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Minimization_TRR_File)];
+                gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Minimization_TRR_File)];
                 [state,outp] = system(gmx_check);
                 lf = regexp(outp,'Last frame.+time *([0-9]|\.)+','tokens','once');
                 if state == 0 || ~isempty(lf)
@@ -114,7 +112,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         end
         mtimer = tic;
         Prep_Liq_Metal_Only = fullfile(Settings.WorkDir,['Prep_Liq_Metal_Only.' Settings.CoordType]);
-        cmd = [Settings.gmx_loc ' insert-molecules -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
+        cmd = [Settings.gmx_loc Settings.insert_molecules ' -f ' windows2unix(Liq_Box_File) ' -ci ' windows2unix(Ref_M) ...
             ' -o ' windows2unix(Prep_Liq_Metal_Only) ' -nmol ' num2str(nmol_liquid) ' -try 200 -scale ' R0 ' -radius ' R0];
         [errcode,output] = system(cmd);
         
@@ -132,7 +130,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             disp(['Randomly adding ' num2str(nmol_liquid) ' ' Settings.Halide ' ions to liquid box...'])
         end
         htimer = tic;
-        cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
+        cmd = [Settings.gmx_loc Settings.insert_molecules ' -ci ' windows2unix(Ref_X) ' -f ' windows2unix(Prep_Liq_Metal_Only) ...
             ' -o ' windows2unix(Prep_Liq_Random_Liq) ' -nmol ' num2str(nmol_liquid) ' -try 400 -scale ' R0 ' -radius ' R0];
         
         [errcode,output] = system(cmd);
@@ -189,7 +187,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             
             % For minimization, add in a close-range repulsive wall to the potential with the following function
             [Settings.TableFile_MX,C6,Energygrptables] = MakeTables(Settings,'MDP_Minimize',true,...
-                'TableName',[Settings.JobName '_Table'],'Add_Wall',~Settings.Polarization);
+                'TableName',[Settings.JobName '_Table'],'Add_Wall',true);
             
             MDP.Minimization_txt = strrep(MDP.Minimization_txt,'##ENERGYGRPSTABLE##',strjoin(Energygrptables,' '));
         else
@@ -333,7 +331,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         MDPout_File = fullfile(Settings.WorkDir,'Prep_Liq_out.mdp');
         GrompLog_File = fullfile(Settings.WorkDir,'Prep_Liq_Grompplog.log');
         
-        FMin_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Prep_Liq_Random_Liq) ...
+        FMin_Grompp = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Prep_Liq_Random_Liq) ...
             ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
             ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
             ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) ...
@@ -350,7 +348,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Log_File = fullfile(Settings.WorkDir,'Prep_Liq.log');
         Energy_file = fullfile(Settings.WorkDir,'Prep_Liq.edr');
         
-        mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
+        mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(TPR_File) ...
             ' -o ' windows2unix(Minimization_TRR_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Minimized_Geom_File) ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq')) ...
@@ -374,7 +372,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
             if Settings.Verbose
                 disp('Failed to minimize, retrying with fewer MPI ranks.')
             end
-            mdrun_command = [Settings.gmx_loc ' mdrun -s ' windows2unix(TPR_File) ...
+            mdrun_command = [Settings.gmx_loc Settings.mdrun ' -s ' windows2unix(TPR_File) ...
                 ' -o ' windows2unix(Minimization_TRR_File) ' -g ' windows2unix(Log_File) ...
                 ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Minimized_Geom_File) ...
                 ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Prep_Liq')) ' -ntmpi 1'];
@@ -422,7 +420,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     Run_Equilibration = true;
     if isfile(Equilibrated_Geom_File)
-        gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Equilibrate_TRR_File)];
+        gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Equilibrate_TRR_File)];
         [state,outp] = system(gmx_check);
         lf = regexp(outp,'Step *([0-9]|\.)+ *([0-9]|\.)+\nTime','tokens','once');
         if state == 0 || ~isempty(lf)
@@ -582,7 +580,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     MDP_Template = strrep(MDP_Template,'##EWALDTOL##',pad(num2str(Settings.MDP.Ewald_rtol),18));
     MDP_Template = strrep(MDP_Template,'##LISTUPDATE##',pad(num2str(Settings.Update_NeighbourList),18));
     MDP_Template = strrep(MDP_Template,'##POSOUT##',pad(num2str(Settings.Output_Coords),18));
-    MDP_Template = strrep(MDP_Template,'##POSOUTCOMP##',pad(num2str(Settings.Output_Coords_Compressed),18));
     MDP_Template = strrep(MDP_Template,'##VELOUT##',pad(num2str(Settings.Output_Velocity),18));
     MDP_Template = strrep(MDP_Template,'##FORCEOUT##',pad(num2str(Settings.Output_Forces),18));
     MDP_Template = strrep(MDP_Template,'##ENOUT##',pad(num2str(Settings.Output_Energies),18));
@@ -649,12 +646,12 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         
         add_cpt = '';
         if isfile(cpt_file) || isfile(prev_cpt_file)
-            gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(cpt_file)];
+            gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(cpt_file)];
             [state,~] = system(gmx_check);
             if state == 0
                 add_cpt = [' -cpi ' windows2unix(cpt_file)];
             elseif isfile(prev_cpt_file)
-                gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(prev_cpt_file)];
+                gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(prev_cpt_file)];
                 [state,~] = system(gmx_check);
                 if state == 0
                     add_cpt = [' -cpi ' windows2unix(prev_cpt_file)];
@@ -667,7 +664,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         GrompLog_File = fullfile(Settings.WorkDir,'Equil_Liq_Grompplog.log');
         
         if ~isfile(TPR_File) || isempty(add_cpt)
-            FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Minimized_Geom_File) ...
+            FEquil_Grompp = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Minimized_Geom_File) ...
                 ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
                 ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
                 ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
@@ -685,7 +682,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Log_File = fullfile(Settings.WorkDir,'Equil_Liq.log');
         Energy_file = fullfile(Settings.WorkDir,'Equil_Liq.edr');
         
-        mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
+        mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(TPR_File) ...
             ' -o ' windows2unix(Equilibrate_TRR_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Equilibrated_Geom_File) add_cpt ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Liq')) ...
@@ -808,7 +805,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     Run_Dynamics = true;
     if isfile(Final_Geom_File)
-        gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(Dynamics_TRR_File)];
+        gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Dynamics_TRR_File)];
         [state,outp] = system(gmx_check);
         lf = regexp(outp,'Step *([0-9]|\.)+ *([0-9]|\.)+\nTime','tokens','once');
         if state == 0 || ~isempty(lf)
@@ -826,12 +823,12 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         
         add_cpt = '';
         if isfile(cpt_file) || isfile(prev_cpt_file)
-            gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(cpt_file)];
+            gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(cpt_file)];
             [state,~] = system(gmx_check);
             if state == 0
                 add_cpt = [' -cpi ' windows2unix(cpt_file)];
             elseif isfile(prev_cpt_file)
-                gmx_check = [Settings.gmx_loc ' check -f ' windows2unix(prev_cpt_file)];
+                gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(prev_cpt_file)];
                 [state,~] = system(gmx_check);
                 if state == 0
                     add_cpt = [' -cpi ' windows2unix(prev_cpt_file)];
@@ -878,7 +875,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         GrompLog_File = fullfile(Settings.WorkDir,'MSD_Liq_Grompplog.log');
         
         if ~isfile(TPR_File) || isempty(add_cpt)
-            FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Equilibrated_Geom_File) ...
+            FEquil_Grompp = [Settings.gmx_loc Settings.grompp  ' -c ' windows2unix(Equilibrated_Geom_File) ...
                 ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Top_Filename) ...
                 ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
                 ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
@@ -931,7 +928,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         Log_File = fullfile(Settings.WorkDir,'MSD_Liq.log');
         Energy_file = fullfile(Settings.WorkDir,'MSD_Liq.edr');
 
-        mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...
+        mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(TPR_File) ...
             ' -o ' windows2unix(Dynamics_TRR_File) ' -g ' windows2unix(Log_File) ...
             ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Final_Geom_File) add_cpt ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'MSD_Liq')) ...
@@ -1060,12 +1057,13 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     En_xvg_file = fullfile(Settings.WorkDir,'MSD_Liq_Energy.xvg');
     
     % Check energy options
-    gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo 0 ' Settings.pipe ' gmx']) ...
-        ' energy -f ' windows2unix(Energy_file) ...
-        ' -s ' windows2unix(TPR_File)];
+    gmx_command = [Settings.wsl 'echo "0" ' Settings.pipe ...
+        ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+        ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
     
-    en_opts = regexp(outpt,'-+\n.+','match','once');
+    en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+    en_opts = en_opts{1};
     En_set = '';
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Volume','tokens','once'))];
     En_set = [En_set ' ' char(regexp(en_opts,'([0-9]{1,2})  Enthalpy','tokens','once'))];
@@ -1074,11 +1072,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     % Grab data from results
     startpoint = 0; % ps
-    gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
-    ' energy -f ' windows2unix(Energy_file)...
-    ' -o ' windows2unix(En_xvg_file) ' -s ' windows2unix(TPR_File) ...
-    ' -b ' num2str(startpoint) ' -e ' num2str(Settings.Liquid_Test_Time)];
-    
+    gmx_command = [Settings.wsl 'echo ' En_set ' ' Settings.pipe ...
+        ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+        ' -f ' windows2unix(Energy_file) ' -o ' windows2unix(En_xvg_file) ...
+        ' -s ' windows2unix(TPR_File) ' -b ' num2str(startpoint) ...
+        ' -e ' num2str(Settings.Liquid_Test_Time)];
     [err,~] = system(gmx_command);
     if err ~= 0
         error('Failed to collect energy data.')
@@ -1093,10 +1091,11 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd.xvg');
     MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd.log');
     msd_command = [Settings.wsl 'echo ' Settings.Metal ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
-        ' msd -f ' windows2unix(Dynamics_TRR_File)         ' -s ' windows2unix(TPR_File) ...
+        Settings.g_msd ' -f ' windows2unix(Dynamics_TRR_File) ' -s ' windows2unix(TPR_File) ...
         ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
         ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.Liquid_Test_Time) ...
         ' -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
+    
     [~,~] = system(msd_command);
     outp = fileread(MSD_Log_File);
     try
@@ -1141,31 +1140,41 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         return
     end
     
-    if Settings.CheckAmorphousLiquid && Settings.CheckAmorphousHalide
+    if Settings.CheckAmorphousHalide
         MSD_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.xvg');
         MSD_Log_File = fullfile(Settings.WorkDir,'MSD_Liq_msd_halide.log');
-        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  ...
-            strrep(Settings.gmx_loc,Settings.wsl,'') ' msd -f ' windows2unix(Dynamics_TRR_File) ...   
-            ' -s ' windows2unix(TPR_File) ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
+        msd_command = [Settings.wsl 'echo ' Settings.Halide ' ' Settings.pipe ' '  strrep(Settings.gmx_loc,Settings.wsl,'') ...
+            Settings.g_msd ' -f ' windows2unix(Dynamics_TRR_File) ' -s ' windows2unix(TPR_File) ...
+            ' -o ' windows2unix(MSD_File) ' -b 0 -e ' num2str(Settings.Liquid_Test_Time) ...
             ' -trestart 0.1 -beginfit ' num2str(0.125*Settings.Liquid_Test_Time) ...
             ' -endfit ' num2str(0.75*Settings.Liquid_Test_Time) Settings.passlog windows2unix(MSD_Log_File)];
         [~,~] = system(msd_command);
         outp = fileread(MSD_Log_File);
-        Diff_txt = regexp(outp,['D\[ *' Settings.Halide '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
-        Output.Liquid_DX_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
-        
-        if Output.Liquid_DX_MP <= Settings.AmorphousDiffThreshold
-            if Settings.Verbose
-                disp('Detected halide in liquid is amorphous.')
+        try
+            Diff_txt = regexp(outp,['D\[ *' Settings.Halide '\] *([0-9]|\.|e|-|\+)+ *(\(.+?\)) *([0-9]|\.|e|-|\+)+'],'tokens','once');
+            Output.Liquid_DX_MP = str2double(Diff_txt{1})*str2double(Diff_txt{3}); % cm^2 / s
+        catch
+            if isfield(Settings,'Retry') && Settings.Retry
+                if Settings.Verbose
+                    error('Failed to gather halide diffusion constant on retry attempt!')
+                end
+            else
+                if Settings.Verbose
+                    disp('Failed to gather halide diffusion constant, retrying...')
+                end
+                try % Clean up
+                    [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.WorkDir) ' -iname "#*#" ' Settings.pipe ' xargs rm']);
+                    [~,~] = system([Settings.wsl 'find ' windows2unix(Settings.OuterDir) ' -iname "*core*" ' Settings.pipe ' xargs rm']);
+                catch me
+                    disp(me.message)
+                end
+                WorkDir = Settings.WorkDir;
+                Settings = Inp_Settings;
+                Settings.WorkDir = WorkDir;
+                Settings.Retry = true;
+                Output = Calc_Liquid_Properties_at_MP(Settings);
+                return
             end
-            Output.Liquid_V_MP = nan;
-            Output.Liquid_H_MP = nan;
-            save(Output_File,'Output');
-            diary off
-            if isfield(Settings,'Diary_Loc') && ~isempty(Settings.Diary_Loc)
-                diary(Settings.Diary_Loc)
-            end
-            return
         end
     else
         Output.Liquid_DX_MP = nan;

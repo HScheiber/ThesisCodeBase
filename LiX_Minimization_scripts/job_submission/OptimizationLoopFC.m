@@ -82,7 +82,7 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoopFC(Settin
     N_c = num2str(N_Supercell_c);
     N_total = (N_Supercell_a*N_Supercell_b*N_Supercell_c)*N_Cell;
     
-    Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(UnitCellFile) ...
+    Supercell_command = [Settings.gmx_loc Settings.genconf ' -f ' windows2unix(UnitCellFile) ...
          ' -o ' windows2unix(SuperCellFile) ' -nbox ' N_a ' ' N_b ' ' N_c];
     [err,output] = system(Supercell_command);
     
@@ -120,7 +120,7 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoopFC(Settin
         passlog = ' &> ';
     end
     
-    GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(SuperCellFile) ...
+    GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(SuperCellFile) ...
         ' -f ' windows2unix(MDP_File) ' -p ' windows2unix(Topology_File) ...
         ' -o ' windows2unix(Trajectory_File) ' -po ' windows2unix(MDPout_File) ...
         passlog windows2unix(GrompLog_File)];
@@ -142,7 +142,7 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoopFC(Settin
     TRR_File = fullfile(Settings.WorkDir,[Settings.FileBase '.trr']);
     ConfOut_File = fullfile(Settings.WorkDir,[Settings.FileBase 'OutConf.' Settings.CoordType]);
     
-    mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(Trajectory_File) ...
+    mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(Trajectory_File) ...
         ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
         ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(ConfOut_File) ...
         ' -rerun ' windows2unix(SuperCellFile) Settings.mdrun_opts];
@@ -177,19 +177,22 @@ function [N_Supercell_a,N_Supercell_b,N_Supercell_c] = OptimizationLoopFC(Settin
     end
     
     % Check energy options
-    gmx_command = [strrep(Settings.gmx_loc,'gmx',['echo 0 ' Settings.pipe ' gmx']) ...
-        ' energy -f ' windows2unix(Energy_file)];
+    gmx_command = [Settings.wsl 'echo "0" ' Settings.pipe ...
+        ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+        ' -f ' windows2unix(Energy_file)];
+    
     [~,outpt] = system(gmx_command);
     
-    en_opts = regexp(outpt,'-+\n.+?-+\n','match','once');
+    en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
+    en_opts = en_opts{1};
     En_set = char(regexp(en_opts,'([0-9]{1,2})  Potential','tokens','once'));
     En_set = regexprep([En_set ' 0'],' +',' ');
     
     % Convert the energy file into readable form
     Energy_output = fullfile(Settings.WorkDir,[Settings.FileBase 'energies.xvg']);
-    
-    eneconv_cmd = [strrep(Settings.gmx_loc,'gmx',['echo' En_set ' ' Settings.pipe ' gmx']) ...
-        ' energy -f ' windows2unix(Energy_file) ' -o ' windows2unix(Energy_output)];
+    eneconv_cmd = [Settings.wsl 'echo ' En_set ' ' Settings.pipe ...
+        ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
+        ' -f ' windows2unix(Energy_file) ' -o ' windows2unix(Energy_output)];
     
     % Run it
     [state,eneconv_output] = system(eneconv_cmd);

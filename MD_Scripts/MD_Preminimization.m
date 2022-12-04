@@ -175,11 +175,6 @@ if Run_Min
             N_Supercell_b = ceil((Settings.Geometry.c/Settings.Geometry.b)*N_Supercell_c_tot/Settings.c_over_a);
         end
         
-        if Settings.Liquid_Interface && Settings.GenCluster
-            N_Supercell_c = round(N_Supercell_c_tot*Settings.Sol_fraction);
-        else
-            N_Supercell_c = N_Supercell_c_tot;
-        end
         if Settings.Verbose
             disp(['Warning: With ' num2str(old_atnum) ...
                 ' atoms, the cut-off length is longer than half the shortest box vector or longer than the smallest box diagonal element.'])
@@ -188,8 +183,28 @@ if Run_Min
     else
         N_Supercell_a = Settings.N_Supercell_a;
         N_Supercell_b = Settings.N_Supercell_b;
-        N_Supercell_c = Settings.N_Supercell_c;
         N_Supercell_c_tot = Settings.N_Supercell_c_tot;
+    end
+    
+    nmol_solid = N_Supercell_a*N_Supercell_b*N_Supercell_c_tot*Settings.Geometry.NF;
+    La = (Settings.Geometry.a/10)*N_Supercell_a; % nm, the minimum box dimension
+    Lb = (Settings.Geometry.b/10)*N_Supercell_b; % nm, the minimum box dimension
+    Lc = (Settings.Geometry.c/10)*N_Supercell_c_tot; % nm, the minimum box dimension
+
+    while nmol_solid < Settings.N_atoms/2 % Enforce a minimum of [Settings.N_atoms] atoms
+        La = La*1.1;
+        Lb = Lb*1.1;
+        Lc = Lc*1.1;
+        N_Supercell_a = ceil(La/(Settings.Geometry.a/10));
+        N_Supercell_b = ceil(Lb/(Settings.Geometry.b/10));
+        N_Supercell_c_tot = ceil(Lc/(Settings.Geometry.c/10));
+        nmol_solid = N_Supercell_a*N_Supercell_b*N_Supercell_c_tot*Settings.Geometry.NF;
+    end
+    
+    if Settings.Liquid_Interface && Settings.GenCluster
+        N_Supercell_c = round(N_Supercell_c_tot*Settings.Sol_fraction);
+    else
+        N_Supercell_c = N_Supercell_c_tot;
     end
     
     % Add number of unit cells to topology file (this will not change)
@@ -217,7 +232,7 @@ if Run_Min
 
     % Create supercell
     temp_SuperCellFile = fullfile(Settings.WorkDir,[Settings.JobName '.' Settings.CoordType]);
-    Supercell_command = [Settings.gmx_loc ' genconf -f ' windows2unix(Settings.UnitCellFile) ...
+    Supercell_command = [Settings.gmx_loc Settings.genconf ' -f ' windows2unix(Settings.UnitCellFile) ...
          ' -o ' windows2unix(temp_SuperCellFile) ' -nbox ' Na ' ' Nb ' ' Nc];
     [errcode,output] = system(Supercell_command);
 
@@ -244,7 +259,7 @@ if Run_Min
         ac = num2str(Settings.Geometry.beta,'%10.4e');
         ab = num2str(Settings.Geometry.gamma,'%10.4e');
 
-        Expand_command = [Settings.gmx_loc ' editconf -f ' windows2unix(temp_SuperCellFile) ...
+        Expand_command = [Settings.gmx_loc Settings.editconf ' -f ' windows2unix(temp_SuperCellFile) ...
              ' -o ' windows2unix(temp_SuperCellFile) ' -box ' a_sc ' ' b_sc ' ' c_sc ' ' ...
              '-noc -angles ' bc ' ' ac ' ' ab];
         [errcode,output] = system(Expand_command);
@@ -259,6 +274,8 @@ if Run_Min
             ReRun_OptPos = true;
         end
     end
+    add_polarization_shells(Settings,temp_SuperCellFile,...
+        'make_index',false,'add_shells',true);
     copyfile(temp_SuperCellFile,Settings.SuperCellFile);
 else
     if Settings.Verbose
@@ -301,7 +318,7 @@ if Run_Min && ReRun_OptPos
     MDP_out_File = fullfile(Settings.WorkDir,[FileBase '_out.mdp']);
     GrompLog_File = fullfile(Settings.WorkDir,[FileBase '_Grompplog.log']);
 
-    FMin_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
+    FMin_Grompp = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
         ' -f ' windows2unix(MDP_in_file) ' -p ' windows2unix(Topology_File) ...
         ' -o ' windows2unix(Trajectory_File) ' -po ' windows2unix(MDP_out_File) ...
         ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
@@ -320,7 +337,7 @@ if Run_Min && ReRun_OptPos
 
     TRR_File = fullfile(Settings.WorkDir,[FileBase '.trr']);
     
-    mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(Trajectory_File) ...
+    mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(Trajectory_File) ...
         ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
         ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Settings.SuperCellFile) ...
         Settings.mdrun_opts];
@@ -349,10 +366,12 @@ if Settings.Liquid_Interface
 end
 
 % If model is polarizable, add in shell positions
-ndx_filename = fullfile(Settings.OuterDir,[Settings.JobName '.ndx']);
+ndx_filename = fullfile(Settings.WorkDir,[Settings.JobName '.ndx']);
 ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
     'ndx_filename',ndx_filename,'add_shells',false);
-
+if isfield(Settings,'ndx_filename')
+    copyfile(ndx_filename,Settings.ndx_filename);
+end
 
 % Generate final topology file for molecular dynamics
 Atomlist = copy_atom_order(Settings.SuperCellFile);
@@ -365,7 +384,18 @@ if isfile(Settings.Traj_Conf_File)
     delete(Settings.Traj_Conf_File)
 end
 
-GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
+% Modify mdp file
+MDP_Template = fileread(Settings.MDP_in_File);
+MDP_Template = regexprep(MDP_Template,'(gen-vel *= *)yes','$1no ','once');
+MDP_Template = regexprep(MDP_Template,'gen-temp *= *.+?\n','','once');
+
+% Save MDP file
+Settings.MDP_in_File = fullfile(Settings.WorkDir,[Settings.JobName '.mdp']);
+fidMDP = fopen(Settings.MDP_in_File,'wt');
+fwrite(fidMDP,regexprep(MDP_Template,'\r',''));
+fclose(fidMDP);
+
+GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
     ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
     ' -o ' windows2unix(Settings.Traj_Conf_File) ' -po ' windows2unix(Settings.MDP_out_File) ...
     ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];

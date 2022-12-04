@@ -56,11 +56,11 @@ Settings.Verbose = false;
 Settings.SigmaEpsilon = true;
 
 % Job settings
-Settings.JobSettings.Cores = 8; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Settings.JobSettings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Settings.JobSettings.dd = [1 2 4]; % Domain decomposition
+Settings.Cores = 8; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Settings.MPI_Ranks = 8; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Settings.npme = []; % Number of rank assigned to PME
+Settings.dd = [1 2 4]; % Domain decomposition
 
 % Bayesian Optimization Stopping Criteria
 Settings.Max_Bayesian_Iterations = 100;
@@ -156,7 +156,7 @@ idx = 0;
 %% Test Model Particular parameter
 Settings.Salt = 'LiBr';
 Settings.Theory = 'BF';
-Settings.InnerRange = false;
+Settings.InnerRange = true;
 Settings.Trial_ID = 'XX4';
 Settings.UseCoupledConstraint = false;
 Settings.Initialize_From_Model = {};
@@ -192,6 +192,7 @@ Settings.Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
 % Other loss options options
 Settings.Fix_Charge = true;
 Settings.Additivity = true;
+Settings.Comb_rule = 'hogervorst'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst', 'GROMACS'. Only applies to BH and BF models
 
 % Auto structure selection
 Settings.Structures = Auto_Structure_Selection(Settings);
@@ -217,7 +218,7 @@ Settings.scratch_dir = fullfile(scratch,Settings.Project_Directory_Name,...
 
 % Turn diary on and submit job
 diary(Settings.Diary_Loc);
-setenv('OMP_NUM_THREADS',num2str(Settings.JobSettings.OMP_Threads))
+setenv('OMP_NUM_THREADS',num2str(Settings.OMP_Threads))
 Bayesian_Optimize_LiX_Parameters(Settings)
 diary('off')
 close all % closes figures

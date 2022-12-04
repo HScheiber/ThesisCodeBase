@@ -5359,10 +5359,10 @@ for tidx = 1:length(Theories)
 end
 
 %% BH Models JA, JB, JC
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -5437,11 +5437,12 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% JC Models JA, JB, JC
-Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+Shared_Settings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 0; % Number of rank assigned to PME
+Shared_Settings.dd = [1 1 2]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -5516,6 +5517,7 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% JC Models EA, EB, ED, EE
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Replicates = 1:5;
@@ -5595,6 +5597,7 @@ for sidx = 1:length(Salts)
 
     end
 end
+
 %% JC Models EG, EH, EJ, EK, EM
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Replicates = 1:5;
@@ -5698,6 +5701,7 @@ for sidx = 1:length(Salts)
 
     end
 end
+
 %% JC Models EN, EP
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Replicates = 1:5;
@@ -5779,6 +5783,7 @@ for sidx = 1:length(Salts)
 
     end
 end
+
 %% JC Models EQ, ER, ES, ET
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Replicates = 1:5;
@@ -5865,6 +5870,7 @@ for sidx = 1:length(Salts)
         Models(idx).SDMM_Range = [0 50];
     end
 end
+
 %% JC Models EV, EW, EX
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Replicates = 1:5;
@@ -5936,13 +5942,14 @@ for sidx = 1:length(Salts)
 
     end
 end
+
 %% BH Models JD, JE, JF, JG
 Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Shared_Settings.ub = 2200; % K, upper bound on MP search
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -6047,13 +6054,14 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% JC Models JD, JE, JF
 Shared_Settings.MinExpWallHeight = 300; % [kJ/mol] in TF and BH models, this is the minimum allowed heighted of the repulsive wall before a loss penalty is applied
 Shared_Settings.ub = 2200; % K, upper bound on MP search
-Shared_Settings.JobSettings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 0; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 1 2]; % Domain decomposition
+Shared_Settings.MPI_Ranks = 2; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 6; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 0; % Number of rank assigned to PME
+Shared_Settings.dd = [1 1 2]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -6137,6 +6145,7 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% BH Models IA, IB, IC, ID
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
@@ -6228,6 +6237,7 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% BH Models IE, IF, IG, IH, II
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
@@ -6355,13 +6365,14 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% BH Models JH, JI, JJ, JK, [not JL], JM
-Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.N_Calc = 10; % Number of chained calculations
+Shared_Settings.Hours = 12; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -6464,13 +6475,14 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% JC Models JH, JI, JJ, JK, [not JL], JM
-Shared_Settings.JobSettings.N_Calc = 10; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 12; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Shared_Settings.N_Calc = 10; % Number of chained calculations
+Shared_Settings.Hours = 12; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -6573,13 +6585,14 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% BH Models JL
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -6620,13 +6633,14 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% JC Models JL
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Shared_Settings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -6667,13 +6681,14 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% BH Models JN, JO, JP
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = 2; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = [1 2 5]; % Domain decomposition
+Shared_Settings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = 2; % Number of rank assigned to PME
+Shared_Settings.dd = [1 2 5]; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'BH'};
 Replicates = 1:5;
@@ -6756,13 +6771,14 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% JC Models JN, JO, JP
-Shared_Settings.JobSettings.N_Calc = 5; % Number of chained calculations
-Shared_Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Shared_Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
-Shared_Settings.JobSettings.npme = []; % Number of rank assigned to PME
-Shared_Settings.JobSettings.dd = []; % Domain decomposition
+Shared_Settings.N_Calc = 5; % Number of chained calculations
+Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 12; % Set the number of OMP threads per MPI rank
+Shared_Settings.npme = []; % Number of rank assigned to PME
+Shared_Settings.dd = []; % Domain decomposition
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC'};
 Replicates = 1:5;
@@ -6846,6 +6862,12 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
+
+
+
+%% New Models
+
 %% Shared_Settings
 Shared_Settings.Max_Bayesian_Iterations = 200;
 Shared_Settings.Max_Secondary_Iterations = 100;
@@ -6854,9 +6876,10 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
+
 %% NaCl - JC/BH Models: KA, KB, KC, KD, KE on NaCl
 Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
 Theories = {'JC' 'BH'};
@@ -6959,6 +6982,7 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% Shared_Settings
 Shared_Settings.Max_Bayesian_Iterations = 200;
 Shared_Settings.Max_Secondary_Iterations = 100;
@@ -6967,11 +6991,12 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
+
 %% LiX - JC/BH Models: KA, KE
-Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' };
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theories = {'JC' 'BH'};
 Replicates = 1:5;
 for tidx = 1:length(Theories)
@@ -7020,6 +7045,7 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% Shared_Settings
 Shared_Settings.Max_Bayesian_Iterations = 200;
 Shared_Settings.Max_Secondary_Iterations = 100;
@@ -7028,9 +7054,10 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
+
 %% NaCl - TF Model: KB and KF
 Salts = {'NaCl'}; % 'LiF' 'LiCl' 'LiBr' 'LiI' 
 Theories = {'TF'};
@@ -7092,8 +7119,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 
 %% BH Models: MA, MB, MC on NaCl
@@ -7172,7 +7199,7 @@ for tidx = 1:length(Theories)
         end
     end
 end
-        
+
 %% Shared_Settings
 Shared_Settings.Max_Bayesian_Iterations = 600;
 Shared_Settings.Max_Secondary_Iterations = 200;
@@ -7182,8 +7209,8 @@ Shared_Settings.Parallel_Bayesopt = true;
 Shared_Settings.Parallel_Struct_Min = false;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
 
 %% JC/BH Models: LA, LB, LC, LD
@@ -7268,6 +7295,7 @@ for tidx = 1:length(Theories)
         end
     end
 end
+
 %% Shared_Settings
 Shared_Settings.Max_Bayesian_Iterations = 300;
 Shared_Settings.Max_Secondary_Iterations = 200;
@@ -7276,9 +7304,10 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
+
 %% BH Models: MD, ME on LiX
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
 Theories = {'BH'};
@@ -7333,10 +7362,6 @@ for tidx = 1:length(Theories)
     end
 end
 
-
-
-
-
 %% Shared_Settings
 Shared_Settings.Max_Bayesian_Iterations = 300;
 Shared_Settings.Max_Secondary_Iterations = 200;
@@ -7345,8 +7370,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 Shared_Settings.EnforceRR = true;
 
@@ -7414,8 +7439,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
 Shared_Settings.EnforceRR = true;
 
@@ -7469,8 +7494,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = false;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 Shared_Settings.EnforceRR = false;
 Shared_Settings.final_opt_type = 'none';
@@ -7536,8 +7561,6 @@ for tidx = 1:length(Theories)
     end
 end
 
-
-
 %% Shared_Settings
 Shared_Settings.Max_Bayesian_Iterations = 300;
 Shared_Settings.Max_Secondary_Iterations = 200;
@@ -7546,8 +7569,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 Shared_Settings.EnforceRR = false;
 Shared_Settings.final_opt_type = 'patternsearch';
@@ -7661,8 +7684,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = false;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH
 Shared_Settings.EnforceRR = true;
 
@@ -7733,8 +7756,8 @@ Shared_Settings.Parallel_Bayesopt = false;
 Shared_Settings.Parallel_Struct_Min = true;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = false;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH
 Shared_Settings.EnforceRR = false;
 Shared_Settings.final_opt_type = 'none';
@@ -7809,8 +7832,8 @@ Shared_Settings.Parallel_Bayesopt = true;
 Shared_Settings.Parallel_Struct_Min = false;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = true;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = true; % Sets domain of BH/TF
 Shared_Settings.EnforceRR = false;
 
@@ -7894,7 +7917,6 @@ for tidx = 1:length(Theories)
             Settings_Array(idx).Fix_Charge = true;
             Settings_Array(idx).Additivity = false;
 
-
             %% Model NE
             idx = idx+1;
             Settings_Array(idx) = Shared_Settings;
@@ -7973,8 +7995,8 @@ Shared_Settings.Parallel_Bayesopt = true;
 Shared_Settings.Parallel_Struct_Min = false;
 Shared_Settings.Parallel_LiX_Minimizer = false;
 Shared_Settings.UseCoupledConstraint = false;
-Shared_Settings.JobSettings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Shared_Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
 Shared_Settings.InnerRange = false; % Sets domain of BH/TF
 Shared_Settings.EnforceRR = true;
 
@@ -8041,6 +8063,642 @@ for tidx = 1:length(Theories)
             Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
             Settings_Array(idx).Fix_Charge = true;
             Settings_Array(idx).Additivity = false;
+
+        end
+    end
+end
+
+%% Shared_Settings
+Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
+Shared_Settings.ExplorationRatio = 2;
+Shared_Settings.Max_Bayesian_Iterations = 800;
+Shared_Settings.Max_Secondary_Iterations = 200;
+Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = false;
+Shared_Settings.InnerRange = true; % Sets domain of BH/TF
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.EnforceRR = true;
+Shared_Settings.final_opt_type = 'none';
+
+%% BF Models: MG
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'BF'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MI
+            idx = idx+1;
+            Settings_Array(idx) = Shared_Settings;
+            Settings_Array(idx).Salt = Salt;
+            Settings_Array(idx).Theory = Theory;
+            Settings_Array(idx).Trial_ID = ['MG' Rep];
+
+            % Loss function
+            Settings_Array(idx).Loss_Options.Rocksalt.LE   = 2;
+            Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+            Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+            Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Settings_Array(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+
+            % Add gaps
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+
+
+            Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+            Settings_Array(idx).Fix_Charge = true;
+            Settings_Array(idx).Additivity = true;
+
+        end
+    end
+end
+
+%% Shared_Settings
+Shared_Settings.Initial_N_Multiplier = 1; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+Shared_Settings.Acquisition_Function = 'expected-improvement';
+Shared_Settings.ExplorationRatio = 1;
+Shared_Settings.Max_Bayesian_Iterations = 50;
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = false;
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.InnerRange = true; % Sets domain of BH
+Shared_Settings.EnforceRR = true;
+Shared_Settings.second_opt_type = 'none';
+Shared_Settings.final_opt_type = 'none';
+Shared_Settings.Liquid_Test_Time = 300; % ps. simulation time to sample the liquid for enthalpy / MSD calculations
+Shared_Settings.Liquid_Equilibrate_Time = 25; % ps. time spent relaxing the liquid for enthalpy / MSD calculations
+Shared_Settings.Solid_Test_Time = 300; % ps. simulation time to sample the solid (second half averaged for enthalpy / volume)
+Shared_Settings.Initialize_From_Model = {'MG'};
+
+%% BH [Gamma<6] and JC Models: MH
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'BH' 'JC'};
+Replicates = 1;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MH
+            idx = idx+1;
+            Settings_Array(idx) = Shared_Settings;
+            Settings_Array(idx).Salt = Salt;
+            Settings_Array(idx).Theory = Theory;
+            Settings_Array(idx).Trial_ID = ['MH' Rep];
+
+            % Loss function
+            Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
+            Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+            Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+            Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+
+            % Add gaps
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+
+
+            Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+            Settings_Array(idx).Fix_Charge = true;
+            Settings_Array(idx).Additivity = true;
+
+        end
+    end
+end
+
+%% Shared_Settings
+Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
+Shared_Settings.ExplorationRatio = 2;
+Shared_Settings.Max_Bayesian_Iterations = 800;
+Shared_Settings.Max_Secondary_Iterations = 200;
+Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = false;
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.EnforceRR = true;
+Shared_Settings.final_opt_type = 'none';
+
+%% Mie Models: MI (n = 10)
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'Mie'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MI
+            idx = idx+1;
+            Settings_Array(idx) = Shared_Settings;
+            Settings_Array(idx).Salt = Salt;
+            Settings_Array(idx).Theory = Theory;
+            Settings_Array(idx).Trial_ID = ['MI' Rep];
+            Settings_Array(idx).S.n.MM = 10;
+            Settings_Array(idx).S.n.XX = 10;
+            Settings_Array(idx).S.n.MX = 10;
+
+            % Loss function
+            Settings_Array(idx).Loss_Options.Rocksalt.LE   = 2;
+            Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+            Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+            Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Settings_Array(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+
+            % Add gaps
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+
+
+            Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+            Settings_Array(idx).Fix_Charge = true;
+            Settings_Array(idx).Additivity = true;
+
+        end
+    end
+end
+
+%% Mie Models: MJ (n = 8)
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'Mie'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MJ
+            idx = idx+1;
+            Settings_Array(idx) = Shared_Settings;
+            Settings_Array(idx).Salt = Salt;
+            Settings_Array(idx).Theory = Theory;
+            Settings_Array(idx).Trial_ID = ['MJ' Rep];
+            Settings_Array(idx).S.n.MM = 8;
+            Settings_Array(idx).S.n.XX = 8;
+            Settings_Array(idx).S.n.MX = 8;
+
+            % Loss function
+            Settings_Array(idx).Loss_Options.Rocksalt.LE   = 2;
+            Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+            Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+            Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Settings_Array(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+
+            % Add gaps
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+
+
+            Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+            Settings_Array(idx).Fix_Charge = true;
+            Settings_Array(idx).Additivity = true;
+
+        end
+    end
+end
+
+
+%% Shared_Settings
+Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
+Shared_Settings.ExplorationRatio = 2;
+Shared_Settings.Max_Bayesian_Iterations = 800;
+Shared_Settings.Max_Secondary_Iterations = 200;
+Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = false;
+Shared_Settings.InnerRange = false; % Sets domain of BH/TF
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.EnforceRR = true;
+Shared_Settings.final_opt_type = 'none';
+Shared_Settings.GaussianCharge = false;
+Shared_Settings.Polarization = false;
+Shared_Settings.Initialize_From_Model = {};
+
+%% BF [Gamma>10] without gaussian charge Models: MH
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'BF'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MH
+            idx = idx+1;
+            Settings_Array(idx) = Shared_Settings;
+            Settings_Array(idx).Salt = Salt;
+            Settings_Array(idx).Theory = Theory;
+            Settings_Array(idx).Trial_ID = ['MH' Rep];
+            Settings_Array(idx) = Alexandria_Potential_Parameters(Settings_Array(idx),...
+                'Coulomb_Only',true);
+
+            % Loss function
+            Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
+            Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+            Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+            Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+
+            % Add gaps
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+
+
+            Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+            Settings_Array(idx).Fix_Charge = true;
+            Settings_Array(idx).Additivity = true;
+
+        end
+    end
+end
+
+%% Shared_Settings
+Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
+Shared_Settings.ExplorationRatio = 2;
+Shared_Settings.Max_Bayesian_Iterations = 800;
+Shared_Settings.Max_Secondary_Iterations = 200;
+Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = false;
+Shared_Settings.InnerRange = false; % Sets domain of BH/TF
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.EnforceRR = true;
+Shared_Settings.final_opt_type = 'none';
+Shared_Settings.GaussianCharge = true;
+Shared_Settings.Polarization = false;
+Shared_Settings.Initialize_From_Model = {};
+
+%% BF [Gamma>10] WITH gaussian charge Models: MI
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'BF'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MH
+            idx = idx+1;
+            Settings_Array(idx) = Shared_Settings;
+            Settings_Array(idx).Salt = Salt;
+            Settings_Array(idx).Theory = Theory;
+            Settings_Array(idx).Trial_ID = ['MI' Rep];
+            Settings_Array(idx) = Alexandria_Potential_Parameters(Settings_Array(idx),...
+                'Coulomb_Only',true);
+
+            % Loss function
+            Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
+            Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+            Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+            Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+
+            % Add gaps
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+
+
+            Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+            Settings_Array(idx).Fix_Charge = true;
+            Settings_Array(idx).Additivity = true;
+
+        end
+    end
+end
+
+
+%% Shared_Settings
+Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
+Shared_Settings.ExplorationRatio = 2;
+Shared_Settings.Max_Bayesian_Iterations = 800;
+Shared_Settings.Max_Secondary_Iterations = 200;
+Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = false;
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.EnforceRR = true;
+Shared_Settings.final_opt_type = 'none';
+Shared_Settings.GaussianCharge = true;
+Shared_Settings.Polarization = false;
+Shared_Settings.Initialize_From_Model = {};
+
+%% JC WITH gaussian charge Models: MI
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'JC'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MI
+            idx = idx+1;
+            Settings_Array(idx) = Shared_Settings;
+            Settings_Array(idx).Salt = Salt;
+            Settings_Array(idx).Theory = Theory;
+            Settings_Array(idx).Trial_ID = ['MI' Rep];
+            Settings_Array(idx) = Alexandria_Potential_Parameters(Settings_Array(idx),...
+                'Coulomb_Only',true);
+
+            % Loss function
+            Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
+            Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+            Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+            Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+
+            % Add gaps
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+
+
+            Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+            Settings_Array(idx).Fix_Charge = true;
+            Settings_Array(idx).Additivity = true;
+
+        end
+    end
+end
+
+%% Shared_Settings
+Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
+Shared_Settings.ExplorationRatio = 2;
+Shared_Settings.Max_Bayesian_Iterations = 800;
+Shared_Settings.Max_Secondary_Iterations = 200;
+Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
+Shared_Settings.Parallel_Bayesopt = false;
+Shared_Settings.Parallel_Struct_Min = true;
+Shared_Settings.Parallel_LiX_Minimizer = false;
+Shared_Settings.UseCoupledConstraint = false;
+Shared_Settings.InnerRange = true; % Sets domain of BH/TF
+Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Shared_Settings.EnforceRR = true;
+Shared_Settings.final_opt_type = 'none';
+Shared_Settings.GaussianCharge = true;
+Shared_Settings.Polarization = false;
+Shared_Settings.Initialize_From_Model = {};
+
+%% BH [Gamma<6] WITH gaussian charge Models: MI
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+Theories = {'BH'};
+Replicates = 1:5;
+for tidx = 1:length(Theories)
+    Theory = Theories{tidx};
+    for sidx = 1:length(Salts)
+        Salt = Salts{sidx};
+
+        % Set initial MP temperature
+        Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+        Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
+        Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
+
+        for ridx = 1:length(Replicates)
+            Rep = num2str(Replicates(ridx));
+
+            %% Model MI
+            idx = idx+1;
+            Settings_Array(idx) = Shared_Settings;
+            Settings_Array(idx).Salt = Salt;
+            Settings_Array(idx).Theory = Theory;
+            Settings_Array(idx).Trial_ID = ['MI' Rep];
+            Settings_Array(idx) = Alexandria_Potential_Parameters(Settings_Array(idx),...
+                'Coulomb_Only',true);
+
+            % Loss function
+            Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
+            Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+            Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+            Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+            Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+            Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+            Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+            Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+
+            % Add gaps
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+            Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+
+
+            Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+            Settings_Array(idx).Fix_Charge = true;
+            Settings_Array(idx).Additivity = true;
 
         end
     end

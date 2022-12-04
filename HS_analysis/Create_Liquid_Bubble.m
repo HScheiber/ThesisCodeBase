@@ -4,7 +4,7 @@ function Geometry = Create_Liquid_Bubble(Settings)
 % Settings = IP.Settings;
 
 warning('off','MATLAB:UndefinedFunction')
-Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
+Settings.Ref_Density = Get_LiX_Liquid_Density(Settings); % molecules/nm^3
 warning('on','MATLAB:UndefinedFunction')
 
 pos_filename = 'positions.dat';
@@ -15,18 +15,18 @@ nmol_cluster = Settings.Cluster_N/2;
 nmol = Settings.N_atoms/2;
 
 % Calculate the radius needed for the given density
-Vol_cluster = nmol_cluster/Ref_Density; % Volume in cubic nm
+Vol_cluster = nmol_cluster/Settings.Ref_Density; % Volume in cubic nm
 R_cluster = ( (3/(4*pi))*Vol_cluster )^(1/3); % Radius in nm
 Inner_Box_Length = 2*(R_cluster);
 
-Vol_total = nmol/Ref_Density; % Volume in cubic nm
+Vol_total = nmol/Settings.Ref_Density; % Volume in cubic nm
 Full_Box_length = Vol_total^(1/3); % Side length of box
 
 Box_Center = Full_Box_length.*[1/2 1/2 1/2]; % Box center in nm
 
 %% How many atoms should fit into a box with the same side length as the sphere?
 Box_Vol = Inner_Box_Length^3; % nm^3 volume
-nmol_box = ceil(Ref_Density*Box_Vol);
+nmol_box = ceil(Settings.Ref_Density*Box_Vol);
 
 % Create a positions.dat file
 fid = fopen(pos_filename,'wt');
@@ -42,14 +42,14 @@ fclose(fid);
 % Add metal
 tmp_file = 'tmp.gro';
 L = num2str(Full_Box_length);
-cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_M) ' -ip ' windows2unix(pos_filename)...
+cmd = [Settings.gmx_loc Settings.insert_molecules ' -ci ' windows2unix(Ref_M) ' -ip ' windows2unix(pos_filename)...
     ' -o ' windows2unix(tmp_file) ' -nmol ' num2str(nmol_box) ' -box ' L ' ' L ' ' L ...
     ' -dr ' num2str(R_cluster)];
 system(cmd,'-echo');
 
 % Add Halide
 MX_out_File = 'full_box.gro';
-cmd = [Settings.gmx_loc ' insert-molecules -ci ' windows2unix(Ref_X) ' -f ' windows2unix(tmp_file) ...
+cmd = [Settings.gmx_loc Settings.insert_molecules ' -ci ' windows2unix(Ref_X) ' -f ' windows2unix(tmp_file) ...
     ' -o ' windows2unix(MX_out_File) ' -nmol ' num2str(nmol_box) ' -ip ' windows2unix(pos_filename) ...
     ' -dr ' num2str(R_cluster) ' -try 200'];
 system(cmd,'-echo');

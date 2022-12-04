@@ -73,8 +73,6 @@ elseif isfield(Settings,'Parallel_Bayesopt') && Settings.Parallel_Bayesopt
     gmx_serial = true;
 elseif Settings.MinMDP.Parallel_Min
     gmx_serial = true;
-elseif Settings.Polarization % Polarization cannot run with gmx parallel
-    gmx_serial = true;
 else
     gmx_serial = false;
 end   
@@ -110,7 +108,7 @@ Lattice_param_UB = 20; % Angstroms, upper bound on the possible lattice paramete
 Settings.Longest_Cutoff = max([Settings.MinMDP.RList_Cutoff Settings.MinMDP.RCoulomb_Cutoff Settings.MinMDP.RVDW_Cutoff]);
 Settings.Table_Length = Settings.Longest_Cutoff + 1.01; % nm. This should be at least equal rc+1 where rc is the largest cutoff
 
-if Settings.JobSettings.SinglePrecision
+if Settings.SinglePrecision
     Settings.Table_StepSize = 0.002; % Step size of tabulated potentials in nm
 else
     Settings.Table_StepSize = 0.0005; % 0.0005 Step size of tabulated potentials in nm
@@ -122,7 +120,7 @@ Settings.Geometry = Default_Crystal(Settings,'Scale',Settings.S);
 
 if gmx_serial % Since using matlab parallel, make sure gromacs runs in serial
     if ~isfield(Settings,'gmx')
-        [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts,~] = MD_Batch_Template(Settings.JobSettings);
+        [~,Settings] = MD_Batch_Template(Settings);
     end
     env.OMP_NUM_THREADS = getenv('OMP_NUM_THREADS');
     env.GMX_PME_NUM_THREADS = getenv('GMX_PME_NUM_THREADS');
@@ -138,9 +136,9 @@ if gmx_serial % Since using matlab parallel, make sure gromacs runs in serial
     Settings.mdrun_opts = ' -pin on -ntmpi 1 -ntomp 1';
     Settings.gmx = Settings.gmx_loc;
 elseif ~Settings.Use_Conv_cell
-    Settings.JobSettings.dd = [];
-    Settings.JobSettings.npme = [];
-    [~,Settings.gmx,Settings.gmx_loc,Settings.mdrun_opts] = MD_Batch_Template(Settings.JobSettings);
+    Settings.dd = [];
+    Settings.npme = [];
+    [~,Settings] = MD_Batch_Template(Settings);
 end
 
 % Find minimum lattice parameter for this
@@ -159,11 +157,7 @@ else
         case {'JC' 'BD' 'BE' 'Mie' 'HS'}
             AddRepWall = false;
         otherwise
-            if Settings.Polarization
-                AddRepWall = false;
-            else
-                AddRepWall = true;
-            end
+            AddRepWall = true;
     end
 end
 

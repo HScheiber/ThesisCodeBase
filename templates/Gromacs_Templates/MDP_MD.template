@@ -6,7 +6,6 @@ nstvout                  = ##VELOUT##; Number of steps that elapse between writi
 nstfout                  = ##FORCEOUT##; Number of steps that elapse between writing forces to output trajectory.
 nstenergy                = ##ENOUT##; Number of steps that elapse between writing energies to output trajectory.
 nstcalcenergy            = ##CALCE##; Number of steps that elapse between calculating the energies, 0 is never
-nstxout-compressed       = ##POSOUTCOMP##; Number of steps that elapse between writing position coordinates using lossy compression
 
 ; Parameters for run
 coulombtype              = ##COULOMB##; Define how the coulombic interaction is calculated

@@ -1,6 +1,6 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theory = 'BF';
-ModelID = 'MG';
+ModelID = 'MK';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
@@ -339,13 +339,15 @@ for idx = 1:NPars
     ylim(axh(idx),'padded')
     xticks(axh(idx),[])
     
-    [name,units] = param_name_map(ParNames{idx});
+    [name,units,logscale] = param_name_map(ParNames{idx});
     ylabel(axh(idx),units,'interpreter','latex','fontsize',fs);
     xlabel(axh(idx),name,'interpreter','latex','fontsize',fs);
     set(axh(idx),'box','on','TickLabelInterpreter','latex',...
         'XMinorGrid','off','YMinorGrid','on','YGrid','on',...
         'FontSize',fs)
-    
+    if logscale
+        set(axh(idx),'YScale','log')
+    end
 end
 
 
@@ -365,7 +367,8 @@ if savefile
     print(figh,filename,'-dpng','-r0','-noui')
 end
 
-function [name,units] = param_name_map(p_name)
+function [name,units,logscale] = param_name_map(p_name)
+    logscale = false;
     switch p_name
         case 'C_MX'
             name = 'C$_{6,\textrm{Li}^{+}\textrm{X}^{-}}$';
@@ -400,12 +403,15 @@ function [name,units] = param_name_map(p_name)
         case 'epsilon_MX'
             name = '$\epsilon_{\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$]';
+            logscale = true;
         case 'epsilon_MM'
             name = '$\epsilon_{\textrm{Li}^{+}\textrm{Li}^{+}}$';
             units = '[kJ mol$^{-1}$]';
+            logscale = true;
         case 'epsilon_XX'
             name = '$\epsilon_{\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '[kJ mol$^{-1}$]';
+            logscale = true;
         case 'sigma_MX'
             name = '$\sigma_{\textrm{Li}^{+}\textrm{X}^{-}}$';
             units = '[nm]';

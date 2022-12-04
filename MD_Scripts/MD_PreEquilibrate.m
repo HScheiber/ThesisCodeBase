@@ -39,22 +39,41 @@ nstpcouple = max(round(tau_p/(20*Settings.MDP.dt)),1);
 nsttcouple = max(round(tau_t/(20*Settings.MDP.dt)),1);
 
 Target_P = regexprep(num2str(Settings.Target_P),' +',' ');
+Target_T = num2str(Settings.Target_T);
 
 % Ensure fast equilibration with Berendsen barostat + small time constant
-MDP_Template = regexprep(Settings.MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
+MDP_Template = regexprep(Settings.MDP_Template,'\r\n','\n');
+MDP_Template = regexprep(MDP_Template,'(nsteps += *)(.+?)( *);',['$1' num2str(timesteps) '$3;']);
 MDP_Template = regexprep(MDP_Template,'(nstenergy += *)(.+?)( *);','$1100$3;');
-MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
-MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);',['$1' Settings.Isotropy '$3;']);
-MDP_Template = regexprep(MDP_Template,'(tau-p += *)(.+?)( *);',['$1 ' num2str(tau_p) '$3;']);
-MDP_Template = regexprep(MDP_Template,'(nstpcouple += *)(.+?)( *);',['$1 ' num2str(nstpcouple) '$3;']);
-MDP_Template = regexprep(MDP_Template,'(compressibility += *)(.+?)( *);',['$1 ' Compressibility '$3;']);
-MDP_Template = regexprep(MDP_Template,'(ref-p += *)(.+?)( *);',['$1 ' Target_P '$3;']);
+MDP_Template = regexprep(MDP_Template,'(annealing += *)(.+?)( +);','$1no$3;');
+
+MDP_Template = regexprep(MDP_Template,'(\; Pressure Coupling\n).+?\n\n',['$1' ...
+    'pcoupl          = Berendsen' newline ...
+    'pcoupltype      = ' Settings.Isotropy newline ...
+    'tau-p           = ' num2str(tau_p) newline ...
+    'nstpcouple      = ' num2str(nstpcouple) newline ...
+    'compressibility = ' Compressibility newline ...
+    'ref-p           = ' Target_P newline newline]);
+
+% MDP_Template = regexprep(MDP_Template,'(\; Pressure Coupling).+?\r','$1');
+% MDP_Template = regexprep(MDP_Template,'(pcoupl += *)(.+?)( *);','$1Berendsen$3;');
+% MDP_Template = regexprep(MDP_Template,'(pcoupltype += *)(.+?)( *);',['$1' Settings.Isotropy '$3;']);
+% MDP_Template = regexprep(MDP_Template,'(tau-p += *)(.+?)( *);',['$1 ' num2str(tau_p) '$3;']);
+% MDP_Template = regexprep(MDP_Template,'(nstpcouple += *)(.+?)( *);',['$1 ' num2str(nstpcouple) '$3;']);
+% MDP_Template = regexprep(MDP_Template,'(compressibility += *)(.+?)( *);',['$1 ' Compressibility '$3;']);
+% MDP_Template = regexprep(MDP_Template,'(ref-p += *)(.+?)( *);',['$1 ' Target_P '$3;']);
     
 % Pair it with velocity rescale thermostat + small time constant
-MDP_Template = regexprep(MDP_Template,'(tcoupl += *)(.+?)( +);','$1v-rescale$3;');
-MDP_Template = regexprep(MDP_Template,'(tau-t += *)(.+?)( +);',['$1 ' num2str(tau_t) '$3;']);
-MDP_Template = regexprep(MDP_Template,'(nsttcouple += *)(.+?)( +);',['$1 ' num2str(nsttcouple) '$3;']);
-MDP_Template = regexprep(MDP_Template,'(annealing += *)(.+?)( +);','$1no$3;');
+MDP_Template = regexprep(MDP_Template,'(\; Temperature Coupling\n).+?\n\n',['$1' ...
+    'tcoupl     = v-rescale' newline ...
+    'tc-grps    = System' newline ...
+    'tau-t      = ' num2str(tau_t) newline ...
+    'nsttcouple = ' num2str(nsttcouple) newline ...
+    'ref-t      = ' Target_T newline newline]);
+
+% MDP_Template = regexprep(MDP_Template,'(tcoupl += *)(.+?)( +);','$1v-rescale$3;');
+% MDP_Template = regexprep(MDP_Template,'(tau-t += *)(.+?)( +);',['$1 ' num2str(tau_t) '$3;']);
+% MDP_Template = regexprep(MDP_Template,'(nsttcouple += *)(.+?)( +);',['$1 ' num2str(nsttcouple) '$3;']);
     
 % Save MDP file, topology file can be reused
 MDP_Filename = fullfile(Settings.WorkDir,'Equil_System.mdp');
@@ -71,7 +90,7 @@ ndx_filename = fullfile(Settings.WorkDir,'Equil_System.ndx');
 ndx_add = add_polarization_shells(Settings,Settings.SuperCellFile,...
     'ndx_filename',ndx_filename,'add_shells',false);
 
-FEquil_Grompp = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
+FEquil_Grompp = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
     ' -f ' windows2unix(MDP_Filename) ' -p ' windows2unix(Settings.Topology_File) ...
     ' -o ' windows2unix(TPR_File) ' -po ' windows2unix(MDPout_File) ...
     ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(GrompLog_File)];
@@ -90,7 +109,7 @@ Energy_file = fullfile(Settings.WorkDir,'Equil_System.edr');
 TRR_File = fullfile(Settings.WorkDir,'Equil_System.trr');
 Equilibrated_Geom_File = fullfile(Settings.WorkDir,['Equil_System.' Settings.CoordType]);
     
-mdrun_command = [Settings.gmx ' mdrun -s ' windows2unix(TPR_File) ...   
+mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(TPR_File) ...   
     ' -o ' windows2unix(TRR_File) ' -g ' windows2unix(Log_File) ...
     ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Equilibrated_Geom_File) ...
     ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_System')) ...
@@ -142,7 +161,7 @@ else
         if Settings.Verbose
             disp('Equilibration failed. Reducing time step did not resolve.')
             disp(mdrun_output);
-            disp(['Error running mdrun for liquid equilibration. Problem command: ' newline mdrun_command]);
+            disp(['Error running mdrun for system pre-equilibration. Problem command: ' newline mdrun_command]);
         end
         Output.Aborted = true;
         return
@@ -168,7 +187,7 @@ fclose(fidMDP);
 if isfile(Settings.Traj_Conf_File)
     delete(Settings.Traj_Conf_File)
 end
-GROMPP_command = [Settings.gmx_loc ' grompp -c ' windows2unix(Settings.SuperCellFile) ...
+GROMPP_command = [Settings.gmx_loc Settings.grompp ' -c ' windows2unix(Settings.SuperCellFile) ...
     ' -f ' windows2unix(Settings.MDP_in_File) ' -p ' windows2unix(Settings.Topology_File) ...
     ' -o ' windows2unix(Settings.Traj_Conf_File) ' -po ' windows2unix(Settings.MDP_out_File) ...
     ndx_add ' -maxwarn ' num2str(Settings.MaxWarn) Settings.passlog windows2unix(Settings.GrompLog_File)];

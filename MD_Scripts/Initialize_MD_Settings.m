@@ -22,24 +22,25 @@ function Settings = Initialize_MD_Settings
 Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Settings.BatchMode = true; % Sets up batch job when true, or runs immediately when false
 Settings.Continue = false; % Where possible, continue a FINISHED calculation when true
-Settings.JobSettings.Hours = 3; % Max time for each job (hours)
-Settings.JobSettings.N_Calc = 1; % Number of jobs to link together.
-Settings.JobSettings.Mins = 0; % Max time for job (minutes)
-Settings.JobSettings.Nodes = 1; % Minimum number of cores to request for calculation.
-Settings.JobSettings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Settings.JobSettings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
-Settings.JobSettings.SinglePrecision = false; % choose true for single precision mode, false for double
-Settings.JobSettings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
-Settings.JobSettings.MPI_Ranks = -1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-Settings.JobSettings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-Settings.JobSettings.npme = []; % Number of MPI ranks assigned to PME
-Settings.JobSettings.dd = []; % Sets the domain decomposition cells. Requires 3 numbers, X, Y, and Z corresponding to the number of cells in each direction.
+Settings.Hours = 3; % Max time for each job (hours)
+Settings.N_Calc = 1; % Number of jobs to link together.
+Settings.Mins = 0; % Max time for job (minutes)
+Settings.Nodes = 1; % Minimum number of cores to request for calculation.
+Settings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
+Settings.SinglePrecision = false; % choose true for single precision mode, false for double
+Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+Settings.MPI_Ranks = -1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+Settings.npme = []; % Number of MPI ranks assigned to PME
+Settings.dd = []; % Sets the domain decomposition cells. Requires 3 numbers, X, Y, and Z corresponding to the number of cells in each direction.
 % Leave dd empty to not use.
-Settings.JobSettings.dds = 0.8; % default = 0.8. Fraction in (0,1) by whose reciprocal the initial DD cell size will be increased in order to provide a margin in which dynamic load balancing can act while preserving the minimum cell size.
+Settings.dds = 0.8; % default = 0.8. Fraction in (0,1) by whose reciprocal the initial DD cell size will be increased in order to provide a margin in which dynamic load balancing can act while preserving the minimum cell size.
 % dds may need to be set lower for cluster jobs due to high inhomogeniety in the system
-Settings.JobSettings.DLB = true; % Turns on Gromacs dynamic load balancing when true
-Settings.JobSettings.TunePME = true; % Optimizes PME load between PP/PME ranks or GPU/CPU
+Settings.DLB = true; % Turns on Gromacs dynamic load balancing when true
+Settings.TunePME = true; % Optimizes PME load between PP/PME ranks or GPU/CPU
 Settings.Verbose = true;
+Settings.gmx_version = ''; % One of: '', '4.6.7' or '2019'. Autoselects when empty.
 
 %% Interaction and Structure Settings
 % These can be arrays
@@ -60,7 +61,7 @@ Settings.ScaleInitialLiqDensity = 1; % Scale initial guess liquid density by thi
 Settings.GaussianCharge = false; % Turn on Gaussian distributed charges when true
 Settings.Polarization = false; % Turn on polarizible Drude model when true
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-Settings.emtol_polarization = 0.1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+Settings.emtol_polarization = 1e-3; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
 % Only active for 'previous' structures:
 Settings.Prev_geom_loc = '';
@@ -121,7 +122,6 @@ Settings.CoordType = 'gro'; % Either pdb, gro, or g96 (use g96 for extra precisi
 
 %% Trajectory update/output options: larger number of steps decreases resolution
 Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
-Settings.Output_Coords_Compressed = 0; % Number of steps between outputting coordinates in compressed format
 Settings.Output_Velocity = 0; % Number of steps between outputting velocities
 Settings.Output_Forces = 0; % Number of steps between outputting forces
 Settings.Calc_Energies = 100; % Number of steps that elapse between calculating the energies.
@@ -133,7 +133,7 @@ Settings.Skip_Minimization = false; % TURNED ON FOR LIQUIDS AUTOMATICALLY. When 
 Settings.Find_Min_Params = true; % When true, finds lowest energy parameters for IC based on Data_Types. When false, uses input IC
 Settings.Find_Similar_Params = false; % If no exact minimized geometry is found for the input model, find geometry for a similar model
 Settings.Data_Types = 1; % Allowed data types for automatic search of initial conditions (0 = normal, 1 = cell optimized, 2 = full optimized, 3 = atom optimized only)
-Settings.MinMDP.Parallel_Min = true; % run minimization routine using matlab parallel when true
+Settings.MinMDP.Parallel_Min = false; % run minimization routine using matlab parallel when true
 Settings.MinMDP.Verbose = false; % Sets verbosity of minimization routine
 Settings.MinMDP.OptPos = false; % Optimize both position and lattice parameters when true
 Settings.MinMDP.Maintain_Symmetry = true; % maintains cell symmetry when true
@@ -164,10 +164,11 @@ Settings.MinMDP.CoordType = 'g96';
 Settings.MinMDP.Disp_Correction = true; % Adds in a long-range dispersion correction when true
 Settings.MinMDP.Use_Conv_cell = false; % When true, use the conventional unit cell, when false use the primitive unit cell
 
-
 Settings.PreEquilibration = 0; % [ps] Use this to run an initial rapid equilibration
 
 %% Geometry editing and cluster settings
+Settings.Geometry = [];
+Settings.Ref_Density = nan;
 Settings.pbc = 'on'; % periodic boundary conditions
 Settings.GenCluster = false; % Turns on cluster generation when true
 Settings.Cluster_Frac = 0.5; % Fraction of the total atoms in the cluster
@@ -216,7 +217,7 @@ Settings.Table_StepSize = 0.0005; % nm, suitable for double precision
 [Settings.home,Settings.project,Settings.computer,Settings.slurm,...
     Settings.BO_Models,Settings.qsub,Settings.passlog,Settings.pipe,...
     Settings.wsl,Settings.MLModelDir,Settings.scratch_dir] = find_home;
-Settings.Project_Directory_Name = 'Melting_Point_Studies'; % Name of project directory to contain job within the main project folder
+Settings.Project_Directory_Name = ''; % Name of project directory to contain job within the main project folder
 
 %% Settings for melting point calculations
 Settings.CheckTime = 25; % ps. Time between checking for melting/freezing
@@ -238,6 +239,11 @@ Settings.QECompressibility = 1e-6; % Compressibility used during the rapid-equil
 Settings.CheckAmorphousLiquid = true; % When true, this enables a check for liquid -> amorphous based on the mean-squared displacement
 Settings.CheckAmorphousHalide = false; % (specific to non-MP liquid calc) When false, only check the metal diffusion, when true: check both metal and halide diffusion
 Settings.AmorphousDiffThreshold = 1e-6; % [cm^2/s] When CheckAmorphousLiquid is true, this sets the threshold for amorphous vs liquid
+Settings.MP_Liquid_Test_Time = 100; % ps. Time used for calculation of liquid MSD in melting point calculations.
+Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MinTimeStep = 0.00025; % [ps] minimum time step
+Settings.StaticCheckTime = true; % When true, always use CheckTime. When false, expand CheckTime dynamically to reduce number of checks.
 
 % optimizer settings
 Settings.Optimizer = 'MPSearcher'; % One of fmincon, patternsearch, MPSearcher, or bayesopt
@@ -260,28 +266,32 @@ Settings.SaveTrajectory = true; % Save processed xyz trajectory file for each te
 Settings.SavePredictionsImage = true; % Save structure fraction vs time image when true for each temperature check
 Settings.SaveFeatures = false; % Save structure fraction vs time image when true for each temperature check
 Settings.SavePredictions = false; % Save structure fraction vs time image when true for each temperature check
-Settings.ML_TimeLength = 21;
-Settings.ML_TimeStep = 5;
-Settings.TimePerFrame = 5; % ps
+Settings.ML_TimeLength = 0;
+Settings.ML_TimeStep = 0;
+Settings.TimePerFrame = 1; % ps
 Settings.Qlm_Average = true;
 Settings.Voronoi = false;
-
+Settings.RunEnergyAnalysis = {}; % Activates energy analysis, case insensitive
+% Incomplete list of options:
+%   1  LJ-(SR)          2  Disper.-corr.    3  Coulomb-(SR)     4  Coul.-recip.
+%   5  Polarization     6  Potential        7  Kinetic-En.      8  Total-Energy
+%   9  Conserved-En.   10  Temperature     11  Pres.-DC        12  Pressure
+%  13  Vir-XX          14  Vir-XY          15  Vir-XZ          16  Vir-YX
+%  17  Vir-YY          18  Vir-YZ          19  Vir-ZX          20  Vir-ZY
+%  21  Vir-ZZ          22  Pres-XX         23  Pres-XY         24  Pres-XZ
+%  25  Pres-YX         26  Pres-YY         27  Pres-YZ         28  Pres-ZX
+%  29  Pres-ZY         30  Pres-ZZ         31  #Surf*SurfTen   32  Coul-SR:Na-Na
 
 % Default model modification parameters
 Settings.S = Init_Scaling_Object;
 Settings.CR_Damp = Init_CRDamping_Object; % note: b = steepness of damping, r_d = position in nm.
 Settings.C6_Damp = Init_C6Damping_Object;
 [Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
+Settings.SigmaEpsilon = true;
 
 % Finite T settings
 Settings.Liquid_Test_Time = 100; % ps. Sets time for primary liquid calculation
 Settings.Liquid_Equilibrate_Time = 25; % ps
 Settings.Solid_Test_Time = 30; % ps. Sets time for combination of solid equilibration + test time
-
-% MP settings
-Settings.MP_Liquid_Test_Time = 100; % ps. Time used for calculation of liquid MSD in melting point calculations.
-Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
-Settings.MinTimeStep = 0.00025; % [ps] minimum time step
 
 end
