@@ -289,9 +289,9 @@ case {'cedar' 'graham' 'narval'} % Cedar, graham, and narval
         Settings.g_traj = 'g_traj_mpi_d';
         Settings.convert_tpr = 'tpbconv_mpi_d';
         if Settings.SinglePrecision
-            Settings.insert_molecules = 'gmx_d insert-molecules';
-        else
             Settings.insert_molecules = 'gmx insert-molecules';
+        else
+            Settings.insert_molecules = 'gmx_d insert-molecules';
         end
         Settings.mdrun_opts = [Settings.mdrun_opts ' -pd'];
     else
@@ -427,9 +427,9 @@ otherwise
             Settings.g_traj = 'g_traj_d';
             Settings.convert_tpr = 'tpbconv_d';
             if Settings.SinglePrecision
-                Settings.insert_molecules = 'gmx_d insert-molecules';
-            else
                 Settings.insert_molecules = 'gmx insert-molecules';
+            else
+                Settings.insert_molecules = 'gmx_d insert-molecules';
             end
             Settings.mdrun_opts = [Settings.mdrun_opts ' -pd'];
             
