@@ -6,8 +6,8 @@ Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'RbF' 'RbCl' 'RbBr' 'RbI' ...
          'CsF' 'CsCl' 'CsBr' 'CsI'};
 Theories = {'BF' 'BH' 'JC' 'Mie'};
-Structures = {'Rocksalt'};%{'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
-Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data').Data;
+Structures = {'Rocksalt' 'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+Data = struct();
 
 Settings.JobSettings.Cores = 1;
 Settings.JobSettings.MPI_Ranks = 1; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
