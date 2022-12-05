@@ -18,6 +18,7 @@ if ~isfield(Settings,'OuterDir')
     Settings.OuterDir = WorkDir;
 end
 Settings = Update_MD_Settings(Settings);
+Settings.Submit_Jobs = false; % should be set to false for MP jobs
 
 Settings.mdrun_opts = regexprep(Settings.mdrun_opts,' -maxh [0-9]+','','once');
 Settings.CurrentTFile = fullfile(Settings.WorkDir,[Settings.JobName '_MP.mat']);

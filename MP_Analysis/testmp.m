@@ -1,6 +1,5 @@
 Settings = Initialize_MD_Settings;
 Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
-Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
 Settings.Liquid_Fraction = 0.50; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
 Settings.MP_Liquid_Test_Time = 50; % ps. simulation time to sample the liquid for MSD calculation involvedin MP
@@ -24,7 +23,7 @@ Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
 % Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
 % Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
 Settings.GaussianCharge = true;
-Settings.Polarization = true;
+Settings.Polarization = false;
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
 Settings.emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'
