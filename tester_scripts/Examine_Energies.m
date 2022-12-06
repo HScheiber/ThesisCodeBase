@@ -1,4 +1,4 @@
-Energy_file = 'Comb_Equil.edr';
+Energy_file = 'Test_MP.edr';
 system(['wsl source ~/.bashrc; echo 9 11 15 18 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
@@ -17,7 +17,7 @@ Data = import_xvg('energy.xvg');
 
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
-nmol_solid = 1;
+nmol_solid = 2000;
 
 hold on %figure
 plot(Data(:,1),Data(:,2)./nmol_solid,'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)

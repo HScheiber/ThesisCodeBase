@@ -25,7 +25,6 @@ switch Salt
         Liq_Compressibility = 0.235;
     case 'LiI'
         Liq_Compressibility = 0.312;
-
     case 'NaF'
         Liq_Compressibility = 0.133;
     case 'NaCl'
@@ -34,7 +33,6 @@ switch Salt
         Liq_Compressibility = 0.361;
     case 'NaI'
         Liq_Compressibility = 0.436;
-
     case 'KF'
         Liq_Compressibility = 0.186;
     case 'KCl'
