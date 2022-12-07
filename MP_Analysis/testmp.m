@@ -4,7 +4,7 @@ Settings.Liquid_Interface = true; % When true, creates an system with half STRUC
 Settings.Liquid_Fraction = 0.50; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
 Settings.MP_Liquid_Test_Time = 50; % ps. simulation time to sample the liquid for MSD calculation involvedin MP
 Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
-Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
+Settings.MP_Equilibrate_Liquid = 30; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 Settings.Cores = 8;
 Settings.MPI_Ranks = 8;
@@ -23,7 +23,7 @@ Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
 % Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
 % Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
 Settings.GaussianCharge = true;
-Settings.Polarization = false;
+Settings.Polarization = true;
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
 Settings.emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'

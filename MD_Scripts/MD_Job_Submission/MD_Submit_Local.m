@@ -7,8 +7,8 @@ Settings = Initialize_MD_Settings;
 Settings.Submit_Jobs = true; % Set to true to submit MD jobs to batch script or to run locally, otherwise just produce input files.
 Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Settings.Nodes = 1; % Minimum number of cores to request for calculation.
-Settings.Cores = 1; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Settings.MPI_Ranks = 1;
+Settings.Cores = 8; % Minimum number of cores to request for calculation. Set to -1 for entire node
+Settings.MPI_Ranks = 8;
 Settings.OMP_Threads = 1;
 Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Settings.SinglePrecision = false; % choose true for single precision mode, false for double
@@ -20,7 +20,7 @@ Settings.MinMDP.Parallel_Min = false;
 %% NaCl/WBK polarized vs unpolarized Alexandria model at Tm starting in rocksalt structure: NVT
 Settings.Theory = 'BF'; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
 Settings.Salt = 'LiI';
-Settings.Structure = 'Liquid';
+Settings.Structure = 'Rocksalt';
 a_RS = 5.857263144; % Angstoms
 T0 = 909;
 Settings.RunEnergyAnalysis = {'Potential' 'Total-Energy' 'Temperature' 'Pressure'};
@@ -31,7 +31,7 @@ Settings.MDP.RList_Cutoff = 1.1; % nm
 Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
 Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
 Settings.Output_Energies = 20; % Number of steps that else between writing energies to energy file.
-Settings.Output_Coords = 2000; % Number of steps between outputting coordinates
+Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
 Settings.MDP.dt = 0.001; % Time step in ps for md type calculations
 Settings.PreEquilibration = 10; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 Settings.Annealing = 'no'; % Options: 'no' 'single' 'periodic'
@@ -71,11 +71,13 @@ Settings.MDP.Initial_T = T0; % Initial termpature at which to generate velocitie
 Settings.SavePredictionsImage = true;
 Settings.ML_TimeLength = 0;
 Settings.ML_TimeStep = 0;
-Settings.TimePerFrame = 1; % ps
+Settings.TimePerFrame = 2; % ps
 Settings.SaveFeatures = false; % Save structure fraction vs time image when true for each temperature check
 Settings.SavePredictions = false; % Save structure fraction vs time image when true for each temperature check
 Settings.Qlm_Average = true;
 
 
 Setup_LiX_Simulation(Settings)
-MD_Postprocessor(Settings)
+
+% [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
+% MD_Postprocessor(Settings)
