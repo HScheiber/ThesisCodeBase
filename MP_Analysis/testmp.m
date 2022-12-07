@@ -2,7 +2,7 @@ Settings = Initialize_MD_Settings;
 Settings.BatchMode = false; % Sets up batch job when true, or runs immediately when false
 Settings.Liquid_Interface = true; % When true, creates an system with half STRUCTURE half LIQUID for melting point testing
 Settings.Liquid_Fraction = 0.50; % Only meaninful when Liquid_Interface = true. Sets the approximate fraction of the total number of atoms that will initialize as Liquid
-Settings.MP_Liquid_Test_Time = 50; % ps. simulation time to sample the liquid for MSD calculation involvedin MP
+Settings.MP_Liquid_Test_Time = 10; % ps. simulation time to sample the liquid for MSD calculation involvedin MP
 Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.PreEquilibration = 0.3; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
@@ -11,26 +11,31 @@ Settings.MPI_Ranks = 8;
 Settings.OMP_Threads = 1;
 setenv('OMP_NUM_THREADS',num2str(Settings.OMP_Threads))
 
+Settings.ML_TimeLength = 0;
+Settings.ML_TimeStep = 0;
+Settings.TimePerFrame = 0.01; % ps
+Settings.Qlm_Average = true;
+
 Settings.Skip_Minimization = false;
-Settings.Theory = 'BF'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-Settings.Salt = 'LiI'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-%[JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
-Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
-% Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
-% Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
-% Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
-% Settings.S.S.MM = Settings.S.S.MM/JCMM.sigma;
-% Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
-% Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
-Settings.GaussianCharge = true;
+Settings.Theory = 'JC'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
+Settings.Salt = 'NaCl'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
+[JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
+%Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
+Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
+Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
+Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
+Settings.S.S.MM = Settings.S.S.MM/JCMM.sigma;
+Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
+Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
+Settings.GaussianCharge = false;
 Settings.Polarization = false;
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
 Settings.emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'
 Settings.RefStructure = 'Rocksalt'; % Reference structure used for determination of melting or freezing (usually liquid)
-Settings.Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
+Settings.Model = 'JC_SPCE'; % Name of the current model. Leave blank for the default JC/TF/BH model
 Settings.JobID = 'Test'; % An ID that is tacked onto the folder name of all current jobs
-Settings.N_atoms = 2000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
+Settings.N_atoms = 10000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
 Settings.MDP.Disp_Correction = true;
 Settings.MDP.vdw_modifier = 'Potential-shift';
 Settings.MinMDP.Disp_Correction = true;
@@ -50,7 +55,7 @@ Settings.Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be
 Settings.Nstpcouple = Get_nstcouple(Settings.Time_Constant_P,Settings.MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
 
 % Thermostat Options
-T0 = 900; % K %BestKnownMP(Settings);
+T0 = 1290; % K %BestKnownMP(Settings);
 Settings.Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'v-rescale' (set NO for NVE)
 Settings.Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
 Settings.Nsttcouple = Get_nstcouple(Settings.Time_Constant_T,Settings.MDP.dt); %[ps] The frequency for coupling the temperature. 
@@ -62,7 +67,7 @@ Settings.GenCluster = false; % Switch from FLAT INTERFACE to SPHERICAL INTERFACE
 Settings.Cluster_Frac = 0.1; % Cluster fraction, must be between (0,1). Keep this fraction LOW to prevent cluster border issues (does not apply to manual radius jobs)
 
 Settings.CheckTime = 25; % ps. Time between checking for melting/freezing
-Settings.MaxCheckTime = 2000; % ps. Max time for melting/freezing runs
+Settings.MaxCheckTime = 200; % ps. Max time for melting/freezing runs
 Settings.T0 = T0; % K, Initial temperature
 Settings.MeltFreezeThreshold = 0.25; % Required CHANGE in fraction or number of atoms either frozen or melted to flag the end of the simulation
 Settings.SaveTrajectory = true; % Save processed xyz trajectory file for each temperature check when true
@@ -71,7 +76,7 @@ Settings.c_over_a = 2;
 Settings.MaxTDiff = 0.01; % Max change in temperature before generating new initial conditions
 
 % Debugging
-Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
+Settings.Output_Coords = 10; % Number of steps between outputting coordinates
 Settings.Output_Velocity = 0; % Number of steps between outputting velocities
 Settings.Expand_LP = true; % when true, allows expansion of lattice parameters of the solid.
 Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
