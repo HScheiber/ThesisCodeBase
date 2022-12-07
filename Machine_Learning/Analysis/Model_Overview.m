@@ -1,9 +1,9 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BF';
-ModelID = 'MK';
-BestOnly = false;
+Theory = 'BH';
+ModelID = 'MH';
+BestOnly = true;
 SelectOnly = [];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
@@ -78,6 +78,7 @@ else
         '$c/a - c^{*}/a^{*}$' ...
         'Error in $V(T = 0)$: $V(T = 0) - V^{*}(T = 0)$' ...
         '$\rho - \rho^{*}$'};
+    
     MinPlotYLabels = {'[kJ mol$^{-1}$]' ...
                       '[kJ mol$^{-1}$]' ...
                       '[\AA]' ...

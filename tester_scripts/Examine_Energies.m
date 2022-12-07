@@ -56,7 +56,7 @@ H = Data(startpoint:end,5)./nmol_solid;
 
 
 
-startpoint = round(numel(Energy.Time)*0.2);
+startpoint = 1;%round(numel(Energy.Time)*0.2);
 col = 'g';
 NF = Energy.NF;
 t = Energy.Time(startpoint:end);
@@ -80,11 +80,11 @@ end
 
 %plot(conv(T,ones(3000,1)./3000),'Linewidth',4,'Color','r')
 
-
 % Statistics on Temperature
 SEM = std(T(1:1:end))/sqrt(length(T(1:1:end)));               % Standard Error
 ts = tinv([0.025  0.975],length(T(1:1:end))-1);      % T-Score
 disp(['Temperature = ' num2str(mean(T(1:1:end)),'%.3f') ' -+' num2str(ts(2)*SEM,'%.3f') ' K'])
+
 
 % Statistics on Pressure
 SEM = std(P)/sqrt(length(P));               % Standard Error

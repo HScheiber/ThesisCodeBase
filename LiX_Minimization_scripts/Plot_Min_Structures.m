@@ -7,7 +7,7 @@ Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'
 
 fs = 24;
 
-Theory = 'JC'; % {'BF' 'BH' 'JC' 'Mie'}
+Theory = 'BH'; % {'BF' 'BH' 'JC' 'Mie'}
 %Salts = {'NaCl'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...
