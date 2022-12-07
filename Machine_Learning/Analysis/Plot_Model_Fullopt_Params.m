@@ -9,7 +9,7 @@ markers = {'o' 's' '^' 'v' 'd' '>' '<' 'p' 'h' 'x'};
 show_as_C6 = false; % When true, plot parameters as B/C6/C8 than the sigma/epsilon parameter value itself
 include_loss_panel = false;
 loss_panel_height = 0.3;
-plot_ref_model = true;
+plot_ref_model = false;
 savefile = true; % switch to save the final plots to file
 
 %% Find model in results

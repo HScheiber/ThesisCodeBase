@@ -14,7 +14,6 @@ Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per 
 Settings.SinglePrecision = false; % choose true for single precision mode, false for double
 Settings.Project_Directory_Name = 'Molten_Salts_MD'; % Name of project directory to contain job within the main project folder
 Settings.MinMDP.nsteps_min = 1000;
-Settings.Output_Coords = 1000; % output coords every 1 ps
 Settings.MinMDP.Parallel_Min = false;
 
 %% NaCl/WBK polarized vs unpolarized Alexandria model at Tm starting in rocksalt structure: NVT
@@ -30,17 +29,17 @@ Settings.MDP.RCoulomb_Cutoff = 1.1; % nm
 Settings.MDP.RList_Cutoff = 1.1; % nm
 Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
 Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
-Settings.Output_Energies = 20; % Number of steps that else between writing energies to energy file.
-Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
+Settings.Output_Energies = 1; % Number of steps that else between writing energies to energy file.
+Settings.Output_Coords = 1; % Number of steps between outputting coordinates
 Settings.MDP.dt = 0.001; % Time step in ps for md type calculations
 Settings.PreEquilibration = 10; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
 Settings.Annealing = 'no'; % Options: 'no' 'single' 'periodic'
-Settings.MDP.Trajectory_Time = 0.5; % ns
+Settings.MDP.Trajectory_Time = 0.001; % ns
 Settings.MDP.dt = 0.001; % Time step in ps for md type calculations
 
-Settings.Model = 'Alexandria_pol'; % Name of the current model. Leave blank for the default JC/TF/BH model
-Settings.JobID = 'ChkNPT'; % An ID that is tacked onto the folder name of all current jobs
-Settings.N_atoms = 1728; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
+Settings.Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
+Settings.JobID = 'GenRS'; % An ID that is tacked onto the folder name of all current jobs
+Settings.N_atoms = 1000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
 Settings.c_over_a = 1;
 Settings.Geometry = [];
 Settings.Skip_Minimization = false;
@@ -48,7 +47,7 @@ Settings.Skip_Minimization = false;
 % load the model
 Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
 Settings.GaussianCharge = true; % Turn on Gaussian distributed charges when true
-Settings.Polarization = true; % Turn on polarizible Drude model when true
+Settings.Polarization = false; % Turn on polarizible Drude model when true
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
 Settings.emtol_polarization = 1e-1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
@@ -71,7 +70,7 @@ Settings.MDP.Initial_T = T0; % Initial termpature at which to generate velocitie
 Settings.SavePredictionsImage = true;
 Settings.ML_TimeLength = 0;
 Settings.ML_TimeStep = 0;
-Settings.TimePerFrame = 2; % ps
+Settings.TimePerFrame = 0.001; % ps
 Settings.SaveFeatures = false; % Save structure fraction vs time image when true for each temperature check
 Settings.SavePredictions = false; % Save structure fraction vs time image when true for each temperature check
 Settings.Qlm_Average = true;
