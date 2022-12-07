@@ -17,20 +17,6 @@ Settings.TimePerFrame = 0.01; % ps
 Settings.Qlm_Average = true;
 
 Settings.Skip_Minimization = false;
-<<<<<<< HEAD
-Settings.Theory = 'BF'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-Settings.Salt = 'LiI'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-%[JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
-Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
-% Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
-% Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
-% Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
-% Settings.S.S.MM = Settings.S.S.MM/JCMM.sigma;
-% Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
-% Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
-Settings.GaussianCharge = true;
-Settings.Polarization = true;
-=======
 Settings.Theory = 'JC'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
 Settings.Salt = 'NaCl'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
 [JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
@@ -43,7 +29,6 @@ Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
 Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
 Settings.GaussianCharge = false;
 Settings.Polarization = false;
->>>>>>> 784c907e00e5910b656a7d707a84a53e47c172cd
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
 Settings.emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 Settings.Structure = 'Rocksalt'; % One of: 'Rocksalt' 'Wurtzite' 'Sphalerite' 'CsCl' 'NiAs' 'BetaBeO' 'FiveFive' 'Liquid' 'Previous'
