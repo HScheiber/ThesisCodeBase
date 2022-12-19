@@ -66,6 +66,7 @@ Settings.MinSkipLoss = 2; % Minimum loss value required before skipping further 
 Settings.EnforceRR = true; % Enforce radius ratios
 
 % Intial optimization settings
+Settings.GPActiveSetSize = 1000; % Also applies to final optimization
 Settings.initial_opt_type = 'bayesopt'; % One of 'bayesopt' or 'surrogateopt'
 Settings.Initial_N_Multiplier = 10; % Multiply the number of input dimensions by this number to obtain the number of initial random points
 Settings.Max_Bayesian_Iterations = 800;

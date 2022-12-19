@@ -189,21 +189,21 @@ import LiXStructureDetector
 
 
 
-WorkDir = r'D:\Example_Nucleations\NaCl\Interface_at_MP'
+WorkDir = r'C:\Users\Hayden\Documents\Patey_Lab\Testing\NaCl_MP_Example'
 Salt = 'NaCl'
-SystemName = 'Interface_at_MP'
+SystemName = 'Test_MP'
 RefStructure='Rocksalt'
 SaveTrajectory=True
 SaveFeatures=False
 SavePredictions=False 
 SavePredictionsImage=True
-ML_TimeLength=50
-ML_TimeStep=5
-TimePerFrame=5
+ML_TimeLength=0
+ML_TimeStep=0
+TimePerFrame=0.1
 FileType='gro'
 Verbose=True
-StartPoint = 1000
-EndPoint = 1100
+StartPoint = 0
+EndPoint = 200
 Version = 2
 SaveDir = None
 InMemory = False

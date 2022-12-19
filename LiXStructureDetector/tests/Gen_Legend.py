@@ -11,7 +11,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
 
-include_interfacial = False
+include_interfacial = True
 scatter = True
 
 labels = ["Liquid","Rocksalt","Wurtzite","5-5","NiAs","Sphalerite","$\\beta$-BeO","AntiNiAs","CsCl","Interfacial"]
