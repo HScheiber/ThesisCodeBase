@@ -1,9 +1,9 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'MH';
-BestOnly = true;
+Theory = 'BF';
+ModelID = 'MK';
+BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
