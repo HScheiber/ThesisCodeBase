@@ -57,9 +57,9 @@ for idx = 1:length(Salt_Struc_Model_T)
     %T0 = 909;
     Settings.RunEnergyAnalysis = {}; %{'Potential' 'Total-Energy' 'Temperature' 'Pressure'};
 
-    Settings.MDP.RVDW_Cutoff = 0.8; % nm
-    Settings.MDP.RCoulomb_Cutoff = 0.9; % nm
-    Settings.MDP.RList_Cutoff = 0.9; % nm
+    Settings.MDP.RVDW_Cutoff = 0.5; % nm
+    Settings.MDP.RCoulomb_Cutoff = 0.6; % nm
+    Settings.MDP.RList_Cutoff = 0.6; % nm
     Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
     Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
     Settings.Output_Energies = 1000; % Number of steps that else between writing energies to energy file.
