@@ -89,7 +89,7 @@ Shared_Settings.InnerRange = true; % Sets domain of BH/TF
 
 % Shared job settings
 Shared_Settings.N_Calc = 8; % Number of chained calculations
-Shared_Settings.Hours = 3; % Max time for each job (hours)
+Shared_Settings.Hours = 6; % Max time for each job (hours)
 Shared_Settings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.Nodes = 0; % Minimum number of cores to request for calculation.
 Shared_Settings.Cores = 12; % Minimum number of cores to request for calculation. Set to -1 for entire node
