@@ -23,6 +23,18 @@ Coulomb_Only = p.Results.Coulomb_Only;
 [Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
 AltParam = struct();
 
+% Switch vdW_Type to Alexandria labels if Vancouver labels used
+switch lower(vdW_Type)
+    case 'bh'
+        vdW_Type = 'BK';
+    case 'bf'
+        vdW_Type = 'WBK';
+    case 'jc'
+        vdW_Type = 'LJ_12-6';
+    case 'mie'
+        vdW_Type = 'LJ_8-6';
+end
+
 if ~Coulomb_Only
     switch lower(vdW_Type)
         case 'wbk'

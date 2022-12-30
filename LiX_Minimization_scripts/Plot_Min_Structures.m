@@ -1,13 +1,13 @@
 Settings = Initialize_MD_Settings;
 %Data = load(fullfile(Settings.home,'data','MX_JCTF_Min_Data.mat'),'Data').Data;
 %Data = load(fullfile(Settings.home,'data','MX_Alexandria_PointQ_Min_Data.mat'),'Data').Data;
-%Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
-Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data').Data;
+Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
+%Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data').Data;
 
 
 fs = 24;
 
-Theory = 'BH'; % {'BF' 'BH' 'JC' 'Mie'}
+Theory = 'Mie'; % {'BF' 'BH' 'JC' 'Mie'}
 %Salts = {'NaCl'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...
@@ -65,8 +65,8 @@ switch Theory
         Thertxt = Theory;
 end
 
-%title(['Comparison of Alkali Halide Crystal Energies: ' Thertxt ' Model.'],...
-%    'Interpreter','latex','FontSize',fs)
+title(['Comparison of Alkali Halide Crystal Energies: ' Thertxt ' Model.'],...
+   'Interpreter','latex','FontSize',fs)
 xlim(axh,[0.5 length(X)+0.5])
 ylim(axh,'padded')
 xticks(axh,X);
