@@ -23,15 +23,16 @@ function Text_out = AddCartesianCoord(Template_text,Crystal,idx,FindParam,CoordT
         for jj=1:size(XYZ_Met_Coords,1)
             XYZ_Met_Coords(jj,:) = round( ( (XYZ_Met_Coords(jj,:).*[a b c])*Crystal.Transform )*10000)/10000;
             XYZ_Hal_Coords(jj,:) = round( ( (XYZ_Hal_Coords(jj,:).*[a b c])*Crystal.Transform )*10000)/10000;
-
+            
             Template_text = strrep(Template_text,['##MX' num2str(jj) '##'],num2str(XYZ_Met_Coords(jj,1),'%5.3f'));
             Template_text = strrep(Template_text,['##MY' num2str(jj) '##'],num2str(XYZ_Met_Coords(jj,2),'%5.3f'));
             Template_text = strrep(Template_text,['##MZ' num2str(jj) '##'],num2str(XYZ_Met_Coords(jj,3),'%5.3f'));
-
+            
             Template_text = strrep(Template_text,['##HX' num2str(jj) '##'],num2str(XYZ_Hal_Coords(jj,1),'%5.3f'));
             Template_text = strrep(Template_text,['##HY' num2str(jj) '##'],num2str(XYZ_Hal_Coords(jj,2),'%5.3f'));
             Template_text = strrep(Template_text,['##HZ' num2str(jj) '##'],num2str(XYZ_Hal_Coords(jj,3),'%5.3f'));
         end
+        Template_text = strrep(Template_text,'   -','  -');
 
         % Add in lattice Parameters
         Lattice_text = cell(3,3);
