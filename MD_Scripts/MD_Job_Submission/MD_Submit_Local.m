@@ -117,7 +117,7 @@ for idx = 1:length(Salt_Struc_Model_T)
         for kdx = 1:length(Qlm_Voronoi)
             Settings.Qlm_Average = Qlm_Voronoi{kdx}(1);
             Settings.Voronoi = Qlm_Voronoi{kdx}(2);
-            Classifier = [num2str(Settings.ML_TimeLength) '_' num2str(Settings.ML_TimeStep)];
+            Classifier = ['NN_' num2str(Settings.ML_TimeLength) '_' num2str(Settings.ML_TimeStep)];
             if Settings.Qlm_Average
                 Classifier = [Classifier 'a'];
             elseif Settings.Voronoi
