@@ -17,7 +17,7 @@ PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Sett
     
     %Output.Froze = logical(PyOut{1});
     %Output.Melted = logical(PyOut{2});
-    Output.RefFrac = double(PyOut{4});
+    Output = double(PyOut{4}); % Ref fraction
     %Output.LiqFrac = double(PyOut{5});
     %Output.Froze_alt = logical(PyOut{6});
 end
