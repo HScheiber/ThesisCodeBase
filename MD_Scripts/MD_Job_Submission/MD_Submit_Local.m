@@ -3,6 +3,7 @@ clear;
 [home,project,computer,slurm] = find_home;
 
 ResultsFile = 'AH_Structure_Classifier_Results.mat';
+JsonResultsFile = 'AHStructureDetector_tests.json';
 Salt_Struc_Model_T = {...
                      {'LiF' 'Rocksalt' 'Mie' 1593}; ...
                      {'LiI' 'Wurtzite' 'JC' 1000}; ...
@@ -101,7 +102,7 @@ for idx = 1:length(Salt_Struc_Model_T)
     Settings.MDP.Initial_T = T0; % Initial termpature at which to generate velocities
     
     Settings.RunPostProcessor = false;
-    Setup_LiX_Simulation(Settings)
+    Setup_LiX_Simulation(Settings);
     
     % Postprocessing
     Settings.SavePredictionsImage = false;
@@ -128,6 +129,10 @@ for idx = 1:length(Salt_Struc_Model_T)
     end
 end
 save(fullfile(project,Settings.Project_Directory_Name,ResultsFile),'Results');
+result_json = jsonencode(Results,'PrettyPrint',true);
+fid = fopen(fullfile(project,Settings.Project_Directory_Name,JsonResultsFile),'wt');
+fprintf(fid,result_json);
+fclose(fid);
 
 % [Settings.WorkDir,Settings.JobName,Settings.Full_Model_Name] = GetMDWorkdir(Settings);
 % MD_Postprocessor(Settings)
