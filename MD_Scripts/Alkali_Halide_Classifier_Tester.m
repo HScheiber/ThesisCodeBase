@@ -15,9 +15,9 @@ PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(Settings.WorkDir, Sett
             'Qlm_Average',Settings.Qlm_Average,...
             'Voronoi',Settings.Voronoi));
     
-    Output.Froze = logical(PyOut{1});
-    Output.Melted = logical(PyOut{2});
+    %Output.Froze = logical(PyOut{1});
+    %Output.Melted = logical(PyOut{2});
     Output.RefFrac = double(PyOut{4});
-    Output.LiqFrac = double(PyOut{5});
-    Output.Froze_alt = logical(PyOut{6});
+    %Output.LiqFrac = double(PyOut{5});
+    %Output.Froze_alt = logical(PyOut{6});
 end
