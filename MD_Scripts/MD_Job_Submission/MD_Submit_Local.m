@@ -84,7 +84,9 @@ for idx = 1:length(Salt_Struc_Model_T)
     % load the model
     Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type',Theory);
     if strcmp(Theory,'JC')
-        [JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
+        SetPot = Initialize_MD_Settings;
+        SetPot.Salt = Salt;
+        [JCMX,JCMM,JCXX] = JC_Potential_Parameters(SetPot);
         Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
         Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
         Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
