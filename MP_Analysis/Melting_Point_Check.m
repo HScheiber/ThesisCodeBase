@@ -990,10 +990,14 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
             end
         end
     end
-
     % Once complete, calculate the function and "gradient"
     if Settings.Verbose
         disp('Checking full trajectory for time-to-phase-change...')
+    end
+    if  abs(mod(Settings.TimePerFrame,Settings.MDP.dt*Settings.Output_Coords)) > sqrt(eps) || ...
+        Settings.TimePerFrame < Settings.MDP.dt*Settings.Output_Coords
+        Settings.TimePerFrame = Settings.MDP.dt*Settings.Output_Coords;
+        disp(['Warning: Reset TimePerFrame for structure checking to: ' num2str(Settings.TimePerFrame) ' ps'])
     end
     CheckStructureTimer = tic;
     PyOut = py.LiXStructureDetector.Calculate_Liquid_Fraction(WorkDir, Settings.Salt, ...

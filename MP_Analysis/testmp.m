@@ -13,20 +13,20 @@ setenv('OMP_NUM_THREADS',num2str(Settings.OMP_Threads))
 
 Settings.ML_TimeLength = 0;
 Settings.ML_TimeStep = 0;
-Settings.TimePerFrame = 0.01; % ps
+Settings.TimePerFrame = 1; % ps
 Settings.Qlm_Average = true;
 
 Settings.Skip_Minimization = false;
 Settings.Theory = 'JC'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
 Settings.Salt = 'NaCl'; % Input model(s) to use: JC, JC3P, JC4P, JCSD (for NaCl), TF, BH
-[JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
+%[JCMX,JCMM,JCXX] = JC_Potential_Parameters(Settings);
 %Settings = Alexandria_Potential_Parameters(Settings,'vdW_Type','WBK');
-Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
-Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
-Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
-Settings.S.S.MM = Settings.S.S.MM/JCMM.sigma;
-Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
-Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
+% Settings.S.E.MM = Settings.S.E.MM/JCMM.epsilon;
+% Settings.S.E.XX = Settings.S.E.XX/JCXX.epsilon;
+% Settings.S.E.MX = Settings.S.E.MX/JCMX.epsilon;
+% Settings.S.S.MM = Settings.S.S.MM/JCMM.sigma;
+% Settings.S.S.XX = Settings.S.S.XX/JCXX.sigma;
+% Settings.S.S.MX = Settings.S.S.MX/JCMX.sigma;
 Settings.GaussianCharge = false;
 Settings.Polarization = false;
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
@@ -76,7 +76,7 @@ Settings.c_over_a = 2;
 Settings.MaxTDiff = 0.01; % Max change in temperature before generating new initial conditions
 
 % Debugging
-Settings.Output_Coords = 10; % Number of steps between outputting coordinates
+Settings.Output_Coords = 1000; % Number of steps between outputting coordinates
 Settings.Output_Velocity = 0; % Number of steps between outputting velocities
 Settings.Expand_LP = true; % when true, allows expansion of lattice parameters of the solid.
 Settings.MDP.CoulombType = 'PME'; % Define the type of coulomb potential used. One of 'PME' or 'Cut-off'
