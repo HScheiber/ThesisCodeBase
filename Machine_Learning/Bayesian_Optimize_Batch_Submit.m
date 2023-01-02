@@ -268,7 +268,7 @@ switch lower(computer)
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
         Shared_Settings.Max_Bayesian_Iterations = 600;
-        Shared_Settings.Max_Secondary_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 50;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
