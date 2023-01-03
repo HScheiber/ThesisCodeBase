@@ -131,6 +131,8 @@ switch lower(computer)
                     Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
                     Settings_array(idx).ScaleCompressibility = 1.128664;
                     
+                    Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+                    Settings_array(idx).emtol_polarization = 1e-1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
                     
                 end
             end
@@ -178,6 +180,9 @@ switch lower(computer)
                     Settings_array(idx).MDP.RVDW_Cutoff = 1.45; % nm
                     Settings_array(idx).MDP.RCoulomb_Cutoff = 1.5; % nm
                     Settings_array(idx).MDP.RList_Cutoff = 1.5; % nm
+                    Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+                    Settings_array(idx).emtol_polarization = 1e-1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+                    
                 end
             end
         end

@@ -61,7 +61,7 @@ Settings.ScaleInitialLiqDensity = 1; % Scale initial guess liquid density by thi
 Settings.GaussianCharge = false; % Turn on Gaussian distributed charges when true
 Settings.Polarization = false; % Turn on polarizible Drude model when true
 Settings.niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-Settings.emtol_polarization = 1e-3; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+Settings.emtol_polarization = 1e-1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
 
 % Only active for 'previous' structures:
 Settings.Prev_geom_loc = '';

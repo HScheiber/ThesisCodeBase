@@ -60,9 +60,9 @@ Energy.Enthalpy     = Data(startpoint:step:end,5);
 
 
 
-startpoint = round(numel(Energy.Time)*0.1);
+startpoint = 1;%round(numel(Energy.Time)*0.1);
 step = 1;
-col = 'm';
+col = 'c';
 NF = Energy.NF;
 t = Energy.Time(startpoint:step:end);
 T = Energy.Temperature(startpoint:step:end);
@@ -79,8 +79,6 @@ else
     hold on
     plot(t,T,'Linewidth',4,'Color',col)
 end
-
-
 
 
 %plot(conv(T,ones(3000,1)./3000),'Linewidth',4,'Color','r')
