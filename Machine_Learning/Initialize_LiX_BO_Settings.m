@@ -23,6 +23,7 @@ Settings.Diary_Loc = '';
 % This feature allows new calculations to start from the outputs of previous completed calculations
 % Note that the previous calculations must have the same targets, or at least cover all of the current targets
 Settings.Initialize_From_Model = {};
+Settings.Initialize_From_Model_Subsample = Inf;
 
 % Charge
 Settings.Q_Range = [0.95 1.05]; % Default range for charge scaling. Only meaningful when Fix_Charge = false

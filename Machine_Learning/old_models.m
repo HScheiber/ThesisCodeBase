@@ -1,3 +1,4 @@
+
 %% Model 1: LiI BF2 (targeting DFT/0.44 kJ/mol gap)
 idx = idx+1;
 Models(idx) = Initialize_LiX_BO_Settings;

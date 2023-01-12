@@ -67,7 +67,7 @@ classdef BayesoptOptions
         DefaultMinWorkerUtilizationFraction = 0.8;
         
         % Constrained Optimization:
-        ErrorConstraintTol = .01;
+        ErrorConstraintTol = 0.5; % .01
         XConstraintSatisfiabilitySamples = 10000;
         
         % Plotting and Display:

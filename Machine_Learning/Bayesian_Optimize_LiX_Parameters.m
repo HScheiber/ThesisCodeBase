@@ -14,6 +14,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     
     % Disable an annoying warning
     warning('off','stats:classreg:learning:impl:GPImpl:GPImpl:SigmaMustBeGreaterThanSigmaLowerBound');
+    warning('off','MATLAB:cellfun:NotACell');
     
     if ~isfield(Settings,'OuterDir')
         Settings.OuterDir = pwd;
@@ -377,7 +378,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                 end
                 
                 if ~isempty(Settings.Initialize_From_Model)
-                    Prev_Data = LoadPrevModelData(Settings,params);
+                    Prev_Data = LoadPrevModelData(Settings,params,Settings.Initialize_From_Model_Subsample);
                     Iterations = size(Prev_Data.InitialObjective,1) + Settings.Max_Bayesian_Iterations;
                     
                     results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...

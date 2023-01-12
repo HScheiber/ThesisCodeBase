@@ -539,12 +539,12 @@ classdef BayesianOptimization_priv
                     copyfile(SaveFilename, prevFilename);
                 end
                 BayesoptResults = bo;
-                save(SaveFilename, 'BayesoptResults', '-v7.3');
+                save(SaveFilename, 'BayesoptResults'); %, '-v7.3'
             catch me
                 if isfile(SaveFilename)
                     copyfile(SaveFilename,prevFilename);
                 end
-                save(SaveFilename, 'BayesoptResults', '-v7.3');
+                save(SaveFilename, 'BayesoptResults'); %, '-v7.3'
                 bayesoptim_priv.warn('SaveToFileFailed', SaveFilename);
                 disp(me);
                 disp(['Current directory: ' pwd])

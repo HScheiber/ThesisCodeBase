@@ -1,4 +1,4 @@
-function Prev_Data = LoadPrevModelData(Settings,params)
+function Prev_Data = LoadPrevModelData(Settings,params,subsample)
 Prev_Data = [];
 % To do:
 % 0. Gather all models of interest from saved model folder
@@ -7,7 +7,8 @@ Prev_Data = [];
 % 3. Load all iteration times
 % 4. Load all error values
 % 5. if using coupled constraints, load all constraint violation points
-% 6. Check if any X points fall outside of current ranges. If so, exclude al data from those points
+% 6a. Check if any X points fall outside of current ranges. If so, exclude al data from those points
+% 6b. Check for any X that are duplicate, remove dupes.
 % 7. Re-calculate new objective function values based on the user data.
 % Check to make sure user data is sufficient to actually calculate the
 % current objective function, if not return an error.
@@ -62,7 +63,9 @@ for idx = N_Models:-1:1
         end
         InitialX{idx} = InitialX{idx}(Within_range,:);
         InitialConstraintViolations{idx} = data.bayesopt_results.ConstraintsTrace;
-        if ~isempty(InitialConstraintViolations{idx})
+        if isempty(InitialConstraintViolations{idx})
+            InitialConstraintViolations{idx} = double.empty(size(Within_range,1),0);
+        else
             InitialConstraintViolations{idx} = InitialConstraintViolations{idx}(Within_range,:);
         end
         InitialErrorValues{idx} = data.bayesopt_results.ErrorTrace(Within_range);
@@ -90,7 +93,27 @@ Prev_Data.InitialUserData = vertcat(InitialUserData{:});
 Prev_Data.InitialObjectiveEvaluationTimes = vertcat(InitialObjectiveEvaluationTimes{:});
 Prev_Data.InitialIterationTimes = vertcat(InitialIterationTimes{:});
 
+% Check for and remove duplicates in X
+datafields = fields(Prev_Data);
+[~,idxUnique,~] = unique(Prev_Data.InitialX,'rows');
+for idx = 1:numel(datafields)
+    field = datafields{idx};
+    Prev_Data.(field) = Prev_Data.(field)(idxUnique,:);
+end
+
 % Re-calculate objective function based on user data
 Prev_Data.InitialObjective = Loss_Recalculate(Settings,Prev_Data.InitialX,...
     Prev_Data.InitialUserData,data.Settings.Structures);
+
+% Tale a Random subsample
+Ndata = numel(Prev_Data.InitialObjective);
+if subsample < Ndata
+    SampleX = randsample(Ndata,1000);
+    datafields = fields(Prev_Data);
+    for idx = 1:numel(datafields)
+        field = datafields{idx};
+        Prev_Data.(field) = Prev_Data.(field)(SampleX,:);
+    end
+end
+
 end

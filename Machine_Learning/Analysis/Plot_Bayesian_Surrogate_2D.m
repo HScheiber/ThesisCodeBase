@@ -1,30 +1,29 @@
 %clear;
-global sldr_h results X Y idx_X idx_Y input_table p full_opt_point ...
-    full_opt_eval bayes_opt_eval bayes_opt_point bayes_opt_est_eval bayes_opt_est_point show_error transforms_extra
+global sldr_h results X Y idx_X idx_Y input_table p full_opt_point Model_type ...
+    full_opt_eval bayes_opt_eval bayes_opt_point show_error transforms_extra % bayes_opt_est_eval bayes_opt_est_point
 % Analysis parameters
-Salt = 'LiI';
-Theory = 'BE';
-Model = 'OA1'; % C5squaredexponential
-Plot_X = 'epsilon_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
-Plot_Y = 'epsilon_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
-
-% 'r0_MM'    'r0_XX'    'epsilon_MM'    'epsilon_XX'    'gamma_MX'
+Salt = 'LiBr';
+Theory = 'BF';
+Model = 'MN5'; % C5squaredexponential
+Plot_X = 'sigma_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
+Plot_Y = 'epsilon_MM';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+% 'r0_MM' / 'sigma_MM'    'r0_XX' / 'sigma_XX'    'epsilon_MM'    'epsilon_XX'    'gamma_MX'
 
 grid_density = 50; % Parameter to set the grid density
 fs = 24;
 show_error = false;
 
-Model_type = 'error'; % constraints, error, objective
+Model_type = 'objective'; % constraints, error, objective
 
 % Load data
-A = load(fullfile('C:\Users\Hayden\Documents\Patey_Lab\BO_Models',Salt,[Salt '_' Theory '_Model_' Model '_data.mat'])).full_data;
+A = load(fullfile('C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed',Salt,[Salt '_' Theory '_Model_' Model '_data.mat'])).full_data;
 results = A.bayesopt_results;
 
 bayes_opt_eval = results.MinObjective;
 bayes_opt_point = table2array(results.XAtMinObjective);
 
-bayes_opt_est_eval = nan;
-bayes_opt_est_point = table2array(results.XAtMinEstimatedObjective);
+% bayes_opt_est_eval = nan;
+% bayes_opt_est_point = table2array(results.XAtMinEstimatedObjective);
 
 % Load best point
 full_opt_point = A.full_opt_point;
@@ -44,8 +43,8 @@ X_best = full_opt_point(idx_X);
 Y_best = full_opt_point(idx_Y);
 X_bayes = bayes_opt_point(idx_X);
 Y_bayes = bayes_opt_point(idx_Y);
-X_bayes_est = bayes_opt_est_point(idx_X);
-Y_bayes_est = bayes_opt_est_point(idx_Y);
+% X_bayes_est = bayes_opt_est_point(idx_X);
+% Y_bayes_est = bayes_opt_est_point(idx_Y);
 
 % Get limits of X and Y coordinate
 lims_X = results.VariableDescriptions(idx_X).Range;
@@ -106,13 +105,6 @@ end
 
 minZ = min(Z,[],'all');
 maxZ = max(Z,[],'all');
-
-if maxZ - minZ > 100
-    Z = real(log1p(Z));
-    full_opt_eval = log1p(full_opt_eval);
-    bayes_opt_eval = max(real(log1p(bayes_opt_eval)),0);
-    bayes_opt_est_eval = max(real(log1p(bayes_opt_est_eval)),0);
-end
 
 % Create Figure
 figh = figure('WindowState','Maximized');
@@ -176,8 +168,8 @@ h(1) = scatter3(ax,X_best,Y_best,full_opt_eval,100,full_opt_eval,'filled',...
     'MarkerEdgeColor','k','MarkerFaceColor','g');
 h(2) = scatter3(ax,X_bayes,Y_bayes,bayes_opt_eval,100,bayes_opt_eval,'filled',...
     'MarkerEdgeColor','k','MarkerFaceColor','r');
-h(3) = scatter3(ax,X_bayes_est,Y_bayes_est,bayes_opt_est_eval,100,bayes_opt_est_eval,'filled',...
-    'MarkerEdgeColor','k','MarkerFaceColor','m');
+% h(3) = scatter3(ax,X_bayes_est,Y_bayes_est,bayes_opt_est_eval,100,bayes_opt_est_eval,'filled',...
+%     'MarkerEdgeColor','k','MarkerFaceColor','m');
 
 xlabel(ax,param_name_map(Plot_X,Salt),'Interpreter','latex','FontSize',fs);
 ylabel(ax,param_name_map(Plot_Y,Salt),'Interpreter','latex','FontSize',fs);
@@ -189,7 +181,7 @@ set(ax,'XGrid','On','YGrid','On','GridLineStyle','-','Layer','Top',...
 title(ax,[Salt ' ' Theory ' Model ' Model ': Bayesian Surrogate Model'],...
     'Interpreter','Latex','FontSize',fs+16);
 
-legend(ax,h,{'Full Opt.','Bayes. Opt.','Est. Bayes. Opt.'},...
+legend(ax,h,{'Full Opt.','Bayes. Opt.'},... % ,'Est. Bayes. Opt.'
     'Interpreter','Latex','FontSize',fs)
 
 xlim(ax,lims_X)
@@ -241,18 +233,18 @@ function output = param_name_map(p_name,Salt)
         case 'r0_mx'
             output = ['$r_{0}$[' Metal '-' Halide ']'];
         case 'gamma_mx'
-            output = ['\gamma$[' Metal '-' Halide ']'];
+            output = ['$\gamma$[' Metal '-' Halide ']'];
         case 'gamma_mm'
-            output = ['\gamma$[' Metal '-' Metal ']'];
+            output = ['$\gamma$[' Metal '-' Metal ']'];
         case 'gamma_xx'
-            output = ['\gamma$[' Halide '-' Halide ']'];
+            output = ['$\gamma$[' Halide '-' Halide ']'];
         otherwise
             output = p_name;
     end
 end
 
 function UpdatePlot(src,~)
-    global sldr_h results X input_table p full_opt_point idx_X idx_Y...
+    global sldr_h results X input_table p full_opt_point idx_X idx_Y Model_type...
         bayes_opt_point bayes_opt_est_point show_error transforms_extra
     
     if strcmp(src.Style,'pushbutton')
@@ -347,6 +339,15 @@ function UpdatePlot(src,~)
     
     % Sample the model at the grid points
     [flat_Z,flat_C] = results.predictObjective(input_table);
+    
+    switch lower(Model_type)
+        case 'objective'
+            [flat_Z,flat_C] = results.predictObjective(input_table);
+        case 'error'
+            [flat_Z,flat_C] = results.predictError(input_table);
+        case 'constraints'
+            [flat_Z,flat_C] = results.predictConstraints(input_table);
+    end
     
     % Reshape the model outputs to match the grids
     Z = reshape(flat_Z,size(X));

@@ -313,10 +313,10 @@ case 'BF'
                 case 'gromacs'
                     gamma_MM = Param.gamma_MM; % Unitless
                     gamma_XX = Param.gamma_XX; % Unitless
-                    gamma_MX = sqrt(gamma_MM*gamma_XX);
+                    gamma_MX = sqrt(gamma_MM.*gamma_XX);
                     
-                    epsilon_MX = sqrt(epsilon_MM*epsilon_XX);
-                    sigma_MX = sqrt(sigma_MM*sigma_XX);
+                    epsilon_MX = sqrt(epsilon_MM.*epsilon_XX);
+                    sigma_MX = sqrt(sigma_MM.*sigma_XX);
             end
     else
         sigma_MX = Param.sigma_MX; % nm
@@ -714,10 +714,11 @@ end
 
 % % Plot result to visualize
 % % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
-% % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'
+% % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
 % 
-% ax1 = 'gamma_MM';
-% ax2 = 'r0_MM';
+% 
+% ax1 = 'epsilon_MM';
+% ax2 = 'epsilon_XX';
 % %ax3 = 'gamma_MX';
 % 
 % %scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
@@ -725,11 +726,11 @@ end
 % hold on
 % scatter(Param.(ax1)(tf),Param.(ax2)(tf),100,'r','filled','linewidth',1,...
 %     'MarkerEdgeColor','k')
-% if any(strcmp(Settings.Theory,{'TF' 'BH'}))
-% %    set(gca, 'XScale', 'log')
-% %    set(gca, 'YScale', 'log')
-%     %set(gca, 'ZScale', 'log')
-% end
+% 
+%    set(gca, 'XScale', 'log')
+%    set(gca, 'YScale', 'log')
+% %    set(gca, 'ZScale', 'log')
+% 
 % % 
 % fs=36;
 % % xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
@@ -743,6 +744,6 @@ end
 % %zlabel(ax3,'fontsize',fs);
 % set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
 % %ylim([0.05 0.8])
-% 
+%
 % clear;
 end
