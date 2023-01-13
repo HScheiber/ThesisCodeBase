@@ -21625,3 +21625,10 @@ ans =
 
    210
 
+open old_models.m
+3*8
+
+ans =
+
+    24
+
