@@ -921,6 +921,9 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
         Pars.(ParNames{idx}) = full_opt_point(idx);
     end
     
+    % Coupled or each salt independent?
+    [Salts,MultiMetal,MultiHalide] = Select_MultiSalt(Settings);
+    
     % Load targets
     DFT = Load_Best_DFT_Data;
     Structures = Settings.Structures;
@@ -929,61 +932,75 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
         Exp = Load_Experimental_Data;
         
         if Settings.Loss_Options.Experimental_LE
-            E_Correction = Exp.(Settings.Salt).Rocksalt.E - DFT.(Settings.Salt).Rocksalt.Energy;        
-            for idx = 1:N
-                try
-                    DFT.(Settings.Salt).(Structures{idx}).Energy = DFT.(Settings.Salt).(Structures{idx}).Energy + E_Correction;
-                catch
-                    DFT.(Settings.Salt).(Structures{idx}).Energy = nan;
-                    DFT.(Settings.Salt).(Structures{idx}).a = nan;
-                    DFT.(Settings.Salt).(Structures{idx}).b = nan;
-                    DFT.(Settings.Salt).(Structures{idx}).c = nan;
+            for salt_idx = 1:numel(Salts)
+                E_Correction = Exp.(Salts{salt_idx}).Rocksalt.E - DFT.(Salts{salt_idx}).Rocksalt.Energy;        
+                for idx = 1:N
+                    try
+                        DFT.(Salts{salt_idx}).(Structures{idx}).Energy = DFT.(Salts{salt_idx}).(Structures{idx}).Energy + E_Correction;
+                    catch
+                        DFT.(Salts{salt_idx}).(Structures{idx}).Energy = nan;
+                        DFT.(Salts{salt_idx}).(Structures{idx}).a = nan;
+                        DFT.(Salts{salt_idx}).(Structures{idx}).b = nan;
+                        DFT.(Salts{salt_idx}).(Structures{idx}).c = nan;
+                    end
                 end
             end
         end
         if Settings.Loss_Options.Experimental_LP
-            DFT.(Settings.Salt).Rocksalt.a = Exp.(Settings.Salt).Rocksalt.a_zero;
-            DFT.(Settings.Salt).Rocksalt.b = Exp.(Settings.Salt).Rocksalt.b_zero;
-            DFT.(Settings.Salt).Rocksalt.c = Exp.(Settings.Salt).Rocksalt.c_zero;
-            DFT.(Settings.Salt).Rocksalt.V = Exp.(Settings.Salt).Rocksalt.V_zero;
-            if isfield(Exp.(Settings.Salt),'Wurtzite')
-                DFT.(Settings.Salt).Wurtzite.a = Exp.(Settings.Salt).Wurtzite.a_zero;
-                DFT.(Settings.Salt).Wurtzite.b = Exp.(Settings.Salt).Wurtzite.b_zero;
-                DFT.(Settings.Salt).Wurtzite.c = Exp.(Settings.Salt).Wurtzite.c_zero;
-                DFT.(Settings.Salt).Wurtzite.V = Exp.(Settings.Salt).Wurtzite.V_zero;
+            for salt_idx = 1:numel(Salts)
+                DFT.(Salts{salt_idx}).Rocksalt.a = Exp.(Salts{salt_idx}).Rocksalt.a_zero;
+                DFT.(Salts{salt_idx}).Rocksalt.b = Exp.(Salts{salt_idx}).Rocksalt.b_zero;
+                DFT.(Salts{salt_idx}).Rocksalt.c = Exp.(Salts{salt_idx}).Rocksalt.c_zero;
+                DFT.(Salts{salt_idx}).Rocksalt.V = Exp.(Salts{salt_idx}).Rocksalt.V_zero;
+                if isfield(Exp.(Salts{salt_idx}),'Wurtzite')
+                    DFT.(Salts{salt_idx}).Wurtzite.a = Exp.(Salts{salt_idx}).Wurtzite.a_zero;
+                    DFT.(Salts{salt_idx}).Wurtzite.b = Exp.(Salts{salt_idx}).Wurtzite.b_zero;
+                    DFT.(Salts{salt_idx}).Wurtzite.c = Exp.(Salts{salt_idx}).Wurtzite.c_zero;
+                    DFT.(Salts{salt_idx}).Wurtzite.V = Exp.(Salts{salt_idx}).Wurtzite.V_zero;
+                end
             end
         end
     end
     
-    Minimization_Data = UserData.Minimization_Data;
-    Finite_T_Data = UserData.Finite_T_Data;
-    
-    disp(repmat('*',1,80))
-    disp(['Final Results - [Salt: ' Settings.Salt '] - [Potential Form: ' Settings.Theory '] - [Model name: ' Settings.Trial_ID ']'])
-    disp(repmat('*',1,80))
-    
-    format long g
-    for idx = 1:length(Settings.Structures)
-        disp(repmat('*',1,60))
-        disp(Settings.Structures{idx})
-        disp('Target (Exp/DFT) Data:')
-        disp(repmat('*',1,60))
-        disp(DFT.(Settings.Salt).(Settings.Structures{idx}))
-        disp(repmat('*',1,60))
-        disp(Settings.Structures{idx})
-        disp('Model Result:')
-        disp(repmat('*',1,60))
-        disp(Minimization_Data{idx})
+    for salt_idx = 1:numel(Salts)
+        Minimization_Data = UserData.Minimization_Data;
+        Finite_T_Data = UserData.Finite_T_Data;
+        
+        if MultiMetal || MultiHalide
+            MinD_show = Minimization_Data.(Salts{salt_idx});
+            FT_show = Finite_T_Data.(Salts{salt_idx});
+        else
+            MinD_show = Minimization_Data;
+            FT_show = Finite_T_Data;
+        end
+
+        disp(repmat('*',1,80))
+        disp(['Final Results - [Salt: ' Salts{salt_idx} '] - [Potential Form: ' Settings.Theory '] - [Model name: ' Settings.Trial_ID ']'])
+        disp(repmat('*',1,80))
+
+        format long g
+        for idx = 1:length(Settings.Structures)
+            disp(repmat('*',1,60))
+            disp(Settings.Structures{idx})
+            disp('Target (Exp/DFT) Data:')
+            disp(repmat('*',1,60))
+            disp(DFT.(Salts{salt_idx}).(Settings.Structures{idx}))
+            disp(repmat('*',1,60))
+            disp(Settings.Structures{idx})
+            disp('Model Result:')
+            disp(repmat('*',1,60))
+            disp(MinD_show{idx})
+        end
+        disp(repmat('*',1,120))
+        disp('Finite Temperature Data (Enthalpy in kJ/mol, Entropy in J/(mol K), Volume in A^3/Forumla Unit, Temperature in K)')
+        disp(repmat('*',1,120))
+        disp(FT_show)
+        disp(repmat('*',1,120))
+
+        disp(['Final Optimized Loss: ' num2str(loss,'%.10e')])
+        disp('Final Optimized Parameters:')
+        disp(Pars)
     end
-    disp(repmat('*',1,120))
-    disp('Finite Temperature Data (Enthalpy in kJ/mol, Entropy in J/(mol K), Volume in A^3/Forumla Unit, Temperature in K)')
-    disp(repmat('*',1,120))
-    disp(Finite_T_Data)
-    disp(repmat('*',1,120))
-    
-    disp(['Final Optimized Loss: ' num2str(loss,'%.10e')])
-    disp('Final Optimized Parameters:')
-    disp(Pars)
     
     % Save final results
     save(Full_opt_filename,'full_opt_results','loss','full_opt_point',...

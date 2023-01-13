@@ -151,7 +151,6 @@ Settings.MDP.Ewald_rtol = 1e-5; % Default (1e-5) The relative strength of the Ew
 Settings.MDP.Fourier_Spacing = 0.12;
 Settings.MDP.VerletBT = -1;
 
-
 % Other stuff
 Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
 Settings.Acquisition_Function = 'expected-improvement-plus';
@@ -163,15 +162,15 @@ Settings.Polarization = false;
 
 %% Test Model Particular parameter
 Settings.ShowPlots = false;
-Settings.GPActiveSetSize = 2000; % Also applies to final optimization
-Settings.Initialize_From_Model_Subsample = inf;
-Settings.Salt = 'LiBr';
+Settings.GPActiveSetSize = 1000; % Also applies to final optimization
+Settings.Salt = 'LiX';
 Settings.Theory = 'BF';
 Settings.InnerRange = false;
 Settings.Trial_ID = 'XX5';
 Settings.UseCoupledConstraint = false;
-Settings.Initialize_From_Model = {'MM'};
-Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
+Settings.Initialize_From_Model = {};
+
+%Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
 
 % Loss function
 Settings.Loss_Options.Rocksalt.LE   = 10;

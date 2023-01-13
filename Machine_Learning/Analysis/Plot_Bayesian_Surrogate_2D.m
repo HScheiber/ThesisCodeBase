@@ -6,7 +6,7 @@ Salt = 'LiBr';
 Theory = 'BF';
 Model = 'MN5'; % C5squaredexponential
 Plot_X = 'sigma_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
-Plot_Y = 'epsilon_MM';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+Plot_Y = 'sigma_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
 % 'r0_MM' / 'sigma_MM'    'r0_XX' / 'sigma_XX'    'epsilon_MM'    'epsilon_XX'    'gamma_MX'
 
 grid_density = 50; % Parameter to set the grid density

@@ -1,5 +1,6 @@
 function params = bayesopt_params(Settings)
     
+	[Metal,Halide] = Separate_Metal_Halide(Settings.Salt);
 
     switch Settings.Theory
     case 'TF'
@@ -299,4 +300,43 @@ function params = bayesopt_params(Settings)
         params = [params,SNMX];
     end
     
+    % When doing coupled salt calculations, need parameter for each salt
+    if strcmp(Halide,'X')
+        Halides = {'F' 'Cl' 'Br' 'I'};
+        ParamNames = {params.Name};
+        for idx = numel(ParamNames):-1:1
+            pname = ParamNames{idx};
+            if contains(pname,'XX')
+                param = params(idx);
+                newparam = repmat(param,1,numel(Halides));
+                for jdx = 1:numel(Halides)
+                    newparam(jdx).Name = strrep(param.Name,'XX',[Halides{jdx} Halides{jdx}]);
+                end
+                params = [params(1:idx-1) newparam params(idx+1:end)];
+            end
+        end
+        if ~Settings.Additivity
+            error('Ensure additivity is enabled when using coupled salt calculations!')
+        end
+    end
+    
+    % When doing coupled salt calculations, need parameter for each salt
+    if strcmp(Metal,'M')
+        Metals = {'Li' 'Na' 'K' 'Rb' 'Cs'};
+        ParamNames = {params.Name};
+        for idx = numel(ParamNames):-1:1
+            pname = ParamNames{idx};
+            if contains(pname,'MM')
+                param = params(idx);
+                newparam = repmat(param,1,numel(Metals));
+                for jdx = 1:numel(Metals)
+                    newparam(jdx).Name = strrep(param.Name,'MM',[Metals{jdx} Metals{jdx}]);
+                end
+                params = [params(1:idx-1) newparam params(idx+1:end)];
+            end
+        end
+        if ~Settings.Additivity
+            error('Ensure additivity is enabled when using coupled salt calculations!')
+        end
+    end
 end
