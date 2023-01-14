@@ -344,6 +344,76 @@ switch lower(computer)
             end
         end
         
+        %% Shared_Settings
+        Shared_Settings.Initial_N_Multiplier = 1; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+        Shared_Settings.Acquisition_Function = 'expected-improvement';
+        Shared_Settings.ExplorationRatio = 1;
+        Shared_Settings.Max_Bayesian_Iterations = 400;
+        Shared_Settings.Max_Secondary_Iterations = 0;
+        Shared_Settings.Parallel_Bayesopt = false;
+        Shared_Settings.Parallel_Struct_Min = true;
+        Shared_Settings.Parallel_LiX_Minimizer = false;
+        Shared_Settings.UseCoupledConstraint = false;
+        Shared_Settings.InnerRange = false; % Sets domain of BH/TF
+        Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
+        Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
+        Shared_Settings.EnforceRR = true;
+        Shared_Settings.final_opt_type = 'none';
+        Shared_Settings.GaussianCharge = false;
+        Shared_Settings.Polarization = false;
+        Shared_Settings.Initialize_From_Model = {'LB'};
+        
+        %% JC - Crystal properties meta-model: PA
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
+        Theories = {'JC'};
+        Replicates = 1;
+        for tidx = 1:length(Theories)
+            Theory = Theories{tidx};
+            for sidx = 1:length(Salts)
+                Salt = Salts{sidx};
+                
+                for ridx = 1:length(Replicates)
+                    Rep = num2str(Replicates(ridx));
+                    
+                    %% Model PA
+                    idx = idx+1;
+                    Settings_Array(idx) = Shared_Settings;
+                    Settings_Array(idx).Salt = Salt;
+                    Settings_Array(idx).Theory = Theory;
+                    Settings_Array(idx).Trial_ID = ['PA' Rep];
+                    
+                    % Loss function
+                    Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
+                    Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
+                    Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 1;
+                    Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
+                    Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
+                    
+                    % Add gaps
+                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+                    
+                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+                    
+                    Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+                    Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+                    Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
+                    
+                    
+                    Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
+                    Settings_Array(idx).Fix_Charge = true;
+                    Settings_Array(idx).Additivity = true;
+                    
+                end
+            end
+        end
+        
     case 'narval'
         %% Shared_Settings
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
@@ -593,85 +663,11 @@ switch lower(computer)
             end
         end
         
-    case 'graham'
-        
-    otherwise % Place jobs here for later assignment
         %% Shared_Settings
         Shared_Settings.Initial_N_Multiplier = 1; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement';
         Shared_Settings.ExplorationRatio = 1;
-        Shared_Settings.Max_Bayesian_Iterations = 200;
-        Shared_Settings.Max_Secondary_Iterations = 0;
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.UseCoupledConstraint = false;
-        Shared_Settings.InnerRange = false; % Sets domain of BH/TF
-        Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Shared_Settings.EnforceRR = true;
-        Shared_Settings.final_opt_type = 'none';
-        Shared_Settings.GaussianCharge = false;
-        Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'LB'};
-        
-        %% JC - Crystal properties meta-model: PA
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
-        Theories = {'JC'};
-        Replicates = 1;
-        for tidx = 1:length(Theories)
-            Theory = Theories{tidx};
-            for sidx = 1:length(Salts)
-                Salt = Salts{sidx};
-                
-                for ridx = 1:length(Replicates)
-                    Rep = num2str(Replicates(ridx));
-                    
-                    %% Model PA
-                    idx = idx+1;
-                    Settings_Array(idx) = Shared_Settings;
-                    Settings_Array(idx).Salt = Salt;
-                    Settings_Array(idx).Theory = Theory;
-                    Settings_Array(idx).Trial_ID = ['PA' Rep];
-                    
-                    % Loss function
-                    Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
-                    Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
-                    Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 1;
-                    Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0.1;
-                    Settings_Array(idx).Loss_Options.CsCl.RLE      = 0.1;
-                    
-                    % Add gaps
-                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
-                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
-                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
-                    
-                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
-                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
-                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
-                    
-                    Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
-                    Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
-                    Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                    Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
-                    
-                    
-                    Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
-                    Settings_Array(idx).Fix_Charge = true;
-                    Settings_Array(idx).Additivity = true;
-                    
-                end
-            end
-        end
-        
-        
-        %% Shared_Settings
-        Shared_Settings.Initial_N_Multiplier = 1; % Multiply the number of input dimensions by this number to obtain the number of initial random points
-        Shared_Settings.Acquisition_Function = 'expected-improvement';
-        Shared_Settings.ExplorationRatio = 1;
-        Shared_Settings.Max_Bayesian_Iterations = 50;
+        Shared_Settings.Max_Bayesian_Iterations = 100;
         Shared_Settings.Max_Secondary_Iterations = 0;
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
@@ -745,6 +741,12 @@ switch lower(computer)
             end
         end
         
+    case 'graham'
+        
+    otherwise % Place jobs here for later assignment
+
+        
+
         
         %% Shared_Settings
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
