@@ -285,7 +285,7 @@ switch lower(computer)
         %% BH - Crystal+Thermal properties with point charge + 'hogervorst' mixing rule: PA
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BH'};
-        Replicates = 5;
+        Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
             for sidx = 1:length(Salts)
@@ -534,7 +534,7 @@ switch lower(computer)
         %% BF - Crystal+Thermal properties with point charge + 'hogervorst' mixing rule: PA
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BF'};
-        Replicates = 5;
+        Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
             for sidx = 1:length(Salts)
@@ -1019,7 +1019,7 @@ switch lower(computer)
         %% BH - Crystal+Thermal properties with point charge + 'kong' mixing rule: MK
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BH'};
-        Replicates = 5;
+        Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
             for sidx = 1:length(Salts)
@@ -1100,7 +1100,7 @@ switch lower(computer)
         %% BH - Crystal+Thermal properties with point charge + 'gromacs' mixing rule: ML
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BH'};
-        Replicates = 5;
+        Replicates = 1:5;
         for tidx = 1:length(Theories)
             Theory = Theories{tidx};
             for sidx = 1:length(Salts)
