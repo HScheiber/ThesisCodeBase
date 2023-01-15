@@ -116,4 +116,9 @@ if subsample < Ndata
     end
 end
 
+% Check if coupled constrains has changed...
+if Settings.
+
+
+
 end

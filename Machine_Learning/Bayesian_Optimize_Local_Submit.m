@@ -163,21 +163,21 @@ Settings.Polarization = false;
 %% Test Model Particular parameter
 Settings.ShowPlots = false;
 Settings.GPActiveSetSize = 1000; % Also applies to final optimization
-Settings.Salt = 'LiX';
-Settings.Theory = 'BF';
+Settings.Salt = 'LiF';
+Settings.Theory = 'JC';
 Settings.InnerRange = false;
 Settings.Trial_ID = 'XX5';
 Settings.UseCoupledConstraint = false;
-Settings.Initialize_From_Model = {};
+Settings.Initialize_From_Model = {'KA'};
 
 %Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
 
 % Loss function
-Settings.Loss_Options.Rocksalt.LE   = 10;
-Settings.Loss_Options.Rocksalt.a    = 1;
-Settings.Loss_Options.Wurtzite.RLE  = 0.1;
-Settings.Loss_Options.FiveFive.RLE  = 0.1;
-Settings.Loss_Options.CsCl.RLE      = 0.1;
+% Settings.Loss_Options.Rocksalt.LE   = 10;
+% Settings.Loss_Options.Rocksalt.a    = 1;
+% Settings.Loss_Options.Wurtzite.RLE  = 0.1;
+% Settings.Loss_Options.FiveFive.RLE  = 0.1;
+% Settings.Loss_Options.CsCl.RLE      = 0.1;
 Settings.Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
 Settings.Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
 Settings.Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
@@ -203,7 +203,7 @@ Settings.Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
 % Other loss options options
 Settings.Fix_Charge = true;
 Settings.Additivity = true;
-Settings.Comb_rule = 'Lorentz-Berthelot'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst', 'GROMACS'. Only applies to BH and BF models
+%Settings.Comb_rule = 'Lorentz-Berthelot'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst', 'GROMACS'. Only applies to BH and BF models
 
 % Auto structure selection
 Settings.Structures = Auto_Structure_Selection(Settings);
