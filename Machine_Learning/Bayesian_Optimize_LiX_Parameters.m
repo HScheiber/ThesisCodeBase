@@ -381,7 +381,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                     Prev_Data = LoadPrevModelData(Settings,params,Settings.Initialize_From_Model_Subsample);
                     Iterations = size(Prev_Data.InitialObjective,1) + Settings.Max_Bayesian_Iterations;
                     
-                    % Check if coupled constrains has changed...
+                    % Check if coupled constraints have changed
                     if width(Prev_Data.InitialConstraintViolations) > NumCC
                         Prev_Data.InitialConstraintViolations = double.empty(size(Prev_Data.InitialConstraintViolations,1),0);
                     end
