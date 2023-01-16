@@ -115,10 +115,4 @@ if subsample < Ndata
         Prev_Data.(field) = Prev_Data.(field)(SampleX,:);
     end
 end
-
-% Check if coupled constrains has changed...
-if Settings.
-
-
-
 end
