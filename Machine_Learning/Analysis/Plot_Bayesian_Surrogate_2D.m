@@ -7,6 +7,7 @@ Theory = 'BF';
 Model = 'MM1';
 Plot_X = 'sigma_MM'; % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ' 
 Plot_Y = 'sigma_XX';   % options: 'SDMM' 'SDXX' 'SRMM' 'SRXX' 'SQ'
+Plot_PCA = false;
 % 'r0_MM' / 'sigma_MM'    'r0_XX' / 'sigma_XX'    'epsilon_MM'    'epsilon_XX'    'gamma_MX'
 %exportgraphics(ax ,'GP_Model.png','ContentType','image','BackgroundColor','none')
 
@@ -16,7 +17,7 @@ contour_lines = 20;
 fs = 24;
 
 Z_Plot = 'objective'; % 'error' 'objective' 'constraints'
-C_Plot = 'objective uncertainty'; %'objective' 'objective uncertainty' 'error' 'error uncertainty' 'constraints'
+C_Plot = 'constraints'; %'objective' 'objective uncertainty' 'error' 'error uncertainty' 'constraints'
 show_zero = false;
 showtitle = false;
 
@@ -38,6 +39,30 @@ full_opt_eval = A.loss;
 varnames = {results.VariableDescriptions.Name};
 transforms = {results.VariableDescriptions.Transform};
 N_vars = length(varnames);
+
+
+% PCA?
+if Plot_PCA
+	X_Data = results.XTrace;
+    X_Ranges = zeros(N_vars,2);
+    % Convert any data in log transform into log representation
+    for idx = 1:N_vars
+        X_Ranges(idx,:) = results.VariableDescriptions(idx).Range;
+        if strcmp(transforms{idx},'log')
+            X_Data{:,idx} = log(X_Data{:,idx});
+            X_Ranges(idx,:) = log(X_Ranges(idx,:));
+        end
+    end
+    
+    
+    [wcoeff,score,latent,tsquared,explained] = pca(X_Data{:,:}, ...
+        'VariableWeights','variance');
+    
+    coefforth = diag(std(X_Data{:,:}))\wcoeff;
+    
+    PCA_1 = coefforth(:,1);
+    PCA_2 = coefforth(:,2);
+end
 
 % Get indexes of the options of interest
 [~,idx_X] = contained_in_cell(Plot_X,varnames);

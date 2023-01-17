@@ -64,7 +64,7 @@ Shared_Settings.MDP.vdw_modifier = 'None';
 Shared_Settings.Cutoff_Buffer = 1.20;
 Shared_Settings.MDP.Disp_Correction = true; % Adds in long-range dispersion correction
 Shared_Settings.MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
-Shared_Settings.N_atoms = 2000;
+Shared_Settings.N_atoms = 5000;
 
 % Barostat Options
 Shared_Settings.Isotropy = 'semiisotropic';
@@ -92,244 +92,13 @@ idx=0;
 
 switch lower(computer)
     case 'graham'
-        %% Alexandria Model (Gaussian charge + polarization) - recreation of literature result for LiI
-        Salts = {'LiI'};
-        Theories = {'BF'};
-        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
-        Structures = {'Rocksalt'};
-        T0 = 909; % K
-        for jdx = 1:length(Salts)
-            Salt = Salts{jdx};
-            for kdx = 1:length(Theories)
-                Theory = Theories{kdx};
-                
-                for sdx = 1:numel(Structures)
-                    Structure = Structures{sdx};
-                    
-                    idx = idx+1;
-                    Settings_array(idx) = Shared_Settings;
-                    Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                    Settings_array(idx).JobID = [Theory '_Alexandria_LitMethod']; % An ID that is tacked onto the folder name of all current jobs
-                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
-                    Settings_array(idx).GaussianCharge = true;
-                    Settings_array(idx).Polarization = true;
-                    
-                    % Initial T
-                    Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                    Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
-                    Settings_array(idx).T0 = T0; % K, Initial temperature
-                    
-                    % Literature settings
-                    % Barostat Options
-                    Settings_array(idx).Isotropy = 'semiisotropic';
-                    Settings_array(idx).Target_P = [1 1]; % Bar
-                    Settings_array(idx).Barostat = 'Berendsen'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
-                    Settings_array(idx).Time_Constant_P = 10; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
-                    Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
-                    Settings_array(idx).ScaleCompressibility = 1.128664;
-                    
-                    Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                    Settings_array(idx).emtol_polarization = 1e-1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
-                    
-                end
-            end
-        end
-        
-        %% Alexandria Model (Gaussian charge + polarization) - recreation of literature result for LiI + 1.45 nm cutoff
-        Salts = {'LiI'};
-        Theories = {'BF'};
-        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
-        Structures = {'Rocksalt'};
-        T0 = 909; % K
-        for jdx = 1:length(Salts)
-            Salt = Salts{jdx};
-            for kdx = 1:length(Theories)
-                Theory = Theories{kdx};
-                
-                for sdx = 1:numel(Structures)
-                    Structure = Structures{sdx};
-                    
-                    idx = idx+1;
-                    Settings_array(idx) = Shared_Settings;
-                    Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                    Settings_array(idx).JobID = [Theory '_Alexandria_LitMethod_145']; % An ID that is tacked onto the folder name of all current jobs
-                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
-                    Settings_array(idx).GaussianCharge = true;
-                    Settings_array(idx).Polarization = true;
-                    
-                    % Initial T
-                    Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                    Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
-                    Settings_array(idx).T0 = T0; % K, Initial temperature
-                    
-                    % Literature settings
-                    % Barostat Options
-                    Settings_array(idx).Isotropy = 'semiisotropic';
-                    Settings_array(idx).Target_P = [1 1]; % Bar
-                    Settings_array(idx).Barostat = 'Berendsen'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
-                    Settings_array(idx).Time_Constant_P = 10; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
-                    Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
-                    Settings_array(idx).ScaleCompressibility = 1.128664;
-                    
-                    Settings_array(idx).MDP.RVDW_Cutoff = 1.45; % nm
-                    Settings_array(idx).MDP.RCoulomb_Cutoff = 1.5; % nm
-                    Settings_array(idx).MDP.RList_Cutoff = 1.5; % nm
-                    Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                    Settings_array(idx).emtol_polarization = 1e-1; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
-                    
-                end
-            end
-        end
-        
-        %% Alexandria Model (Gaussian charge + polarization) - emtol 1e-2 + PR(1ps) for LiI
-        Salts = {'LiI'};
-        Theories = {'BF'};
-        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
-        Structures = {'Rocksalt'};
-        T0 = 909; % K
-        for jdx = 1:length(Salts)
-            Salt = Salts{jdx};
-            for kdx = 1:length(Theories)
-                Theory = Theories{kdx};
-                
-                for sdx = 1:numel(Structures)
-                    Structure = Structures{sdx};
-                    
-                    idx = idx+1;
-                    Settings_array(idx) = Shared_Settings;
-                    Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                    Settings_array(idx).JobID = [Theory '_emtol_1e-2']; % An ID that is tacked onto the folder name of all current jobs
-                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
-                    Settings_array(idx).GaussianCharge = true;
-                    Settings_array(idx).Polarization = true;
-                    
-                    % Initial T
-                    Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                    Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
-                    Settings_array(idx).T0 = T0; % K, Initial temperature
-                    
-                    % Barostat Options
-                    Settings_array(idx).Isotropy = 'semiisotropic';
-                    Settings_array(idx).Target_P = [1 1]; % Bar
-                    Settings_array(idx).Barostat = 'Parrinello-Rahman'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
-                    Settings_array(idx).Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
-                    Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
-                    Settings_array(idx).ScaleCompressibility = 1;
-                    
-                    Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                    Settings_array(idx).emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
-                    
-                end
-            end
-        end
-        
-        %% Alexandria Model (Gaussian charge + polarization) - emtol 1e-2 + PR(10ps) barostat for LiI
-        Salts = {'LiI'};
-        Theories = {'BF'};
-        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
-        Structures = {'Rocksalt'};
-        T0 = 909; % K
-        for jdx = 1:length(Salts)
-            Salt = Salts{jdx};
-            for kdx = 1:length(Theories)
-                Theory = Theories{kdx};
-                
-                for sdx = 1:numel(Structures)
-                    Structure = Structures{sdx};
-                    
-                    idx = idx+1;
-                    Settings_array(idx) = Shared_Settings;
-                    Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                    Settings_array(idx).JobID = [Theory '_emtol_1e-2_PR10']; % An ID that is tacked onto the folder name of all current jobs
-                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
-                    Settings_array(idx).GaussianCharge = true;
-                    Settings_array(idx).Polarization = true;
-                    
-                    % Initial T
-                    Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                    Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
-                    Settings_array(idx).T0 = T0; % K, Initial temperature
-                    
-                    % Barostat Options
-                    Settings_array(idx).Isotropy = 'semiisotropic';
-                    Settings_array(idx).Target_P = [1 1]; % Bar
-                    Settings_array(idx).Barostat = 'Parrinello-Rahman'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
-                    Settings_array(idx).Time_Constant_P = 10; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
-                    Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
-                    Settings_array(idx).ScaleCompressibility = 1;
-                    
-                    Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                    Settings_array(idx).emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
-                    
-                end
-            end
-        end
-        
-        %% Alexandria Model (Gaussian charge + polarization) - emtol 1e-2 + Berendsen(10ps) barostat for LiI
-        Salts = {'LiI'};
-        Theories = {'BF'};
-        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
-        Structures = {'Rocksalt'};
-        T0 = 909; % K
-        for jdx = 1:length(Salts)
-            Salt = Salts{jdx};
-            for kdx = 1:length(Theories)
-                Theory = Theories{kdx};
-                
-                for sdx = 1:numel(Structures)
-                    Structure = Structures{sdx};
-                    
-                    idx = idx+1;
-                    Settings_array(idx) = Shared_Settings;
-                    Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                    Settings_array(idx).JobID = [Theory '_emtol_1e-2_Berendsen10']; % An ID that is tacked onto the folder name of all current jobs
-                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
-                    Settings_array(idx).GaussianCharge = true;
-                    Settings_array(idx).Polarization = true;
-                    
-                    % Initial T
-                    Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                    Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
-                    Settings_array(idx).T0 = T0; % K, Initial temperature
-                    
-                    % Barostat Options
-                    Settings_array(idx).Isotropy = 'semiisotropic';
-                    Settings_array(idx).Target_P = [1 1]; % Bar
-                    Settings_array(idx).Barostat = 'Berendsen'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
-                    Settings_array(idx).Time_Constant_P = 10; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
-                    Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
-                    Settings_array(idx).ScaleCompressibility = 1;
-                    
-                    Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                    Settings_array(idx).emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
-                    
-                end
-            end
-        end
-        
         %% Alexandria Model (Gaussian charge + polarization) - emtol 1e-2 + Berendsen(1ps) barostat for LiI
         Salts = {'LiI'};
-        Theories = {'BF'};
-        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
+        Theories = {'BF' 'BH'};
         Structures = {'Rocksalt'};
-        T0 = 909; % K
         for jdx = 1:length(Salts)
             Salt = Salts{jdx};
+            T0 = Exp.(Salt).mp; % K
             for kdx = 1:length(Theories)
                 Theory = Theories{kdx};
                 
@@ -342,8 +111,8 @@ switch lower(computer)
                     Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
                     Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
                     Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                    Settings_array(idx).JobID = [Theory '_emtol_1e-2_Berendsen1']; % An ID that is tacked onto the folder name of all current jobs
-                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
+                    Settings_array(idx).JobID = [Theory '_N5000']; % An ID that is tacked onto the folder name of all current jobs
+                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',Theory);
                     Settings_array(idx).GaussianCharge = true;
                     Settings_array(idx).Polarization = true;
                     
@@ -359,51 +128,6 @@ switch lower(computer)
                     Settings_array(idx).Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
                     Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
                     Settings_array(idx).ScaleCompressibility = 1;
-                    
-                    Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
-                    Settings_array(idx).emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
-                    
-                end
-            end
-        end
-        
-        %% Alexandria Model (Gaussian charge + polarization) - emtol 1e-2 + Berendsen(10ps,lit. compress.) barostat for LiI
-        Salts = {'LiI'};
-        Theories = {'BF'};
-        vdW_Type = {'WBK'}; % Allowed vdW types: 'WBK', 'BK', 'LJ_12-6', 'LJ_8-6'
-        Structures = {'Rocksalt'};
-        T0 = 909; % K
-        for jdx = 1:length(Salts)
-            Salt = Salts{jdx};
-            for kdx = 1:length(Theories)
-                Theory = Theories{kdx};
-                
-                for sdx = 1:numel(Structures)
-                    Structure = Structures{sdx};
-                    
-                    idx = idx+1;
-                    Settings_array(idx) = Shared_Settings;
-                    Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Structure = Structure; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
-                    Settings_array(idx).Model = 'Alexandria'; % Name of the current model. Leave blank for the default JC/TF/BH model
-                    Settings_array(idx).JobID = [Theory '_emtol_1e-2_Berendsen10_litcomp']; % An ID that is tacked onto the folder name of all current jobs
-                    Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',vdW_Type{kdx});
-                    Settings_array(idx).GaussianCharge = true;
-                    Settings_array(idx).Polarization = true;
-                    
-                    % Initial T
-                    Settings_array(idx).Target_T = T0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-                    Settings_array(idx).MDP.Initial_T = T0; % Initial termpature at which to generate velocities
-                    Settings_array(idx).T0 = T0; % K, Initial temperature
-                    
-                    % Barostat Options
-                    Settings_array(idx).Isotropy = 'semiisotropic';
-                    Settings_array(idx).Target_P = [1 1]; % Bar
-                    Settings_array(idx).Barostat = 'Berendsen'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
-                    Settings_array(idx).Time_Constant_P = 10; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
-                    Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
-                    Settings_array(idx).ScaleCompressibility = 1.128664;
                     
                     Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
                     Settings_array(idx).emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence

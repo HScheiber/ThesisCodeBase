@@ -168,7 +168,7 @@ Settings.Theory = 'JC';
 Settings.InnerRange = false;
 Settings.Trial_ID = 'XX5';
 Settings.UseCoupledConstraint = false;
-Settings.Initialize_From_Model = {'KA'};
+Settings.Initialize_From_Model = {};
 
 %Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
 

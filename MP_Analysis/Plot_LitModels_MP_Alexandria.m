@@ -5,9 +5,9 @@ fs = 32;
 mkrsz = 14;
 linestyles = {'-',':','-.','--'};
 mkrshapes = {'s' 'd' '^' 'o'};
-%DataSetName = 'Alexandria_Melting_Point_Data.mat';
-DataSetName = 'Alexandria_Polarized_Melting_Point_Data.mat';
-Models = {'BF' 'BH' 'JC' 'Mie'};
+DataSetName = 'Alexandria_Melting_Point_Data.mat';
+%DataSetName = 'Alexandria_Polarized_Melting_Point_Data.mat';
+Models = {'BF' 'BH' 'JC' 'Mie'}; %  'BH' 'JC' 'Mie'
 Legend_Labels = {'Experiment' 'WBK' 'BK' 'Lennard Jones [12-6]' 'Lennard Jones [8-6]'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...
@@ -199,3 +199,6 @@ title(axh,titleg,'FontSize',fs,'Interpreter','latex')
 
 % exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
 %     'ContentType','vector','BackgroundColor','none')
+
+exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
+'ContentType','vector','BackgroundColor','none')

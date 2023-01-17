@@ -743,13 +743,13 @@ else
     tf = log1p(Loss) < sqrt(eps);
 end
 
-% % Plot result to visualize
-% % 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
-% % 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
-% 
-% 
-% ax1 = 'epsilon_MM';
-% ax2 = 'epsilon_XX';
+% Plot result to visualize
+% 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
+% 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
+
+
+% ax1 = 'sigma_MM';
+% ax2 = 'epsilon_MM';
 % %ax3 = 'gamma_MX';
 % 
 % %scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
@@ -758,8 +758,8 @@ end
 % scatter(Param.(ax1)(tf),Param.(ax2)(tf),100,'r','filled','linewidth',1,...
 %     'MarkerEdgeColor','k')
 % 
-%    set(gca, 'XScale', 'log')
-%    set(gca, 'YScale', 'log')
+% %    set(gca, 'XScale', 'log')
+% %    set(gca, 'YScale', 'log')
 % %    set(gca, 'ZScale', 'log')
 % 
 % % 
@@ -775,6 +775,6 @@ end
 % %zlabel(ax3,'fontsize',fs);
 % set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
 % %ylim([0.05 0.8])
-%
+% 
 % clear;
 end
