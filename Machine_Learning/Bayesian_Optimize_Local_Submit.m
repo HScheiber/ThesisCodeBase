@@ -63,7 +63,7 @@ Settings.npme = []; % Number of rank assigned to PME
 Settings.dd = []; % Domain decomposition
 
 % Bayesian Optimization Stopping Criteria
-Settings.Max_Bayesian_Iterations = 600;
+Settings.Max_Bayesian_Iterations = 400;
 Settings.Max_Secondary_Iterations = 50;
 
 % Local optimization settings convergence settings
@@ -152,32 +152,32 @@ Settings.MDP.Fourier_Spacing = 0.12;
 Settings.MDP.VerletBT = -1;
 
 % Other stuff
-Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
+Settings.Initial_N_Multiplier = 20; % Multiply the number of input dimensions by this number to obtain the number of initial random points
 Settings.Acquisition_Function = 'expected-improvement-plus';
 Settings.ExplorationRatio = 2;
 Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
-Settings.GaussianCharge = true;
+Settings.GaussianCharge = false;
 Settings.Polarization = false;
 
 
 %% Test Model Particular parameter
 Settings.ShowPlots = false;
 Settings.GPActiveSetSize = 1000; % Also applies to final optimization
-Settings.Salt = 'LiF';
-Settings.Theory = 'JC';
+Settings.Salt = 'LiX';
+Settings.Theory = 'BF';
 Settings.InnerRange = false;
-Settings.Trial_ID = 'XX5';
+Settings.Trial_ID = 'QX1';
 Settings.UseCoupledConstraint = false;
 Settings.Initialize_From_Model = {};
 
 %Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
 
 % Loss function
-% Settings.Loss_Options.Rocksalt.LE   = 10;
-% Settings.Loss_Options.Rocksalt.a    = 1;
-% Settings.Loss_Options.Wurtzite.RLE  = 0.1;
-% Settings.Loss_Options.FiveFive.RLE  = 0.1;
-% Settings.Loss_Options.CsCl.RLE      = 0.1;
+Settings.Loss_Options.Rocksalt.LE   = 10;
+Settings.Loss_Options.Rocksalt.a    = 1;
+Settings.Loss_Options.Wurtzite.RLE  = 0.1;
+Settings.Loss_Options.FiveFive.RLE  = 0.1;
+Settings.Loss_Options.CsCl.RLE      = 0.1;
 Settings.Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
 Settings.Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
 Settings.Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
@@ -203,7 +203,7 @@ Settings.Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
 % Other loss options options
 Settings.Fix_Charge = true;
 Settings.Additivity = true;
-%Settings.Comb_rule = 'Lorentz-Berthelot'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst', 'GROMACS'. Only applies to BH and BF models
+Settings.Comb_rule = 'Hogervorst'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst', 'GROMACS'. Only applies to BH and BF models
 
 % Auto structure selection
 Settings.Structures = Auto_Structure_Selection(Settings);
