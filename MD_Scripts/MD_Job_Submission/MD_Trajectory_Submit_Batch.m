@@ -445,6 +445,76 @@ switch lower(computer)
     case 'narval'
 
     otherwise
+        
+        %% LiI/WBK polarized Alexandria model at 909 starting in liquid structure: NPT, lit settings with anisotropic barostat
+        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+        Theories = {'BH' 'BF'};
+        Structure = 'Rocksalt';
+        
+        for sdx = 1:numel(Salts)
+            Salt = Salts{sdx};
+            
+            for jdx = 1:numel(Theories)
+                Theory = Theories{jdx};
+
+                idx = idx+1;
+                Settings_array(idx) = Shared_Settings;
+                Settings_array(idx).RunEnergyAnalysis = {'Temperature' 'Pressure' 'Volume' 'Enthalpy'};
+                Settings_array(idx).Structure = Structure;
+
+                Settings_array(idx).MDP.RVDW_Cutoff = 1.0; % nm
+                Settings_array(idx).MDP.RCoulomb_Cutoff = 1.1; % nm
+                Settings_array(idx).MDP.RList_Cutoff = 1.1; % nm
+                Settings_array(idx).MDP.Disp_Correction = true; % Adds in long-range dispersion correction
+                Settings_array(idx).MinMDP.Disp_Correction = true; % Adds in long-range dispersion correction
+
+                Settings_array(idx).Theory = Theory; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+                Settings_array(idx).Salt = Salt; % Input model(s) to use: JC, JC3P, JC4P, TF, BH
+
+                Settings_array(idx).Model = 'Alexandria_pol'; % Name of the current model. Leave blank for the default JC/TF/BH model
+                Settings_array(idx).JobID = 'ChkLiqStable'; % An ID that is tacked onto the folder name of all current jobs
+                Settings_array(idx).N_atoms = 5000; % Minimum number of atoms to include in box or size of search box for cluster jobs. This will automatically resize as needed
+                Settings_array(idx).c_over_a = 1;
+
+                % load the model
+                Settings_array(idx) = Alexandria_Potential_Parameters(Settings_array(idx),'vdW_Type',Theory);
+                Settings_array(idx).GaussianCharge = true; % Turn on Gaussian distributed charges when true
+                Settings_array(idx).Polarization = true; % Turn on polarizible Drude model when true
+
+                % Polarization settings
+                Settings_array(idx).niter_polarization = 1000; % Maximum number of iterations for optimizing the shell positions
+                Settings_array(idx).emtol_polarization = 1e-2; % [kJ/(mol nm)] A tolerance for self consistent polarization convergence
+
+                % Misc settings
+                Settings_array(idx).Output_Energies = 100; % Number of steps that else between writing energies to energy file.
+                Settings_array(idx).Output_Coords = 1000; % Number of steps between outputting coordinates
+                Settings_array(idx).MDP.dt = 0.001; % Time step in ps for md type calculations
+                Settings_array(idx).PreEquilibration = 0; % ps. Relax the prepared system for this amount of time at the start with ultrafast relaxation settings.
+                
+                % Simulated annealing options
+                Settings_array(idx).Annealing = 'single'; % Options: 'no' 'single' 'periodic'
+                Settings_array(idx).Annealing_Times = [0  5000]; % [ps] A list with the number of annealing reference/control points used
+                Settings_array(idx).Annealing_Temps = [0  2000];   % [K] A list of temperatures at the annealing reference/control points used. Must be equal in length to previous line.
+                Settings_array(idx).MDP.Trajectory_Time = 5; % ns
+
+                % Barostat Options
+                Settings_array(idx).Isotropy = 'anisotropic';
+                Settings_array(idx).Target_P = [1 1 1 0 0 0]; % Bar
+                Settings_array(idx).Barostat = 'Parrinello-Rahman'; % Options: 'no' 'Berendsen' 'Parrinello-Rahman' 'MTTK' (set NO for NVT)
+                Settings_array(idx).Time_Constant_P = 1; % 0.2 [ps] time constant for coupling P. Should be at least 20 times larger than (Nstpcouple*timestep)
+                Settings_array(idx).Nstpcouple = Get_nstcouple(Settings_array(idx).Time_Constant_P,Settings_array(idx).MDP.dt); % [ps] The frequency for coupling the pressure. The box is scaled every nstpcouple steps. 
+                Settings_array(idx).ScaleCompressibility = 1;
+                
+                % Thermostat Options
+                Settings_array(idx).Thermostat = 'v-rescale'; % Options: 'no' 'berendsen' 'nose-hoover' 'andersen' 'andersen-massive' 'nose-hoover' (set NO for NVE)
+                Settings_array(idx).Time_Constant_T = 0.2; %[ps] time constant for coupling T. Should be at least 20*Nsttcouple*timestep
+                Settings_array(idx).Nsttcouple = Get_nstcouple(Settings_array(idx).Time_Constant_T,Settings_array(idx).MDP.dt); %[ps] The frequency for coupling the temperature. 
+                Settings_array(idx).MDP.Initial_T = 0; % Initial termpature at which to generate velocities
+                Settings_array(idx).Target_T = 0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
+            end
+        end
+        
+        
 end
 
 %% Check for already running jobs
