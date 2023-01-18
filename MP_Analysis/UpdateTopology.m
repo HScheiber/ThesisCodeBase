@@ -55,6 +55,21 @@ if Settings.Table_Req
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',num2str(C6.MM,'%.10e'));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',num2str(C6.XX,'%.10e'));
     Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',num2str(C6.MX,'%.10e'));    
+elseif strcmp(Settings.Theory,'LJ')
+    
+    % Definte the function type as 1 (LJ)
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##NBFUNC##','1');
+
+    % Define the combination rules (Lorenz-berthelot in sigma-epsilon form)
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##COMBR##','2');
+    
+    % Add parameters to topology text
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETC##',pad(num2str(Settings.S.S.MM,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALC##',pad(num2str(Settings.S.S.XX,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALC##',pad(num2str(Settings.S.S.MX,'%10.8e'),10));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METMETA##',num2str(Settings.S.E.MM,'%10.8e'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##HALHALA##',num2str(Settings.S.E.XX,'%10.8e'));
+    Settings.Topology_Text = strrep(Settings.Topology_Text,'##METHALA##',num2str(Settings.S.E.MX,'%10.8e'));
     
 elseif contains(Settings.Theory,'JC')
     

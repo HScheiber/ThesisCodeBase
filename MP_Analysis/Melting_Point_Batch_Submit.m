@@ -94,7 +94,7 @@ switch lower(computer)
     case 'graham'
         %% Alexandria Model (Gaussian charge + polarization) - emtol 1e-2 + Berendsen(1ps) barostat for LiI
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-        Theories = {'BF' 'BH'};
+        Theories = {'LJ' 'Mie' 'BF' 'BH'};
         Structures = {'Rocksalt'};
         for jdx = 1:length(Salts)
             Salt = Salts{jdx};

@@ -29,7 +29,7 @@ switch lower(vdW_Type)
         vdW_Type = 'BK';
     case 'bf'
         vdW_Type = 'WBK';
-    case 'jc'
+    case {'jc' 'lj'}
         vdW_Type = 'LJ_12-6';
     case 'mie'
         vdW_Type = 'LJ_8-6';

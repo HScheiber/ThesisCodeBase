@@ -1,6 +1,7 @@
 
 ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed';
 Settings = Initialize_MD_Settings;
+Settings = Update_MD_Settings(Settings);
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; % 'LiF' 'LiCl' 'LiBr' 'LiI'
 
 Settings.Theory = 'BH';
@@ -84,6 +85,9 @@ for pts = 1:numel(plts)
                 U = JC_Potential_Generator(Settings,...
                     'Startpoint',Startpoint);
                 disp([Settings.Salt ' ' ML_Model_Name ': Q = ' num2str(Settings.S.Q)])
+            elseif strcmp(Settings.Theory,'LJ')
+                U = LJ_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'TF')
                 U = TF_Potential_Generator(Settings,...
                     'Startpoint',Startpoint);

@@ -462,6 +462,72 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
         else
             Settings.S.Q = Param.SQ;
         end
+    case 'LJ'
+        
+        % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
+        if Settings.SigmaEpsilon
+
+            % Sigma
+            Settings.S.S.MM = Param.sigma_MM;
+            Settings.S.S.XX = Param.sigma_XX;
+
+            % Epsilon
+            Settings.S.E.MM = Param.epsilon_MM;
+            Settings.S.E.XX = Param.epsilon_XX;
+
+            if Settings.Additivity
+                Settings.S.S.MX = (Param.sigma_MM + Param.sigma_XX)./2;
+                Settings.S.E.MX = sqrt(Param.epsilon_MM.*Param.epsilon_XX);
+
+                if Settings.Additional_MM_Disp
+                    Full_MM_Epsilon = Param.epsilon_MM + Param.epsilon_MM2;
+                    Settings.S.E.MM = Full_MM_Epsilon;
+                end
+            else
+                Settings.S.S.MX = Param.sigma_MX;
+                Settings.S.E.MX = Param.epsilon_MX;
+            end
+
+        % Dispersion/repulsion form
+        else
+            % Dispersion
+            Settings.S.D.MM = Param.SDMM;
+            Settings.S.D.XX = Param.SDXX;
+
+            % Repulsion
+            Settings.S.R.MM = Param.SRMM;
+            Settings.S.R.XX = Param.SRXX;
+
+            if Settings.Additivity
+
+                % Scaled
+                MM_Epsilon = (Settings.S.D.MM.^2).*(1./Settings.S.R.MM);
+                MM_Sigma = (1./(Settings.S.D.MM.^(1/6))).*(Settings.S.R.MM.^(1/6));
+
+                XX_Epsilon = (Settings.S.D.XX.^2).*(1./Settings.S.R.XX);
+                XX_Sigma = (1./(Settings.S.D.XX.^(1/6))).*(Settings.S.R.XX.^(1/6));
+
+                MX_Epsilon = sqrt(MM_Epsilon.*XX_Epsilon);
+                MX_Sigma   = (MM_Sigma + XX_Sigma)./2;
+                
+                Settings.S.D.MX = 4.*MX_Epsilon.*MX_Sigma.^6;
+                Settings.S.R.MX = 4.*MX_Epsilon.*MX_Sigma.^12;
+
+                if Settings.Additional_MM_Disp
+                    Settings.S.D.MM = Settings.S.D.MM + Param.SDMM2;
+                end
+            else
+                Settings.S.D.MX = Param.SDMX;
+                Settings.S.R.MX = Param.SRMX;
+            end
+        end
+
+        % Scaling Coulombic Charge
+        if Settings.Fix_Charge
+            Settings.S.Q = Settings.Q_value;
+        else
+            Settings.S.Q = Param.SQ;
+        end
     case 'Mie'
 
         % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
@@ -526,6 +592,8 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
         U = TF_Potential_Generator_vec(Settings);
     elseif strcmp(Settings.Theory,'JC')
         U = JC_Potential_Generator_vec(Settings);
+    elseif strcmp(Settings.Theory,'LJ')
+        U = LJ_Potential_Generator_vec(Settings);
     elseif strcmp(Settings.Theory,'Mie')
         U = Mie_Potential_Generator_vec(Settings);
     end
@@ -724,7 +792,7 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
 
     if Settings.EnforceRR && Settings.SigmaEpsilon && Settings.Additivity
         switch Settings.Theory
-            case {'JC' 'Mie' 'BF'}
+            case {'JC' 'Mie' 'BF' 'LJ'}
                 RR_Walls = Param.sigma_MM./Param.sigma_XX; % Ratio of M/X size, should be < 1
             case {'BH' 'BD' 'BE' 'TF'}
                 RR_Walls = Param.r0_MM./Param.r0_XX; % Ratio of M/X size, should be < 1

@@ -225,6 +225,38 @@ if Table_Req
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'ewald-rtol-lj.+?\n','');
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'lj-pme-comb-rule.+?\n','');
     Settings.MDP_Template = regexprep(Settings.MDP_Template,'verlet-buffer-tolerance.+?\n','');
+elseif contains(Settings.Theory,'LJ')
+    
+    Settings.TableFile_MX = '';
+
+    % Definte the function type as 1 (LJ)
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##NBFUNC##','1');
+
+    % Define the combination rules (Lorenz-berthelot in sigma-epsilon form)
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##COMBR##','2');
+
+    % Add parameters to topology text
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETC##',pad(num2str(Settings.S.S.MM,'%10.8e'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALC##',pad(num2str(Settings.S.S.XX,'%10.8e'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALC##',pad(num2str(Settings.S.S.MX,'%10.8e'),10));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METMETA##',num2str(Settings.S.E.MM,'%10.8e'));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##HALHALA##',num2str(Settings.S.E.XX,'%10.8e'));
+    Settings.Topology_Template = strrep(Settings.Topology_Template,'##METHALA##',num2str(Settings.S.E.MX,'%10.8e'));
+
+    % Modify the MDP file
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWTYPE##',pad(Settings.MinMDP.VDWType,18));
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##VDWMOD##',pad(Settings.MinMDP.vdw_modifier,18));
+    Settings.MDP_Template = strrep(Settings.MDP_Template,'##CUTOFF##',pad(Settings.MinMDP.CutOffScheme,18));
+    Settings.MDP_Template = regexprep(Settings.MDP_Template,'energygrp-table.+?\n','');
+    Settings.MDP_Template = regexprep(Settings.MDP_Template,'ewald-rtol-lj.+?\n','');
+    Settings.MDP_Template = regexprep(Settings.MDP_Template,'lj-pme-comb-rule.+?\n','');
+    
+    % Add in Verlet Settings
+    if strcmp(Settings.MinMDP.CutOffScheme,'Verlet')
+        Settings.MDP_Template = strrep(Settings.MDP_Template,'##VerletBT##',pad(num2str(Settings.MinMDP.VerletBT),18));
+    else
+        Settings.MDP_Template = regexprep(Settings.MDP_Template,'verlet-buffer-tolerance.+?\n','');
+    end
     
 elseif contains(Settings.Theory,'JC')
     switch Settings.Theory

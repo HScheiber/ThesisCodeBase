@@ -52,6 +52,9 @@ if isfile(Model_data_Filename)
     
     Settings = data.Settings;
     Settings.S = Init_Scaling_Object;
+    if ~isfield(Settings,'Comb_rule')
+        Settings.Comb_rule = 'Lorentz-Berthelot';
+    end
     Ptypes = bayesopt_params(Settings);
     Param_names = {Ptypes.Name};
     Param = table();
