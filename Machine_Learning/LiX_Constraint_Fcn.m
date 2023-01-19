@@ -41,7 +41,6 @@ ParNames = Param.Properties.VariableNames;
 
 % Coupled or each salt independent?
 [Salts,MultiMetal,MultiHalide] = Select_MultiSalt(Settings);
-
 for salt_idx = 1:numel(Salts) % Loop through coupled salts
     Settings.Salt = Salts{salt_idx};
     [Settings.Metal,Settings.Halide] = Separate_Metal_Halide(Settings.Salt);
@@ -648,17 +647,17 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
     Loss(ovop_idx) = Loss(ovop_idx) + max(r_min - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % valley too far
     Loss(ovop_idx) = Loss(ovop_idx) + max((Settings.MinMXWellR/10) - r_min,0).*Settings.BadFcnLossPenalty; % valley too close
 
-    % % Loss = zeros(N_par,1);
-    % idxes = find(Loss == 0);
-    % for jdx = 1:min(numel(idxes),100)
-    %     idx = idxes(jdx);
-    %     plot(U.r,U.MX(idx,:))
-    %     hold on
-    %     scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
-    %     scatter(U.r(valleys_idx(idx,:)),U.MX(idx,valleys_idx(idx,:)))
-    % end
-    % ylim([-1000 1000])
-    % xlim([0 1])
+%     % Loss = zeros(N_par,1);
+%     idxes = find(Loss ~= 0);
+%     for jdx = 1:min(numel(idxes),100)
+%         idx = idxes(jdx);
+%         plot(U.r,U.MX(idx,:))
+%         hold on
+%         scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
+%         scatter(U.r(valleys_idx(idx,:)),U.MX(idx,valleys_idx(idx,:)))
+%     end
+%     ylim([-1000 1000])
+%     xlim([0 1])
 
     %% Grab the peaks and valleys of the MM/XX potentials
     YY = {'MM' 'XX'};
@@ -811,38 +810,4 @@ else
     tf = log1p(Loss) < sqrt(eps);
 end
 
-% Plot result to visualize
-% 'r0_MM'  'r0_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
-% 'sigma_MM'  'sigma_XX'  'epsilon_MM'  'epsilon_XX'  'gamma_MX'
-
-
-% ax1 = 'sigma_MM';
-% ax2 = 'epsilon_MM';
-% %ax3 = 'gamma_MX';
-% 
-% %scatter3(Param.(ax1),Param.(ax2),Param.(ax3),50,tf_num,'filled')
-% scatter(Param.(ax1)(~tf),Param.(ax2)(~tf),100,'k','x')
-% hold on
-% scatter(Param.(ax1)(tf),Param.(ax2)(tf),100,'r','filled','linewidth',1,...
-%     'MarkerEdgeColor','k')
-% 
-% %    set(gca, 'XScale', 'log')
-% %    set(gca, 'YScale', 'log')
-% %    set(gca, 'ZScale', 'log')
-% 
-% % 
-% fs=36;
-% % xlabel('$\epsilon_{ii}$','Interpreter','latex','fontsize',fs);
-% % ylabel('$\epsilon_{jj}$','Interpreter','latex','fontsize',fs);
-% % xlabel('$\varepsilon_{\textrm{Li}^{+}\textrm{Li}^{+}}$','fontsize',fs,'interpreter','latex');
-% % ylabel('$\varepsilon_{\textrm{X}^{-}\textrm{X}^{-}}$','fontsize',fs,'interpreter','latex');
-% % xlabel('$r_{0,\textrm{Li}^{+}\textrm{Li}^{+}}$','fontsize',fs,'interpreter','latex');
-% % ylabel('$r_{0,\textrm{X}^{-}\textrm{X}^{-}}$','fontsize',fs,'interpreter','latex');
-% xlabel(ax1,'fontsize',fs,'interpreter','latex');
-% ylabel(ax2,'fontsize',fs,'interpreter','latex');
-% %zlabel(ax3,'fontsize',fs);
-% set(gca, 'ticklabelinterpreter', 'latex','fontsize',fs)
-% %ylim([0.05 0.8])
-% 
-% clear;
 end

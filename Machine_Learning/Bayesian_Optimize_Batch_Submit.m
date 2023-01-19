@@ -748,7 +748,7 @@ switch lower(computer)
         Shared_Settings.Initial_N_Multiplier = 20; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 600;
+        Shared_Settings.Max_Bayesian_Iterations = 800;
         Shared_Settings.Max_Secondary_Iterations = 200;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
@@ -830,7 +830,7 @@ switch lower(computer)
         Shared_Settings.Initial_N_Multiplier = 20; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 600;
+        Shared_Settings.Max_Bayesian_Iterations = 800;
         Shared_Settings.Max_Secondary_Iterations = 200;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;

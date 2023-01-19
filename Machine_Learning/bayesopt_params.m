@@ -87,14 +87,24 @@ function params = bayesopt_params(Settings)
             params = [params,SQ];
         end
     case {'BH' 'BD' 'BE'}
-        if ~isfield(Settings,'InnerRange')
-            Settings.InnerRange = false;
-        end
         SQ = optimizableVariable('SQ',Settings.Q_Range,'Type','real');
         
         if Settings.SigmaEpsilon
-            if Settings.InnerRange % For BH model, inner range is when gamma is [0, 6]
-
+            
+            if strcmp(Halide,'X')
+                % r_0
+                Sr0MM = optimizableVariable('r0_MM',[0 0.15],'Type','real'); % Units: nm
+                Sr0XX = optimizableVariable('r0_XX',[0.03 0.25],'Type','real'); % Units: nm
+                
+                % epsilon
+                SepsilonMM = optimizableVariable('epsilon_MM',[4e2 1e8],'Type','real','Transform','log'); % Units: kJ/mol
+                SepsilonXX = optimizableVariable('epsilon_XX',[4e2 1e6],'Type','real','Transform','log'); % Units: kJ/mol [1 1e6]
+                
+                % gamma
+                SgammaMM = optimizableVariable('gamma_MM',[1 4],'Type','real'); 
+                SgammaXX = optimizableVariable('gamma_XX',[1 4],'Type','real'); 
+                
+            elseif Settings.InnerRange % For BH model, inner range is when gamma is [0, 6]
                 % r_0
                 Sr0MM = optimizableVariable('r0_MM',[0 0.15],'Type','real'); % Units: nm
                 Sr0XX = optimizableVariable('r0_XX',[0 0.25],'Type','real'); % Units: nm
@@ -176,28 +186,41 @@ function params = bayesopt_params(Settings)
     case 'BF'
         SQ = optimizableVariable('SQ',Settings.Q_Range,'Type','real');
         
-        % sigma
-        SsigmaMM = optimizableVariable('sigma_MM',[0.01 0.5],'Type','real'); % Units: nm
-        SsigmaXX = optimizableVariable('sigma_XX',[0.15 1.2],'Type','real'); % Units: nm
-        SsigmaMX = optimizableVariable('sigma_MX',[0.1 0.8],'Type','real'); % Units: nm
-
-        % epsilon
-        SepsilonMM = optimizableVariable('epsilon_MM',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
-        SepsilonXX = optimizableVariable('epsilon_XX',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
-        SepsilonMX = optimizableVariable('epsilon_MX',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
-        
-        if Settings.InnerRange
+        if strcmp(Halide,'X')
+            % sigma
+            SsigmaMM = optimizableVariable('sigma_MM',[0.04 0.5],'Type','real'); % Units: nm
+            SsigmaXX = optimizableVariable('sigma_XX',[0.17 1.2],'Type','real'); % Units: nm
+            
+            % epsilon
+            SepsilonMM = optimizableVariable('epsilon_MM',[1e-3 1000],'Type','real','Transform','log'); % Units: kJ/mol
+            SepsilonXX = optimizableVariable('epsilon_XX',[1e-5 200],'Type','real','Transform','log'); % Units: kJ/mol
+            
             % gamma
-            SgammaMM = optimizableVariable('gamma_MM',[0 10],'Type','real'); % Units: kJ/mol
-            SgammaXX = optimizableVariable('gamma_XX',[0 10],'Type','real'); % Units: kJ/mol
-            SgammaMX = optimizableVariable('gamma_MX',[0 10],'Type','real'); % Units: kJ/mol
+            SgammaMM = optimizableVariable('gamma_MM',[9 22],'Type','real'); % Units: kJ/mol
+            SgammaXX = optimizableVariable('gamma_XX',[9 22],'Type','real'); % Units: kJ/mol
         else
-            % gamma
-            SgammaMM = optimizableVariable('gamma_MM',[8 25],'Type','real'); % Units: kJ/mol
-            SgammaXX = optimizableVariable('gamma_XX',[8 25],'Type','real'); % Units: kJ/mol
-            SgammaMX = optimizableVariable('gamma_MX',[8 25],'Type','real'); % Units: kJ/mol
+            
+            % sigma
+            SsigmaMM = optimizableVariable('sigma_MM',[0.01 0.5],'Type','real'); % Units: nm
+            SsigmaXX = optimizableVariable('sigma_XX',[0.15 1.2],'Type','real'); % Units: nm
+            SsigmaMX = optimizableVariable('sigma_MX',[0.1 0.8],'Type','real'); % Units: nm
+            
+            SepsilonMM = optimizableVariable('epsilon_MM',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
+            SepsilonXX = optimizableVariable('epsilon_XX',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
+            SepsilonMX = optimizableVariable('epsilon_MX',[1e-7 1000],'Type','real','Transform','log'); % Units: kJ/mol
+            
+            if Settings.InnerRange
+                % gamma
+                SgammaMM = optimizableVariable('gamma_MM',[0 10],'Type','real'); % Units: kJ/mol
+                SgammaXX = optimizableVariable('gamma_XX',[0 10],'Type','real'); % Units: kJ/mol
+                SgammaMX = optimizableVariable('gamma_MX',[0 10],'Type','real'); % Units: kJ/mol
+            else
+                % gamma
+                SgammaMM = optimizableVariable('gamma_MM',[8 25],'Type','real'); % Units: kJ/mol
+                SgammaXX = optimizableVariable('gamma_XX',[8 25],'Type','real'); % Units: kJ/mol
+                SgammaMX = optimizableVariable('gamma_MX',[8 25],'Type','real'); % Units: kJ/mol
+            end
         end
-        
         if Settings.Additivity
             switch lower(Settings.Comb_rule)
                 case 'lorentz-berthelot'

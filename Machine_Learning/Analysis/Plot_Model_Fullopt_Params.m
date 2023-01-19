@@ -1,6 +1,6 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-Theory = 'BF';
-ModelID = 'MM';
+Theory = 'BH';
+ModelID = 'MG';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
@@ -222,7 +222,9 @@ for idx = 1:N_Salts
             end
             
             Param = data.full_opt_point;
-            data.Settings = Update_MD_Settings(data.Settings);
+            if ~isfield(data.Settings,'Comb_rule')
+                data.Settings.Comb_rule = 'Lorentz-Berthelot';
+            end
             ParTable = Gen_Param_Table(data.Settings,Param);
             
             for kdx = 1:NPars

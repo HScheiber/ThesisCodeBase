@@ -104,12 +104,8 @@ switch lower(computer)
                 Settings_array(idx).Target_T = 0; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
             end
         end
-        
     case 'narval'
-
     otherwise
-        
-
 end
 
 %% Check for already running jobs
