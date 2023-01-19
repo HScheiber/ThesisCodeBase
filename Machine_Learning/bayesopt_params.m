@@ -235,15 +235,15 @@ function params = bayesopt_params(Settings)
         if ~Settings.Fix_Charge
             params = [params,SQ];
         end
-    case {'JC' 'Mie'}
+    case {'JC' 'Mie' 'LJ'}
         if Settings.SigmaEpsilon
-            SDMM = optimizableVariable('sigma_MM',[0.05 0.46],'Type','real'); % Units: nm
-            SDXX = optimizableVariable('sigma_XX',[0.13 0.55],'Type','real'); % Units: nm
+            SDMM = optimizableVariable('sigma_MM',[0.05 0.5],'Type','real'); % Units: nm
+            SDXX = optimizableVariable('sigma_XX',[0.15 1.2],'Type','real'); % Units: nm
             SDMX = optimizableVariable('sigma_MX',[0 0.6],'Type','real'); % Units: nm
             
-            SRMM = optimizableVariable('epsilon_MM',[0 300],'Type','real'); % Units: kJ/mol
-            SRXX = optimizableVariable('epsilon_XX',[0 50],'Type','real'); % Units: kJ/mol
-            SRMX = optimizableVariable('epsilon_MX',[0 100],'Type','real'); % Units: kJ/mol
+            SRMM = optimizableVariable('epsilon_MM',[1e-5 4.5e2],'Type','real','transform','log'); % Units: kJ/mol
+            SRXX = optimizableVariable('epsilon_XX',[1e-5 1e2],'Type','real','transform','log'); % Units: kJ/mol
+            SRMX = optimizableVariable('epsilon_MX',[1e-5 1e3],'Type','real','transform','log'); % Units: kJ/mol
             
             SDMM2= optimizableVariable('epsilon_MM2',[0 1000],'Type','real'); % Units: kJ/mol
             

@@ -1,9 +1,9 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'MG';
-BestOnly = false;
+Theory = 'JC';
+ModelID = 'PB';
+BestOnly = true;
 SelectOnly = [];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
@@ -21,10 +21,10 @@ bbbuffer = 0.15;
 
 plot_LE = true;
 plot_RLE = true;
-plot_a = false;
+plot_a = true;
 plot_c = false;
 plot_ac = false;
-plot_volume = true;
+plot_volume = false;
 plot_density = false;
 plot_loss = false;
 plot_finite_T_data = true;

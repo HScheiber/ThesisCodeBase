@@ -1,6 +1,6 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-Theory = 'BH';
-ModelID = 'MG';
+Theory = 'JC';
+ModelID = 'LB';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
@@ -126,7 +126,9 @@ for idx = 1:N_Salts
         Param.C_MX = 4*Param.epsilon_MX*(Param.sigma_MX^6);
         Param.C_MM = 4*Param.epsilon_MM*(Param.sigma_MM^6);
         Param.C_XX = 4*Param.epsilon_XX*(Param.sigma_XX^6);
-        
+        for kdx = 1:NPars
+            RefModeData(idx,kdx) = Param.(ParNames{kdx});
+        end
     elseif strcmp(Theory,'Mie')
         [OutputMX,OutputMM,OutputXX] = JC_Potential_Parameters(RefSettings);
         
@@ -149,6 +151,9 @@ for idx = 1:N_Salts
         Param.C_XX = 4*Param.epsilon_XX*(Param.sigma_XX^6);
         
         Param.n_MX = 12;
+        for kdx = 1:NPars
+            RefModeData(idx,kdx) = Param.(ParNames{kdx});
+        end
     else
         [OutputMX,OutputMM,OutputXX] = TF_Potential_Parameters(RefSettings);
         if show_as_C6
@@ -189,9 +194,9 @@ for idx = 1:N_Salts
         if Param.gamma_XX < 6
             Param.epsilon_XX = -Param.epsilon_XX;
         end
-    end
-    for kdx = 1:NPars
-        RefModeData(idx,kdx) = Param.(ParNamesTF{kdx});
+        for kdx = 1:NPars
+            RefModeData(idx,kdx) = Param.(ParNamesTF{kdx});
+        end
     end
     
     for jdx = 1:N_Models

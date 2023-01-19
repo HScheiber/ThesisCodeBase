@@ -1,10 +1,10 @@
 %% Plot result to visualize
 Settings = Initialize_LiX_BO_Settings;
 Settings.Salt = 'LiF';
-Settings.Theory = 'BH';
+Settings.Theory = 'JC';
 Settings.SigmaEpsilon = true;
-Settings.Comb_rule = 'Hogervorst';
-N_chk = 10000;
+Settings.Comb_rule = 'Lorentz-Berthelot'; % Hogervorst % Lorentz-Berthelot
+N_chk = 100000;
 
 Parinfo = bayesopt_params(Settings);
 ParNames = {Parinfo.Name};

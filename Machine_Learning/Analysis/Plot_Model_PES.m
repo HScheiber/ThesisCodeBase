@@ -4,8 +4,8 @@ Settings = Initialize_MD_Settings;
 Settings = Update_MD_Settings(Settings);
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; % 'LiF' 'LiCl' 'LiBr' 'LiI'
 
-Settings.Theory = 'BH';
-ModelID = 'MG';
+Settings.Theory = 'BF';
+ModelID = 'PA';
 PlotTypes = 'full';
 fs = 34; % font size
 lw = 3; % line width
