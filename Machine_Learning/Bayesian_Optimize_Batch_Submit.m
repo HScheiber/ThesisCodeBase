@@ -599,7 +599,7 @@ switch lower(computer)
         Shared_Settings.Polarization = false;
         Shared_Settings.Initialize_From_Model = {};
         
-        %% JC - Thermal properties only: PD
+        %% JC - Thermal properties (favouring rocksalt) only: PD
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'JC'};
         Replicates = 1:5;
@@ -631,6 +631,22 @@ switch lower(computer)
                     Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
                     Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
                     Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+                    
+                    % Add gaps
+                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
+                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
+                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
+                    
+                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
+                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
+                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
+                    
+                    Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
+                    Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
+                    Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
+                    Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
                     
                     Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
                     Settings_Array(idx).Fix_Charge = true;
@@ -744,7 +760,7 @@ switch lower(computer)
         Shared_Settings.Polarization = false;
         Shared_Settings.Initialize_From_Model = {};
         
-        %% BH - Crystal+Thermal properties with point charge + All salt simul. + 'hogervorst' mixing rule: QA
+        %% BF - Crystal+Thermal properties with point charge + All salt simul. + 'hogervorst' mixing rule: QA
         Salts = {'LiX'}; 
         Theories = {'BF'};
         Replicates = 1:5;

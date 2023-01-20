@@ -1,4 +1,3 @@
-
 function Settings = Get_Scaling_Params(Settings,Param)
 
 % Conversion factors
@@ -27,7 +26,6 @@ PotSettings.Salt = Settings.Salt;
 % Potential Scaling
 switch Settings.Theory
 case 'TF'
-
     % Loose form of exp-C6-C8 model
     if Settings.SigmaEpsilon
 
@@ -125,7 +123,6 @@ case 'TF'
             Settings.S.Q = Param.SQ;
         end
     end
-
 case {'BH' 'BD' 'BE'}
 
     % Loose form of exp-C6 model
@@ -138,23 +135,77 @@ case {'BH' 'BD' 'BE'}
         epsilon_MM = Param.epsilon_MM; % kJ/mol
         epsilon_XX = Param.epsilon_XX; % kJ/mol
         
-        gamma_MX = Param.gamma_MX; % Unitless
-        
         if Settings.Additivity
-            r0_MX = (r0_MM + r0_XX)./2; % nm
-            epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
-            gamma_MM = gamma_MX; % Unitless
-            gamma_XX = gamma_MX; % Unitless
+            switch lower(Settings.Comb_rule)
+                case 'lorentz-berthelot'
+                    r0_MX = (r0_MM + r0_XX)./2; % nm
+                    epsilon_MX = sqrt(epsilon_MM.*epsilon_XX); % kJ/mol
+                    gamma_MX = Param.gamma_MX; % Unitless
+                    gamma_MM = gamma_MX; % Unitless
+                    gamma_XX = gamma_MX; % Unitless
+                    epsilon_MM(gamma_MM < 6) = -abs(epsilon_MM(gamma_MM < 6));
+                    epsilon_XX(gamma_XX < 6) = -abs(epsilon_XX(gamma_XX < 6));
+                    epsilon_MX(gamma_MX < 6) = -abs(epsilon_MX(gamma_MX < 6));
+                case 'hogervorst'
+                    gamma_MM = Param.gamma_MM; % Unitless
+                    gamma_XX = Param.gamma_XX; % Unitless
+                    gamma_MX = (gamma_MM + gamma_XX)./2;
+
+                    epsilon_MX = 2.*epsilon_MM.*epsilon_XX./(epsilon_MM + epsilon_XX);
+
+                    epsilon_MM(gamma_MM < 6) = -abs(epsilon_MM(gamma_MM < 6));
+                    epsilon_XX(gamma_XX < 6) = -abs(epsilon_XX(gamma_XX < 6));
+                    epsilon_MX(gamma_MX < 6) = -abs(epsilon_MX(gamma_MX < 6));
+
+                    r0_MX = ( sqrt( ( epsilon_MM.*epsilon_XX.*gamma_MM.*gamma_XX.*(r0_MM.*r0_XX).^6 )...
+                        ./((gamma_MM - 6).*(gamma_XX - 6)) ).*(gamma_MX - 6)./(epsilon_MX.*gamma_MX) ).^(1/6);
+
+                case {'kong' 'gromacs'}
+                    gamma_MM = Param.gamma_MM; % Unitless
+                    gamma_XX = Param.gamma_XX; % Unitless
+
+                    epsilon_MM(gamma_MM < 6) = -abs(epsilon_MM(gamma_MM < 6));
+                    epsilon_XX(gamma_XX < 6) = -abs(epsilon_XX(gamma_XX < 6));
+
+                    k_MM = 1 ./ ( gamma_MM - 6 );
+                    k_XX = 1 ./ ( gamma_XX - 6 );
+
+                    A_MM = 6.*epsilon_MM.*k_MM.*exp(gamma_MM); % prefactor
+                    A_XX = 6.*epsilon_XX.*k_XX.*exp(gamma_XX);
+
+                    B_MM = gamma_MM./r0_MM; % exponent
+                    B_XX = gamma_XX./r0_XX;
+
+                    C_MM = epsilon_MM.*gamma_MM.*k_MM.*(r0_MM.^6); % dispersion
+                    C_XX = epsilon_XX.*gamma_XX.*k_XX.*(r0_XX.^6);
+
+                    switch lower(Settings.Comb_rule)
+                        case 'kong'
+                            A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
+                                            A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
+                            B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
+                            C_MX = sqrt(C_MM.*C_XX);
+                        case 'gromacs'
+                            A_MX = sqrt(A_MM.*A_XX);
+                            B_MX = 2./( (1./B_MM) + (1./B_XX) );
+                            C_MX = sqrt(C_MM.*C_XX);
+                    end
+
+                    % Convert back to gamma/epsilon/r0
+                    gamma_MX   = -7.*lambertw((-1/7).*(6.*C_MX.*(B_MX.^6)./A_MX).^(1./7));
+                    r0_MX      = gamma_MX./B_MX;
+                    epsilon_MX = C_MX.*(gamma_MX - 6)./(gamma_MX.*(r0_MX.^6));
+                    epsilon_MX(gamma_MX < 6) = -abs(epsilon_MX(gamma_MX < 6));
+            end
         else
             r0_MX = Param.r0_MX; % nm
             epsilon_MX = Param.epsilon_MX; % kJ/mol
             gamma_MM = Param.gamma_MM; % Unitless
             gamma_XX = Param.gamma_XX; % Unitless
+            epsilon_MX(gamma_MX < 6) = -epsilon_MX(gamma_MX < 6);
+            epsilon_MM(gamma_MM < 6) = -epsilon_MM(gamma_MM < 6);
+            epsilon_XX(gamma_XX < 6) = -epsilon_XX(gamma_XX < 6);
         end
-        
-        epsilon_MX(gamma_MX < 6) = -epsilon_MX(gamma_MX < 6);
-        epsilon_MM(gamma_MM < 6) = -epsilon_MM(gamma_MM < 6);
-        epsilon_XX(gamma_XX < 6) = -epsilon_XX(gamma_XX < 6);
         
         % Outputs
         Settings.S.S.MM = r0_MM;
@@ -211,7 +262,6 @@ case {'BH' 'BD' 'BE'}
             Settings.S.Q = Param.SQ;
         end
     end
-
 case 'JC' % JC models
 
     % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
@@ -360,7 +410,6 @@ case 'LJ'
     else
         Settings.S.Q = Param.SQ;
     end
-    
 case 'BF'
     % Input parameters
     Settings.S.S.MM = Param.sigma_MM; % nm
@@ -368,19 +417,39 @@ case 'BF'
     
     Settings.S.E.MM = Param.epsilon_MM; % kJ/mol
     Settings.S.E.XX = Param.epsilon_XX; % kJ/mol
-    
-    Settings.S.G.MX = Param.gamma_MX; % Unitless
-    
-    if Settings.Additivity
-        Settings.S.S.MX = (Settings.S.S.MM + Settings.S.S.XX)./2; % nm
-        Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX); % kJ/mol
-        Settings.S.G.MM = Settings.S.G.MX; % Unitless
-        Settings.S.G.XX = Settings.S.G.MX; % Unitless
+        
+    if Settings.Additivity       
+        switch lower(Settings.Comb_rule)
+            case 'lorentz-berthelot'
+                Settings.S.G.MX = Param.gamma_MX; % Unitless
+                Settings.S.S.MX = (Settings.S.S.MM + Settings.S.S.XX)./2; % nm
+                Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX); % kJ/mol
+                Settings.S.G.MM = Settings.S.G.MX; % Unitless
+                Settings.S.G.XX = Settings.S.G.MX; % Unitless
+            case 'hogervorst'
+                Settings.S.G.MM = Param.gamma_MM; % Unitless
+                Settings.S.G.XX = Param.gamma_XX; % Unitless
+                Settings.S.G.MX = (Settings.S.G.MM + Settings.S.G.XX)./2;
+
+                Settings.S.E.MX = 2.*Settings.S.E.MM.*Settings.S.E.XX./(Settings.S.E.MM + Settings.S.E.XX);
+
+                Settings.S.S.MX = ( sqrt( ( Settings.S.E.MM.*Settings.S.E.XX.*Settings.S.G.MM.*Settings.S.G.XX.*(Settings.S.S.MM.*Settings.S.S.XX).^6 )...
+                    ./((Settings.S.G.MM - 6).*(Settings.S.G.XX - 6)) ).*(Settings.S.G.MX - 6)./(Settings.S.E.MX.*Settings.S.G.MX) ).^(1/6);
+            case 'gromacs'
+                Settings.S.G.MM = Param.gamma_MM; % Unitless
+                Settings.S.G.XX = Param.gamma_XX; % Unitless
+                Settings.S.G.MX = sqrt(Settings.S.G.MM.*Settings.S.G.XX);
+
+                Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX);
+                Settings.S.S.MX = sqrt(Settings.S.S.MM.*Settings.S.S.XX);
+        end
+        
     else
         Settings.S.S.MX = Param.sigma_MX; % nm
         Settings.S.E.MX = Param.epsilon_MX; % kJ/mol
         Settings.S.G.MM = Param.gamma_MM; % Unitless
         Settings.S.G.XX = Param.gamma_XX; % Unitless
+        Settings.S.G.MX = Param.gamma_MX;
     end
     
     % Scaling Coulombic Charge
