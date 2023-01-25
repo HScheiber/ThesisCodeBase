@@ -249,7 +249,7 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
                             epsilon_XX = -epsilon_XX;
                         end
 
-                    case 'hogervorst'
+                    case {'hogervorst' 'hogervorst-wbk'}
                         gamma_MM = Param.gamma_MM; % Unitless
                         gamma_XX = Param.gamma_XX; % Unitless
                         gamma_MX = (gamma_MM + gamma_XX)/2;
@@ -339,7 +339,10 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
             if abs(imag(epsilon_MX)) > sqrt(eps)
                 epsilon_MX = nan;
             end
-
+            r0_MX = real(r0_MX);
+            gamma_MX = real(gamma_MX);
+            epsilon_MX = real(epsilon_MX);
+            
             % Outputs
             Settings.S.S.MM = r0_MM;
             Settings.S.S.XX = r0_XX;
@@ -411,22 +414,56 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
                         epsilon_MX = sqrt(epsilon_MM*epsilon_XX); % kJ/mol
                         gamma_MM = gamma_MX; % Unitless
                         gamma_XX = gamma_MX; % Unitless
+                        
                     case 'hogervorst'
                         gamma_MM = Param.gamma_MM; % Unitless
                         gamma_XX = Param.gamma_XX; % Unitless
                         gamma_MX = (gamma_MM + gamma_XX)/2;
-
+                        
                         epsilon_MX = 2*epsilon_MM*epsilon_XX/(epsilon_MM + epsilon_XX);
-
+                        
                         sigma_MX = ( sqrt( ( epsilon_MM*epsilon_XX*gamma_MM*gamma_XX*(sigma_MM*sigma_XX)^6 )...
                             /((gamma_MM - 6)*(gamma_XX - 6)) )*(gamma_MX - 6)/(epsilon_MX*gamma_MX) )^(1/6);
-                    case 'gromacs'
+                        
+                    case 'hogervorst-wbk'
                         gamma_MM = Param.gamma_MM; % Unitless
                         gamma_XX = Param.gamma_XX; % Unitless
-                        gamma_MX = sqrt(gamma_MM.*gamma_XX);
+                        gamma_MX = (gamma_MM + gamma_XX)/2;
+                        
+                        epsilon_MX = 2*epsilon_MM*epsilon_XX/(epsilon_MM + epsilon_XX);
+                        
+                        sigma_MX = ( sqrt( ( epsilon_MM.*epsilon_XX.*(gamma_MM + 3).*(gamma_XX + 3).*(sigma_MM.*sigma_XX).^6 )...
+                            ./(gamma_MM.*gamma_XX) ).*gamma_MX./(epsilon_MX.*(gamma_MX + 3)) ).^(1/6);
+                    case {'kong' 'gromacs'}
+                        gamma_MM = Param.gamma_MM; % Unitless
+                        gamma_XX = Param.gamma_XX; % Unitless
+                        
+                        % Define approximate tight form constants (valid as r->0)
+                        A_MM = 6.*epsilon_MM.*exp(gamma_MM)/gamma_MM; % prefactor
+                        A_XX = 6.*epsilon_XX.*exp(gamma_XX)/gamma_XX;
+                        
+                        B_MM = gamma_MM./sigma_MM; % exponent
+                        B_XX = gamma_XX./sigma_XX;
+                        
+                        C_MM = 2.*epsilon_MM.*(gamma_MM + 3)./gamma_MM; % dispersion
+                        C_XX = 2.*epsilon_XX.*(gamma_XX + 3)./gamma_XX;
 
-                        epsilon_MX = sqrt(epsilon_MM.*epsilon_XX);
-                        sigma_MX = sqrt(sigma_MM.*sigma_XX);
+                        switch lower(Settings.Comb_rule)
+                            case 'kong'
+                                A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
+                                                A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
+                                B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
+                                C_MX = sqrt(C_MM.*C_XX);
+                            case 'gromacs'
+                                A_MX = sqrt(A_MM*A_XX);
+                                B_MX = 2/( (1/B_MM) + (1/B_XX) );
+                                C_MX = sqrt(C_MM*C_XX);
+                        end
+
+                        % Convert back to gamma/epsilon/r0
+                        gamma_MX = -lambertw(-1,-3*C_MX/(A_MX*exp(3))) - 3;
+                        sigma_MX = gamma_MX/B_MX;
+                        epsilon_MX = A_MX*gamma_MX*exp(-gamma_MX)/6; % = gamma_MX*C_MX/(2*(gamma_MX + 3));
                 end
         else
             sigma_MX = Param.sigma_MX; % nm
@@ -435,7 +472,21 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
             gamma_XX = Param.gamma_XX; % Unitless
             gamma_MX = Param.gamma_MX; % Unitless
         end
-
+        
+        % Remove any complex numbers
+        if abs(imag(sigma_MX)) > sqrt(eps)
+            sigma_MX = nan;
+        end
+        if abs(imag(gamma_MX)) > sqrt(eps)
+            gamma_MX = nan;
+        end
+        if abs(imag(epsilon_MX)) > sqrt(eps)
+        	epsilon_MX = nan;
+        end
+        sigma_MX = real(sigma_MX);
+        gamma_MX = real(gamma_MX);
+        epsilon_MX = real(epsilon_MX);
+        
         % Outputs
         Settings.S.S.MM = sigma_MM;
         Settings.S.S.XX = sigma_XX;

@@ -114,7 +114,7 @@ case {'BH' 'BD' 'BE'} % Buckingham model
                         Output.epsilon_XX = -Output.epsilon_XX;
                     end
                     
-                case 'hogervorst'
+                case {'hogervorst' 'hogervorst-wbk'}
                     Output.gamma_MX = (Output.gamma_MM + Output.gamma_XX)/2;
                     
                     Output.epsilon_MX = 2*Output.epsilon_MM.*Output.epsilon_XX/(Output.epsilon_MM + Output.epsilon_XX);
@@ -228,10 +228,40 @@ case 'BF' % Wang-Buckingham model
                     
                     Output.sigma_MX = ( sqrt( ( Output.epsilon_MM*Output.epsilon_XX*Output.gamma_MM*Output.gamma_XX*(Output.sigma_MM*Output.sigma_XX)^6 )...
                         /((Output.gamma_MM - 6)*(Output.gamma_XX - 6)) )*(Output.gamma_MX - 6)/(Output.epsilon_MX.*Output.gamma_MX) )^(1/6);
-                case 'gromacs'
-                    Output.gamma_MX = sqrt(Output.gamma_MM*Output.gamma_XX);
-                    Output.epsilon_MX = sqrt(Output.epsilon_MM*Output.epsilon_XX);
-                    Output.sigma_MX = sqrt(Output.sigma_MM*Output.sigma_XX);
+                case 'hogervorst-wbk'
+                    Output.gamma_MX = (Output.gamma_MM + Output.gamma_XX)/2;
+                    Output.epsilon_MX = 2*Output.epsilon_MM*Output.epsilon_XX/(Output.epsilon_MM + Output.epsilon_XX);
+
+                    Output.sigma_MX = ( sqrt( ( Output.epsilon_MM.*Output.epsilon_XX.*(Output.gamma_MM + 3).*(Output.gamma_XX + 3).*(Output.sigma_MM.*Output.sigma_XX).^6 )...
+                        ./(Output.gamma_MM.*Output.gamma_XX) ).*Output.gamma_MX./(Output.epsilon_MX.*(Output.gamma_MX + 3)) ).^(1/6);
+                case {'kong' 'gromacs'}
+                    
+                    % Define approximate tight form constants (valid as r->0)
+                    B_MM = 6.*Output.epsilon_MM.*exp(Output.gamma_MM)/Output.gamma_MM; % prefactor
+                    B_XX = 6.*Output.epsilon_XX.*exp(Output.gamma_XX)/Output.gamma_XX;
+
+                    alpha_MM = Output.gamma_MM./Output.sigma_MM; % exponent
+                    alpha_XX = Output.gamma_XX./Output.sigma_XX;
+
+                    C_MM = 2.*Output.epsilon_MM.*(Output.gamma_MM + 3)./Output.gamma_MM; % dispersion
+                    C_XX = 2.*Output.epsilon_XX.*(Output.gamma_XX + 3)./Output.gamma_XX;
+
+                    switch lower(Settings.Comb_rule)
+                        case 'kong'
+                            B_MX = (1/2).*( B_MM.*(B_MM.*alpha_MM./(B_XX.*alpha_XX)).^(-alpha_MM./(alpha_MM + alpha_XX)) + ...
+                                            B_XX.*(B_XX.*alpha_XX./(B_MM.*alpha_MM)).^(-alpha_XX./(alpha_MM + alpha_XX)) );
+                            alpha_MX = 2.*alpha_MM.*alpha_XX./(alpha_MM + alpha_XX);
+                            C_MX = sqrt(C_MM.*C_XX);
+                        case 'gromacs'
+                            B_MX = sqrt(B_MM*B_XX);
+                            alpha_MX = 2/( (1/alpha_MM) + (1/alpha_XX) );
+                            C_MX = sqrt(C_MM*C_XX);
+                    end
+
+                    % Convert back to gamma/epsilon/r0
+                    Output.gamma_MX = -lambertw(-1,-3*C_MX/(B_MX*exp(3))) - 3;
+                    Output.sigma_MX = Output.gamma_MX/alpha_MX;
+                    Output.epsilon_MX = B_MX*Output.gamma_MX*exp(-Output.gamma_MX)/6; % = gamma_MX*C_MX/(2*(gamma_MX + 3));
             end
         end
 

@@ -139,7 +139,7 @@ function params = bayesopt_params(Settings)
                 switch lower(Settings.Comb_rule)
                     case 'lorentz-berthelot'
                         params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
-                    case {'kong' 'hogervorst' 'gromacs'}
+                    case {'kong' 'hogervorst'  'hogervorst-wbk' 'gromacs'}
                         params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMM,SgammaXX];
                 end
             else
@@ -199,7 +199,6 @@ function params = bayesopt_params(Settings)
             SgammaMM = optimizableVariable('gamma_MM',[9 22],'Type','real'); % Units: kJ/mol
             SgammaXX = optimizableVariable('gamma_XX',[9 22],'Type','real'); % Units: kJ/mol
         else
-            
             % sigma
             SsigmaMM = optimizableVariable('sigma_MM',[0.01 0.5],'Type','real'); % Units: nm
             SsigmaXX = optimizableVariable('sigma_XX',[0.15 1.2],'Type','real'); % Units: nm
@@ -225,7 +224,7 @@ function params = bayesopt_params(Settings)
             switch lower(Settings.Comb_rule)
                 case 'lorentz-berthelot'
                     params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMX];
-                case {'kong' 'hogervorst' 'gromacs'}
+                case {'kong' 'hogervorst' 'hogervorst-wbk' 'gromacs'}
                     params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMM,SgammaXX];
             end
         else

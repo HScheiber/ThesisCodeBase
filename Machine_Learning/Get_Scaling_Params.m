@@ -146,7 +146,7 @@ case {'BH' 'BD' 'BE'}
                     epsilon_MM(gamma_MM < 6) = -abs(epsilon_MM(gamma_MM < 6));
                     epsilon_XX(gamma_XX < 6) = -abs(epsilon_XX(gamma_XX < 6));
                     epsilon_MX(gamma_MX < 6) = -abs(epsilon_MX(gamma_MX < 6));
-                case 'hogervorst'
+                case {'hogervorst' 'hogervorst-wbk'}
                     gamma_MM = Param.gamma_MM; % Unitless
                     gamma_XX = Param.gamma_XX; % Unitless
                     gamma_MX = (gamma_MM + gamma_XX)./2;
@@ -202,6 +202,7 @@ case {'BH' 'BD' 'BE'}
             epsilon_MX = Param.epsilon_MX; % kJ/mol
             gamma_MM = Param.gamma_MM; % Unitless
             gamma_XX = Param.gamma_XX; % Unitless
+            gamma_MX = Param.gamma_MX;
             epsilon_MX(gamma_MX < 6) = -epsilon_MX(gamma_MX < 6);
             epsilon_MM(gamma_MM < 6) = -epsilon_MM(gamma_MM < 6);
             epsilon_XX(gamma_XX < 6) = -epsilon_XX(gamma_XX < 6);
@@ -430,18 +431,50 @@ case 'BF'
                 Settings.S.G.MM = Param.gamma_MM; % Unitless
                 Settings.S.G.XX = Param.gamma_XX; % Unitless
                 Settings.S.G.MX = (Settings.S.G.MM + Settings.S.G.XX)./2;
-
+                
                 Settings.S.E.MX = 2.*Settings.S.E.MM.*Settings.S.E.XX./(Settings.S.E.MM + Settings.S.E.XX);
-
+                
                 Settings.S.S.MX = ( sqrt( ( Settings.S.E.MM.*Settings.S.E.XX.*Settings.S.G.MM.*Settings.S.G.XX.*(Settings.S.S.MM.*Settings.S.S.XX).^6 )...
                     ./((Settings.S.G.MM - 6).*(Settings.S.G.XX - 6)) ).*(Settings.S.G.MX - 6)./(Settings.S.E.MX.*Settings.S.G.MX) ).^(1/6);
-            case 'gromacs'
+            case 'hogervorst-wbk'
                 Settings.S.G.MM = Param.gamma_MM; % Unitless
                 Settings.S.G.XX = Param.gamma_XX; % Unitless
-                Settings.S.G.MX = sqrt(Settings.S.G.MM.*Settings.S.G.XX);
+                Settings.S.G.MX = (Settings.S.G.MM + Settings.S.G.XX)/2;
+                
+                Settings.S.E.MX = 2*Settings.S.E.MM*Settings.S.E.XX/(Settings.S.E.MM + Settings.S.E.XX);
+                
+                Settings.S.S.MX = ( sqrt( ( Settings.S.E.MM.*Settings.S.E.XX.*(Settings.S.G.MM + 3).*(Settings.S.G.XX + 3).*(sigma_MM.*sigma_XX).^6 )...
+                    ./(Settings.S.G.MM.*Settings.S.G.XX) ).*Settings.S.G.MX./(Settings.S.E.MX.*(Settings.S.G.MX + 3)) ).^(1/6);
+            case {'kong' 'gromacs'}
+                Settings.S.G.MM = Param.gamma_MM; % Unitless
+                Settings.S.G.XX = Param.gamma_XX; % Unitless
 
-                Settings.S.E.MX = sqrt(Settings.S.E.MM.*Settings.S.E.XX);
-                Settings.S.S.MX = sqrt(Settings.S.S.MM.*Settings.S.S.XX);
+                % Define approximate tight form constants (valid as r->0)
+                A_MM = 6.*Settings.S.E.MM.*exp(Settings.S.G.MM)/Settings.S.G.MM; % prefactor
+                A_XX = 6.*Settings.S.E.XX.*exp(Settings.S.G.XX)/Settings.S.G.XX;
+
+                B_MM = Settings.S.G.MM./sigma_MM; % exponent
+                B_XX = Settings.S.G.XX./sigma_XX;
+
+                C_MM = 2.*Settings.S.E.MM.*(Settings.S.G.MM + 3)./Settings.S.G.MM; % dispersion
+                C_XX = 2.*Settings.S.E.XX.*(Settings.S.G.XX + 3)./Settings.S.G.XX;
+
+                switch lower(Settings.Comb_rule)
+                    case 'kong'
+                        A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
+                                        A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
+                        B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
+                        C_MX = sqrt(C_MM.*C_XX);
+                    case 'gromacs'
+                        A_MX = sqrt(A_MM*A_XX);
+                        B_MX = 2/( (1/B_MM) + (1/B_XX) );
+                        C_MX = sqrt(C_MM*C_XX);
+                end
+
+                % Convert back to gamma/epsilon/r0
+                Settings.S.G.MX = -lambertw(-1,-3*C_MX/(A_MX*exp(3))) - 3;
+                Settings.S.S.MX = Settings.S.G.MX/B_MX;
+                Settings.S.E.MX = A_MX*Settings.S.G.MX*exp(-Settings.S.G.MX)/6;
         end
         
     else

@@ -163,9 +163,9 @@ Settings.Polarization = false;
 %% Test Model Particular parameter
 Settings.ShowPlots = false;
 Settings.GPActiveSetSize = 1000; % Also applies to final optimization
-Settings.Salt = 'LiF';
-Settings.Theory = 'JC';
-Settings.InnerRange = true;
+Settings.Salt = 'LiI';
+Settings.Theory = 'BF';
+Settings.InnerRange = false;
 Settings.Trial_ID = 'QX1';
 Settings.UseCoupledConstraint = false;
 Settings.Initialize_From_Model = {};
@@ -203,7 +203,7 @@ Settings.Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
 % Other loss options options
 Settings.Fix_Charge = true;
 Settings.Additivity = true;
-Settings.Comb_rule = 'Lorentz-Berthelot'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst', 'GROMACS'. Only applies to BH and BF models
+Settings.Comb_rule = 'Kong'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst[-wbk]', 'GROMACS'. Only applies to BH and BF models
 
 % Auto structure selection
 Settings.Structures = Auto_Structure_Selection(Settings);
