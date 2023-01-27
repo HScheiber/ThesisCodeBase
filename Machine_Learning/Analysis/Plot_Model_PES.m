@@ -4,7 +4,7 @@ Settings = Initialize_MD_Settings;
 Settings = Update_MD_Settings(Settings);
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; % 'LiF' 'LiCl' 'LiBr' 'LiI'
 
-Settings.Theory = 'BF';
+Settings.Theory = 'BH';
 ModelID = 'PA';
 PlotTypes = 'full';
 fs = 34; % font size
@@ -29,7 +29,11 @@ for pts = 1:numel(plts)
 
         % Find reps of models
         if length(ModelID) > 2
-            Models = [{''} ModelID];
+            if strcmp(Settings.Theory,'BH') || strcmp(Settings.Theory,'TF') || strcmp(Settings.Theory,'BF')
+            	Models = [{''} ModelID];
+            else
+            	Models = ModelID;
+            end
         else
             files = {dir(fullfile(ML_results_dir,Settings.Salt,['*' ModelID '*'])).name};
             Models = unique(regexp(files,[ModelID '([0-9]|[a-z])+'],'match','once'));
@@ -39,16 +43,17 @@ for pts = 1:numel(plts)
                 [~,idx] = sort(cellfun(@str2double,regexp(Models,'[0-9]+','match','once')));
                 Models = Models(idx);
             end
-            Models = [{''} Models];
+            if strcmp(Settings.Theory,'BH') || strcmp(Settings.Theory,'TF') || strcmp(Settings.Theory,'BF')
+            	Models = [{''} Models];
+            end
         end
-
+        Model_Names = Models;
         N_Models = length(Models);
         % Col_MX = [0.2 0.2 0.2; cbrewer('seq','Blues',(N_Models-1)/2); cbrewer('seq','Reds',(N_Models-1)/2) ];
         %Col_MX = [0.5 0.5 0.5; cbrewer('qual','Pastel2',N_Models)];
         Col_MX = [0 0 0; cbrewer('qual','Set1',N_Models,'spline')];
         Col_MX = max(min(Col_MX,1),0);
-
-
+        
         %% Other parameters
         Settings.WaterModel = 'SPC/E';
         Settings.Table_Length = 3; % nm
@@ -77,8 +82,15 @@ for pts = 1:numel(plts)
                 h_MX(idx) = [];
                 continue
             end
-
-            if isempty(Models{idx}) && strcmp(Settings.Theory,'BH')
+            if isempty(Models{idx})
+                Model_Names{idx} = Settings.Theory;
+            end
+            
+            if isempty(Models{idx}) && (strcmp(Settings.Theory,'BH') || strcmp(Settings.Theory,'BF'))
+                Model_Names{idx} = 'TF';
+                potset = Initialize_MD_Settings;
+                [~,~,~,Settings.S] = TF_Potential_Parameters(potset);
+                Settings.SigmaEpsilon = false;
                 U = TF_Potential_Generator(Settings,...
                     'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'JC')
@@ -99,6 +111,9 @@ for pts = 1:numel(plts)
                     'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'BE')
                 U = BE_Potential_Generator(Settings,...
+                    'Startpoint',Startpoint);
+            elseif strcmp(Settings.Theory,'BF')
+                U = BF_Potential_Generator(Settings,...
                     'Startpoint',Startpoint);
             elseif strcmp(Settings.Theory,'Mie')
                 U = Mie_Potential_Generator(Settings,...
@@ -175,17 +190,19 @@ for pts = 1:numel(plts)
         grid(ax,'on')
         grid(ax,'minor')
         xticks(ax,0:1:6);
-        if pts == 1
+        if pts == 1 && (sidx == 1 || sidx == 2)
             title(ax,Settings.Salt,'Interpreter','latex','fontsize',fs)
             xticklabels(ax,[])
             %xlabel(ax,'Separation [\AA]','fontsize',fs,'Interpreter','latex');
+        elseif pts == 1 && (sidx == 3 || sidx == 4)
+            title(ax,Settings.Salt,'Interpreter','latex','fontsize',fs)
         end
         ylim(ax,yl);
         
-        if pts == 1 && sidx == 1
+        if pts == 1 && (sidx == 1 || sidx == 3)
             yticks(ax,yt)
             ylabel(ax,'$u_{ij}^{\textrm{LJ}}$ [kJ mol$^{-1}$]','fontsize',fs,'Interpreter','latex');
-        elseif pts == 2 && sidx == 1
+        elseif pts == 2 && (sidx == 1 || sidx == 3)
             yticks(ax,yt)
             ylabel(ax,'$u_{ij}^{\textrm{CLJ}}$ [kJ mol$^{-1}$]','fontsize',fs,'Interpreter','latex');
         else
@@ -222,13 +239,13 @@ if savefile
     exportgraphics(figh,filename,'resolution',600)
     
 else
-    title(T,['Plot of ' ttxt ' for ' Settings.Theory ' Models'],...
+    title(T,['Plot of ' ttxt ' for ' Settings.Theory ' Models ' ModelID],...
        'Interpreter','latex','fontsize',fs)
     
-    Model_Labels = [{[Metal '$^{+}$' Halide '$^{-}$']}  ...
-        {[Metal '$^{+}$' Metal '$^{+}$']} ...
-        {[Halide '$^{-}$' Halide '$^{-}$']}];
-    legh = legend(ax,h_MX(2:end),Models{2:end},'Interpreter','latex',...
+    Model_Labels = [{[Model_Names{1} ': ' Halide '$^{-}$' Halide '$^{-}$']}  ...
+        {[Model_Names{1} ': ' Metal '$^{+}$' Metal '$^{+}$']} ...
+        {[Model_Names{1} ': ' Metal '$^{+}$' Halide '$^{-}$']}];
+    legh = legend(ax,[h_MX(2:end); h_MM(1); h_XX(1); h_MX(1)],[Model_Names{2:end} Model_Labels],'Interpreter','latex',...
         'NumColumns',1,'Location','EastOutside');
     legend('boxoff')
     

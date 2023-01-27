@@ -1,6 +1,6 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
-Theory = 'JC';
-ModelID = 'LB';
+Theory = 'BH';
+ModelID = 'PA';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
@@ -9,7 +9,7 @@ markers = {'o' 's' '^' 'v' 'd' '>' '<' 'p' 'h' 'x'};
 show_as_C6 = false; % When true, plot parameters as B/C6/C8 than the sigma/epsilon parameter value itself
 include_loss_panel = false;
 loss_panel_height = 0.3;
-plot_ref_model = false;
+plot_ref_model = true;
 savefile = true; % switch to save the final plots to file
 
 %% Find model in results
@@ -38,43 +38,75 @@ if ~isempty(Models)
     Models = Models(idx);
 end
 
+
+% Find info on model class
+data_found = false;
+for idx = 1:N_Salts
+    for jdx = 1:N_Models
+        dat_file = fullfile(ML_results_dir,Salts{idx},[Salts{idx} '_' Theory '_Model_' Models{jdx} '_data.mat']);
+        if ~isfile(dat_file)
+            continue
+        else
+            % Load data
+            try
+                data = load(dat_file).full_data;
+                Settings = data.Settings;
+                params = data.bayesopt_results.VariableDescriptions;
+                data_found = true;
+                break
+            catch
+                continue
+            end
+        end
+    end
+    if data_found
+        break
+    end
+end
+if ~data_found
+    error(['Unable to model data for ' Theory ' Model ' ModelID])
+end
+if ~isfield(Settings,'Comb_rule')
+    Settings.Comb_rule = 'Lorentz-Berthelot';
+end
+
 %% Pre-allocate data arrays
 switch Theory
     case 'BH'
         if show_as_C6
             ParNames = {'C_MX' 'C_MM' 'C_XX' 'B_MX' 'B_MM' 'B_XX' 'alpha_MX' 'alpha_MM' 'alpha_XX'};
             NPars = 9;
-            NY = 2;
-            NX = 5;
         else
-            ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX'};
-            NPars = 7;
-            NY = 2;
-            NX = 4;
+            switch lower(Settings.Comb_rule)
+                case 'lorentz-berthelot'
+                    ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX'};
+                    NPars = 7;
+                otherwise
+                    ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX' 'gamma_MM' 'gamma_XX'};
+                    NPars = 9;
+            end
         end
     case 'BF'
         if show_as_C6
             ParNames = {'C_MX' 'C_MM' 'C_XX' 'B_MX' 'B_MM' 'B_XX' 'alpha_MX' 'alpha_MM' 'alpha_XX'};
             NPars = 9;
-            NY = 2;
-            NX = 5;
         else
-            ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'sigma_MX' 'sigma_MM' 'sigma_XX' 'gamma_MX'};
-            NPars = 7;
-            NY = 2;
-            NX = 4;
+            switch lower(Settings.Comb_rule)
+                case 'lorentz-berthelot'
+                    ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'sigma_MX' 'sigma_MM' 'sigma_XX' 'gamma_MX'};
+                    NPars = 7;
+                otherwise
+                    ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'sigma_MX' 'sigma_MM' 'sigma_XX' 'gamma_MX' 'gamma_MM' 'gamma_XX'};
+                    NPars = 9;
+            end
         end
     case 'JC'
         if show_as_C6
             ParNames = {'C_MX' 'C_MM' 'C_XX' 'B_MX' 'B_MM' 'B_XX'};
             NPars = 6;
-            NY = 2;
-            NX = 3;
         else
             ParNames = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'sigma_MX' 'sigma_MM' 'sigma_XX'};
             NPars = 6;
-            NY = 2;
-            NX = 3;
         end
         
     case 'Mie'
@@ -154,12 +186,19 @@ for idx = 1:N_Salts
         for kdx = 1:NPars
             RefModeData(idx,kdx) = Param.(ParNames{kdx});
         end
+%     elseif strcmp(Theory,'BF')
+%         
     else
         [OutputMX,OutputMM,OutputXX] = TF_Potential_Parameters(RefSettings);
         if show_as_C6
             ParNamesTF = ParNames;
         else
-            ParNamesTF = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX'};
+            switch lower(Settings.Comb_rule)
+                case 'lorentz-berthelot'
+                    ParNamesTF = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX'};
+                otherwise
+                    ParNamesTF = {'epsilon_MX' 'epsilon_MM' 'epsilon_XX' 'r0_MX' 'r0_MM' 'r0_XX' 'gamma_MX' 'gamma_MM' 'gamma_XX'};
+            end
         end
         Param.C_MX = OutputMX.C;
         Param.C_MM = OutputMM.C;
@@ -230,7 +269,7 @@ for idx = 1:N_Salts
             if ~isfield(data.Settings,'Comb_rule')
                 data.Settings.Comb_rule = 'Lorentz-Berthelot';
             end
-            ParTable = Gen_Param_Table(data.Settings,Param);
+            ParTable = Gen_Param_Table(data.Settings,Param,false);
             
             for kdx = 1:NPars
                 Param_PlotData(idx,jdx,kdx) = ParTable.(ParNames{kdx});
@@ -324,6 +363,7 @@ par_panel = uipanel(figh,'FontSize',fs,...
 T = tiledlayout(par_panel,'flow', 'Padding', 'loose', 'TileSpacing', 'loose'); 
 axh = gobjects(1,NPars);
 xx = 1:N_Salts;
+parsnn = {params.Name};
 for idx = 1:NPars
     axh(idx) = nexttile(T);
     hold(axh(idx),'on');
@@ -343,19 +383,45 @@ for idx = 1:NPars
             'linewidth',3,'marker','x');
     end
     
+    [name,units,logscale] = param_name_map(ParNames{idx});
+    if logscale
+        set(axh(idx),'YScale','log')
+    end
     xlim(axh(idx),[0.5 N_Salts + 0.5])
-    ylim(axh(idx),'padded')
+    if any(contains(parsnn,ParNames{idx}))
+        paridx = contains(parsnn,ParNames{idx});
+        ylim(axh(idx),params(paridx).Range)
+        
+        if logscale
+            space = ceil(log10(params(paridx).Range(2))) - floor(log10(params(paridx).Range(1)));
+            yllog = floor(log10(params(paridx).Range(1))):round(space/4):ceil(log10(params(paridx).Range(2)));
+            yticks(axh(idx),10.^(yllog))
+        else
+            space = round(params(paridx).Range(2) - params(paridx).Range(1),1,"significant");
+            yl = round(params(paridx).Range(1),1,"significant"):space/4:round(params(paridx).Range(2),2,"significant");
+            yticks(axh(idx),yl)
+        end
+        
+    else
+        ylim(axh(idx),'padded')
+        yrange = ylim(axh(idx));
+        if logscale
+            space = ceil(log10(yrange(2))) - floor(log10(yrange(1)));
+            yllog = floor(log10(yrange(1))):round(space/4):ceil(log10(yrange(2)));
+            yticks(axh(idx),10.^(yllog))
+        else
+            space = round(yrange(2) - yrange(1),1,"significant");
+            yl = round(yrange(1),1,"significant"):space/4:round(yrange(2),2,'significant');
+            yticks(axh(idx),yl)
+        end
+    end
     xticks(axh(idx),[])
     
-    [name,units,logscale] = param_name_map(ParNames{idx});
     ylabel(axh(idx),units,'interpreter','latex','fontsize',fs);
     xlabel(axh(idx),name,'interpreter','latex','fontsize',fs);
     set(axh(idx),'box','on','TickLabelInterpreter','latex',...
         'XMinorGrid','off','YMinorGrid','on','YGrid','on',...
         'FontSize',fs)
-    if logscale
-        set(axh(idx),'YScale','log')
-    end
 end
 
 
@@ -449,6 +515,12 @@ function [name,units,logscale] = param_name_map(p_name)
             units = '[nm]';
         case 'gamma_MX'
             name = '$\gamma_{\textrm{Li}^{+}\textrm{X}^{-}}$';
+            units = '';
+        case 'gamma_MM'
+            name = '$\gamma_{\textrm{Li}^{+}\textrm{Li}^{+}}$';
+            units = '';
+        case 'gamma_XX'
+            name = '$\gamma_{\textrm{X}^{-}\textrm{X}^{-}}$';
             units = '';
         otherwise
             name = p_name;

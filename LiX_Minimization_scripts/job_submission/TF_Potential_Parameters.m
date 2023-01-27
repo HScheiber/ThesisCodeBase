@@ -1,3 +1,4 @@
+
 % Output units: energies are kJ/mol and distances are nm
 function [OutputMX,OutputMM,OutputXX,S] = TF_Potential_Parameters(Settings,varargin)
 

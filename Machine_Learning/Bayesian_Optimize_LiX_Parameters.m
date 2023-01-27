@@ -516,6 +516,13 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
             results = BayesoptResults;
         end
         
+        % Final GP fit - May take a while if FinalGPFitActiveSetSize is too large
+        if Settings.FinalGPFitActiveSetSize > Settings.GPActiveSetSize && ...
+                 results.NumObjectiveEvaluations > Settings.GPActiveSetSize
+            results = resume(results,'MaxObjectiveEvaluations',0,...
+                'GPActiveSetSize',Settings.FinalGPFitActiveSetSize);
+        end
+        
         % overwrite results
         save(Results_filename,'results')
         fclose(fopen('secondary_completed', 'w'));

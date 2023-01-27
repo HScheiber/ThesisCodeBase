@@ -1,11 +1,17 @@
 % This function assumes sigma-epsilon form
-function Output = Gen_Param_Table(Settings,Param)
+function Output = Gen_Param_Table(Settings,Param,varargin)
 
 DefParams = bayesopt_params(Settings);
 ParNames = {DefParams.Name};
 Output = struct;
 for idx = 1:numel(Param)
     Output.(ParNames{idx}) = Param(idx);
+end
+
+if nargin < 3
+    Negative_epsilon = true;
+else
+    Negative_epsilon = varargin{1};
 end
 
 
@@ -104,14 +110,16 @@ case {'BH' 'BD' 'BE'} % Buckingham model
                     Output.gamma_MM   = Output.gamma_MX; % Unitless
                     Output.gamma_XX   = Output.gamma_MX; % Unitless
                     
-                    if Output.gamma_MX < 6
-                        Output.epsilon_MX = -Output.epsilon_MX;
-                    end
-                    if Output.gamma_MM < 6
-                        Output.epsilon_MM = -Output.epsilon_MM;
-                    end
-                    if Output.gamma_XX < 6
-                        Output.epsilon_XX = -Output.epsilon_XX;
+                    if Negative_epsilon
+                        if Output.gamma_MX < 6
+                            Output.epsilon_MX = -Output.epsilon_MX;
+                        end
+                        if Output.gamma_MM < 6
+                            Output.epsilon_MM = -Output.epsilon_MM;
+                        end
+                        if Output.gamma_XX < 6
+                            Output.epsilon_XX = -Output.epsilon_XX;
+                        end
                     end
                     
                 case {'hogervorst' 'hogervorst-wbk'}
@@ -131,6 +139,19 @@ case {'BH' 'BD' 'BE'} % Buckingham model
                     
                     Output.r0_MX = ( sqrt( ( Output.epsilon_MM*Output.epsilon_XX*Output.gamma_MM*Output.gamma_XX*(Output.r0_MM*Output.r0_XX)^6 )...
                         /((Output.gamma_MM - 6)*(Output.gamma_XX - 6)) )*(Output.gamma_MX - 6)/(Output.epsilon_MX*Output.gamma_MX) )^(1/6);
+                    
+                    if ~Negative_epsilon
+                        if Output.gamma_MX < 6
+                            Output.epsilon_MX = -Output.epsilon_MX;
+                        end
+                        if Output.gamma_MM < 6
+                            Output.epsilon_MM = -Output.epsilon_MM;
+                        end
+                        if Output.gamma_XX < 6
+                            Output.epsilon_XX = -Output.epsilon_XX;
+                        end
+                    end
+                    
                 case {'kong' 'gromacs'}
                     
                     if Output.gamma_MM < 6
@@ -170,6 +191,17 @@ case {'BH' 'BD' 'BE'} % Buckingham model
                     Output.epsilon_MX = C_MX*(Output.gamma_MX - 6)/(Output.gamma_MX*(Output.r0_MX^6));
                     if Output.gamma_MX < 6
                         Output.epsilon_MX = -abs(Output.epsilon_MX);
+                    end
+                    if ~Negative_epsilon
+                        if Output.gamma_MX < 6
+                            Output.epsilon_MX = -Output.epsilon_MX;
+                        end
+                        if Output.gamma_MM < 6
+                            Output.epsilon_MM = -Output.epsilon_MM;
+                        end
+                        if Output.gamma_XX < 6
+                            Output.epsilon_XX = -Output.epsilon_XX;
+                        end
                     end
         	end
         end

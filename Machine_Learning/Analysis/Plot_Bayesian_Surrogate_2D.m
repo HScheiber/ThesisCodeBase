@@ -12,12 +12,12 @@ Plot_PCA = false;
 %exportgraphics(ax ,'GP_Model.png','ContentType','image','BackgroundColor','none')
 
 
-grid_density = 100; % Parameter to set the grid density
-contour_lines = 20;
+grid_density = 200; % Parameter to set the grid density
+contour_lines = 30;
 fs = 24;
 
 Z_Plot = 'objective'; % 'error' 'objective' 'constraints'
-C_Plot = 'constraints'; %'objective' 'objective uncertainty' 'error' 'error uncertainty' 'constraints'
+C_Plot = 'error'; %'objective' 'objective uncertainty' 'error' 'error uncertainty' 'constraints'
 show_zero = false;
 showtitle = false;
 
@@ -124,6 +124,10 @@ switch lower(Z_Plot)
         objective = true;
     case 'error'
         [flat_Z,errors_uncertainty] = results.predictError(input_table);
+        % Convert error & uncertainty to probability of error
+        flat_Z = (flat_Z+1)/2;
+        errors_uncertainty = (errors_uncertainty+1)/2;
+        
         errors = true;
     case 'constraints'
         flat_Z = double(results.Options.XConstraintFcn(input_table)); %results.predictConstraints(input_table);
@@ -151,13 +155,17 @@ switch lower(C_Plot)
             flat_C = flat_Z;
         else
             [flat_C,~] = results.predictError(input_table);
+            % Convert error to probability of error
+            flat_C = (flat_C+1)/2;
         end
-        cbarstring = 'Error Model';
+        cbarstring = '$P$(error)';
     case 'error uncertainty'
         if errors
             flat_C = errors_uncertainty;
         else
             [~,flat_C] = results.predictError(input_table);
+            % Convert to probability of error
+            flat_C = (flat_C+1)/2;
         end
         cbarstring = 'Error Uncert.';
     case 'constraints'
@@ -230,8 +238,8 @@ button_h(1) = uicontrol(figh,'Units','Normalized','Style','PushButton','Position
 
 % Plot
 hold(ax,'on')
-[~,pc] = contour3(X,Y,Z,contour_lines,'-k','LineWidth',1);
-p = surf(ax,X,Y,Z,C,'EdgeColor','none','FaceAlpha',0.5);
+[~,pc] = contour3(X,Y,Z,contour_lines,':k','LineWidth',1);
+p = surf(ax,X,Y,Z,C,'EdgeColor','none','FaceAlpha',1);
 if strcmp(C_Plot,'constraints')
     colormap(ax,[0.5 0 0; 0 0.5 0])
 else
