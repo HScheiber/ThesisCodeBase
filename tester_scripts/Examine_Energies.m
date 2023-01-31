@@ -1,5 +1,6 @@
-Energy_file = 'BF_Alexandria_LitMethod_145.edr';
-system(['wsl source ~/.bashrc; echo 9 11 15 18 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
+Energy_file = 'ChkLiqStable_R_BF_Model_Alexandria_pol_NPT.edr';
+%system(['wsl source ~/.bashrc; echo 0 ^| gmx_d energy -f ' windows2unix(Energy_file)],'-echo')
+system(['wsl source ~/.bashrc; echo 6 9 11 15 18 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %     En_xvg_file = fullfile(Settings.WorkDir,'Prep_Liq.xvg');
 %     Data = import_xvg(En_xvg_file);
@@ -14,10 +15,13 @@ Data = import_xvg('energy.xvg');
 % @ s3 legend "Enthalpy"
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
-nmol_solid = 1000;
+nmol_solid = 11664;
 
 hold on %figure
-plot(Data(:,1),Data(:,2)./nmol_solid,'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
+%plot(Data(:,1),Data(:,2)./nmol_solid,'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
+plot(Data(:,3),Data(:,2)./nmol_solid,'Linewidth',4,'Color','r') % T vs potential (kj/mol ion pairs)
+plot(Data(:,3),Data(:,5)./nmol_solid,'Linewidth',4,'Color','b') % T vs Volume (nm^3/ion pair)
+
 plot(Data(:,1),Data(:,2),'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
 % std(Data(:,3)./Data(:,2))
 % range(Data(:,3)./Data(:,2))
