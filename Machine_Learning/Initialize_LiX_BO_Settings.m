@@ -10,7 +10,12 @@ Settings.Theory = 'JC'; % JC, TF
 Settings.Continue_Calculation = true; % Continue the calculation from where it left off
 Settings.Fix_Charge = true; % When true, fixes coulombic charges at 1
 Settings.Additivity = true; % Only applies to JC model. When true, use combining rules
-Settings.Comb_rule = 'Lorentz-Berthelot'; % (case insensitive). One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst[-wbk]', 'GROMACS'. Only applies to BH and BF models
+Settings.Comb_rule = 'Lorentz-Berthelot'; % Mixin rules (case insensitive)
+% One of: 'Lorentz-Berthelot', 'Kong[-sr][-mid][-lr]', 'Hogervorst[-wbk]',
+% 'GROMACS[-sr][-mid][-lr]'. Only applies to BH and BF models. The
+% [-sr][-mid][-lr] modifiers refer to short range, mid-range, and
+% long-range approximations to the Wang-Buckingham potential. Does not
+% affect the traditional Buckingham potential
 Settings.Additional_MM_Disp = false; % When Additivity is activated with the JC model, tacks on an additional non-additive metal-metal interaction
 Settings.SigmaEpsilon = false; % For all models, recasts the search space in terms of sigma/epsilon rather than dispersion/repulsion
 Settings.InnerRange = false; % When SigmaEpislon is on, use this to set the TF/BH inner gamma range vs outer gamma range

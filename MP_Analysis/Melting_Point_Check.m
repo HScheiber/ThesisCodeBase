@@ -256,30 +256,34 @@ function [feval,fderiv,User_data] = Melting_Point_Check(T,Settings)
         
         % Grab the step size from the mdp file and update the CheckTime to match the previous one
         MDP_in_File = fullfile(WorkDir,[Settings.JobName '.mdp']);
-        MDP_txt = fileread(MDP_in_File);
-        nstepsre = regexp(MDP_txt,'nsteps *= *(.+?) *;','tokens','once');
-        stepsizere = regexp(MDP_txt,'dt *= *(.+?) *;','tokens','once');
-        PrevCheckTime = str2double(nstepsre{1})*str2double(stepsizere{1});
-        
-        if PrevCheckTime < Settings.CheckTime
-            ContinueFromCheckPoint = false;  % this should not be reached unless the settings are changed
-        end
-        
-        Trajectory_File = fullfile(WorkDir,[Settings.JobName '.trr']);
-        gmx_check_cmd = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Trajectory_File)];
-        [errcode,outchk] = system(gmx_check_cmd);
-        if errcode ~= 0
-            ContinueFromCheckPoint = false;
-        end
-        
-        ftime = regexp(outchk,'Coords +([0-9]|\.|e|E)+ +([0-9]|\.|e|E)+','tokens','once');
-        if isempty(ftime)
-            ContinueFromCheckPoint = false;
-        else
-            telpse = (str2double(ftime{1})-1)*str2double(ftime{2}); % Elapsed time in ps
-            if telpse < Settings.CheckTime
+        if isfile(MDP_in_File)
+            MDP_txt = fileread(MDP_in_File);
+            nstepsre = regexp(MDP_txt,'nsteps *= *(.+?) *;','tokens','once');
+            stepsizere = regexp(MDP_txt,'dt *= *(.+?) *;','tokens','once');
+            PrevCheckTime = str2double(nstepsre{1})*str2double(stepsizere{1});
+
+            if PrevCheckTime < Settings.CheckTime
+                ContinueFromCheckPoint = false;  % this should not be reached unless the settings are changed
+            end
+
+            Trajectory_File = fullfile(WorkDir,[Settings.JobName '.trr']);
+            gmx_check_cmd = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Trajectory_File)];
+            [errcode,outchk] = system(gmx_check_cmd);
+            if errcode ~= 0
                 ContinueFromCheckPoint = false;
             end
+
+            ftime = regexp(outchk,'Coords +([0-9]|\.|e|E)+ +([0-9]|\.|e|E)+','tokens','once');
+            if isempty(ftime)
+                ContinueFromCheckPoint = false;
+            else
+                telpse = (str2double(ftime{1})-1)*str2double(ftime{2}); % Elapsed time in ps
+                if telpse < Settings.CheckTime
+                    ContinueFromCheckPoint = false;
+                end
+            end
+        else
+            ContinueFromCheckPoint = false;
         end
     else
         ContinueFromCheckPoint = false;

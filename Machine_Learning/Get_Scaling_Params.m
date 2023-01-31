@@ -160,7 +160,7 @@ case {'BH' 'BD' 'BE'}
                     r0_MX = ( sqrt( ( epsilon_MM.*epsilon_XX.*gamma_MM.*gamma_XX.*(r0_MM.*r0_XX).^6 )...
                         ./((gamma_MM - 6).*(gamma_XX - 6)) ).*(gamma_MX - 6)./(epsilon_MX.*gamma_MX) ).^(1/6);
 
-                case {'kong' 'gromacs'}
+                case {'kong' 'gromacs' 'kong-sr' 'gromacs-sr' 'kong-mid' 'gromacs-mid' 'kong-lr' 'gromacs-lr'}
                     gamma_MM = Param.gamma_MM; % Unitless
                     gamma_XX = Param.gamma_XX; % Unitless
 
@@ -180,12 +180,12 @@ case {'BH' 'BD' 'BE'}
                     C_XX = epsilon_XX.*gamma_XX.*k_XX.*(r0_XX.^6);
 
                     switch lower(Settings.Comb_rule)
-                        case 'kong'
+                        case {'kong' 'kong-sr' 'kong-mid' 'kong-lr'}
                             A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
                                             A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
                             B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
                             C_MX = sqrt(C_MM.*C_XX);
-                        case 'gromacs'
+                        case {'gromacs' 'gromacs-sr' 'gromacs-mid' 'gromacs-lr'}
                             A_MX = sqrt(A_MM.*A_XX);
                             B_MX = 2./( (1./B_MM) + (1./B_XX) );
                             C_MX = sqrt(C_MM.*C_XX);
@@ -418,7 +418,7 @@ case 'BF'
     
     Settings.S.E.MM = Param.epsilon_MM; % kJ/mol
     Settings.S.E.XX = Param.epsilon_XX; % kJ/mol
-        
+    
     if Settings.Additivity       
         switch lower(Settings.Comb_rule)
             case 'lorentz-berthelot'
@@ -443,38 +443,95 @@ case 'BF'
                 
                 Settings.S.E.MX = 2*Settings.S.E.MM*Settings.S.E.XX/(Settings.S.E.MM + Settings.S.E.XX);
                 
-                Settings.S.S.MX = ( sqrt( ( Settings.S.E.MM.*Settings.S.E.XX.*(Settings.S.G.MM + 3).*(Settings.S.G.XX + 3).*(sigma_MM.*sigma_XX).^6 )...
+                Settings.S.S.MX = ( sqrt( ( Settings.S.E.MM.*Settings.S.E.XX.*(Settings.S.G.MM + 3).*(Settings.S.G.XX + 3).*(Settings.S.S.MM.*Settings.S.S.XX).^6 )...
                     ./(Settings.S.G.MM.*Settings.S.G.XX) ).*Settings.S.G.MX./(Settings.S.E.MX.*(Settings.S.G.MX + 3)) ).^(1/6);
-            case {'kong' 'gromacs'}
+            case {'kong' 'gromacs' 'kong-sr' 'gromacs-sr' 'kong-mid' 'gromacs-mid' 'kong-lr' 'gromacs-lr'}
                 Settings.S.G.MM = Param.gamma_MM; % Unitless
                 Settings.S.G.XX = Param.gamma_XX; % Unitless
-
-                % Define approximate tight form constants (valid as r->0)
-                A_MM = 6.*Settings.S.E.MM.*exp(Settings.S.G.MM)/Settings.S.G.MM; % prefactor
-                A_XX = 6.*Settings.S.E.XX.*exp(Settings.S.G.XX)/Settings.S.G.XX;
-
-                B_MM = Settings.S.G.MM./sigma_MM; % exponent
-                B_XX = Settings.S.G.XX./sigma_XX;
-
-                C_MM = 2.*Settings.S.E.MM.*(Settings.S.G.MM + 3)./Settings.S.G.MM; % dispersion
-                C_XX = 2.*Settings.S.E.XX.*(Settings.S.G.XX + 3)./Settings.S.G.XX;
-
+                
+                % These apply exactly in all cases
+                B_MM = Settings.S.G.MM./Settings.S.S.MM; % exponent
+                B_XX = Settings.S.G.XX./Settings.S.S.XX;
+                
                 switch lower(Settings.Comb_rule)
-                    case 'kong'
-                        A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
-                                        A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
-                        B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
-                        C_MX = sqrt(C_MM.*C_XX);
-                    case 'gromacs'
-                        A_MX = sqrt(A_MM*A_XX);
-                        B_MX = 2/( (1/B_MM) + (1/B_XX) );
-                        C_MX = sqrt(C_MM*C_XX);
-                end
+                    case {'kong' 'kong-sr' 'gromacs' 'gromacs-sr'}
+                        % Define approximate tight form constants (valid as r->0)
+                        A_MM = 6.*Settings.S.E.MM.*exp(Settings.S.G.MM)./Settings.S.G.MM; % prefactor
+                        A_XX = 6.*Settings.S.E.XX.*exp(Settings.S.G.XX)./Settings.S.G.XX;
+                        
+                        C_MM = 2.*Settings.S.E.MM.*(Settings.S.G.MM + 3)./Settings.S.G.MM; % dispersion
+                        C_XX = 2.*Settings.S.E.XX.*(Settings.S.G.XX + 3)./Settings.S.G.XX;
+                        
+                        % Apply mixing rules
+                        switch lower(Settings.Comb_rule)
+                            case {'kong' 'kong-sr'}
+                                A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
+                                                A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
+                                B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
+                                C_MX = sqrt(C_MM.*C_XX);
+                            case {'gromacs' 'gromacs-sr'}
+                                A_MX = sqrt(A_MM.*A_XX);
+                                B_MX = 2./( (1./B_MM) + (1./B_XX) );
+                                C_MX = sqrt(C_MM.*C_XX);
+                        end
+                        
+                        % Convert MX parameters back to gamma/epsilon/sigma
+                        Settings.S.G.MX = -lambertw(-1,-3*C_MX./(A_MX.*exp(3))) - 3;
+                        Settings.S.S.MX = Settings.S.G.MX./B_MX;
+                        Settings.S.E.MX = A_MX.*Settings.S.G.MX.*exp(-Settings.S.G.MX)./6;
+                        
+                    case {'kong-mid' 'gromacs-mid'}
+                        % Define approximate tight form constants (valid as r->0)
+                        A_MM = 3.*Settings.S.E.MM.*exp(Settings.S.G.MM)./Settings.S.G.MM; % prefactor
+                        A_XX = 3.*Settings.S.E.XX.*exp(Settings.S.G.XX)./Settings.S.G.XX;
+                        
+                        C_MM = Settings.S.E.MM.*(Settings.S.G.MM + 3)./Settings.S.G.MM; % dispersion
+                        C_XX = Settings.S.E.XX.*(Settings.S.G.XX + 3)./Settings.S.G.XX;
+                        
+                        % Apply mixing rules
+                        switch lower(Settings.Comb_rule)
+                            case 'kong-mid'
+                                A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
+                                                A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
+                                B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
+                                C_MX = sqrt(C_MM.*C_XX);
+                            case 'gromacs-mid'
+                                A_MX = sqrt(A_MM.*A_XX);
+                                B_MX = 2./( (1./B_MM) + (1./B_XX) );
+                                C_MX = sqrt(C_MM.*C_XX);
+                        end
+                        
+                        % Convert MX parameters back to gamma/epsilon/sigma
+                        Settings.S.G.MX = -lambertw(-1,-3*C_MX./(A_MX.*exp(3))) - 3;
+                        Settings.S.S.MX = Settings.S.G.MX./B_MX;
+                        Settings.S.E.MX = A_MX.*Settings.S.G.MX.*exp(-Settings.S.G.MX)./3;
+                        
+                    case {'kong-lr' 'gromacs-lr'}
+                        % Define approximate tight form constants (valid as r->0)
+                        A_MM = 6.*Settings.S.E.MM.*exp(Settings.S.G.MM).*(Settings.S.S.MM.^6)./Settings.S.G.MM; % prefactor
+                        A_XX = 6.*Settings.S.E.XX.*exp(Settings.S.G.XX).*(Settings.S.S.XX.^6)./Settings.S.G.XX;
 
-                % Convert back to gamma/epsilon/r0
-                Settings.S.G.MX = -lambertw(-1,-3*C_MX/(A_MX*exp(3))) - 3;
-                Settings.S.S.MX = Settings.S.G.MX/B_MX;
-                Settings.S.E.MX = A_MX*Settings.S.G.MX*exp(-Settings.S.G.MX)/6;
+                        C_MM = 2.*Settings.S.E.MM.*(Settings.S.G.MM + 3).*(Settings.S.S.MM.^6)./Settings.S.G.MM; % dispersion
+                        C_XX = 2.*Settings.S.E.XX.*(Settings.S.G.XX + 3).*(Settings.S.S.XX.^6)./Settings.S.G.XX;
+
+                        % Apply mixing rules
+                        switch lower(Settings.Comb_rule)
+                            case 'kong-lr'
+                                A_MX = (1/2).*( A_MM.*(A_MM.*B_MM./(A_XX.*B_XX)).^(-B_MM./(B_MM + B_XX)) + ...
+                                                A_XX.*(A_XX.*B_XX./(A_MM.*B_MM)).^(-B_XX./(B_MM + B_XX)) );
+                                B_MX = 2.*B_MM.*B_XX./(B_MM + B_XX);
+                                C_MX = sqrt(C_MM.*C_XX);
+                            case 'gromacs-lr'
+                                A_MX = sqrt(A_MM.*A_XX);
+                                B_MX = 2./( (1./B_MM) + (1./B_XX) );
+                                C_MX = sqrt(C_MM.*C_XX);
+                        end
+
+                        % Convert MX parameters back to gamma/epsilon/sigma
+                        Settings.S.G.MX = -lambertw(-1,-3*C_MX./(A_MX.*exp(3))) - 3;
+                        Settings.S.S.MX = Settings.S.G.MX./B_MX;
+                        Settings.S.E.MX = A_MX.*(B_MX.^6).*(Settings.S.G.MX.^(-5)).*exp(-Settings.S.G.MX)./6;
+                end
         end
         
     else
