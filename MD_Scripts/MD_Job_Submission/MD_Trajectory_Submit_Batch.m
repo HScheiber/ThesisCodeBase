@@ -38,7 +38,7 @@ switch lower(computer)
     case {'unbearabull' 'cedar'}
     case 'graham'
         %% Boiling test: polarized Alexandria model annealing from 0 to 2000 K, NPT, anisotropic PR/1ps barostat
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+        Salts = {'LiF' 'LiCl' 'LiBr'};
         Theories = {'BH' 'BF'};
         Structure = 'Rocksalt';
         
