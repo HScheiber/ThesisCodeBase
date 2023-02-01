@@ -1,4 +1,4 @@
-Energy_file = 'ChkLiqStable_R_BF_Model_Alexandria_pol_NPT.edr';
+Energy_file = 'ChkLiqStable_R_BH_Model_Alexandria_pol_NPT.edr';
 %system(['wsl source ~/.bashrc; echo 0 ^| gmx_d energy -f ' windows2unix(Energy_file)],'-echo')
 system(['wsl source ~/.bashrc; echo 6 9 11 15 18 0 ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])
 %system(['wsl source ~/.bashrc; echo "4 0" ^| gmx_d energy -f ' windows2unix(Energy_file) ' -o energy.xvg'])

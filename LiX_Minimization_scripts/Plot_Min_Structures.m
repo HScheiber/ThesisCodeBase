@@ -1,21 +1,23 @@
 Settings = Initialize_MD_Settings;
 %Data = load(fullfile(Settings.home,'data','MX_JCTF_Min_Data.mat'),'Data').Data;
 %Data = load(fullfile(Settings.home,'data','MX_Alexandria_PointQ_Min_Data.mat'),'Data').Data;
-Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
-%Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data').Data;
+%Data = load(fullfile(Settings.home,'data','MX_Alexandria_Min_Data.mat'),'Data').Data;
+Data = load(fullfile(Settings.home,'data','MX_Alexandria_Polarized_Min_Data.mat'),'Data').Data;
 
 
-fs = 24;
+fs = 34;
 
 Theory = 'BH'; % {'BF' 'BH' 'JC' 'Mie'}
 %Salts = {'NaCl'};
-Salts = {'LiF' 'LiCl' 'LiBr' 'LiI',...
-         'NaF' 'NaCl' 'NaBr' 'NaI' ...
-         'KF' 'KCl' 'KBr' 'KI' ...
-         'RbF' 'RbCl' 'RbBr' 'RbI' ...
-         'CsF' 'CsCl' 'CsBr' 'CsI'};
-Structures = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
-Structures_legend = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' '$\beta$-BeO' 'CsCl'};
+Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
+%          'NaF' 'NaCl' 'NaBr' 'NaI' ...
+%          'KF' 'KCl' 'KBr' 'KI' ...
+%          'RbF' 'RbCl' 'RbBr' 'RbI' ...
+%          'CsF' 'CsCl' 'CsBr' 'CsI'};
+% Structures = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' 'BetaBeO' 'CsCl'};
+% Structures_legend = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive' 'AntiNiAs' '$\beta$-BeO' 'CsCl'};
+Structures = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive'};
+Structures_legend = {'Wurtzite' 'NiAs' 'Sphalerite' 'FiveFive'};
 Prop_of_intr = 'E';
 
 X = 1:length(Salts);
@@ -44,9 +46,9 @@ for jdx = 1:length(Structures)
 end
 
 
-for idx = X(1:end-1)
-    xline(axh,idx+0.5,'--k','Linewidth',1)
-end
+% for idx = X(1:end-1)
+%     xline(axh,idx+0.5,'--k','Linewidth',1)
+% end
     
 switch Theory
     case 'TF'
@@ -65,20 +67,23 @@ switch Theory
         Thertxt = Theory;
 end
 
-title(['Comparison of Alkali Halide Crystal Energies: ' Thertxt ' Model.'],...
-   'Interpreter','latex','FontSize',fs)
+% title(['Comparison of Alkali Halide Crystal Energies: ' Thertxt ' Model.'],...
+%    'Interpreter','latex','FontSize',fs)
 xlim(axh,[0.5 length(X)+0.5])
 ylim(axh,'padded')
 xticks(axh,X);
 xticklabels(axh,Salts);
+yticks(axh,-20:10:10)
+set(axh,'YMinorTick','on')
 set(axh,'FontSize',fs,'Box','On','TickLabelInterpreter','latex')
 axh.XAxis.TickLength = [0 0];
-axh.YGrid = 'on';
-axh.YMinorGrid = 'On';
-ylabel(axh,'$E_{\textrm{RS}} - E_{\textrm{Struc}}$ [kJ mol$^{-1}$]','Interpreter','latex');
-legend(p,Structures_legend,'FontSize',fs,'Box','On','Interpreter','latex',...
-    'NumColumns',4)
-ylim(axh,[-60 10])
+%axh.YGrid = 'on';
+%axh.YMinorGrid = 'On';
+%ylabel(axh,'$E_{\textrm{RS}} - E_{\textrm{Struc}}$ [kJ mol$^{-1}$]','Interpreter','latex');
+ylabel(axh,'$\Delta E_{L}$ [kJ mol$^{-1}$]','Interpreter','latex');
+% legend(p,Structures_legend,'FontSize',fs,'Box','On','Interpreter','latex',...
+%     'NumColumns',4)
+ylim(axh,[-25 10])
 %xticks(axh,[]);
 %xticklabels(axh,[]);
 

@@ -16,9 +16,10 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     warning('off','stats:classreg:learning:impl:GPImpl:GPImpl:SigmaMustBeGreaterThanSigmaLowerBound');
     warning('off','MATLAB:cellfun:NotACell');
     
-    if ~isfield(Settings,'OuterDir')
-        Settings.OuterDir = pwd;
-    end
+    % Update any missing settings
+    Settings = Update_MD_Settings(Settings);
+    Settings = Update_BO_LiX_Settings(Settings);
+    
     Intermediate_BO_file = fullfile(Settings.OuterDir,'intermediate_bayesian_opt.mat');
     Intermediate_BO_backup = fullfile(Settings.OuterDir,'intermediate_bayesian_opt.mat.PREV');
     Intermediate_Fullopt_file = fullfile(Settings.OuterDir,'intermediate_secondary_opt.mat');
@@ -27,12 +28,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
         diary(Settings.Diary_Loc)
     end
     
-    % Initialize some global settings for later
-    Settings = Update_MD_Settings(Settings);
-    if ~isfield(Settings,'GPActiveSetSize')
-        Settings.GPActiveSetSize = 1000;
-    end
-    
+    % Initialize some global settings for later    
     Deterministic = ~any([Settings.Loss_Options.Fusion_Enthalpy Settings.Loss_Options.MP_Volume_Change Settings.Loss_Options.Liquid_MP_Volume ...
         Settings.Loss_Options.Solid_MP_Volume Settings.Loss_Options.Liquid_DM_MP Settings.Loss_Options.MP ] > sqrt(eps));
     

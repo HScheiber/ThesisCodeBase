@@ -7,8 +7,8 @@ linestyles = {'-',':','-.','--'};
 mkrshapes = {'s' 'd' '^' 'o'};
 %DataSetName = 'Alexandria_Melting_Point_Data.mat';
 DataSetName = 'Alexandria_Polarized_Melting_Point_Data.mat';
-Models = {'BF' 'BH' 'JC' 'Mie'}; %  'BH' 'JC' 'Mie'
-Legend_Labels = {'Experiment' 'WBK' 'BK' 'Lennard Jones [12-6]' 'Lennard Jones [8-6]'};
+Models = {'BF'}; %  'BH' 'JC' 'Mie'
+Legend_Labels = {'Experiment' 'Alexandria'}; % 'BK' 'Lennard Jones [12-6]' 'Lennard Jones [8-6]'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
          'NaF' 'NaCl' 'NaBr' 'NaI' ...
          'KF' 'KCl' 'KBr' 'KI' ...
@@ -31,6 +31,9 @@ Lit = Load_Literature_Model_MPs;
 
 SaveDataDir = fullfile(Settings.home,'data',DataSetName);
 Data = load(SaveDataDir).Data;
+Data.LiI.BF.Rocksalt.Alt_Structure = false;
+Data.LiI.BF.Rocksalt.dT = [909 909];
+
 
 % This is the X coordinate to map to the salts
 X = 1:length(Salts);
@@ -89,13 +92,13 @@ for idx = X
                                 disp([Salt ' ' Model ' ' Structure ' : ' num2str(Y_ff(idx,jdx),'%.0f') ])
                         end
                         
-                        MPs_idx = ~Data.(Salt).(Model).(Structure).Freeze_Trace & ...
-                            ~Data.(Salt).(Model).(Structure).Melt_Trace;
-                        Tms = Data.(Salt).(Model).(Structure).T_Trace(MPs_idx);
-                        Fz = Data.(Salt).(Model).(Structure).T_Trace(logical(Data.(Salt).(Model).(Structure).Freeze_Trace));
-                        Mt = Data.(Salt).(Model).(Structure).T_Trace(logical(Data.(Salt).(Model).(Structure).Melt_Trace));
-                        Y_indet(idx,jdx,sdx) = diff([max([Fz 0]) min(Mt)]);
-                        N_indet(idx,jdx,sdx) = length(Tms);
+%                         MPs_idx = ~Data.(Salt).(Model).(Structure).Freeze_Trace & ...
+%                             ~Data.(Salt).(Model).(Structure).Melt_Trace;
+%                         Tms = Data.(Salt).(Model).(Structure).T_Trace(MPs_idx);
+%                         Fz = Data.(Salt).(Model).(Structure).T_Trace(logical(Data.(Salt).(Model).(Structure).Freeze_Trace));
+%                         Mt = Data.(Salt).(Model).(Structure).T_Trace(logical(Data.(Salt).(Model).(Structure).Melt_Trace));
+%                         Y_indet(idx,jdx,sdx) = diff([max([Fz 0]) min(Mt)]);
+%                         N_indet(idx,jdx,sdx) = length(Tms);
                     end
                 end
             end
@@ -192,13 +195,13 @@ xticks(axh,X);
 xticklabels(axh,Salts);
 set(axh,'FontSize',fs,'Box','On','TickLabelInterpreter','latex')
 ylabel(axh,'T [K]','Interpreter','latex');
-legend(p,Legend_Labels,'FontSize',fs,'Box','On','Interpreter','latex','NumColumns',2,'location','southeast')
+legend(p,Legend_Labels,'FontSize',fs,'Box','On','Interpreter','latex','NumColumns',1,'location','northeast')
 grid(axh,'on')
 
-title(axh,titleg,'FontSize',fs,'Interpreter','latex')
+%title(axh,titleg,'FontSize',fs,'Interpreter','latex')
 
 % exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
 %     'ContentType','vector','BackgroundColor','none')
 
-exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
-'ContentType','vector','BackgroundColor','none')
+% exportgraphics(axh ,'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Manuscript_4\Figures\MP_Alkali_Halides.pdf',...
+% 'ContentType','vector','BackgroundColor','none')

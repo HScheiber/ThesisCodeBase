@@ -58,7 +58,7 @@ scatter(ax,rt,fmin,80,'r','filled','o',"LineWidth",1,'MarkerEdgeColor','k')
 scatter(ax,sigma,ffun(sigma),80,'r','filled','o',"LineWidth",1,'MarkerEdgeColor','k')
 ylim(ax,ylims)
 xlim(ax,[rmin,xmax])
-title(ax,title_txt,'fontsize',fs,'Interpreter','latex')
+% title(ax,title_txt,'fontsize',fs,'Interpreter','latex')
 
 set(ax,'box','on','TickLabelInterpreter','latex');
 set(ax,'XMinorTick','off','YMinorTick','off','FontSize',fs);
@@ -67,11 +67,11 @@ xlabel(ax,'$r$','fontsize',fs,'Interpreter','latex');
 %ylabel(ax,'$u^{BH}$','fontsize',fs,'Interpreter','latex');
 
 [xtt,xidx] = sort([0 sigma]);
-xlab = {'0' '$\sigma$'};
+xlab = {'0' '$\sigma_{ij}$'};
 xlabsrt = xlab(xidx);
 
 [ytt,yidx] = sort([-epsilon 0]);
-ylab = {'$-\varepsilon$' '0'};
+ylab = {'$-\varepsilon_{ij}$' '0'};
 ylabsrt = ylab(yidx);
 
 xticks(ax,xtt)

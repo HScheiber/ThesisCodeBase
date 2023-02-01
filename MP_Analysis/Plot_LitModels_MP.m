@@ -97,13 +97,13 @@ for idx = X
                                 disp([Salt ' ' Model ' ' Structure ' : ' num2str(Y_ff(idx,jdx),'%.0f') ])
                         end
                         
-                        MPs_idx = ~Data.(Salt).(Model).(Structure).(Tag).Freeze_Trace & ...
-                            ~Data.(Salt).(Model).(Structure).(Tag).Melt_Trace;
-                        Tms = Data.(Salt).(Model).(Structure).(Tag).T_Trace(MPs_idx);
-                        Fz = Data.(Salt).(Model).(Structure).(Tag).T_Trace(logical(Data.(Salt).(Model).(Structure).(Tag).Freeze_Trace));
-                        Mt = Data.(Salt).(Model).(Structure).(Tag).T_Trace(logical(Data.(Salt).(Model).(Structure).(Tag).Melt_Trace));
-                        Y_indet(idx,jdx,sdx) = diff([max([Fz 0]) min(Mt)]);
-                        N_indet(idx,jdx,sdx) = length(Tms);
+%                         MPs_idx = ~Data.(Salt).(Model).(Structure).(Tag).Freeze_Trace & ...
+%                             ~Data.(Salt).(Model).(Structure).(Tag).Melt_Trace;
+%                         Tms = Data.(Salt).(Model).(Structure).(Tag).T_Trace(MPs_idx);
+%                         Fz = Data.(Salt).(Model).(Structure).(Tag).T_Trace(logical(Data.(Salt).(Model).(Structure).(Tag).Freeze_Trace));
+%                         Mt = Data.(Salt).(Model).(Structure).(Tag).T_Trace(logical(Data.(Salt).(Model).(Structure).(Tag).Melt_Trace));
+%                         Y_indet(idx,jdx,sdx) = diff([max([Fz 0]) min(Mt)]);
+%                         N_indet(idx,jdx,sdx) = length(Tms);
                     end
                 end
             end
