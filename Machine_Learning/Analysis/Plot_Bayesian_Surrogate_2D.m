@@ -16,8 +16,8 @@ grid_density = 200; % Parameter to set the grid density
 contour_lines = 30;
 fs = 24;
 
-Z_Plot = 'objective'; % 'error' 'objective' 'constraints'
-C_Plot = 'error'; %'objective' 'objective uncertainty' 'error' 'error uncertainty' 'constraints'
+Z_Plot = 'error'; % 'error' 'objective' 'constraints'
+C_Plot = 'error uncertainty'; %'objective' 'objective uncertainty' 'error' 'error uncertainty' 'constraints'
 show_zero = false;
 showtitle = false;
 

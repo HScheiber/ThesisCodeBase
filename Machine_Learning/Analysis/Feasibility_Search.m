@@ -1,10 +1,11 @@
 %% Plot result to visualize
 Settings = Initialize_LiX_BO_Settings;
-Settings.Salt = 'LiF';
-Settings.Theory = 'BF';
+Settings.Salt = 'LiI';
+Settings.Theory = 'JC';
 Settings.SigmaEpsilon = true;
-Settings.Comb_rule = 'Kong-lr'; % Hogervorst % Lorentz-Berthelot % Kong % Hogervorst-WBK
-N_chk = 10000;
+Settings.Comb_rule = 'Lorentz-Berthelot'; % Hogervorst % Lorentz-Berthelot % Kong[-lr][-sr][-mid] % Hogervorst[-wbk]
+N_chk = 100000;
+fs = 20;
 
 Parinfo = bayesopt_params(Settings);
 ParNames = {Parinfo.Name};
@@ -73,6 +74,8 @@ for idx = 1:N_Vars
             else
                 xlabel(ax,par_name_map(Y_VarName),'interpreter','latex');
             end
+            set(ax, 'Fontsize', fs,'Ticklabelinterpreter','latex','box','on')
+            grid(ax,'minor')
         else % pair correlation plots
             X_VarName = ParNames{jdx};
             X_Data = Param.(X_VarName);
@@ -88,6 +91,8 @@ for idx = 1:N_Vars
             end
             xlim(ax,X_Range);
             ylim(ax,Y_Range);
+            set(ax, 'Fontsize', fs,'Ticklabelinterpreter','latex','box','on')
+            grid(ax,'minor')
             
             if jdx == 1
                 ylabel(ax,par_name_map(Y_VarName),'interpreter','latex');

@@ -741,17 +741,19 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
     Loss(ovop_idx) = Loss(ovop_idx) + max(r_min - (Settings.MaxMXWellR/10),0).*Settings.BadFcnLossPenalty; % valley too far
     Loss(ovop_idx) = Loss(ovop_idx) + max((Settings.MinMXWellR/10) - r_min,0).*Settings.BadFcnLossPenalty; % valley too close
 
-%     % Loss = zeros(N_par,1);
 %     idxes = find(Loss ~= 0);
-%     for jdx = 1:min(numel(idxes),100)
+%     for jdx = 1:min(numel(idxes),1000)
 %         idx = idxes(jdx);
-%         plot(U.r,U.MX(idx,:))
+%         plot(U.r.*10,U.MX(idx,:),'Linewidth',3)
 %         hold on
 %         scatter(U.r(peaks_idx(idx,:)),U.MX(idx,peaks_idx(idx,:)))
 %         scatter(U.r(valleys_idx(idx,:)),U.MX(idx,valleys_idx(idx,:)))
 %     end
-%     ylim([-1000 1000])
-%     xlim([0 1])
+%     ylim([-1500 1000])
+%     xlim([0 15])
+%     set(gca,'fontsize',34,'TickLabelInterpreter','latex')
+%     xlabel(gca,'Interaction distance $r$ [\AA]','FontSize',34,'interpreter','latex')
+%     ylabel(gca,'Pair Potential $u_{ij}(r)$','FontSize',34,'interpreter','latex')
 
     %% Grab the peaks and valleys of the MM/XX potentials
     YY = {'MM' 'XX'};
@@ -870,17 +872,20 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
         r_wall_sv{j} = nan(size(U.MX,1),1);
         r_wall_sv{j}(walls_idx) = r_wall;
 
-    %     % Loss = zeros(N_par,1);
-    %     idxes = find(Loss == 0);
-    %     for jdx = 1:min(numel(idxes),100)
-    %         idx=idxes(jdx);
-    %         hold on
-    %         plot(U.r,U.(jj)(idx,:))
-    %         scatter(U.r(peaks_idx(idx,:)),U.(jj)(idx,peaks_idx(idx,:)))
-    %         scatter(U.r(valleys_idx(idx,:)),U.(jj)(idx,valleys_idx(idx,:)))
-    %     end
-    %     ylim([-1000 1000])
-    %     xlim([0 2])
+%         % Loss = zeros(N_par,1);
+%         idxes = find(Loss ~= 0);
+%         for jdx = 1:min(numel(idxes),100)
+%             idx=idxes(jdx);
+%             hold on
+%             plot(U.r.*10,U.(jj)(idx,:),'Linewidth',3)
+% %             scatter(U.r(peaks_idx(idx,:)),U.(jj)(idx,peaks_idx(idx,:)))
+% %             scatter(U.r(valleys_idx(idx,:)),U.(jj)(idx,valleys_idx(idx,:)))
+%         end
+%         ylim([-1000 2500])
+%         xlim([0 10])
+%         set(gca,'fontsize',34,'TickLabelInterpreter','latex')
+%         xlabel(gca,'Interaction distance $r$ [\AA]','FontSize',34,'interpreter','latex')
+%         ylabel(gca,'Pair Potential $u_{ij}(r)$','FontSize',34,'interpreter','latex')
     end
 
     if Settings.EnforceRR && Settings.SigmaEpsilon && Settings.Additivity

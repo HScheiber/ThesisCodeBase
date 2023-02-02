@@ -156,7 +156,7 @@ Settings.Initial_N_Multiplier = 20; % Multiply the number of input dimensions by
 Settings.Acquisition_Function = 'expected-improvement-plus';
 Settings.ExplorationRatio = 2;
 Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
-Settings.GaussianCharge = false;
+Settings.GaussianCharge = true;
 Settings.Polarization = false;
 
 
@@ -166,9 +166,10 @@ Settings.GPActiveSetSize = 1000; % Also applies to final optimization
 Settings.Salt = 'LiI';
 Settings.Theory = 'BF';
 Settings.InnerRange = false;
-Settings.Trial_ID = 'QX1';
+Settings.Trial_ID = 'VV1';
 Settings.UseCoupledConstraint = false;
 Settings.Initialize_From_Model = {};
+Settings.Comb_rule = 'Kong';
 
 %Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
 
