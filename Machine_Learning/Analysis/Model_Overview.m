@@ -2,7 +2,7 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BH';
-ModelID = 'MI';
+ModelID = 'PB';
 BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
@@ -11,7 +11,7 @@ saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Thesis_Dra
 DM_Multiplier = 1e5;
 
 %% Plot options
-fs = 24; % font size
+fs = 22; % font size
 markers = {'o' 's' '^' 'v' 'd' '>' '<' 'p' 'h' 'x'};
 show_as_percent_error = false; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
 include_av_line = false;
@@ -26,7 +26,7 @@ plot_c = false;
 plot_ac = false;
 plot_volume = false;
 plot_density = false;
-plot_loss = false;
+plot_loss = true;
 plot_finite_T_data = true;
 
 %% Script begins

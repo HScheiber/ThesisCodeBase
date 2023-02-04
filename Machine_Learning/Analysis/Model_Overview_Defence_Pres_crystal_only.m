@@ -1,13 +1,13 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'JC';
-ModelID = 'LB';
+Theory = 'BH';
+ModelID = 'NB';
 BestOnly = true;
 SelectOnly = [];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
-saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\Thesis\Defense_Presentation';
+saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Amgen_Presentation_Images';
 DM_Multiplier = 1e5;
 
 %% Plot options
@@ -29,6 +29,16 @@ plot_density = false;
 plot_loss = false;
 plot_finite_T_data = true;
 
+ylim_LE = [-3 1];
+ylim_RLE = [0 20];
+ylim_a = [];
+ylim_c = [];
+ylim_ac = [];
+ylim_volume = [-1 18];
+ylim_density = [];
+
+ylim_MP = [0 500];
+
 %% Script begins
 cm3_per_Ang3 = 1e-24; % cubic cm/cubic angstrom
 N_A = 6.02214076e23; % formula units/mol
@@ -37,24 +47,27 @@ ML_results_dir = 'C:\Users\Hayden\Documents\Patey_Lab\Model_Building\Completed';
 Structures   = {'Rocksalt' 'Wurtzite'};
 MinPlotTypes = {'LE' 'RLE' 'a' 'c' 'ac' 'V' 'Density'};
 MinPlotIdxes = [plot_LE plot_RLE plot_a plot_c plot_ac plot_volume plot_density];
+MinPlotYLims = {ylim_LE ylim_RLE ylim_a ylim_c ylim_ac ylim_volume ylim_density};
 MinPlotTypes = MinPlotTypes(MinPlotIdxes);
+MinPlotYLims = MinPlotYLims(MinPlotIdxes);
 FiniteTTypes = {'MP'};
+FiniteTYLims = {ylim_MP};
 % MP_Titles = {'$T_{m} - T_{m}^{*}$' ...
 %     '$\Delta H^{\circ}_{\mathrm{fus}} - \Delta H^{\circ *}_{\mathrm{fus}}$' ...
 %     '$\Delta V_{\mathrm{fus}} - \Delta V_{\mathrm{fus}}^{*}$' ...
 %     '$V_{\mathrm{liq}}(T_{m}^{*}) - V_{\mathrm{liq}}^{*}(T_{m}^{*})$' ...
 %     '$V_{\mathrm{sol}}(T_{m}^{*}) - V_{\mathrm{sol}}^{*}(T_{m}^{*})$' ...
 %     '$D_{\mathrm{liq,Li}^{+}} - D_{\mathrm{liq,Li}^{+}}^{*}$'};
-MP_Titles = {'$T_m$'};
+MP_Titles = {'Error in $T_m$'};
 FT_Loss_Names = {'MP'};
 
 if show_as_percent_error
-    MinPlotTitles = {'##Struct## $E_{L}$' ...
+    MinPlotTitles = {'##Struct## $E_{L}$ Err.' ...
         '$\Delta E_{L}$(##Struct##)' ...
         '$a - a^{*}$' ...
         '$c - c^{*}$' ...
         '$c/a - c^{*}/a^{*}$' ...
-        '##Struct## $V(T = 0)$' ...
+        '##Struct## $V(T = 0)$ Err.' ...
         '$\rho - \rho^{*}$'};
     MinPlotYLabels = {'[\%]' ...
         '[kJ mol$^{-1}$]' ...
@@ -66,12 +79,12 @@ if show_as_percent_error
     
     FiniteTYLabels = {'[K]'};
 else
-    MinPlotTitles = {'##Struct## $E_{L}$' ...
+    MinPlotTitles = {'##Struct## $E_{L}$ Err.' ...
         'E_{L}$(##Struct##) - $E_{L}$(rocksalt)' ...
         '$a - a^{*}$' ...
         '$c - c^{*}$' ...
         '$c/a - c^{*}/a^{*}$' ...
-        '##Struct## $V(T = 0)$' ...
+        '##Struct## $V(T = 0)$ Err.' ...
         '$\rho - \rho^{*}$'};
     MinPlotYLabels = {'[kJ mol$^{-1}$]' ...
                       '[kJ mol$^{-1}$]' ...
@@ -511,7 +524,11 @@ for idx = 1:N_FiniteTTypes
     end
 
     % Add boxes for targets
-    ylim(axobj_ft(idx),'padded');
+    if isempty(FiniteTYLims{idx})
+        ylim(axobj_ft(idx),'padded');
+    else
+        ylim(axobj_ft(idx),FiniteTYLims{idx});
+    end
     xlim(axobj_ft(idx),'padded');
     ylmits = ylim;
     xlmits = xlim;
@@ -565,7 +582,11 @@ for jdx = 1:N_MinPlot_Rows
         set(axobj_min(idx,jdx),'XMinorTick','off','YMinorTick','on','FontSize',fs);
         xticklabels(axobj_min(idx,jdx),[])
         axobj_min(idx,jdx).XAxis.TickLength = [0,0];
-        ylim(axobj_min(idx,jdx),'padded')
+        if isempty(MinPlotYLims{jdx})
+            ylim(axobj_min(idx,jdx),'padded');
+        else
+            ylim(axobj_min(idx,jdx),MinPlotYLims{jdx});
+        end
         xlim(axobj_min(idx,jdx),'padded')
         xlmits = xlim;
         ylmits = ylim;
@@ -607,7 +628,7 @@ end
 h(end+1) = bar(axobj_min(1,1),nan,nan,'FaceColor',[0.5 0.5 0.5],'Visible','on','BarWidth',1,...
     'LineWidth',2,'EdgeColor','b','FaceAlpha',0.5,'LineStyle','--');
 legtxt = strcat({'\ \ '},Salts,{'\quad'});
-legtxt{end+1}  = '\ \ DFT';
+legtxt{end+1}  = '\ \ DFT Target';
 legh = legend(h,legtxt,'Position',[0.25 0 0.5 0.06],'Orientation','Horizontal',...
     'Interpreter','latex','Box','off','fontsize',fs,'NumColumns', N_Salts+1);
 

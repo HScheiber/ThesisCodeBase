@@ -186,8 +186,8 @@ switch lower(computer)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 400;
-        Shared_Settings.Max_Secondary_Iterations = 200;
+        Shared_Settings.Max_Bayesian_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
@@ -200,9 +200,9 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'MO'};
+        Shared_Settings.Initialize_From_Model = {'MQ'};
         
-        %% BF [Gamma>10] without gaussian charge Models: MQ (continuation of MO)
+        %% BF [Gamma>10] without gaussian charge Models: MR (continuation of MQ)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BF'};
         Replicates = 1:5;
@@ -224,7 +224,7 @@ switch lower(computer)
                     Settings_Array(idx) = Shared_Settings;
                     Settings_Array(idx).Salt = Salt;
                     Settings_Array(idx).Theory = Theory;
-                    Settings_Array(idx).Trial_ID = ['MQ' Rep];
+                    Settings_Array(idx).Trial_ID = ['MR' Rep];
                     
                     % Loss function
                     Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
@@ -266,7 +266,7 @@ switch lower(computer)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 400;
+        Shared_Settings.Max_Bayesian_Iterations = 200;
         Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
@@ -280,9 +280,9 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'PA'};
+        Shared_Settings.Initialize_From_Model = {'PB'};
         
-        %% BH - Crystal+Thermal properties with point charge + 'hogervorst' mixing rule: PB (continuation of PA)
+        %% BH - Crystal+Thermal properties with point charge + 'hogervorst' mixing rule: PG (continuation of PB)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BH'};
         Replicates = 1:5;
@@ -304,7 +304,7 @@ switch lower(computer)
                     Settings_Array(idx) = Shared_Settings;
                     Settings_Array(idx).Salt = Salt;
                     Settings_Array(idx).Theory = Theory;
-                    Settings_Array(idx).Trial_ID = ['PB' Rep];
+                    Settings_Array(idx).Trial_ID = ['PG' Rep];
                     Settings_Array(idx).Comb_rule = 'hogervorst';
                     
                     % Loss function
@@ -349,8 +349,8 @@ switch lower(computer)
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 400;
-        Shared_Settings.Max_Secondary_Iterations = 200;
+        Shared_Settings.Max_Bayesian_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Parallel_Bayesopt = true;
         Shared_Settings.Parallel_Struct_Min = false;
         Shared_Settings.Parallel_LiX_Minimizer = false;
@@ -361,9 +361,9 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'PC'};
+        Shared_Settings.Initialize_From_Model = {'PE'};
         
-        %% JC - Crystal properties: PE (continuation of PC)
+        %% JC - Crystal properties: PF (continuation of PE)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'JC'};
         Replicates = 1:5;
@@ -380,7 +380,7 @@ switch lower(computer)
                     Settings_Array(idx) = Shared_Settings;
                     Settings_Array(idx).Salt = Salt;
                     Settings_Array(idx).Theory = Theory;
-                    Settings_Array(idx).Trial_ID = ['PE' Rep];
+                    Settings_Array(idx).Trial_ID = ['PF' Rep];
                     
                     % Loss function
                     Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
@@ -746,8 +746,8 @@ switch lower(computer)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 400;
-        Shared_Settings.Max_Secondary_Iterations = 200;
+        Shared_Settings.Max_Bayesian_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
@@ -760,9 +760,9 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = true;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'MI'};
+        Shared_Settings.Initialize_From_Model = {'MP'};
         
-        %% BH WITH gaussian charge Models: MP (continuation of MI)
+        %% BH WITH gaussian charge Models: MQ (continuation of MP)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BH'};
         Replicates = 1:5;
@@ -779,12 +779,11 @@ switch lower(computer)
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
                     
-                    %% Model MN
                     idx = idx+1;
                     Settings_Array(idx) = Shared_Settings;
                     Settings_Array(idx).Salt = Salt;
                     Settings_Array(idx).Theory = Theory;
-                    Settings_Array(idx).Trial_ID = ['MP' Rep];
+                    Settings_Array(idx).Trial_ID = ['MQ' Rep];
                     Settings_Array(idx) = Alexandria_Potential_Parameters(Settings_Array(idx),...
                         'Coulomb_Only',true);
                     
@@ -829,7 +828,7 @@ switch lower(computer)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 400;
+        Shared_Settings.Max_Bayesian_Iterations = 200;
         Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
@@ -843,9 +842,9 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'PA'};
+        Shared_Settings.Initialize_From_Model = {'PB'};
         
-        %% BF - Crystal+Thermal properties with point charge + 'hogervorst' mixing rule: PB (continuation of PA)
+        %% BF - Crystal+Thermal properties with point charge + 'hogervorst' mixing rule: PG (continuation of PB)
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theories = {'BF'};
         Replicates = 1:5;
@@ -862,12 +861,11 @@ switch lower(computer)
                 for ridx = 1:length(Replicates)
                     Rep = num2str(Replicates(ridx));
                     
-                    %% Model PA
                     idx = idx+1;
                     Settings_Array(idx) = Shared_Settings;
                     Settings_Array(idx).Salt = Salt;
                     Settings_Array(idx).Theory = Theory;
-                    Settings_Array(idx).Trial_ID = ['PB' Rep];
+                    Settings_Array(idx).Trial_ID = ['PG' Rep];
                     Settings_Array(idx).Comb_rule = 'hogervorst';
                     
                     % Loss function

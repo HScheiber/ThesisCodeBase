@@ -15,7 +15,7 @@ Data = import_xvg('energy.xvg');
 % @ s3 legend "Enthalpy"
 % %[ps] time constant for coupling T. Should be 20*Nsttcouple*timestep
 
-nmol_solid = 11664;
+nmol_solid = 11664/2;
 
 hold on %figure
 %plot(Data(:,1),Data(:,2)./nmol_solid,'Linewidth',4,'Color','r') % potential (kj/mol ion pairs)
