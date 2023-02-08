@@ -12,12 +12,12 @@ Plot_PCA = false;
 %exportgraphics(ax ,'GP_Model.png','ContentType','image','BackgroundColor','none')
 
 
-grid_density = 200; % Parameter to set the grid density
+grid_density = 300; % Parameter to set the grid density
 contour_lines = 30;
 fs = 24;
 
-Z_Plot = 'error'; % 'error' 'objective' 'constraints'
-C_Plot = 'error uncertainty'; %'objective' 'objective uncertainty' 'error' 'error uncertainty' 'constraints'
+Z_Plot = 'objective'; % 'error' 'objective' 'constraints'
+C_Plot = 'objective uncertainty'; %'objective' 'objective uncertainty' 'error' 'error uncertainty' 'constraints'
 show_zero = false;
 showtitle = false;
 
@@ -243,7 +243,7 @@ p = surf(ax,X,Y,Z,C,'EdgeColor','none','FaceAlpha',1);
 if strcmp(C_Plot,'constraints')
     colormap(ax,[0.5 0 0; 0 0.5 0])
 else
-    colormap(ax,'turbo')
+    colormap(ax,flipud(turbo))
 end
 caxis(ax,[min(C,[],'all') max(C,[],'all')]);
 cb = colorbar(ax,'Position',[0.93209 0.41752 0.034057 0.49485],...

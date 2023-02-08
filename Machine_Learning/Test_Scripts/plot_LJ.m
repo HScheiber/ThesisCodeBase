@@ -131,7 +131,7 @@ end
 ylim(ax,ylims)
 xlim(ax,[rmin,xmax])
 
-fs=32;
+fs=45;
 set(gca,'box','on','TickLabelInterpreter','latex');
 set(gca,'XMinorTick','on','YMinorTick','on','FontSize',fs);
 

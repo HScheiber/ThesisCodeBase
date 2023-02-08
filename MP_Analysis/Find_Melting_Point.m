@@ -315,6 +315,7 @@ end
 T_contents = dir(T_folder);
 T_contents = T_contents(cellfun(@isempty,regexp({T_contents.name},...
     ['(^\.)|(' Tmtxt '.gro)|(Grompplog.log)'],'once')));
+tpr_file = '';
 for idx = 1:length(T_contents)
     copyfile(fullfile(T_folder,T_contents(idx).name), fullfile(Tm_folder,T_contents(idx).name))
     if contains(T_contents(idx).name,'.tpr')
