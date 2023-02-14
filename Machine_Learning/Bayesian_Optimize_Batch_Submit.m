@@ -548,7 +548,7 @@ switch lower(computer)
                     Settings_Array(idx).Comb_rule = 'hogervorst-wbk';
                     
                     % Loss function
-                    Settings_Array(idx).Loss_Options.Rocksalt.LE   = 0;
+                    Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
                     Settings_Array(idx).Loss_Options.Rocksalt.a    = 0;
                     Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0;
                     Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0;
