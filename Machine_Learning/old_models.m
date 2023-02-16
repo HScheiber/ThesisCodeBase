@@ -9753,8 +9753,6 @@ for tidx = 1:length(Theories)
 
         for ridx = 1:length(Replicates)
             Rep = num2str(Replicates(ridx));
-
-            %% Model PC
             idx = idx+1;
             Settings_Array(idx) = Shared_Settings;
             Settings_Array(idx).Salt = Salt;
@@ -9984,7 +9982,6 @@ for tidx = 1:length(Theories)
         for ridx = 1:length(Replicates)
             Rep = num2str(Replicates(ridx));
 
-            %% Model PC
             idx = idx+1;
             Settings_Array(idx) = Shared_Settings;
             Settings_Array(idx).Salt = Salt;

@@ -1,12 +1,12 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'PD';
+Theory = 'BF';
+ModelID = 'PF';
 BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
-savefile = false; % switch to save the final plots to file
+savefile = true; % switch to save the final plots to file
 saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\BO_Review';
 DM_Multiplier = 1e5;
 
