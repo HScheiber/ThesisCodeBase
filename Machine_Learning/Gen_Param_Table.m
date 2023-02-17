@@ -273,11 +273,11 @@ case 'BF' % Wang-Buckingham model
                     switch lower(Settings.Comb_rule)
                         case {'kong' 'kong-sr' 'gromacs' 'gromacs-sr'}
                             % Define approximate tight form constants (valid as r->0)
-                            B_MM = 6.*epsilon_MM.*exp(gamma_MM)./gamma_MM; % prefactor
-                            B_XX = 6.*epsilon_XX.*exp(gamma_XX)./gamma_XX;
+                            B_MM = 6.*Output.epsilon_MM.*exp(Output.gamma_MM)./Output.gamma_MM; % prefactor
+                            B_XX = 6.*Output.epsilon_XX.*exp(Output.gamma_XX)./Output.gamma_XX;
 
-                            C_MM = 2.*epsilon_MM.*(gamma_MM + 3)./gamma_MM; % dispersion
-                            C_XX = 2.*epsilon_XX.*(gamma_XX + 3)./gamma_XX;
+                            C_MM = 2.*Output.epsilon_MM.*(Output.gamma_MM + 3)./Output.gamma_MM; % dispersion
+                            C_XX = 2.*Output.epsilon_XX.*(Output.gamma_XX + 3)./Output.gamma_XX;
 
                             % Apply mixing rules
                             switch lower(Settings.Comb_rule)
@@ -299,11 +299,11 @@ case 'BF' % Wang-Buckingham model
 
                         case {'kong-mid' 'gromacs-mid'}
                             % Define approximate tight form constants (valid as r->0)
-                            B_MM = 3.*epsilon_MM.*exp(gamma_MM)./gamma_MM; % prefactor
-                            B_XX = 3.*epsilon_XX.*exp(gamma_XX)./gamma_XX;
+                            B_MM = 3.*Output.epsilon_MM.*exp(Output.gamma_MM)./Output.gamma_MM; % prefactor
+                            B_XX = 3.*Output.epsilon_XX.*exp(Output.gamma_XX)./Output.gamma_XX;
 
-                            C_MM = epsilon_MM.*(gamma_MM + 3)./gamma_MM; % dispersion
-                            C_XX = epsilon_XX.*(gamma_XX + 3)./gamma_XX;
+                            C_MM = Output.epsilon_MM.*(Output.gamma_MM + 3)./Output.gamma_MM; % dispersion
+                            C_XX = Output.epsilon_XX.*(Output.gamma_XX + 3)./Output.gamma_XX;
 
                             % Apply mixing rules
                             switch lower(Settings.Comb_rule)
@@ -325,11 +325,11 @@ case 'BF' % Wang-Buckingham model
 
                         case {'kong-lr' 'gromacs-lr'}
                             % Define approximate tight form constants (valid as r->0)
-                            B_MM = 6.*epsilon_MM.*exp(gamma_MM).*(sigma_MM.^6)./gamma_MM; % prefactor
-                            B_XX = 6.*epsilon_XX.*exp(gamma_XX).*(sigma_XX.^6)./gamma_XX;
+                            B_MM = 6.*Output.epsilon_MM.*exp(Output.gamma_MM).*(Output.sigma_MM.^6)./Output.gamma_MM; % prefactor
+                            B_XX = 6.*Output.epsilon_XX.*exp(Output.gamma_XX).*(Output.sigma_XX.^6)./Output.gamma_XX;
 
-                            C_MM = 2.*epsilon_MM.*(gamma_MM + 3).*(sigma_MM.^6)./gamma_MM; % dispersion
-                            C_XX = 2.*epsilon_XX.*(gamma_XX + 3).*(sigma_XX.^6)./gamma_XX;
+                            C_MM = 2.*Output.epsilon_MM.*(Output.gamma_MM + 3).*(Output.sigma_MM.^6)./Output.gamma_MM; % dispersion
+                            C_XX = 2.*Output.epsilon_XX.*(Output.gamma_XX + 3).*(Output.sigma_XX.^6)./Output.gamma_XX;
 
                             % Apply mixing rules
                             switch lower(Settings.Comb_rule)

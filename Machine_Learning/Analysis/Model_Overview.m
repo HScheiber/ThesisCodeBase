@@ -2,7 +2,7 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BF';
-ModelID = 'PF';
+ModelID = 'PK';
 BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
@@ -704,8 +704,13 @@ if N_Salts > 1 && ~BestOnly
 
                 % Add boxes for targets
                 if isfield(Bayesopt_Loss_Options,Structures{idx}) && Bayesopt_Loss_Options.(Structures{idx}).(MinPlotTypes{jdx}) > sqrt(eps)
-                    rech = rectangle(axobj_min(idx,jdx),'Position',[0.55 ylmits(1) N_Salts-0.1 (ylmits(2) - ylmits(1))],...
-                            'Curvature',0,'LineWidth',min(3*Bayesopt_Loss_Options.(Structures{idx}).(MinPlotTypes{jdx}),4),'EdgeColor','r');
+                    if strcmp(Structures{idx},'CsCl')
+                        rech = rectangle(axobj_min(idx,jdx),'Position',[0.55 csclylim(1) N_Salts-0.1 (csclylim(2) - csclylim(1))],...
+                                'Curvature',0,'LineWidth',min(3*Bayesopt_Loss_Options.(Structures{idx}).(MinPlotTypes{jdx}),4),'EdgeColor','r');
+                    else
+                        rech = rectangle(axobj_min(idx,jdx),'Position',[0.55 ylmits(1) N_Salts-0.1 (ylmits(2) - ylmits(1))],...
+                                'Curvature',0,'LineWidth',min(3*Bayesopt_Loss_Options.(Structures{idx}).(MinPlotTypes{jdx}),4),'EdgeColor','r');
+                    end
                 end
                 xlim(axobj_min(idx,jdx),[0.5 N_Salts+0.5])
             end
