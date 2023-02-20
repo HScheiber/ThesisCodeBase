@@ -383,7 +383,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
                 gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Equilibrate_TRR_File)];
                 [state,outp] = system(gmx_check);
                 lf = regexp(outp,'Step *([0-9]|\.)+ *([0-9]|\.)+\nTime','tokens','once');
-                if state == 0 || ~isempty(lf)
+                if state == 0 && ~isempty(lf)
                     traj_time = (str2double(lf{1})-1)*str2double(lf{2});
                     if traj_time >=Settings.Solid_Test_Time
                         Run_Equilibration = false;
