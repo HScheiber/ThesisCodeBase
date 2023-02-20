@@ -442,11 +442,6 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
                         B_MM = gamma_MM./sigma_MM; % exponent
                         B_XX = gamma_XX./sigma_XX;
                         
-                        
-                        
-                        
-                        
-                        
                         switch lower(Settings.Comb_rule)
                             case {'kong' 'kong-sr' 'gromacs' 'gromacs-sr'}
                                 % Define approximate tight form constants (valid as r->0)
@@ -723,7 +718,6 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
             Settings.S.Q = Param.SQ;
         end
     case 'Mie'
-
         % sigma/epsilon form (cast in terms of sigma/epsilon scaling internally)
         if Settings.SigmaEpsilon
             % Sigma scaling
@@ -1093,12 +1087,7 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
         end
         strmatch = strcmp(Settings.Finite_T_Data.Structure,Structures);
         V0_model = Settings.Minimization_Data{strmatch}.V; % Volume of model in A^3/molecule
-
-        if ~isfield(Settings,'MaxModelVolume')
-            defSettings = Initialize_LiX_BO_Settings;
-            Settings.MaxModelVolume = defSettings.MaxModelVolume;
-        end
-
+        
         if V0_model > Settings.MaxModelVolume
             Model_Mismatch = (V0_model - Settings.MaxModelVolume)/Settings.MaxModelVolume;
             Loss_add_Vol = Model_Mismatch*Settings.BadFcnLossPenalty;

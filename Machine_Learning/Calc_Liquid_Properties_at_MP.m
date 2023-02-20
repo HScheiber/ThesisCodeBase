@@ -435,10 +435,14 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     
     Run_Equilibration = true;
     if isfile(Equilibrated_Geom_File)
+        % Check equilibrated geom file is not empty
+        s = dir(Equilibrated_Geom_File);
+        
+        % Check if trr is valid
         gmx_check = [Settings.gmx_loc Settings.g_check ' -f ' windows2unix(Equilibrate_TRR_File)];
         [state,outp] = system(gmx_check);
         lf = regexp(outp,'Step *([0-9]|\.)+ *([0-9]|\.)+\nTime','tokens','once');
-        if state == 0 || ~isempty(lf)
+        if s.bytes == 0 && state == 0 && ~isempty(lf)
             traj_time = (str2double(lf{1})-1)*str2double(lf{2});
             if traj_time >= Settings.Liquid_Equilibrate_Time
                 Run_Equilibration = false;
