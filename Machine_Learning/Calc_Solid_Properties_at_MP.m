@@ -372,10 +372,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     
     Equilibrate_TRR_File = fullfile(Settings.WorkDir,'Equil_Sol.trr');
     Final_Geom_File = fullfile(Settings.WorkDir,['Equil_Sol_out.' Settings.CoordType]);
-    Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
+    Final_Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
     
     Run_Equilibration = true;
-    if isfile(Final_Geom_File) && isfile(Energy_file)
+    if isfile(Final_Geom_File) && isfile(Final_Energy_file)
         try
             % Check integrity of minimized geom file
             Data = load_gro_file(Final_Geom_File);
@@ -438,11 +438,10 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
 
         % Prepare Equilibration mdrun command
         Log_File = fullfile(Settings.WorkDir,'Equil_Sol.log');
-        Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
 
         mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(TPR_File) ...
             ' -o ' windows2unix(Equilibrate_TRR_File) ' -g ' windows2unix(Log_File) ...
-            ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Final_Geom_File) add_cpt ...
+            ' -e ' windows2unix(Final_Energy_file) ' -c ' windows2unix(Final_Geom_File) add_cpt ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'Equil_Sol')) ...
             Settings.mdrun_opts];
 
@@ -515,7 +514,6 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
         end
     else
         TPR_File = fullfile(Settings.WorkDir,'Equil_Sol.tpr');
-        Energy_file = fullfile(Settings.WorkDir,'Equil_Sol.edr');
         if N_atoms_prev ~= nmol_solid*2
             copyfile(Final_Geom_File,Settings.SuperCellFile)
         end
@@ -549,7 +547,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     % Check energy options
     gmx_command = [Settings.wsl 'echo "0" ' Settings.pipe ...
         ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
-        ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File)];
+        ' -f ' windows2unix(Final_Energy_file) ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
     
     en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
@@ -564,7 +562,7 @@ function Output = Calc_Solid_Properties_at_MP(Settings,varargin)
     startpoint = Settings.Solid_Test_Time*0.5; % ps
     gmx_command = [Settings.wsl 'echo ' En_set ' ' Settings.pipe ...
         ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
-        ' -f ' windows2unix(Energy_file) ' -o ' windows2unix(En_xvg_file) ...
+        ' -f ' windows2unix(Final_Energy_file) ' -o ' windows2unix(En_xvg_file) ...
         ' -s ' windows2unix(TPR_File) ' -b ' num2str(startpoint) ...
         ' -e ' num2str(Settings.Solid_Test_Time)];
     [err,~] = system(gmx_command);

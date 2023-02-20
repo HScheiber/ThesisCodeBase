@@ -826,9 +826,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     %% Calculate metal ion diffusion coefficient - Start with a simulation using normal barostat/thermostat settings
     Dynamics_TRR_File = fullfile(Settings.WorkDir,'MSD_Liq.trr'); % Production started
     Final_Geom_File = fullfile(Settings.WorkDir,['MSD_Liq_out.' Settings.CoordType]); % Production complete
+    Final_Energy_File = fullfile(Settings.WorkDir,'MSD_Liq.edr');
     
     Run_Dynamics = true;
-    if isfile(Final_Geom_File)
+    if isfile(Final_Geom_File) && isfile(Final_Energy_File)
         try
             % Check integrity of equilibrated geom file
             Data = load_gro_file(Final_Geom_File);
@@ -959,11 +960,10 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
 
         % Prepare Equilibration mdrun command
         Log_File = fullfile(Settings.WorkDir,'MSD_Liq.log');
-        Energy_file = fullfile(Settings.WorkDir,'MSD_Liq.edr');
 
         mdrun_command = [Settings.gmx Settings.mdrun ' -s ' windows2unix(TPR_File) ...
             ' -o ' windows2unix(Dynamics_TRR_File) ' -g ' windows2unix(Log_File) ...
-            ' -e ' windows2unix(Energy_file) ' -c ' windows2unix(Final_Geom_File) add_cpt ...
+            ' -e ' windows2unix(Final_Energy_File) ' -c ' windows2unix(Final_Geom_File) add_cpt ...
             ' -deffnm ' windows2unix(fullfile(Settings.WorkDir,'MSD_Liq')) ...
             Settings.mdrun_opts];
         
@@ -1057,7 +1057,6 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
         if Settings.Verbose
             disp('System dynamics step previously completed.')
         end
-        Energy_file = fullfile(Settings.WorkDir,'MSD_Liq.edr');
         TPR_File = fullfile(Settings.WorkDir,'MSD_Liq.tpr');
     end
     
@@ -1092,7 +1091,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     % Check energy options
     gmx_command = [Settings.wsl 'echo "0" ' Settings.pipe ...
         ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
-        ' -f ' windows2unix(Energy_file) ' -s ' windows2unix(TPR_File)];
+        ' -f ' windows2unix(Final_Energy_File) ' -s ' windows2unix(TPR_File)];
     [~,outpt] = system(gmx_command);
     
     en_opts = regexp(outpt,'End your selection with an empty line or a zero.\n-+(.+?)\n\n','tokens','once');
@@ -1107,7 +1106,7 @@ function Output = Calc_Liquid_Properties_at_MP(Settings)
     startpoint = 0; % ps
     gmx_command = [Settings.wsl 'echo ' En_set ' ' Settings.pipe ...
         ' ' strrep(Settings.gmx_loc,Settings.wsl,'') Settings.g_energy ...
-        ' -f ' windows2unix(Energy_file) ' -o ' windows2unix(En_xvg_file) ...
+        ' -f ' windows2unix(Final_Energy_File) ' -o ' windows2unix(En_xvg_file) ...
         ' -s ' windows2unix(TPR_File) ' -b ' num2str(startpoint) ...
         ' -e ' num2str(Settings.Liquid_Test_Time)];
     [err,~] = system(gmx_command);
