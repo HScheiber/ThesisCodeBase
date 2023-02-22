@@ -515,7 +515,7 @@ switch lower(computer)
         
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'PN';
+        Model_Tag = 'PO';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
