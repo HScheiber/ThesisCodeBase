@@ -413,7 +413,7 @@ switch lower(computer)
         end
         
     case 'narval'
-        %% BF/MT - Crystal+Thermal properties WITH gaussian charge + Lorentz-Berthelot mixing rule (Continuation of MS)
+        %% BF/MU - Crystal+Thermal properties WITH gaussian charge + Lorentz-Berthelot mixing rule (Continuation of MT)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -431,11 +431,11 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = true;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'MS'};
+        Shared_Settings.Initialize_From_Model = {'MT'};
 
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'MT';
+        Model_Tag = 'MU';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -458,14 +458,14 @@ switch lower(computer)
                     'Coulomb_Only',true);
 
                 % Loss function
-                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
+                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
                 Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
                 Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
                 Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0;
                 Settings_Array(idx).Loss_Options.CsCl.RLE      = 0;
                 Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_DM_MP  = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-                Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+                Settings_Array(idx).Loss_Options.Liquid_DM_MP  = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                Settings_Array(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
                 Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                 Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
 
@@ -493,7 +493,7 @@ switch lower(computer)
             end
         end
         
-        %% BF/PO - Crystal+Thermal properties with point charge + 'kong-lr' mixing rule (continuation of PN)
+        %% BF/PR - Crystal+Thermal properties with point charge + 'kong-lr' mixing rule (continuation of PO)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -511,11 +511,11 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'PN'};
+        Shared_Settings.Initialize_From_Model = {'PO'};
         
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'PO';
+        Model_Tag = 'PR';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -536,14 +536,14 @@ switch lower(computer)
                 Settings_Array(idx).Comb_rule = 'kong-lr';
                 
                 % Loss function
-                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
+                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
                 Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
                 Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
                 Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0;
                 Settings_Array(idx).Loss_Options.CsCl.RLE      = 0;
                 Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-                Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+                Settings_Array(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                Settings_Array(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
                 Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                 Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                 
@@ -569,7 +569,7 @@ switch lower(computer)
             end
         end
         
-        %% BF/PQ - Crystal+Thermal properties with point charge + 'kong-sr' mixing rule (continuation of PL)
+        %% BF/PS - Crystal+Thermal properties with point charge + 'kong-sr' mixing rule (continuation of PQ)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -587,11 +587,11 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'PL'};
+        Shared_Settings.Initialize_From_Model = {'PQ'};
         
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'PQ';
+        Model_Tag = 'PS';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -612,14 +612,14 @@ switch lower(computer)
                 Settings_Array(idx).Comb_rule = 'kong-sr';
                 
                 % Loss function
-                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 10;
+                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
                 Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
                 Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0.1;
                 Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0;
                 Settings_Array(idx).Loss_Options.CsCl.RLE      = 0;
                 Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0.1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-                Settings_Array(idx).Loss_Options.MP_Volume_Change = 10; % Fitting the experimental change in volume due to melting at the experimental MP
+                Settings_Array(idx).Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+                Settings_Array(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
                 Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
                 Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
                 
