@@ -1013,6 +1013,39 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     % Save final results
     save(Full_opt_filename,'full_opt_results','loss','full_opt_point',...
         'Minimization_Data','Finite_T_Data','Pars','Calculation_properties');
-    diary off
     
+    %% Export final results to data store
+    destination_folder = '/home/scheiber/project/Model_Building/Completed';
+    inpfile = fullfile(Settings.OuterDir,[FileBase '.inp']);
+    fullopt = fullfile(Settings.OuterDir,Full_opt_filename);
+    bayesopt = fullfile(Settings.OuterDir,Results_filename);
+    destfile = fullfile(destination_folder,Settings.Salt,[FileBase '_data.mat']);
+    
+    if isfile(fullopt)
+        full_data = load(fullopt);
+    else
+        full_data = struct;
+    end
+    if isfile(bayesopt)
+        bayesopt_dat = load(bayesopt);
+    else
+        bayesopt_dat = struct;
+        bayesopt_dat.results = [];
+    end
+    
+    if isfile(inpfile)
+        input_model = load(inpfile,'-mat');
+        full_data.Settings = input_model.Settings;
+    end
+    if isfile(Intermediate_Fullopt_file)
+        fullopt_hist_dat = load(Intermediate_Fullopt_file);
+        full_data.secondary_result = fullopt_hist_dat.intermediate_data;
+    end
+    full_data.bayesopt_results = bayesopt_dat.results;
+
+    if ~isfolder(fullfile(destination_folder,Settings.Salt))
+        mkdir(fullfile(destination_folder,Settings.Salt))
+    end
+    save(destfile,full_data);
+    diary off
 end
