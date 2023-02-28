@@ -1054,6 +1054,6 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     if ~isfolder(fullfile(destination_folder,Settings.Salt))
         mkdir(fullfile(destination_folder,Settings.Salt))
     end
-    save(destfile,full_data);
+    save(destfile,'full_data');
     diary off
 end
