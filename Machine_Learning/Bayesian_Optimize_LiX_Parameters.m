@@ -277,12 +277,20 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
 
     if ~run_bayesopt
         % Skip primary bayesian optimization step
-        
         % Find and Load the previous results
-        obs = dir(['*Model_' Settings.Trial_ID '*_bayesopt.mat']);         
-        res = load(obs.name); % Loads the results variable
-        results = res.results;
-        
+        try
+            obs = dir(['*Model_' Settings.Trial_ID '*_bayesopt.mat']);         
+            res = load(obs.name); % Loads the results variable
+            results = res.results;
+        catch
+            disp('Unable to load finished bayesian optimization datafile.')
+            disp('Retrying from last checkpoint.')
+            if isfield(obs,'name') && isfile(obs.name)
+                delete(obs.name);
+            end
+            Bayesian_Optimize_LiX_Parameters(Input_Settings);
+            return
+        end
     elseif Settings.Continue_Calculation && continue_bayesopt
         % If you want to resume:
         try
