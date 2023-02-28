@@ -129,13 +129,13 @@ function Loss = LiX_Loss(Settings)
         
         % The reference structure for the gap. 
         % Current structure is looped through.
-        Gap_ref_structure = Settings.Loss_Options.(Structure).Gap.Ref;
+        Gap_ref_structure = Settings.Loss_Options.(Structure).Gap.Ref; % Ex: Rocksalt
         
         % The target gap between reference and current structure
         % Gap.Value < 0 -> "reference structure" is favoured
         % Gap.Value > 0 -> "current structure" is favoured
         % Gap.Value = 0 -> structures are equal in energy
-        Target_Gap = Settings.Loss_Options.(Structure).Gap.Value;
+        Target_Gap = Settings.Loss_Options.(Structure).Gap.Value; % Ex: -2 kJ/mol
         
         % Difference in energy between the reference structure and the current structure. 
         % Negative values means the "reference structure" is favoured. 
