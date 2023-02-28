@@ -5,8 +5,8 @@ fs = 32;
 mkrsz = 14;
 linestyles = {'-',':','-.','--'};
 mkrshapes = {'s' 'd' '^' 'o'};
-%DataSetName = 'Alexandria_Melting_Point_Data.mat';
-DataSetName = 'Alexandria_Polarized_Melting_Point_Data.mat';
+DataSetName = 'Alexandria_Melting_Point_Data.mat';
+%DataSetName = 'Alexandria_Polarized_Melting_Point_Data.mat';
 Models = {'BF'}; %  'BH' 'JC' 'Mie'
 Legend_Labels = {'Experiment' 'Alexandria'}; % 'BK' 'Lennard Jones [12-6]' 'Lennard Jones [8-6]'};
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI' ...
@@ -31,8 +31,8 @@ Lit = Load_Literature_Model_MPs;
 
 SaveDataDir = fullfile(Settings.home,'data',DataSetName);
 Data = load(SaveDataDir).Data;
-Data.LiI.BF.Rocksalt.Alt_Structure = false;
-Data.LiI.BF.Rocksalt.dT = [909 909];
+%Data.LiI.BF.Rocksalt.Alt_Structure = false;
+%Data.LiI.BF.Rocksalt.dT = [909 909];
 
 
 % This is the X coordinate to map to the salts
