@@ -591,13 +591,11 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                                 delete(Intermediate_Fullopt_backup);
                             end
                             disp('Unable to load backup secondary optimization checkpoint file, restarting.')
-                            [~,midx] = min(results.ObjectiveTrace);
-                            x0 = results.XTrace{midx,:};
+                            x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
                         end
                     end
                 else
-                    [~,midx] = min(results.ObjectiveTrace);
-                    x0 = results.XTrace{midx,:};
+                    x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
                 end
 
                 [full_opt_point,~,~,full_opt_results] = fminsearch(fun,x0,optionsNM);
@@ -664,14 +662,12 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                                 delete(Intermediate_Fullopt_backup);
                             end
                             remaining_evals = Settings.Max_Local_Iterations;
-                            [~,midx] = min(results.ObjectiveTrace);
-                            x0 = results.XTrace{midx,:};
+                            x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
                         end
                     end
                 else
                     remaining_evals = Settings.Max_Local_Iterations;
-                    [~,midx] = min(results.ObjectiveTrace);
-                    x0 = results.XTrace{midx,:};
+                    x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
                 end
 
                 [full_opt_point,~,exitflag,full_opt_results] = fminsearchbnd(fun,x0,lb,ub,optionsNM);
@@ -740,16 +736,13 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                             if isfile(Intermediate_Fullopt_backup)
                                 delete(Intermediate_Fullopt_backup);
                             end
-                            [~,midx] = min(results.ObjectiveTrace);
-                            x0 = results.XTrace{midx,:};
-                            
+                            x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
                             init_meshsize = 0.1;
                             max_iter = Settings.Max_Local_Iterations;
                         end
                     end
                 else
-                    [~,midx] = min(results.ObjectiveTrace);
-                    x0 = results.XTrace{midx,:};
+                    x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
                     init_meshsize = 0.1;
                     max_iter = Settings.Max_Local_Iterations;
                 end
@@ -776,20 +769,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
         %             'SearchFcn',{@searchneldermead,1,optionsNM});
 
                 [full_opt_point,~,~,full_opt_results] = patternsearch(fun,x0,[],[],[],[],lb,ub,[],options);
-
-                % Check to see if the max local iterations is exceeded
-        %         if exitflag == 0  && max_iter > 1 && Model.switch_final_opt % calculation exceeded number of allowed iterations
-        %             disp('Swicthing local optimization to fminsearchbnd')
-        %             Model.final_opt_type = 'fminsearchbnd';
-        %             
-        %             % Overwrite the input file if it exists
-        %             if batch_subm
-        %                 save(Input_Model,'Settings','-mat')
-        %             end
-        %             
-        %             Bayesian_Optimize_LiX_Parameters(Settings)
-        %             return
-        %         end
+                
             case 'fmincon' % fmincon uses gradients!
 
                 % Constraints
@@ -823,14 +803,12 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                             if isfile(Intermediate_Fullopt_backup)
                                 delete(Intermediate_Fullopt_backup);
                             end
-                            [~,midx] = min(results.ObjectiveTrace);
-                            x0 = results.XTrace{midx,:};
+                            x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
                             max_iter = Settings.Max_Local_Iterations;
                         end
                     end
                 else
-                    [~,midx] = min(results.ObjectiveTrace);
-                    x0 = results.XTrace{midx,:};
+                    x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
                     max_iter = Settings.Max_Local_Iterations;
                 end
 
@@ -853,8 +831,7 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
                 full_opt_results.funccount = 0;
                 full_opt_results.algorithm = 'none';
                 full_opt_results.message = 'Local optimization skipped. Results are for best global optimization point.';
-                [~,midx] = min(results.ObjectiveTrace);
-                full_opt_point = results.XTrace{midx,:};
+                full_opt_point = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
             otherwise
                 error('Unknown final optimization scheme. Choose one of "fminsearch", "patternsearch", "fminsearchbnd", or "none"')
         end

@@ -8,4 +8,7 @@ function Settings = Update_BO_LiX_Settings(Settings)
     if ~isfield(Settings,'OuterDir')
         Settings.OuterDir = pwd;
     end
+    if ~isfield(Settings,'BestPointCriterion')
+        Settings.BestPointCriterion = 'min-observed';
+    end
 end

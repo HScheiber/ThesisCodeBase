@@ -168,8 +168,8 @@ Settings.Theory = 'BF';
 Settings.InnerRange = false;
 Settings.Trial_ID = 'VV1';
 Settings.UseCoupledConstraint = false;
-Settings.Initialize_From_Model = {};
-Settings.Comb_rule = 'Kong';
+Settings.Initialize_From_Model = {'PS'};
+Settings.Comb_rule = 'kong-sr';
 
 %Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
 
@@ -204,7 +204,6 @@ Settings.Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
 % Other loss options options
 Settings.Fix_Charge = true;
 Settings.Additivity = true;
-Settings.Comb_rule = 'Kong'; % One of: 'Lorentz-Berthelot', 'Kong', 'Hogervorst[-wbk]', 'GROMACS'. Only applies to BH and BF models
 
 % Auto structure selection
 Settings.Structures = Auto_Structure_Selection(Settings);
