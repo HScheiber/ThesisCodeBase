@@ -83,6 +83,8 @@ Settings.MinSampleDistance = 1e-1; % Controls how often surrogateopt resets but 
 Settings.ExplorationRatio = 2; % Exploration ratio used in 'plus' Acquisition Functions, or kappa used in lower-confidence-bound
 Settings.KernelFunction = 'ardmatern52'; % The covariance function used in the primary bayesian optimization
 Settings.ShowPlots = true; % Switch to turn on/off BO plots
+Settings.BestPointCriterion = 'min-observed'; % What type of best point is reported by the Bayesian optimization. one of:  'min-observed' | 'min-mean' | 'min-visited-mean'
+
 % Available Kernels:
 % 'exponential', 'squaredexponential', 'matern32', 'matern52', 
 % 'rationalquadratic', 'ardexponential', 'ardsquaredexponential', 
@@ -93,7 +95,6 @@ Settings.ShowPlots = true; % Switch to turn on/off BO plots
 % 'expected-improvement-plus' with ExplorationRatio determining exploration/exploitation trade off
 % 'lower-confidence-bound' with ExplorationRatio = kappa
 % 'probability-of-improvement'
-
 
 % (optional) secondary bayesian optimization settings
 Settings.second_opt_type = 'bayesopt'; % One of 'bayesopt' or 'none'

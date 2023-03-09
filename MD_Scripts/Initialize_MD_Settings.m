@@ -245,9 +245,9 @@ Settings.MP_Equilibrate_Solid = 15; % number of ps to equilibrate the solid for,
 Settings.MP_Equilibrate_Liquid = 20; % number of ps to equilibrate the liquid for, use 0 to skip. Only works for flat solid-liquid interface
 Settings.MinTimeStep = 0.00025; % [ps] minimum time step
 Settings.StaticCheckTime = true; % When true, always use CheckTime. When false, expand CheckTime dynamically to reduce number of checks.
-Settings.Optimizer = 'MPSearcher'; % [Depreciated] Sets the MP algorithm. One of fmincon, patternsearch, MPSearcher, or bayesopt
 
 %% optimizer settings
+Settings.Optimizer = 'MPSearcher'; % [Depreciated] Sets the MP algorithm. One of fmincon, patternsearch, MPSearcher, or bayesopt
 Settings.ExplorationRatio = 1; % only applies to bayesopt
 Settings.Acquisition_Function = 'expected-improvement'; % only applies to bayesopt
 Settings.MaxMPIterations = 10; % Maximum iterations for MP calculations, does not apply to MPSearcher optimizer.
@@ -260,8 +260,6 @@ Settings.BracketThreshold = 5; % [K] Sets the target bracket for the melting poi
 Settings.MinStepSize = 0.25; % [K] Sets the minimum step size between iterations in K
 Settings.UseDerivativeWeighting = false; % Set true to use derivative-weighted midpoints
 Settings.IgnoreBounds = false; % Ignores recording the MP bounds if set to true. Usually only used on the final iteration.
-Settings.BestPointCriterion = 'min-observed'; % What type of best point is reported by the Bayesian optimization
-% one of:  'min-observed' | 'min-mean' | 'min-visited-mean'
 
 %% Postprocessor settings
 Settings.RunPostProcessor = true; % Turns on or off postprocessing of the trajectory
