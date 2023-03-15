@@ -2,7 +2,7 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BF';
-ModelID = 'PU';
+ModelID = 'QD';
 BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
@@ -27,6 +27,7 @@ plot_ac = false;
 plot_volume = false;
 plot_density = false;
 plot_loss = true;
+true_loss = true; % when true, plot the final re-calculated loss rather than the loss reported during Bayesian optimization
 plot_finite_T_data = true;
 
 %% Script begins
@@ -237,17 +238,21 @@ if N_MinPlot_Rows
                 
                 Minimization_Data = data.Minimization_Data;
                 
-                if isfield(data,'secondary_result')
-                    optimvals = nan(1,length(data.secondary_result));
-                    for jdx = 1:length(data.secondary_result)
-                        optimvals(jdx) = [data.secondary_result(jdx).optimValues.fval];
-                    end
-                    Total_loss(idx,iidx) = min(optimvals);
-                elseif isfield(data,'bayesopt_results') && ~isempty(data.bayesopt_results)
-                    %Total_loss(idx,iidx) = data.bayesopt_results.MinObjective;
-                    Total_loss(idx,iidx) = min(data.bayesopt_results.ObjectiveTrace);
+                if true_loss
+                    Total_loss(idx,iidx) = data.loss;
                 else
-                    Total_loss(idx,iidx) = nan;
+                    if isfield(data,'secondary_result')
+                        optimvals = nan(1,length(data.secondary_result));
+                        for jdx = 1:length(data.secondary_result)
+                            optimvals(jdx) = [data.secondary_result(jdx).optimValues.fval];
+                        end
+                        Total_loss(idx,iidx) = min(optimvals);
+                    elseif isfield(data,'bayesopt_results') && ~isempty(data.bayesopt_results)
+                        %Total_loss(idx,iidx) = data.bayesopt_results.MinObjective;
+                        Total_loss(idx,iidx) = min(data.bayesopt_results.ObjectiveTrace);
+                    else
+                        Total_loss(idx,iidx) = nan;
+                    end
                 end
             catch
                 disp(['Could not obtain crystal minimization data for: ' Salt ', ' Theory ', Model ' Model '.']);
