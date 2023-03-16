@@ -163,12 +163,12 @@ Settings.Polarization = false;
 %% Test Model Particular parameter
 Settings.ShowPlots = false;
 Settings.GPActiveSetSize = 1000; % Also applies to final optimization
-Settings.Salt = 'LiX';
+Settings.Salt = 'LiI';
 Settings.Theory = 'BF';
 Settings.InnerRange = false;
 Settings.Trial_ID = 'XX1';
 Settings.UseCoupledConstraint = false;
-Settings.Initialize_From_Model = {};
+Settings.Initialize_From_Model = {'RC'};
 Settings.Comb_rule = 'hogervorst-wbk';
 
 %Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters

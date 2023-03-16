@@ -11,4 +11,7 @@ function Settings = Update_BO_LiX_Settings(Settings)
     if ~isfield(Settings,'BestPointCriterion')
         Settings.BestPointCriterion = 'min-observed';
     end
+    if ~isfield(Settings,'Initialize_From_Model_ExcludeError')
+        Settings.InitializeExcludeError = false;
+    end
 end

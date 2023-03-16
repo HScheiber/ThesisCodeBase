@@ -29,6 +29,7 @@ Settings.Diary_Loc = '';
 % Note that the previous calculations must have the same targets, or at least cover all of the current targets
 Settings.Initialize_From_Model = {};
 Settings.Initialize_From_Model_Subsample = Inf;
+Settings.InitializeExcludeError = false; % Exclude loading NaN objective values from dataset when true
 
 % Charge
 Settings.Q_Range = [0.95 1.05]; % Default range for charge scaling. Only meaningful when Fix_Charge = false

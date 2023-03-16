@@ -2,7 +2,7 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BF';
-ModelID = 'QD';
+ModelID = 'RI';
 BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
@@ -532,7 +532,9 @@ if N_Salts > 1 && ~BestOnly
             xticks(axobj_loss(idx),1:N_Models)
             xticklabels(axobj_loss(idx),[])
             axobj_loss(idx).XAxis.TickLength = [0,0];
-            ylim(axobj_loss(idx),[0 max(plot_data./(10.^expon))*1.1])
+            if ~all(isnan(plot_data))
+            	ylim(axobj_loss(idx),[0 max(plot_data./(10.^expon))*1.1])
+            end
             if savefile
                 sgtitle(loss_panel,['Minimized Objective Function $f\left(\mathbf{x}^{*}\right)$: ' ...
                     PubTheoryName ' Model ' ModelID],...

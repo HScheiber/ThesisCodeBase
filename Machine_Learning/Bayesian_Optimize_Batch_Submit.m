@@ -576,7 +576,7 @@ switch lower(computer)
             end
         end
         
-        %% BF/RI - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule (Continuation of PT and PU)
+        %% BF/RJ - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule (Continuation of PT and PU)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -614,10 +614,11 @@ switch lower(computer)
                 idx = idx+1;
                 Settings_Array(idx) = Shared_Settings;
                 
-                Settings_Array(idx).FinalGPFitActiveSetSize = 10000; % Final GP fit
+                Settings_Array(idx).FinalGPFitActiveSetSize = 15000; % Final GP fit
                 Settings_Array(idx).BestPointCriterion = 'min-visited-mean';
                 Settings_Array(idx).Hours = 24; % Max time for each job (hours)
                 Settings_Array(idx).N_Calc = 2; % Number of chained calculations
+                Settings_Array(idx).InitializeExcludeError = true;
                 
                 Settings_Array(idx).Salt = Salt;
                 Settings_Array(idx).Theory = Theory;

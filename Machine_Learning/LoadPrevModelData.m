@@ -101,6 +101,15 @@ for idx = 1:numel(datafields)
     Prev_Data.(field) = Prev_Data.(field)(idxUnique,:);
 end
 
+% Optional: remove all data with NaN objective
+if Settings.InitializeExcludeError
+    valid_idx = Prev_Data.InitialErrorValues ~= -1;
+    for idx = 1:numel(datafields)
+        field = datafields{idx};
+        Prev_Data.(field) = Prev_Data.(field)(valid_idx,:);
+    end
+end
+
 % Re-calculate objective function based on user data
 Prev_Data.InitialObjective = Loss_Recalculate(Settings,Prev_Data.InitialX,...
     Prev_Data.InitialUserData,data.Settings.Structures);
