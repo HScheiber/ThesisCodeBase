@@ -576,7 +576,7 @@ switch lower(computer)
             end
         end
         
-        %% BF/RA - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule (Continuation of PT and PU)
+        %% BF/RI - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule (Continuation of PT and PU)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -692,7 +692,7 @@ switch lower(computer)
             Settings_Array(idx).Salt = Salt;
             Settings_Array(idx).Theory = Theory;
             Settings_Array(idx).Trial_ID = [Model_Tag Rep];
-            Settings_Array(idx).Comb_rule = 'hovervorst-wbk';
+            Settings_Array(idx).Comb_rule = 'hogervorst-wbk';
             Settings_Array(idx).Hours = 6; % Max time for each job (hours)
 
             % Loss function

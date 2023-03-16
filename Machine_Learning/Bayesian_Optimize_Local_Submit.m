@@ -156,34 +156,34 @@ Settings.Initial_N_Multiplier = 20; % Multiply the number of input dimensions by
 Settings.Acquisition_Function = 'expected-improvement-plus';
 Settings.ExplorationRatio = 2;
 Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
-Settings.GaussianCharge = true;
+Settings.GaussianCharge = false;
 Settings.Polarization = false;
 
 
 %% Test Model Particular parameter
 Settings.ShowPlots = false;
 Settings.GPActiveSetSize = 1000; % Also applies to final optimization
-Settings.Salt = 'LiI';
+Settings.Salt = 'LiX';
 Settings.Theory = 'BF';
 Settings.InnerRange = false;
-Settings.Trial_ID = 'VV1';
+Settings.Trial_ID = 'XX1';
 Settings.UseCoupledConstraint = false;
-Settings.Initialize_From_Model = {'PS'};
-Settings.Comb_rule = 'kong-sr';
+Settings.Initialize_From_Model = {};
+Settings.Comb_rule = 'hogervorst-wbk';
 
 %Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
 
 % Loss function
 Settings.Loss_Options.Rocksalt.LE   = 1;
 Settings.Loss_Options.Rocksalt.a    = 1;
-Settings.Loss_Options.Wurtzite.RLE  = 1;
+Settings.Loss_Options.Wurtzite.RLE  = 0;
 Settings.Loss_Options.FiveFive.RLE  = 0;
 Settings.Loss_Options.CsCl.RLE      = 0;
-Settings.Loss_Options.Fusion_Enthalpy  = 0; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-Settings.Loss_Options.Liquid_DM_MP = 0; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-Settings.Loss_Options.MP_Volume_Change = 0; % Fitting the experimental change in volume due to melting at the experimental MP
-Settings.Loss_Options.Liquid_MP_Volume = 0; % Fitting the experimental volume per formula unit at the experimental MP
-Settings.Loss_Options.Solid_MP_Volume  = 0; % Fitting the experimental volume of the experimental solid structure at the experimental MP
+Settings.Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
+Settings.Loss_Options.Liquid_DM_MP = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
+Settings.Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
+Settings.Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
+Settings.Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
 
 % Add gaps
 Settings.Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:

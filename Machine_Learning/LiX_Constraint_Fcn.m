@@ -437,6 +437,8 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
                                 sigma_MX = gamma_MX./B_MX;
                                 epsilon_MX = A_MX.*(B_MX.^6).*(gamma_MX.^(-5)).*exp(-gamma_MX)./6;
                         end
+                    otherwise
+                        error(['Unknown combining rule: ' Settings.Comb_rule])
                 end
         else
             sigma_MX = Param.sigma_MX; % nm
