@@ -14,4 +14,7 @@ function Settings = Update_BO_LiX_Settings(Settings)
     if ~isfield(Settings,'Initialize_From_Model_ExcludeError')
         Settings.InitializeExcludeError = false;
     end
+    if ~isfield(Settings,'InitializeRealizeError')
+        Settings.InitializeRealizeError = false;
+    end
 end

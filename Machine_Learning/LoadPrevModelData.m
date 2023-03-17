@@ -101,18 +101,21 @@ for idx = 1:numel(datafields)
     Prev_Data.(field) = Prev_Data.(field)(idxUnique,:);
 end
 
+% Re-calculate objective function based on user data
+Prev_Data.InitialObjective = Loss_Recalculate(Settings,Prev_Data.InitialX,...
+    Prev_Data.InitialUserData,data.Settings.Structures);
+
 % Optional: remove all data with NaN objective
 if Settings.InitializeExcludeError
-    valid_idx = Prev_Data.InitialErrorValues ~= -1;
+    valid_idx = Prev_Data.InitialErrorValues == 1;
     for idx = 1:numel(datafields)
         field = datafields{idx};
         Prev_Data.(field) = Prev_Data.(field)(valid_idx,:);
     end
+elseif Settings.InitializeRealizeError % otherwise set to pentalty
+    error_idx = Prev_Data.InitialErrorValues == -1;
+    Prev_Data.InitialObjective(error_idx) = log1p(Settings.BadFcnLossPenalty);
 end
-
-% Re-calculate objective function based on user data
-Prev_Data.InitialObjective = Loss_Recalculate(Settings,Prev_Data.InitialX,...
-    Prev_Data.InitialUserData,data.Settings.Structures);
 
 % Tale a Random subsample
 Ndata = numel(Prev_Data.InitialObjective);

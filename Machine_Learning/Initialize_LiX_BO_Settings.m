@@ -30,6 +30,7 @@ Settings.Diary_Loc = '';
 Settings.Initialize_From_Model = {};
 Settings.Initialize_From_Model_Subsample = Inf;
 Settings.InitializeExcludeError = false; % Exclude loading NaN objective values from dataset when true
+Settings.InitializeRealizeError = false; % Reset NaN objective values to log1p(BadFcnLossPenalty)
 
 % Charge
 Settings.Q_Range = [0.95 1.05]; % Default range for charge scaling. Only meaningful when Fix_Charge = false

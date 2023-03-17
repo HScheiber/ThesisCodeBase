@@ -168,6 +168,7 @@ Settings.Theory = 'BF';
 Settings.InnerRange = false;
 Settings.Trial_ID = 'XX1';
 Settings.UseCoupledConstraint = false;
+Settings.InitializeRealizeError = true;
 Settings.Initialize_From_Model = {'RC'};
 Settings.Comb_rule = 'hogervorst-wbk';
 
