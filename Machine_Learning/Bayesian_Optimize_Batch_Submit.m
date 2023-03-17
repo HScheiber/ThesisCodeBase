@@ -576,7 +576,7 @@ switch lower(computer)
             end
         end
         
-        %% BF/RK - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule (Continuation of PT and PU)
+        %% BF/RL - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule (Continuation of RA)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -598,7 +598,7 @@ switch lower(computer)
 
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'RK';
+        Model_Tag = 'RL';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -615,10 +615,10 @@ switch lower(computer)
                 Settings_Array(idx) = Shared_Settings;
                 
                 Settings_Array(idx).FinalGPFitActiveSetSize = 15000; % Final GP fit
-                Settings_Array(idx).BestPointCriterion = 'min-visited-mean';
+                Settings_Array(idx).BestPointCriterion = 'min-visited-upper-confidence-interval';
                 Settings_Array(idx).Hours = 24; % Max time for each job (hours)
                 Settings_Array(idx).N_Calc = 2; % Number of chained calculations
-                Settings_Array(idx).InitializeRealizeError = true;
+                Settings_Array(idx).InitializeExcludeError = true;
                 
                 Settings_Array(idx).Salt = Salt;
                 Settings_Array(idx).Theory = Theory;
