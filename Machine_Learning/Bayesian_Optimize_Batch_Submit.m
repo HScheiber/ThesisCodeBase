@@ -89,7 +89,7 @@ Shared_Settings.InnerRange = true; % Sets domain of BH/TF
 Shared_Settings.GPActiveSetSize = 1000;
 
 % Shared job settings
-Shared_Settings.N_Calc = 8; % Number of chained calculations
+Shared_Settings.N_Calc = 10; % Number of chained calculations
 Shared_Settings.Hours = 3; % Max time for each job (hours)
 Shared_Settings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.Nodes = 0; % Minimum number of cores to request for calculation.
@@ -182,170 +182,7 @@ Exp = Load_Experimental_Data;
 idx=0;
 switch lower(computer)
     case 'cedar'
-        %% BF/RH - Crystal properties with point charge + hogervorst-wbk mixing rule (Continuation of RC)
-        Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
-        Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
-        Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 200;
-        Shared_Settings.Max_Secondary_Iterations = 100;
-        Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
-        Shared_Settings.Parallel_Bayesopt = true;
-        Shared_Settings.Parallel_Struct_Min = false;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.UseCoupledConstraint = false;
-        Shared_Settings.InnerRange = false; % Sets domain of BH/TF/BF
-        Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Shared_Settings.EnforceRR = true;
-        Shared_Settings.GaussianCharge = false;
-        Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'RC'};
-
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
-        Theory = 'BF';
-        Model_Tag = 'RH';
-        Replicates = 1:5;
-        for sidx = 1:length(Salts)
-            Salt = Salts{sidx};
-
-            % Set initial MP temperature
-            Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-            Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
-            Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-
-            for ridx = 1:length(Replicates)
-                Rep = num2str(Replicates(ridx));
-                
-                idx = idx+1;
-                Settings_Array(idx) = Shared_Settings;
-                Settings_Array(idx).final_opt_type = 'fminsearchbnd';
-                Settings_Array(idx).MaxFunEvals = 100;
-                Settings_Array(idx).switch_final_opt = true;
-                Settings_Array(idx).Max_Local_Iterations = 500; % max iterations of the final optimizations
-                
-                
-                Settings_Array(idx).Salt = Salt;
-                Settings_Array(idx).Theory = Theory;
-                Settings_Array(idx).Trial_ID = [Model_Tag Rep];
-                Settings_Array(idx).Comb_rule = 'hogervorst-wbk';
-                
-                % Loss function
-                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
-                Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
-                Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 1;
-                Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0;
-                Settings_Array(idx).Loss_Options.CsCl.RLE      = 0;
-                Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 0; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_DM_MP = 0; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-                Settings_Array(idx).Loss_Options.MP_Volume_Change = 0; % Fitting the experimental change in volume due to melting at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 0; % Fitting the experimental volume per formula unit at the experimental MP
-                Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 0; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-                
-                % Add gaps
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
-
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
-
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
-
-
-                Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
-                Settings_Array(idx).Fix_Charge = true;
-                Settings_Array(idx).Additivity = true;
-
-            end
-        end
-        
-        %% BF/MX - Crystal+Thermal properties WITH gaussian charge + Lorentz-Berthelot mixing rule (Continuation of MW)
-        Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
-        Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
-        Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 200;
-        Shared_Settings.Max_Secondary_Iterations = 100;
-        Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.UseCoupledConstraint = false;
-        Shared_Settings.InnerRange = false; % Sets domain of BH/TF/BF
-        Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Shared_Settings.EnforceRR = true;
-        Shared_Settings.final_opt_type = 'none';
-        Shared_Settings.GaussianCharge = true;
-        Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'MW'};
-
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
-        Theory = 'BF';
-        Model_Tag = 'MX';
-        Replicates = 1:5;
-        for sidx = 1:length(Salts)
-            Salt = Salts{sidx};
-
-            % Set initial MP temperature
-            Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-            Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
-            Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-
-            for ridx = 1:length(Replicates)
-                Rep = num2str(Replicates(ridx));
-                
-                idx = idx+1;
-                Settings_Array(idx) = Shared_Settings;
-                Settings_Array(idx).Salt = Salt;
-                Settings_Array(idx).Theory = Theory;
-                Settings_Array(idx).Trial_ID = [Model_Tag Rep];
-                Settings_Array(idx).Comb_rule = 'lorentz-berthelot';
-                Settings_Array(idx) = Alexandria_Potential_Parameters(Settings_Array(idx),...
-                    'Coulomb_Only',true);
-
-                % Loss function
-                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
-                Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
-                Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0;
-                Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0;
-                Settings_Array(idx).Loss_Options.CsCl.RLE      = 0;
-                Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_DM_MP  = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-                Settings_Array(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
-                Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-
-                % Add gaps
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
-
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
-
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
-
-
-                Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
-                Settings_Array(idx).Fix_Charge = true;
-                Settings_Array(idx).Additivity = true;
-
-            end
-        end
-        
-        %% BF/RG - Crystal+Thermal properties with point charge + 'kong-sr' mixing rule (continuation of RD)
+        %% BF/RO - Crystal+Thermal properties with point charge + 'kong-sr' mixing rule (continuation of RG)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -363,11 +200,11 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'RD'};
+        Shared_Settings.Initialize_From_Model = {'RG'};
         
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'RG';
+        Model_Tag = 'RO';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -421,86 +258,7 @@ switch lower(computer)
             end
         end
         
-        %% BF/MY - Crystal+Thermal properties with point charge + Lorentz-Berthelot mixing rule (Continuation of MR)
-        Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
-        Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
-        Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 200;
-        Shared_Settings.Max_Secondary_Iterations = 100;
-        Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
-        Shared_Settings.Parallel_Bayesopt = false;
-        Shared_Settings.Parallel_Struct_Min = true;
-        Shared_Settings.Parallel_LiX_Minimizer = false;
-        Shared_Settings.UseCoupledConstraint = false;
-        Shared_Settings.InnerRange = false; % Sets domain of BH/TF/BF
-        Shared_Settings.MPI_Ranks = 12; % Sets the number of MPI ranks (distributed memory parallel processors). -1 for auto
-        Shared_Settings.OMP_Threads = 1; % Set the number of OMP threads per MPI rank
-        Shared_Settings.EnforceRR = true;
-        Shared_Settings.final_opt_type = 'none';
-        Shared_Settings.GaussianCharge = false;
-        Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'MR'};
-
-        Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
-        Theory = 'BF';
-        Model_Tag = 'MY';
-        Replicates = 1:5;
-        for sidx = 1:length(Salts)
-            Salt = Salts{sidx};
-
-            % Set initial MP temperature
-            Shared_Settings.Target_T = Exp.(Salt).mp; % Target temperature in kelvin. Does not apply when thermostat option 'no' is chosen
-            Shared_Settings.MDP.Initial_T = Exp.(Salt).mp; % Initial termpature at which to generate velocities
-            Shared_Settings.T0 = Exp.(Salt).mp; % K, Initial temperature
-
-            for ridx = 1:length(Replicates)
-                Rep = num2str(Replicates(ridx));
-                
-                idx = idx+1;
-                Settings_Array(idx) = Shared_Settings;
-                Settings_Array(idx).Salt = Salt;
-                Settings_Array(idx).Theory = Theory;
-                Settings_Array(idx).Trial_ID = [Model_Tag Rep];
-                Settings_Array(idx).Comb_rule = 'lorentz-berthelot';
-
-                % Loss function
-                Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
-                Settings_Array(idx).Loss_Options.Rocksalt.a    = 1;
-                Settings_Array(idx).Loss_Options.Wurtzite.RLE  = 0;
-                Settings_Array(idx).Loss_Options.FiveFive.RLE  = 0;
-                Settings_Array(idx).Loss_Options.CsCl.RLE      = 0;
-                Settings_Array(idx).Loss_Options.Fusion_Enthalpy  = 10; % Fitting the experimental enthalpy difference of the liquid and solid at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_DM_MP  = 1; % Fitting the experimental metal ion diffusion constant of the molten salt at the experimental MP
-                Settings_Array(idx).Loss_Options.MP_Volume_Change = 1; % Fitting the experimental change in volume due to melting at the experimental MP
-                Settings_Array(idx).Loss_Options.Liquid_MP_Volume = 1; % Fitting the experimental volume per formula unit at the experimental MP
-                Settings_Array(idx).Loss_Options.Solid_MP_Volume  = 1; % Fitting the experimental volume of the experimental solid structure at the experimental MP
-
-                % Add gaps
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.Wurtzite.Gap.Ref = 'Rocksalt';
-
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.FiveFive.Gap.Ref = 'Rocksalt';
-
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Value = 0; % Negative value:
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Weight = 1000;
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Type = @lt; % pick one of: lt | gt | eq | ge | le | ne
-                Settings_Array(idx).Loss_Options.CsCl.Gap.Ref = 'Rocksalt';
-
-
-                Settings_Array(idx).Structures = Auto_Structure_Selection(Settings_Array(idx));
-                Settings_Array(idx).Fix_Charge = true;
-                Settings_Array(idx).Additivity = true;
-
-            end
-        end
-        
-    case 'narval'
-        %% BF/RF - Crystal+Thermal properties with point charge + 'kong-lr' mixing rule (continuation of RE)
+        %% BF/RN - Crystal+Thermal properties with point charge + 'kong-lr' mixing rule (continuation of RF)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -518,11 +276,11 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'RE'};
+        Shared_Settings.Initialize_From_Model = {'RF'};
         
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'RF';
+        Model_Tag = 'RN';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -576,13 +334,13 @@ switch lower(computer)
             end
         end
         
-        %% BF/RL - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule (Continuation of RA)
+        %% BF/RM - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule (Continuation of RA)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 0;
-        Shared_Settings.Max_Secondary_Iterations = 0;
-        Shared_Settings.Secondary_Acquisition_Function = 'none'; % The acquisition function used in the secondary bayesian optimization
+        Shared_Settings.Max_Bayesian_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 100;
+        Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
         Shared_Settings.Parallel_LiX_Minimizer = false;
@@ -598,7 +356,7 @@ switch lower(computer)
 
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'RL';
+        Model_Tag = 'RM';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -614,10 +372,6 @@ switch lower(computer)
                 idx = idx+1;
                 Settings_Array(idx) = Shared_Settings;
                 
-                Settings_Array(idx).FinalGPFitActiveSetSize = 15000; % Final GP fit
-                Settings_Array(idx).BestPointCriterion = 'min-visited-upper-confidence-interval';
-                Settings_Array(idx).Hours = 24; % Max time for each job (hours)
-                Settings_Array(idx).N_Calc = 2; % Number of chained calculations
                 Settings_Array(idx).InitializeExcludeError = true;
                 
                 Settings_Array(idx).Salt = Salt;
@@ -661,12 +415,13 @@ switch lower(computer)
             end
         end
         
-        %% BF/SA - Crystal+Thermal properties with point charge + All salt simul. + 'hovervorst-wbk' mixing rule
+    case 'narval'
+        %% BF/SB - Crystal+Thermal properties with point charge + All salt simul. + 'hovervorst-wbk' mixing rule (continuation of SA)
         Shared_Settings.Initial_N_Multiplier = 20; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
-        Shared_Settings.Max_Bayesian_Iterations = 600;
-        Shared_Settings.Max_Secondary_Iterations = 400;
+        Shared_Settings.Max_Bayesian_Iterations = 200;
+        Shared_Settings.Max_Secondary_Iterations = 100;
         Shared_Settings.Secondary_Acquisition_Function = 'expected-improvement'; % The acquisition function used in the secondary bayesian optimization
         Shared_Settings.Parallel_Bayesopt = false;
         Shared_Settings.Parallel_Struct_Min = true;
@@ -679,11 +434,11 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = false;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {};
+        Shared_Settings.Initialize_From_Model = {'SA'};
         
         Salt = 'LiX';
         Theory = 'BF';
-        Model_Tag = 'SA';
+        Model_Tag = 'SB';
         Replicates = 1:5;
         for ridx = 1:length(Replicates)
             Rep = num2str(Replicates(ridx));
@@ -730,7 +485,7 @@ switch lower(computer)
         end
         
     case 'graham'
-        %% BF/QE model Crystal+Thermal properties WITH Gaussian charge + 'kong-lr' mixing rule (continuation of QC)
+        %% BF/QG model Crystal+Thermal properties WITH Gaussian charge + 'kong-lr' mixing rule (continuation of QE)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -748,11 +503,11 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = true;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'QC'};
+        Shared_Settings.Initialize_From_Model = {'QE'};
         
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'QE';
+        Model_Tag = 'QG';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -807,7 +562,7 @@ switch lower(computer)
             end
         end
         
-        %% BF/QD model Crystal+Thermal properties WITH Gaussian charge + 'hogervorst-wbk' mixing rule (continuation of QB)
+        %% BF/QH model Crystal+Thermal properties WITH Gaussian charge + 'hogervorst-wbk' mixing rule (continuation of QF)
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -825,11 +580,11 @@ switch lower(computer)
         Shared_Settings.final_opt_type = 'none';
         Shared_Settings.GaussianCharge = true;
         Shared_Settings.Polarization = false;
-        Shared_Settings.Initialize_From_Model = {'QD'};
+        Shared_Settings.Initialize_From_Model = {'QF'};
         
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; 
         Theory = 'BF';
-        Model_Tag = 'QF';
+        Model_Tag = 'QH';
         Replicates = 1:5;
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
