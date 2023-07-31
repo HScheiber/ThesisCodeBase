@@ -34,6 +34,9 @@ InitialErrorValues              = cell(N_Models,1);
 InitialUserData                 = cell(N_Models,1);
 InitialObjectiveEvaluationTimes = cell(N_Models,1);
 InitialIterationTimes           = cell(N_Models,1);
+if strcmp(Settings.Salt,'LiX')
+    ObjectiveTrace              = cell(N_Models,1);
+end
 
 for idx = N_Models:-1:1
     Model = Models{idx};
@@ -49,6 +52,9 @@ for idx = N_Models:-1:1
         InitialUserData(idx) = [];
         InitialObjectiveEvaluationTimes(idx) = [];
         InitialIterationTimes(idx) = [];
+        if strcmp(Settings.Salt,'LiX')
+            ObjectiveTrace(idx) = [];
+        end
         continue
     end
     
@@ -72,7 +78,9 @@ for idx = N_Models:-1:1
         InitialUserData{idx} = data.bayesopt_results.UserDataTrace(Within_range);
         InitialObjectiveEvaluationTimes{idx} = data.bayesopt_results.ObjectiveEvaluationTimeTrace(Within_range);
         InitialIterationTimes{idx} = data.bayesopt_results.IterationTimeTrace(Within_range);
-        
+        if strcmp(Settings.Salt,'LiX')
+            ObjectiveTrace{idx} = data.bayesopt_results.ObjectiveTrace(Within_range);
+        end
     catch
         disp(['Could not load data for: ' Settings.Salt ', ' Settings.Theory ', Model ' Model '.']);
         InitialX(idx) = [];
@@ -81,6 +89,9 @@ for idx = N_Models:-1:1
         InitialUserData(idx) = [];
         InitialObjectiveEvaluationTimes(idx) = [];
         InitialIterationTimes(idx) = [];
+        if strcmp(Settings.Salt,'LiX')
+            ObjectiveTrace(idx) = [];
+        end
         continue
     end
 end
@@ -92,6 +103,11 @@ Prev_Data.InitialErrorValues = vertcat(InitialErrorValues{:});
 Prev_Data.InitialUserData = vertcat(InitialUserData{:});
 Prev_Data.InitialObjectiveEvaluationTimes = vertcat(InitialObjectiveEvaluationTimes{:});
 Prev_Data.InitialIterationTimes = vertcat(InitialIterationTimes{:});
+if strcmp(Settings.Salt,'LiX')
+    disp('Warning: Re-calculation of objective function not implemented for multi-salt jobs.')
+    disp('Please ensure the current job has the same objective function as previous.')
+    Prev_Data.InitialObjective = vertcat(ObjectiveTrace{:});
+end
 
 % Check for and remove duplicates in X
 datafields = fields(Prev_Data);
@@ -102,8 +118,10 @@ for idx = 1:numel(datafields)
 end
 
 % Re-calculate objective function based on user data
-Prev_Data.InitialObjective = Loss_Recalculate(Settings,Prev_Data.InitialX,...
-    Prev_Data.InitialUserData,data.Settings.Structures);
+if ~strcmp(Settings.Salt,'LiX')
+    Prev_Data.InitialObjective = Loss_Recalculate(Settings,Prev_Data.InitialX,...
+        Prev_Data.InitialUserData,data.Settings.Structures);
+end
 
 % Optional: remove all data with NaN objective
 if Settings.InitializeExcludeError
