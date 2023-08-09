@@ -41,7 +41,8 @@ elseif strcmp(Settings.Theory,'JC') && strcmp(Settings.Salt,'LiI') && strcmp(Set
 end
 
 if isfile(Model_data_Filename)
-    data = load(Model_data_Filename).full_data;
+    dat = load(Model_data_Filename);
+    data = dat.full_data;
 
     if isfield(data,'secondary_result')
         params = data.full_opt_point;
