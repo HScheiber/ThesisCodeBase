@@ -33,7 +33,7 @@ if isempty(Settings.Model)
     Settings.C6_Damp = Init_C6Damping_Object;
     [Settings.GAdjust_MX,Settings.GAdjust_MM,Settings.GAdjust_XX] = Init_GAdjust_Object;
     
-    Full_Model_Name = ModelName(Settings);
+    Full_Model_Name = [Settings.Theory '_Model_' Settings.Model];
 else
     Full_Model_Name = [Settings.Theory '_Model_' Settings.Model];
 end
