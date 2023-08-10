@@ -87,9 +87,9 @@ function View_Gmx_Table(Table_Loc,Q,C)
     
     hold on
     plot(U.r,U_Total,'-k','linewidth',1)
-    hold on
-    plot(U.r,dU_Total,'-r','linewidth',1)
-    hold on
+%     hold on
+%     plot(U.r,dU_Total,'-r','linewidth',1)
+%     hold on
     %plot(U.r,ref_U)
     ylim([-500 500])
     xlim([0 2])

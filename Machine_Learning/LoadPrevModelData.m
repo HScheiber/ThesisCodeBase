@@ -1,6 +1,5 @@
 function Prev_Data = LoadPrevModelData(Settings,params,subsample)
 Prev_Data = [];
-% To do:
 % 0. Gather all models of interest from saved model folder
 % 1. load all X Points
 % 2. load all user data

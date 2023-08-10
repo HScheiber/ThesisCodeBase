@@ -5,7 +5,7 @@ clear;
 [home,project,computer,slurm] = find_home;
 
 % Set up calculations below
-skip_calculations = [];
+skip_calculations = [1:15];
 check_complete = true; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs. NOTE: Does not work on sockeye
 
@@ -78,6 +78,9 @@ switch lower(computer)
                     Settings_array(idx).S = Loaded_Model.S;
                 else
                     error([Salt ' ' Theory ' ' Model ': Model not found'])
+                end
+                if strcmp(Theory,'TF') && isempty(Model)
+                    Settings_array(idx).SigmaEpsilon = false;
                 end
                 Settings_array(idx).GaussianCharge = false; % Turn on Gaussian distributed charges when true
                 Settings_array(idx).Polarization = false; % Turn on polarizible Drude model when true
