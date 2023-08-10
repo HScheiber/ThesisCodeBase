@@ -80,10 +80,18 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
             % energy scale units are kJ/mol
 
             % Input parameters
-            r0_MM = Param.r0_MM; % nm
+            if Settings.Fix_Li_params
+                r0_MM = Settings.S.S.MM; % nm
+            else
+                r0_MM = Param.r0_MM; % nm
+            end
             r0_XX = Param.r0_XX; % nm
-
-            epsilon_MM = Param.epsilon_MM; % kJ/mol
+            
+            if Settings.Fix_Li_params
+                epsilon_MM = Settings.S.E.MM; % kJ/mol
+            else
+                epsilon_MM = Param.epsilon_MM; % kJ/mol
+            end
             epsilon_XX = Param.epsilon_XX; % kJ/mol
 
             gamma_MX = Param.gamma_MX; % Unitless
@@ -96,7 +104,11 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
             else
                 r0_MX = Param.r0_MX; % nm
                 epsilon_MX = Param.epsilon_MX; % kJ/mol
-                gamma_MM = Param.gamma_MM; % Unitless
+                if Settings.Fix_Li_params
+                    gamma_MM = Settings.S.G.MM; % Unitless
+                else
+                    gamma_MM = Param.gamma_MM; % Unitless
+                end
                 gamma_XX = Param.gamma_XX; % Unitless
             end
 
@@ -318,10 +330,14 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
         end
     case 'BF'
         % Input parameters
-        sigma_MM = Param.sigma_MM; % nm
+        if Settings.Fix_Li_params
+            sigma_MM = Settings.S.S.MM; % nm
+            epsilon_MM = Settings.S.E.MM; % kJ/mol
+        else
+            sigma_MM = Param.sigma_MM; % nm
+            epsilon_MM = Param.epsilon_MM; % kJ/mol
+        end
         sigma_XX = Param.sigma_XX; % nm
-
-        epsilon_MM = Param.epsilon_MM; % kJ/mol
         epsilon_XX = Param.epsilon_XX; % kJ/mol
 
         if Settings.Additivity
@@ -333,7 +349,11 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
                         gamma_MM = gamma_MX; % Unitless
                         gamma_XX = gamma_MX; % Unitless
                     case 'hogervorst'
-                        gamma_MM = Param.gamma_MM; % Unitless
+                        if Settings.Fix_Li_params
+                            gamma_MM = Settings.S.G.MM; % Unitless
+                        else
+                            gamma_MM = Param.gamma_MM; % Unitless
+                        end
                         gamma_XX = Param.gamma_XX; % Unitless
                         gamma_MX = (gamma_MM + gamma_XX)./2;
 
@@ -342,7 +362,11 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
                         sigma_MX = ( sqrt( ( epsilon_MM.*epsilon_XX.*gamma_MM.*gamma_XX.*(sigma_MM.*sigma_XX).^6 )...
                             ./((gamma_MM - 6).*(gamma_XX - 6)) ).*(gamma_MX - 6)./(epsilon_MX.*gamma_MX) ).^(1/6);
                     case {'hogervorst-wbk'}
-                        gamma_MM = Param.gamma_MM; % Unitless
+                        if Settings.Fix_Li_params
+                            gamma_MM = Settings.S.G.MM; % Unitless
+                        else
+                            gamma_MM = Param.gamma_MM; % Unitless
+                        end
                         gamma_XX = Param.gamma_XX; % Unitless
                         gamma_MX = (gamma_MM + gamma_XX)./2;
                         
@@ -351,7 +375,11 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
                         sigma_MX = ( sqrt( ( epsilon_MM.*epsilon_XX.*(gamma_MM + 3).*(gamma_XX + 3).*(sigma_MM.*sigma_XX).^6 )...
                             ./(gamma_MM.*gamma_XX) ).*gamma_MX./(epsilon_MX.*(gamma_MX + 3)) ).^(1/6);
                     case {'kong' 'gromacs' 'kong-sr' 'gromacs-sr' 'kong-mid' 'gromacs-mid' 'kong-lr' 'gromacs-lr'}
-                        gamma_MM = Param.gamma_MM; % Unitless
+                        if Settings.Fix_Li_params
+                            gamma_MM = Settings.S.G.MM; % Unitless
+                        else
+                            gamma_MM = Param.gamma_MM; % Unitless
+                        end
                         gamma_XX = Param.gamma_XX; % Unitless
                         
                         % These apply exactly in all cases
@@ -443,7 +471,11 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
         else
             sigma_MX = Param.sigma_MX; % nm
             epsilon_MX = Param.epsilon_MX; % kJ/mol
-            gamma_MM = Param.gamma_MM; % Unitless
+            if Settings.Fix_Li_params
+                gamma_MM = Settings.S.G.MM; % Unitless
+            else
+                gamma_MM = Param.gamma_MM; % Unitless
+            end
             gamma_XX = Param.gamma_XX; % Unitless
             gamma_MX = Param.gamma_MX; % Unitless
         end
@@ -893,9 +925,17 @@ for salt_idx = 1:numel(Salts) % Loop through coupled salts
     if Settings.EnforceRR && Settings.SigmaEpsilon && Settings.Additivity
         switch Settings.Theory
             case {'JC' 'Mie' 'BF' 'LJ'}
-                RR_Walls = Param.sigma_MM./Param.sigma_XX; % Ratio of M/X size, should be < 1
+                if Settings.Fix_Li_params
+                    RR_Walls = Settings.S.S.MM./Param.sigma_XX; % Ratio of M/X size, should be < 1
+                else
+                    RR_Walls = Param.sigma_MM./Param.sigma_XX; % Ratio of M/X size, should be < 1
+                end
             case {'BH' 'BD' 'BE' 'TF'}
-                RR_Walls = Param.r0_MM./Param.r0_XX; % Ratio of M/X size, should be < 1
+                if Settings.Fix_Li_params
+                    RR_Walls = Settings.S.S.MM./Param.r0_XX; % Ratio of M/X size, should be < 1
+                else
+                    RR_Walls = Param.r0_MM./Param.r0_XX; % Ratio of M/X size, should be < 1
+                end
         end
         Loss = Loss + max(RR_Walls - 1,0).*Settings.BadFcnLossPenalty; % Radius ratios are incorrect
     elseif Settings.EnforceRR

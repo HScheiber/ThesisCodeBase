@@ -17,4 +17,7 @@ function Settings = Update_BO_LiX_Settings(Settings)
     if ~isfield(Settings,'InitializeRealizeError')
         Settings.InitializeRealizeError = false;
     end
+    if ~isfield(Settings,'Fix_Li_params')
+        Settings.Fix_Li_params = false;
+    end
 end

@@ -11,9 +11,9 @@ Settings.Continue_Calculation = true; % Continue the calculation from where it l
 Settings.Fix_Charge = true; % When true, fixes coulombic charges at 1
 Settings.Additivity = true; % Only applies to JC model. When true, use combining rules
 Settings.Comb_rule = 'Lorentz-Berthelot'; % Mixin rules (case insensitive)
-% One of: 'Lorentz-Berthelot', 'Kong[-sr][-mid][-lr]', 'Hogervorst[-wbk]',
-% 'GROMACS[-sr][-mid][-lr]'. Only applies to BH and BF models. The
-% [-sr][-mid][-lr] modifiers refer to short range, mid-range, and
+% One of: 'Lorentz-Berthelot', 'Kong[-sr|-mid|-lr]', 'Hogervorst[-wbk]',
+% 'GROMACS[-sr|-mid|-lr]'. Only applies to BH and BF models. The
+% [-sr|-mid|-lr] modifiers refer to short range, mid-range, and
 % long-range approximations to the Wang-Buckingham potential. Does not
 % affect the traditional Buckingham potential
 Settings.Additional_MM_Disp = false; % When Additivity is activated with the JC model, tacks on an additional non-additive metal-metal interaction
@@ -21,6 +21,7 @@ Settings.SigmaEpsilon = false; % For all models, recasts the search space in ter
 Settings.InnerRange = false; % When SigmaEpislon is on, use this to set the TF/BH inner gamma range vs outer gamma range
 Settings.Additional_Function = Init_Additional_Function; % Adding additional function options
 Settings.Fix_Alpha = false; % Active for TF and BH models only when NOT using SigmaEpsilon form. When active, the value of exponential repulsion parameter, which is related to compressibility, is fixed
+Settings.Fix_Li_params = false; % When true, removes lithium parameters from optimizable parameters
 Settings.Fix_C8 = false; % Active for TF model only when NOT using SigmaEpsilon form. When active, the value of C8 is fixed by the value of C6, and is no longer a free parameter
 Settings.Fix_Mie_n = true; % When using the Mie model, this fixes the value of the Born exponent, when false the value is an optimizable parameter
 Settings.Diary_Loc = '';

@@ -163,14 +163,26 @@ Settings.Polarization = false;
 %% Test Model Particular parameter
 Settings.ShowPlots = false;
 Settings.GPActiveSetSize = 1000; % Also applies to final optimization
-Settings.Salt = 'LiX';
+Settings.Salt = 'LiF';
 Settings.Theory = 'BF';
 Settings.InnerRange = false;
-Settings.Trial_ID = 'SB6';
+Settings.Trial_ID = 'XX1';
 Settings.UseCoupledConstraint = false;
 Settings.InitializeRealizeError = true;
-Settings.Initialize_From_Model = {'SA'};
+Settings.Initialize_From_Model = {};
 Settings.Comb_rule = 'hogervorst-wbk';
+Settings.Fix_Li_params = true;
+Ref_Model = 'RM1';
+
+% Load previous model
+RefSet = Settings;
+RefSet.Salt = 'LiI';
+RefSet.Model = Ref_Model;
+[RefSet,ModelFound] = Load_Model_Params(RefSet);
+if ~ModelFound
+    error('Unable to load model')
+end
+Settings.S = RefSet.S;
 
 %Settings = Alexandria_Potential_Parameters(Settings,'Coulomb_Only',true); % Loads Gaussian charge parameters
 

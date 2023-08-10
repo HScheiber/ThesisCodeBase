@@ -45,9 +45,17 @@ function params = bayesopt_params(Settings)
             
             
             if Settings.Additivity
-                params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
+                if Settings.Fix_Li_params
+                    params = [Sr0XX,SepsilonXX,SgammaMX];
+                else
+                    params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
+                end
             else
-                params = [Sr0MM,Sr0XX,Sr0MX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
+                if Settings.Fix_Li_params
+                    params = [Sr0XX,Sr0MX,SepsilonXX,SepsilonMX,SgammaXX,SgammaMX];
+                else
+                    params = [Sr0MM,Sr0XX,Sr0MX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
+                end
             end
         else
             % C6 dispersion parameters
@@ -71,16 +79,31 @@ function params = bayesopt_params(Settings)
             SRMX = optimizableVariable('SRMX',[0.1 50],'Type','real');
             
             if Settings.Fix_C8
-                params = [SD6MM,SD6XX,SD6MX];
+                if Settings.Fix_Li_params
+                    params = [SD6XX,SD6MX];
+                else
+                    params = [SD6MM,SD6XX,SD6MX];
+                end
             else
-                params = [SD6MM,SD6XX,SD6MX,SD8MM,SD8XX,SD8MX];
+                if Settings.Fix_Li_params
+                    params = [SD6XX,SD6MX,SD8XX,SD8MX];
+                else
+                    params = [SD6MM,SD6XX,SD6MX,SD8MM,SD8XX,SD8MX];
+                end
             end
             
             if ~Settings.Fix_Alpha
-                params = [params,SAMM,SAXX,SAMX];
+                if Settings.Fix_Li_params
+                    params = [params,SAXX,SAMX];
+                else
+                    params = [params,SAMM,SAXX,SAMX];
+                end
             end
-            
-            params = [params,SRMM,SRXX,SRMX];
+            if Settings.Fix_Li_params
+                params = [params,SRXX,SRMX];
+            else
+                params = [params,SRMM,SRXX,SRMX];
+            end
         end
         
         if ~Settings.Fix_Charge
@@ -138,12 +161,24 @@ function params = bayesopt_params(Settings)
             if Settings.Additivity
                 switch lower(Settings.Comb_rule)
                     case 'lorentz-berthelot'
-                        params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
+                        if Settings.Fix_Li_params
+                            params = [Sr0XX,SepsilonXX,SgammaMX];
+                        else
+                            params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMX];
+                        end
                     otherwise
-                        params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMM,SgammaXX];
+                        if Settings.Fix_Li_params
+                            params = [Sr0XX,SepsilonXX,SgammaXX];
+                        else
+                            params = [Sr0MM,Sr0XX,SepsilonMM,SepsilonXX,SgammaMM,SgammaXX];
+                        end
                 end
             else
-                params = [Sr0MM,Sr0XX,Sr0MX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
+                if Settings.Fix_Li_params
+                    params = [Sr0XX,Sr0MX,SepsilonXX,SepsilonMX,SgammaXX,SgammaMX];
+                else
+                    params = [Sr0MM,Sr0XX,Sr0MX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
+                end
             end
             
             if ~Settings.Fix_Charge
@@ -166,20 +201,32 @@ function params = bayesopt_params(Settings)
             SAMX = optimizableVariable('SAMX',[0.1 10],'Type','real');
 
             if Settings.Additivity
-                params = [SDMM,SDXX,SRMM,SRXX];
+                if Settings.Fix_Li_params
+                    params = [SDXX,SRXX];
+                else
+                    params = [SDMM,SDXX,SRMM,SRXX];
+                end
             else
-                params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX];
+                if Settings.Fix_Li_params
+                    params = [SDXX,SDMX,SRXX,SRMX];
+                else
+                    params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX];
+                end
             end
 
             if ~Settings.Fix_Alpha
-                params = [params,SAMM,SAXX,SAMX];
+                if Settings.Fix_Li_params
+                    params = [params,SAXX,SAMX];
+                else
+                    params = [params,SAMM,SAXX,SAMX];
+                end
             end
 
             if ~Settings.Fix_Charge
                 params = [params,SQ];
             end
 
-            if Settings.Additivity && Settings.Additional_MM_Disp
+            if Settings.Additivity && Settings.Additional_MM_Disp && ~Settings.Fix_Li_params
                 params = [params,SDMM2];
             end
         end    
@@ -223,12 +270,24 @@ function params = bayesopt_params(Settings)
         if Settings.Additivity
             switch lower(Settings.Comb_rule)
                 case 'lorentz-berthelot'
-                    params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMX];
+                    if Settings.Fix_Li_params
+                        params = [SsigmaXX,SepsilonXX,SgammaMX];
+                    else
+                        params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMX];
+                    end
                 otherwise
-                    params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMM,SgammaXX];
+                    if Settings.Fix_Li_params
+                        params = [SsigmaXX,SepsilonXX,SgammaXX];
+                    else
+                        params = [SsigmaMM,SsigmaXX,SepsilonMM,SepsilonXX,SgammaMM,SgammaXX];
+                    end
             end
         else
-            params = [SsigmaMM,SsigmaXX,SsigmaMX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
+            if Settings.Fix_Li_params
+                params = [SsigmaXX,SsigmaMX,SepsilonXX,SepsilonMX,SgammaXX,SgammaMX];
+            else
+                params = [SsigmaMM,SsigmaXX,SsigmaMX,SepsilonMM,SepsilonXX,SepsilonMX,SgammaMM,SgammaXX,SgammaMX];
+            end
         end
 
         if ~Settings.Fix_Charge
@@ -270,31 +329,47 @@ function params = bayesopt_params(Settings)
         
         if Settings.Fix_Charge
             if Settings.Additivity
-                if Settings.Additional_MM_Disp
-                    params = [SDMM,SDXX,SRMM,SRXX,SDMM2];
+                if Settings.Fix_Li_params
+                    params = [SDXX,SRXX];
+                elseif Settings.Additional_MM_Disp
+                	params = [SDMM,SDXX,SRMM,SRXX,SDMM2];
                 else
                     params = [SDMM,SDXX,SRMM,SRXX];
                 end
             else
-                params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX];
+                if Settings.Fix_Li_params
+                    params = [SDXX,SDMX,SRXX,SRMX];
+                else
+                    params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX];
+                end
             end
         else
             SQ = optimizableVariable('SQ',Settings.Q_Range,'Type','real');
             if Settings.Additivity
-                if Settings.Additional_MM_Disp
+                if Settings.Fix_Li_params
+                    params = [SDXX,SRXX,SQ];
+                elseif Settings.Additional_MM_Disp
                     params = [SDMM,SDXX,SRMM,SRXX,SQ,SDMM2];
                 else
                     params = [SDMM,SDXX,SRMM,SRXX,SQ];
                 end
             else
-                params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX,SQ];
+                if Settings.Fix_Li_params
+                    params = [SDXX,SDMX,SRXX,SRMX,SQ];
+                else
+                    params = [SDMM,SDXX,SDMX,SRMM,SRXX,SRMX,SQ];
+                end
             end
         end
         if strcmp(Settings.Theory,'Mie') && ~Settings.Fix_Mie_n
             if Settings.Additivity
                 params = [params,SnMX];
             else
-                params = [params,SnMM,SnXX,SnMX];
+                if Settings.Fix_Li_params
+                    params = [params,SnXX,SnMX];
+                else
+                    params = [params,SnMM,SnXX,SnMX];
+                end
             end
         end
     end

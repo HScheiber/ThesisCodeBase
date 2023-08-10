@@ -52,6 +52,7 @@ if isfile(Model_data_Filename)
     end
     
     Settings = data.Settings;
+    Settings = Update_BO_LiX_Settings(Settings);
     Settings.S = Init_Scaling_Object;
     if ~isfield(Settings,'Comb_rule')
         Settings.Comb_rule = 'Lorentz-Berthelot';
