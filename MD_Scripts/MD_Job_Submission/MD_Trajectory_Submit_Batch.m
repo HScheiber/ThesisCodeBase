@@ -22,7 +22,7 @@ Shared_Settings.MPI_Ranks = 4;
 Shared_Settings.OMP_Threads = 12;
 Shared_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
-Shared_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
+Shared_Settings.BigNode = true; % For cedar and sockeye, choose the large node types when true.
 Shared_Settings.npme = []; % Number of rank assigned to PME
 Shared_Settings.dd = []; % Domain decomposition
 Shared_Settings.Project_Directory_Name = 'Molten_Salts_MD'; % Name of project directory to contain job within the main project folder
