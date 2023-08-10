@@ -5,7 +5,7 @@ clear;
 [home,project,computer,slurm] = find_home;
 
 % Set up calculations below
-skip_calculations = [1:15];
+skip_calculations = [];
 check_complete = true; % Checks if job is already completed, skips completed jobs
 check_running = true; % Checks if a job is already running, skips running jobs. NOTE: Does not work on sockeye
 
@@ -166,8 +166,8 @@ switch lower(computer)
                 % Simulated annealing options
                 Settings_array(idx).Annealing = 'single'; % Options: 'no' 'single' 'periodic'
                 Settings_array(idx).MDP.Trajectory_Time = (MP-300)/50+1; % ns
-                Settings.Annealing_Times = [0  (MP-300)*1000/50 (MP-300)*1000/50+1000]; % [ps] A list with the number of annealing reference/control points used
-                Settings.Annealing_Temps = [MP 300 300];   % [K] A list of temperatures at the annealing reference/control points used. Must be equal in length to previous line.
+                Settings_array(idx).Annealing_Times = [0  (MP-300)*1000/50 (MP-300)*1000/50+1000]; % [ps] A list with the number of annealing reference/control points used
+                Settings_array(idx).Annealing_Temps = [MP 300 300];   % [K] A list of temperatures at the annealing reference/control points used. Must be equal in length to previous line.
 
 
                 % Barostat Options
