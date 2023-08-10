@@ -55,6 +55,7 @@ switch lower(computer)
 
                 idx = idx+1;
                 Settings_array(idx) = Shared_Settings;
+                Settings_array(idx).N_Calc = 4;
                 Settings_array(idx).RunEnergyAnalysis = {'Temperature' 'Pressure' 'Volume' 'Enthalpy'};
                 Settings_array(idx).Structure = Structure;
 
