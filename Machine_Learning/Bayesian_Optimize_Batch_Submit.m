@@ -484,7 +484,7 @@ switch lower(computer)
             Settings_Array(idx).Additivity = true;
         end
         
-        %% BF/VA - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule, pre-determined Li params
+        %% BF/TA - Crystal+Thermal properties with point charge + hogervorst-wbk mixing rule, pre-determined Li params
         Shared_Settings.Initial_N_Multiplier = 40; % Multiply the number of input dimensions by this number to obtain the number of initial random points
         Shared_Settings.Acquisition_Function = 'expected-improvement-plus';
         Shared_Settings.ExplorationRatio = 2;
@@ -506,19 +506,20 @@ switch lower(computer)
      
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theory = 'BF';
-        Model_Tag = 'VA';
-        Ref_Model = 'RM1';
+        Model_Tag = 'TA';
         Replicates = 1:5;
         
+        % Load Reference model
         Settings = Shared_Settings;
         Settings.Theory = Theory;
         Settings.Salt = 'LiI';
-        Settings.Model = Ref_Model;
+        Settings.Model = 'RM1';
         [RefModel_Settings,ModelFound] = Load_Model_Params(Settings);
-        if ~ModelFound
-            error('Unable to load model')
+        if ModelFound
+            Shared_Settings.S = RefModel_Settings.S;
+        else
+            error('Unable to load reference model.')
         end
-        
         
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
@@ -540,7 +541,6 @@ switch lower(computer)
                 Settings_Array(idx).Theory = Theory;
                 Settings_Array(idx).Trial_ID = [Model_Tag Rep];
                 Settings_Array(idx).Comb_rule = 'hogervorst-wbk';
-                Settings_Array(idx).S = RefModel_Settings.S;
 
                 % Loss function
                 Settings_Array(idx).Loss_Options.Rocksalt.LE   = 1;
