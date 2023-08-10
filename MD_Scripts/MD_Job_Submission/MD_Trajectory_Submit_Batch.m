@@ -18,8 +18,8 @@ Shared_Settings.Hours = 6; % Max time for each job (hours)
 Shared_Settings.Mins = 0; % Max time for job (minutes)
 Shared_Settings.Nodes = 1; % Minimum number of cores to request for calculation.
 Shared_Settings.Cores = -1; % Minimum number of cores to request for calculation. Set to -1 for entire node
-Shared_Settings.MPI_Ranks = -1;
-Shared_Settings.OMP_Threads = 1;
+Shared_Settings.MPI_Ranks = 4;
+Shared_Settings.OMP_Threads = 12;
 Shared_Settings.Mempernode = '0'; % Memory request for server (default = '-1', max per core = '0', eg '3G' for cedar or 3gb for sockeye)
 Shared_Settings.SinglePrecision = false; % choose true for single precision mode, false for double
 Shared_Settings.BigNode = false; % For cedar and sockeye, choose the large node types when true.
