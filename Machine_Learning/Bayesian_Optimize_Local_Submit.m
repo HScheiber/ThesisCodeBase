@@ -171,13 +171,13 @@ Settings.UseCoupledConstraint = false;
 Settings.InitializeRealizeError = true;
 Settings.Initialize_From_Model = {};
 Settings.Comb_rule = 'hogervorst-wbk';
+Settings.Initialize_From_Model = {'TA'};
 Settings.Fix_Li_params = true;
-Ref_Model = 'RM1';
 
 % Load previous model
 RefSet = Settings;
 RefSet.Salt = 'LiI';
-RefSet.Model = Ref_Model;
+RefSet.Model = 'RM1';
 [RefSet,ModelFound] = Load_Model_Params(RefSet);
 if ~ModelFound
     error('Unable to load model')
