@@ -1,6 +1,6 @@
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
 Theory = 'BF';
-ModelID = 'RM';
+ModelID = 'TA';
 Reps = 1:5;
 Show = []; % Sort by loss function and only show the lowest-loss results.
 Show_init = [];
@@ -37,7 +37,6 @@ if ~isempty(Models)
     [~,idx] = sort(cellfun(@str2double,regexp(Models,'[0-9]+','match','once')));
     Models = Models(idx);
 end
-
 
 % Find info on model class
 data_found = false;

@@ -247,6 +247,11 @@ case {'BH' 'BD' 'BE'} % Buckingham model
     end
 case 'BF' % Wang-Buckingham model
     if Settings.SigmaEpsilon
+        if Settings.Fix_Li_params
+            Output.sigma_MM = Settings.S.S.MM;
+            Output.epsilon_MM = Settings.S.E.MM;
+            Output.gamma_MM = Settings.S.G.MM;
+        end
         if Settings.Additivity
             switch lower(Settings.Comb_rule)
                 case 'lorentz-berthelot'
