@@ -2,7 +2,7 @@ clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
 Theory = 'BF';
-ModelID = 'TA';
+ModelID = 'TB';
 BestOnly = false;
 SelectOnly = [];
 Reps = [1:5];
@@ -13,7 +13,7 @@ DM_Multiplier = 1e5;
 %% Plot options
 fs = 22; % font size
 markers = {'o' 's' '^' 'v' 'd' '>' '<' 'p' 'h' 'x'};
-show_as_percent_error = true; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
+show_as_percent_error = false; % Plot as percent error. If false, plot as the numerical error value (i.e. including units)
 include_av_line = false;
 wwbuffer = 0.075;
 ttbuffer = 0.08;

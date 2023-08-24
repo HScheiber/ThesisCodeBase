@@ -1,8 +1,8 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'NB';
+Theory = 'BF';
+ModelID = 'RM';
 BestOnly = true;
 SelectOnly = [];
 Reps = [1:5];
@@ -29,15 +29,15 @@ plot_density = false;
 plot_loss = false;
 plot_finite_T_data = true;
 
-ylim_LE = [-3 1];
+ylim_LE = [-3 15];
 ylim_RLE = [0 20];
 ylim_a = [];
 ylim_c = [];
 ylim_ac = [];
-ylim_volume = [-1 18];
+ylim_volume = [-5 50];
 ylim_density = [];
 
-ylim_MP = [0 500];
+ylim_MP = [-10 10];
 
 %% Script begins
 cm3_per_Ang3 = 1e-24; % cubic cm/cubic angstrom
