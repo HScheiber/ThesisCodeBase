@@ -696,7 +696,7 @@ switch lower(computer)
         Scomb.E.MM = mean(cellfun(@(s) s.E.MM, S));
         Scomb.S.MM = mean(cellfun(@(s) s.S.MM, S));
         Scomb.G.MM = mean(cellfun(@(s) s.G.MM, S));
-        Shared_Settings.S = Scomb.S;
+        Shared_Settings.S = Scomb;
         
         for sidx = 1:length(Salts)
             Salt = Salts{sidx};
