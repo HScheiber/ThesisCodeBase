@@ -41,7 +41,7 @@ switch lower(computer)
         %% Checking Radial Distribution Functions
         Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'};
         Theories = {'BF'};
-        Models = {'Alexandria'};
+        Models = {'TH1'};
         Structure = 'Liquid';
         
         for sdx = 1:numel(Salts)
