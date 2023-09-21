@@ -119,5 +119,7 @@ Settings.Parallel_LiX_Minimizer = false; % Run the parallel version of the LiX_M
 Settings.Parallel_Struct_Min = false; % Run the parallel version of the LiX_Minimizer subroutine when true (this is generally less efficient)
 Settings.Parallel_Bayesopt = true; % Run the parallel version of Bayesian Optimization when true
 
+Settings.Skip_Optimization = false; % Used to re-run a trial at a specific input point.
+
 end
 

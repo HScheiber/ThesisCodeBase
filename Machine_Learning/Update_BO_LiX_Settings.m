@@ -20,4 +20,7 @@ function Settings = Update_BO_LiX_Settings(Settings)
     if ~isfield(Settings,'Fix_Li_params')
         Settings.Fix_Li_params = false;
     end
+    if ~isfield(Settings,'Skip_Optimization')
+        Settings.Skip_Optimization = false;
+    end
 end

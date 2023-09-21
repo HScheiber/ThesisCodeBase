@@ -1,13 +1,13 @@
 clear; %#ok<*UNRCH>
 %% Data options
 Salts = {'LiF' 'LiCl' 'LiBr' 'LiI'}; %  'LiF' 'LiCl' 'LiBr' 'LiI' 'NaCl'
-Theory = 'BH';
-ModelID = 'MG';
+Theory = 'BF';
+ModelID = 'TF';
 BestOnly = true;
-SelectOnly = [5 3 1 5]; %[2 4 5 1]; %[5 3 1 5];
+SelectOnly = [4 3 4 3]; %[5 3 1 5]; %[2 4 5 1]; %[5 3 1 5];
 Reps = [1:5];
 savefile = false; % switch to save the final plots to file
-saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Amgen_Presentation_Images';
+saveloc = 'C:\Users\Hayden\Documents\Patey_Lab\Thesis_Projects\bayesopt_LiX_project\figures';
 DM_Multiplier = 1e5;
 
 %% Plot options
@@ -680,8 +680,10 @@ legh = legend(h,legtxt,'Position',[0.25 0 0.5 0.06],'Orientation','Horizontal',.
 %     filename = ['Model_Overview_' Theory '_Model_' ModelID '.png'];
 %     print(figh,fullfile(saveloc,filename),'-dpng','-r300','-noui')
 % end
-filename = ['Model_Overview_' Theory '_Model_' ModelID '.emf'];
-exportgraphics(figh,fullfile(saveloc,filename),'BackgroundColor','none')
+if savefile
+    filename = ['Model_Overview_' Theory '_Model_' ModelID '.emf'];
+    exportgraphics(figh,fullfile(saveloc,filename),'BackgroundColor','none')
+end
 
 function Output = LegStructure(Structure)
     switch Structure
@@ -692,9 +694,4 @@ function Output = LegStructure(Structure)
         otherwise
             Output = Structure;
     end
-end
-
-function ylim = GetYlims(FiniteTType,ylims)
-    FiniteTTypes
-
 end

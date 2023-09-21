@@ -254,219 +254,48 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
     
     %% Global optimization with bayesian optimization
     % Deal with restart requests
-    if Settings.Continue_Calculation && (isfile(Intermediate_Fullopt_file) || isfile(Intermediate_Fullopt_backup))
-        run_bayesopt = false;
-        continue_bayesopt = false;
-        continue_fullopt = true;
-    elseif Settings.Continue_Calculation && isfile(Results_filename)
-        run_bayesopt = false;
-        continue_bayesopt = false;
-        continue_fullopt = false;
-    elseif Settings.Continue_Calculation && (isfile(Intermediate_BO_file) || isfile(Intermediate_BO_backup))
-        run_bayesopt = true;
-        continue_bayesopt = true;
-        continue_fullopt = false;
-    else
-        if Settings.Continue_Calculation
-            disp('No checkpoint files found. Starting new calculation.');
-        end
-        run_bayesopt = true;
-        continue_bayesopt = false;
-        continue_fullopt = false;
-    end
-
-    if ~run_bayesopt
-        % Skip primary bayesian optimization step
-        % Find and Load the previous results
-        try
-            obs = dir(['*Model_' Settings.Trial_ID '*_bayesopt.mat']);         
-            res = load(obs.name); % Loads the results variable
-            results = res.results;
-        catch
-            disp('Unable to load finished bayesian optimization datafile.')
-            disp('Retrying from last checkpoint.')
-            if isfield(obs,'name') && isfile(obs.name)
-                delete(obs.name);
+    if ~Settings.Skip_Optimization
+        if Settings.Continue_Calculation && (isfile(Intermediate_Fullopt_file) || isfile(Intermediate_Fullopt_backup))
+            run_bayesopt = false;
+            continue_bayesopt = false;
+            continue_fullopt = true;
+        elseif Settings.Continue_Calculation && isfile(Results_filename)
+            run_bayesopt = false;
+            continue_bayesopt = false;
+            continue_fullopt = false;
+        elseif Settings.Continue_Calculation && (isfile(Intermediate_BO_file) || isfile(Intermediate_BO_backup))
+            run_bayesopt = true;
+            continue_bayesopt = true;
+            continue_fullopt = false;
+        else
+            if Settings.Continue_Calculation
+                disp('No checkpoint files found. Starting new calculation.');
             end
-            Bayesian_Optimize_LiX_Parameters(Input_Settings);
-            return
+            run_bayesopt = true;
+            continue_bayesopt = false;
+            continue_fullopt = false;
         end
-    elseif Settings.Continue_Calculation && continue_bayesopt
-        % If you want to resume:
-        try
-            dat = load(Intermediate_BO_file,'-mat');
-        catch
-            % Catch corrupt files
-            disp('Unable to load intermediate bayesian optimization data.')
-            disp('Attempting to load backup step.')
-            
+
+        if ~run_bayesopt
+            % Skip primary bayesian optimization step
+            % Find and Load the previous results
             try
-                dat = load(Intermediate_BO_backup,'-mat');
+                obs = dir(['*Model_' Settings.Trial_ID '*_bayesopt.mat']);         
+                res = load(obs.name); % Loads the results variable
+                results = res.results;
             catch
-                disp('Unable to load backup step of Bayesian Optimization, restarting calculation.')
-                if isfile(Intermediate_BO_file)
-                    delete(Intermediate_BO_file)
+                disp('Unable to load finished bayesian optimization datafile.')
+                disp('Retrying from last checkpoint.')
+                if isfield(obs,'name') && isfile(obs.name)
+                    delete(obs.name);
                 end
-                if isfile(Intermediate_BO_backup)
-                    delete(Intermediate_BO_backup)
-                end
-                Bayesian_Optimize_LiX_Parameters(Input_Settings)
+                Bayesian_Optimize_LiX_Parameters(Input_Settings);
                 return
             end
-        end
-        
-        % Catch corrupt files
-        if ~isfield(dat,'BayesoptResults') || ~isprop(dat.BayesoptResults,'TotalElapsedTime')
-            % Catch corrupt files
-            disp('Unable to load intermediate bayesian optimization data.')
-            disp('Attempting to load backup step.')
+        elseif Settings.Continue_Calculation && continue_bayesopt
+            % If you want to resume:
             try
-                dat = load(Intermediate_BO_backup,'-mat');
-            catch
-                disp('Unable to load backup step of Bayesian Optimization, restarting calculation.')
-                if isfile(Intermediate_BO_file)
-                    delete(Intermediate_BO_file)
-                end
-                if isfile(Intermediate_BO_backup)
-                    delete(Intermediate_BO_backup)
-                end
-                Bayesian_Optimize_LiX_Parameters(Input_Settings)
-                return
-            end
-        end
-        
-        switch Settings.initial_opt_type
-            case 'bayesopt'
-                if Settings.ShowPlots
-                    plotopt = 'all';
-                else
-                    plotopt = [];
-                end
-                
-                BayesoptResults = dat.BayesoptResults;
-                remaining_evals = Settings.Max_Bayesian_Iterations ...
-                    + size(BayesoptResults.Options.InitialX,1) ...
-                    - BayesoptResults.NumObjectiveEvaluations;
-                
-                if isfield(BayesoptResults.Options,'KernelFunction')
-                    results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
-                        'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
-                        'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
-                        'ParallelMethod','clipped-model-prediction',...
-                        'MaxObjectiveEvaluations',remaining_evals,...
-                        'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                        'GPActiveSetSize',Settings.GPActiveSetSize,...
-                        'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
-                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
-                else
-                    results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
-                        'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
-                        'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
-                        'ParallelMethod','clipped-model-prediction',...
-                        'MaxObjectiveEvaluations',remaining_evals,...
-                        'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                        'GPActiveSetSize',Settings.GPActiveSetSize,'XConstraintFcn',constraint_fun,...
-                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
-                end
-                % Save results
-                save(Results_filename,'results')                
-        end
-    else
-        rng('shuffle'); % Reset the random seed to current time
-        switch Settings.initial_opt_type
-            case 'bayesopt'
-                if Settings.ShowPlots
-                    plotopt = 'all';
-                else
-                    plotopt = [];
-                end
-                
-                if ~isempty(Settings.Initialize_From_Model)
-                    Prev_Data = LoadPrevModelData(Settings,params,Settings.Initialize_From_Model_Subsample);
-                    Iterations = size(Prev_Data.InitialObjective,1) + Settings.Max_Bayesian_Iterations;
-                    
-                    % Check if coupled constraints have changed
-                    if width(Prev_Data.InitialConstraintViolations) > NumCC
-                        Prev_Data.InitialConstraintViolations = double.empty(size(Prev_Data.InitialConstraintViolations,1),0);
-                    end
-                    
-                    results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
-                        'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
-                        'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
-                        'UseParallel',Settings.Parallel_Bayesopt,'ParallelMethod','clipped-model-prediction',...
-                        'MaxObjectiveEvaluations',Iterations,'NumSeedPoints',seed_points,...
-                        'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                        'GPActiveSetSize',Settings.GPActiveSetSize,...
-                        'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
-                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet,...
-                        'InitialX',Prev_Data.InitialX,...
-                        'InitialObjective',Prev_Data.InitialObjective,...
-                        'InitialConstraintViolations',Prev_Data.InitialConstraintViolations,...
-                        'InitialErrorValues',Prev_Data.InitialErrorValues,...
-                        'InitialUserData',Prev_Data.InitialUserData,...
-                        'InitialObjectiveEvaluationTimes',Prev_Data.InitialObjectiveEvaluationTimes,...
-                        'InitialIterationTimes',Prev_Data.InitialIterationTimes);
-                else
-                    results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
-                        'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
-                        'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
-                        'UseParallel',Settings.Parallel_Bayesopt,'ParallelMethod','clipped-model-prediction',...
-                        'MaxObjectiveEvaluations',Settings.Max_Bayesian_Iterations,'NumSeedPoints',seed_points,...
-                        'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                        'GPActiveSetSize',Settings.GPActiveSetSize,...
-                        'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
-                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
-                end
-            case 'surrogateopt'
-                if Settings.ShowPlots
-                    plotopt = 'surrogateoptplot';
-                else
-                    plotopt = [];
-                end
-                % surrogateopt options
-                options = optimoptions('surrogateopt','Display','iter',...
-                    'MaxFunctionEvaluations',Settings.Max_Bayesian_Iterations,...
-                    'MinSurrogatePoints',Settings.MinSurrogatePoints,...
-                    'MinSampleDistance',Settings.MinSampleDistance,...
-                    'PlotFcn',plotopt,...
-                    'UseParallel',Settings.Parallel_Bayesopt,...
-                    'CheckpointFile','intermediate_surrogate_opt.mat');
-
-                ub = nan(1,length(params));
-                lb = nan(1,length(params));
-                for idx = 1:length(params)
-                    lb(idx) = params(idx).Range(1);
-                    ub(idx) = params(idx).Range(2);
-                end
-                [x0,fval,~,output,trials] = surrogateopt(fun,lb,ub,options);
-                results.ObjectiveFcn = fun;
-                results.XAtMinObjective = array2table(x0,'VariableNames',{params.Name});
-                results.XTrace = array2table(trials.X,'VariableNames',{params.Name});
-                results.NumObjectiveEvaluations = output.funccount;
-                results.MinEstimatedObjective = fval;
-                results.MinObjective = fval;
-        end
-        % Save results
-        save(Results_filename,'results')
-    end
-    
-    %% Secondary optimization with different aqcuisition function focused on locally optimizing result
-    if strcmpi(Settings.initial_opt_type,'bayesopt') && strcmpi(Settings.second_opt_type,'bayesopt') && ~isfile('secondary_completed')
-        if Settings.ShowPlots
-            plotopt = 'all';
-        else
-            plotopt = [];
-        end
-        
-        % Make file to signal that secondary optimization has already began
-        if ~isfile('secondary_started')
-            disp('Beginning Intermediate Optimization Step.')
-            fclose(fopen('secondary_started', 'w'));
-            BayesoptResults = results;
-        else
-            try
-                dat = load(Intermediate_BO_file);
-                BayesoptResults = dat.BayesoptResults;
+                dat = load(Intermediate_BO_file,'-mat');
             catch
                 % Catch corrupt files
                 disp('Unable to load intermediate bayesian optimization data.')
@@ -474,250 +303,403 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
 
                 try
                     dat = load(Intermediate_BO_backup,'-mat');
-                    BayesoptResults = dat.BayesoptResults;
                 catch
-                    disp('Unable to load backup step of Bayesian Optimization.')
-                    disp('Restarting intermediate optimization from finished initial optimization.')
+                    disp('Unable to load backup step of Bayesian Optimization, restarting calculation.')
                     if isfile(Intermediate_BO_file)
                         delete(Intermediate_BO_file)
                     end
                     if isfile(Intermediate_BO_backup)
                         delete(Intermediate_BO_backup)
                     end
-                    BayesoptResults = results;
-                end
-            end
-        end
-        
-        % Calculate remaining evaluations for secondary optimization
-        remaining_evals = Settings.Max_Secondary_Iterations ...
-            + Settings.Max_Bayesian_Iterations ...
-            + size(BayesoptResults.Options.InitialX,1) ...
-            - BayesoptResults.NumObjectiveEvaluations;
-        
-        if remaining_evals > 0
-            if isfield(BayesoptResults.Options,'KernelFunction')
-                results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
-                    'PlotFcn',plotopt,'ExplorationRatio',Settings.ExplorationRatio_Secondary,...
-                    'AcquisitionFunctionName',Settings.Secondary_Acquisition_Function,'Verbose',1,...
-                    'ParallelMethod','clipped-model-prediction',...
-                    'MaxObjectiveEvaluations',remaining_evals,...
-                    'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                    'GPActiveSetSize',Settings.GPActiveSetSize,...
-                    'KernelFunction',Settings.SecondaryKernelFunction,'XConstraintFcn',constraint_fun,...
-                    'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
-            else
-                results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
-                    'PlotFcn',plotopt,'ExplorationRatio',Settings.ExplorationRatio_Secondary,...
-                    'AcquisitionFunctionName',Settings.Secondary_Acquisition_Function,'Verbose',1,...
-                    'ParallelMethod','clipped-model-prediction','MaxObjectiveEvaluations',remaining_evals,...
-                    'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
-                    'GPActiveSetSize',Settings.GPActiveSetSize,...
-                    'XConstraintFcn',constraint_fun,...
-                    'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
-            end
-        else
-            results = BayesoptResults;
-        end
-        
-        % Final GP fit - May take a while if FinalGPFitActiveSetSize is too large
-        if Settings.FinalGPFitActiveSetSize > Settings.GPActiveSetSize && ...
-                 results.NumObjectiveEvaluations > Settings.GPActiveSetSize
-            results = resume(results,'MaxObjectiveEvaluations',0,...
-                'GPActiveSetSize',Settings.FinalGPFitActiveSetSize);
-        end
-        
-        % overwrite results
-        save(Results_filename,'results')
-        fclose(fopen('secondary_completed', 'w'));
-        delete('secondary_started');
-    end
-    
-    %% Perform final local optimization %%
-    if ~isfile(Final_point_filename)
-        switch Settings.final_opt_type
-            case 'fminsearch'
-                % First, reset the parallelization scheme for fminsearch as it has no parallel option
-                % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
-                if Settings.Parallel_Bayesopt || Settings.Parallel_LiX_Minimizer
-                    Settings.Parallel_Bayesopt = false;
-                    Settings.Parallel_Struct_Min = false;
-                    Settings.Parallel_LiX_Minimizer = true;
-                    Settings.MinMDP.Parallel_Min = false;
-                elseif Settings.Parallel_Struct_Min
-                    Settings.Parallel_Bayesopt = false;
-                    Settings.Parallel_Struct_Min = true;
-                    Settings.Parallel_LiX_Minimizer = false;
-                    Settings.MinMDP.Parallel_Min = true;
-                end
-                fun = @(x)LiX_Minimizer(Settings,x);
-
-                % Options for the Nelder–Mead search
-                optionsNM = optimset('Display','iter','MaxIter',Settings.Max_Local_Iterations,...
-                    'TolFun',Settings.Loss_Convergence,'TolX',Settings.Param_Convergence,...
-                    'OutputFcn',@outputFcn_secondary_opt);
-
-                if continue_fullopt
-                    try
-                        dat = load(Intermediate_Fullopt_file);
-                        intermediate_data = dat.intermediate_data;
-                        x0 = intermediate_data(end).x;
-
-                        remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
-                        if remaining_evals <= 0
-                            remaining_evals = 1;
-                        end
-
-                        optionsNM.MaxIter = remaining_evals;
-                    catch
-                        disp('Unable to load local optimization checkpoint file, attempting to load backup.')
-                        if isfile(Intermediate_Fullopt_file)
-                            delete(Intermediate_Fullopt_file);
-                        end
-                        try
-
-                            dat = load(Intermediate_Fullopt_backup,'-mat');
-                            intermediate_data = dat.intermediate_data;
-                            x0 = intermediate_data(end).x;
-
-                            remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
-                            if remaining_evals <= 0
-                                remaining_evals = 1;
-                            end
-
-                            optionsNM.MaxIter = remaining_evals;
-                        catch
-                            if isfile(Intermediate_Fullopt_backup)
-                                delete(Intermediate_Fullopt_backup);
-                            end
-                            disp('Unable to load backup secondary optimization checkpoint file, restarting.')
-                            x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-                        end
-                    end
-                else
-                    x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-                end
-
-                [full_opt_point,~,~,full_opt_results] = fminsearch(fun,x0,optionsNM);
-            case 'fminsearchbnd'
-
-                % Constraints
-                Ranges = [params.Range];
-                lb = Ranges(1:2:end);
-                ub = Ranges(2:2:end);
-                
-                % First, reset the parallelization scheme for fminsearchbnd as it has no parallel option
-                % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
-                if Settings.Parallel_Bayesopt || Settings.Parallel_LiX_Minimizer
-                    Settings.Parallel_Bayesopt = false;
-                    Settings.Parallel_Struct_Min = false;
-                    Settings.Parallel_LiX_Minimizer = true;
-                    Settings.MinMDP.Parallel_Min = false;
-                elseif Settings.Parallel_Struct_Min
-                    Settings.Parallel_Bayesopt = false;
-                    Settings.Parallel_Struct_Min = true;
-                    Settings.Parallel_LiX_Minimizer = false;
-                    Settings.MinMDP.Parallel_Min = true;
-                end
-                fun = @(x)LiX_Minimizer(Settings,x);
-
-                % Options for the Nelder–Mead search
-                optionsNM = optimset('Display','iter','MaxIter',Settings.Max_Local_Iterations,...
-                    'MaxFunEvals',Settings.MaxFunEvals,'TolFun',Settings.Loss_Convergence,'TolX',Settings.Param_Convergence,...
-                    'OutputFcn',@outputFcn_secondary_opt);
-
-                if continue_fullopt
-                    try
-                        dat = load(Intermediate_Fullopt_file);
-                        intermediate_data = dat.intermediate_data;
-                        x0 = intermediate_data(end).x;
-
-                        remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
-
-                        if remaining_evals <= 0
-                            remaining_evals = 1;
-                        end
-
-                        optionsNM.MaxIter = remaining_evals;
-                    catch
-                        disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                        if isfile(Intermediate_Fullopt_file)
-                            delete(Intermediate_Fullopt_file);
-                        end
-                        try
-                            dat = load(Intermediate_Fullopt_backup,'-mat');
-                            intermediate_data = dat.intermediate_data;
-                            x0 = intermediate_data(end).x;
-
-                            remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
-
-                            if remaining_evals <= 0
-                                remaining_evals = 1;
-                            end
-
-                            optionsNM.MaxIter = remaining_evals;
-                        catch
-                            disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                            if isfile(Intermediate_Fullopt_backup)
-                                delete(Intermediate_Fullopt_backup);
-                            end
-                            remaining_evals = Settings.Max_Local_Iterations;
-                            x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-                        end
-                    end
-                else
-                    remaining_evals = Settings.Max_Local_Iterations;
-                    x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-                end
-
-                [full_opt_point,~,exitflag,full_opt_results] = fminsearchbnd(fun,x0,lb,ub,optionsNM);
-
-                % Check to see if the max local iterations is exceeded
-                if exitflag == 0 && remaining_evals > 1 && Settings.switch_final_opt % calculation exceeded number of allowed iterations
-                    % switch to nealder-mead simplex minimization
-                    disp('Swicthing local optimization to patternsearch')
-                    Settings.final_opt_type = 'patternsearch';
-
-                    % Overwrite the input file if it exists
-                    if batch_subm
-                        save(Input_Settings,'Settings','-mat')
-                    end
-
-                    Bayesian_Optimize_LiX_Parameters(Settings)
+                    Bayesian_Optimize_LiX_Parameters(Input_Settings)
                     return
                 end
-            case 'patternsearch'
+            end
 
-                %% Options for Patternsearch
+            % Catch corrupt files
+            if ~isfield(dat,'BayesoptResults') || ~isprop(dat.BayesoptResults,'TotalElapsedTime')
+                % Catch corrupt files
+                disp('Unable to load intermediate bayesian optimization data.')
+                disp('Attempting to load backup step.')
+                try
+                    dat = load(Intermediate_BO_backup,'-mat');
+                catch
+                    disp('Unable to load backup step of Bayesian Optimization, restarting calculation.')
+                    if isfile(Intermediate_BO_file)
+                        delete(Intermediate_BO_file)
+                    end
+                    if isfile(Intermediate_BO_backup)
+                        delete(Intermediate_BO_backup)
+                    end
+                    Bayesian_Optimize_LiX_Parameters(Input_Settings)
+                    return
+                end
+            end
 
-                % Constraints
-                Ranges = [params.Range];
-                lb = Ranges(1:2:end);
-                ub = Ranges(2:2:end);
+            switch Settings.initial_opt_type
+                case 'bayesopt'
+                    if Settings.ShowPlots
+                        plotopt = 'all';
+                    else
+                        plotopt = [];
+                    end
 
-                % Load previous data
-                if continue_fullopt
+                    BayesoptResults = dat.BayesoptResults;
+                    remaining_evals = Settings.Max_Bayesian_Iterations ...
+                        + size(BayesoptResults.Options.InitialX,1) ...
+                        - BayesoptResults.NumObjectiveEvaluations;
+
+                    if isfield(BayesoptResults.Options,'KernelFunction')
+                        results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
+                            'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
+                            'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
+                            'ParallelMethod','clipped-model-prediction',...
+                            'MaxObjectiveEvaluations',remaining_evals,...
+                            'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
+                            'GPActiveSetSize',Settings.GPActiveSetSize,...
+                            'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
+                            'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
+                    else
+                        results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
+                            'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
+                            'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
+                            'ParallelMethod','clipped-model-prediction',...
+                            'MaxObjectiveEvaluations',remaining_evals,...
+                            'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
+                            'GPActiveSetSize',Settings.GPActiveSetSize,'XConstraintFcn',constraint_fun,...
+                            'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
+                    end
+                    % Save results
+                    save(Results_filename,'results')                
+            end
+        else
+            rng('shuffle'); % Reset the random seed to current time
+            switch Settings.initial_opt_type
+                case 'bayesopt'
+                    if Settings.ShowPlots
+                        plotopt = 'all';
+                    else
+                        plotopt = [];
+                    end
+
+                    if ~isempty(Settings.Initialize_From_Model)
+                        Prev_Data = LoadPrevModelData(Settings,params,Settings.Initialize_From_Model_Subsample);
+                        Iterations = size(Prev_Data.InitialObjective,1) + Settings.Max_Bayesian_Iterations;
+
+                        % Check if coupled constraints have changed
+                        if width(Prev_Data.InitialConstraintViolations) > NumCC
+                            Prev_Data.InitialConstraintViolations = double.empty(size(Prev_Data.InitialConstraintViolations,1),0);
+                        end
+
+                        results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
+                            'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
+                            'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
+                            'UseParallel',Settings.Parallel_Bayesopt,'ParallelMethod','clipped-model-prediction',...
+                            'MaxObjectiveEvaluations',Iterations,'NumSeedPoints',seed_points,...
+                            'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
+                            'GPActiveSetSize',Settings.GPActiveSetSize,...
+                            'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
+                            'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet,...
+                            'InitialX',Prev_Data.InitialX,...
+                            'InitialObjective',Prev_Data.InitialObjective,...
+                            'InitialConstraintViolations',Prev_Data.InitialConstraintViolations,...
+                            'InitialErrorValues',Prev_Data.InitialErrorValues,...
+                            'InitialUserData',Prev_Data.InitialUserData,...
+                            'InitialObjectiveEvaluationTimes',Prev_Data.InitialObjectiveEvaluationTimes,...
+                            'InitialIterationTimes',Prev_Data.InitialIterationTimes);
+                    else
+                        results = bayesopt_priv(fun,params,'IsObjectiveDeterministic',Deterministic,...
+                            'ExplorationRatio',Settings.ExplorationRatio,'PlotFcn',plotopt,...
+                            'AcquisitionFunctionName',Settings.Acquisition_Function,'Verbose',1,...
+                            'UseParallel',Settings.Parallel_Bayesopt,'ParallelMethod','clipped-model-prediction',...
+                            'MaxObjectiveEvaluations',Settings.Max_Bayesian_Iterations,'NumSeedPoints',seed_points,...
+                            'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
+                            'GPActiveSetSize',Settings.GPActiveSetSize,...
+                            'KernelFunction',Settings.KernelFunction,'XConstraintFcn',constraint_fun,...
+                            'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
+                    end
+                case 'surrogateopt'
+                    if Settings.ShowPlots
+                        plotopt = 'surrogateoptplot';
+                    else
+                        plotopt = [];
+                    end
+                    % surrogateopt options
+                    options = optimoptions('surrogateopt','Display','iter',...
+                        'MaxFunctionEvaluations',Settings.Max_Bayesian_Iterations,...
+                        'MinSurrogatePoints',Settings.MinSurrogatePoints,...
+                        'MinSampleDistance',Settings.MinSampleDistance,...
+                        'PlotFcn',plotopt,...
+                        'UseParallel',Settings.Parallel_Bayesopt,...
+                        'CheckpointFile','intermediate_surrogate_opt.mat');
+
+                    ub = nan(1,length(params));
+                    lb = nan(1,length(params));
+                    for idx = 1:length(params)
+                        lb(idx) = params(idx).Range(1);
+                        ub(idx) = params(idx).Range(2);
+                    end
+                    [x0,fval,~,output,trials] = surrogateopt(fun,lb,ub,options);
+                    results.ObjectiveFcn = fun;
+                    results.XAtMinObjective = array2table(x0,'VariableNames',{params.Name});
+                    results.XTrace = array2table(trials.X,'VariableNames',{params.Name});
+                    results.NumObjectiveEvaluations = output.funccount;
+                    results.MinEstimatedObjective = fval;
+                    results.MinObjective = fval;
+            end
+            % Save results
+            save(Results_filename,'results')
+        end
+
+        %% Secondary optimization with different aqcuisition function focused on locally optimizing result
+        if strcmpi(Settings.initial_opt_type,'bayesopt') && strcmpi(Settings.second_opt_type,'bayesopt') && ~isfile('secondary_completed')
+            if Settings.ShowPlots
+                plotopt = 'all';
+            else
+                plotopt = [];
+            end
+
+            % Make file to signal that secondary optimization has already began
+            if ~isfile('secondary_started')
+                disp('Beginning Intermediate Optimization Step.')
+                fclose(fopen('secondary_started', 'w'));
+                BayesoptResults = results;
+            else
+                try
+                    dat = load(Intermediate_BO_file);
+                    BayesoptResults = dat.BayesoptResults;
+                catch
+                    % Catch corrupt files
+                    disp('Unable to load intermediate bayesian optimization data.')
+                    disp('Attempting to load backup step.')
+
                     try
-                        dat = load(Intermediate_Fullopt_file);
-                        intermediate_data = dat.intermediate_data;
-                        x0 = intermediate_data(end).x;    
-
-                        % Establish initial mesh size
-                        if isfield(intermediate_data(end).optimValues,'meshsize')
-                            init_meshsize = intermediate_data(end).optimValues.meshsize;
-                        else
-                            init_meshsize = 0.1;
-                        end
-
-                        current_iterations = length(intermediate_data);
-                        max_iter = Settings.Max_Local_Iterations - current_iterations;
+                        dat = load(Intermediate_BO_backup,'-mat');
+                        BayesoptResults = dat.BayesoptResults;
                     catch
-                        disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                        if isfile(Intermediate_Fullopt_file)
-                            delete(Intermediate_Fullopt_file);
+                        disp('Unable to load backup step of Bayesian Optimization.')
+                        disp('Restarting intermediate optimization from finished initial optimization.')
+                        if isfile(Intermediate_BO_file)
+                            delete(Intermediate_BO_file)
                         end
+                        if isfile(Intermediate_BO_backup)
+                            delete(Intermediate_BO_backup)
+                        end
+                        BayesoptResults = results;
+                    end
+                end
+            end
+
+            % Calculate remaining evaluations for secondary optimization
+            remaining_evals = Settings.Max_Secondary_Iterations ...
+                + Settings.Max_Bayesian_Iterations ...
+                + size(BayesoptResults.Options.InitialX,1) ...
+                - BayesoptResults.NumObjectiveEvaluations;
+
+            if remaining_evals > 0
+                if isfield(BayesoptResults.Options,'KernelFunction')
+                    results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
+                        'PlotFcn',plotopt,'ExplorationRatio',Settings.ExplorationRatio_Secondary,...
+                        'AcquisitionFunctionName',Settings.Secondary_Acquisition_Function,'Verbose',1,...
+                        'ParallelMethod','clipped-model-prediction',...
+                        'MaxObjectiveEvaluations',remaining_evals,...
+                        'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
+                        'GPActiveSetSize',Settings.GPActiveSetSize,...
+                        'KernelFunction',Settings.SecondaryKernelFunction,'XConstraintFcn',constraint_fun,...
+                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
+                else
+                    results = resume(BayesoptResults,'IsObjectiveDeterministic',Deterministic,...
+                        'PlotFcn',plotopt,'ExplorationRatio',Settings.ExplorationRatio_Secondary,...
+                        'AcquisitionFunctionName',Settings.Secondary_Acquisition_Function,'Verbose',1,...
+                        'ParallelMethod','clipped-model-prediction','MaxObjectiveEvaluations',remaining_evals,...
+                        'OutputFcn',@saveToFile,'SaveFileName',Intermediate_BO_file,...
+                        'GPActiveSetSize',Settings.GPActiveSetSize,...
+                        'XConstraintFcn',constraint_fun,...
+                        'NumCoupledConstraints',NumCC,'AreCoupledConstraintsDeterministic',CCDet);
+                end
+            else
+                results = BayesoptResults;
+            end
+
+            % Final GP fit - May take a while if FinalGPFitActiveSetSize is too large
+            if Settings.FinalGPFitActiveSetSize > Settings.GPActiveSetSize && ...
+                     results.NumObjectiveEvaluations > Settings.GPActiveSetSize
+                results = resume(results,'MaxObjectiveEvaluations',0,...
+                    'GPActiveSetSize',Settings.FinalGPFitActiveSetSize);
+            end
+
+            % overwrite results
+            save(Results_filename,'results')
+            fclose(fopen('secondary_completed', 'w'));
+            delete('secondary_started');
+        end
+
+        %% Perform final local optimization %%
+        if ~isfile(Final_point_filename)
+            switch Settings.final_opt_type
+                case 'fminsearch'
+                    % First, reset the parallelization scheme for fminsearch as it has no parallel option
+                    % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
+                    if Settings.Parallel_Bayesopt || Settings.Parallel_LiX_Minimizer
+                        Settings.Parallel_Bayesopt = false;
+                        Settings.Parallel_Struct_Min = false;
+                        Settings.Parallel_LiX_Minimizer = true;
+                        Settings.MinMDP.Parallel_Min = false;
+                    elseif Settings.Parallel_Struct_Min
+                        Settings.Parallel_Bayesopt = false;
+                        Settings.Parallel_Struct_Min = true;
+                        Settings.Parallel_LiX_Minimizer = false;
+                        Settings.MinMDP.Parallel_Min = true;
+                    end
+                    fun = @(x)LiX_Minimizer(Settings,x);
+
+                    % Options for the Nelder–Mead search
+                    optionsNM = optimset('Display','iter','MaxIter',Settings.Max_Local_Iterations,...
+                        'TolFun',Settings.Loss_Convergence,'TolX',Settings.Param_Convergence,...
+                        'OutputFcn',@outputFcn_secondary_opt);
+
+                    if continue_fullopt
                         try
-                            dat = load(Intermediate_Fullopt_backup,'-mat');
+                            dat = load(Intermediate_Fullopt_file);
+                            intermediate_data = dat.intermediate_data;
+                            x0 = intermediate_data(end).x;
+
+                            remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
+                            if remaining_evals <= 0
+                                remaining_evals = 1;
+                            end
+
+                            optionsNM.MaxIter = remaining_evals;
+                        catch
+                            disp('Unable to load local optimization checkpoint file, attempting to load backup.')
+                            if isfile(Intermediate_Fullopt_file)
+                                delete(Intermediate_Fullopt_file);
+                            end
+                            try
+
+                                dat = load(Intermediate_Fullopt_backup,'-mat');
+                                intermediate_data = dat.intermediate_data;
+                                x0 = intermediate_data(end).x;
+
+                                remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
+                                if remaining_evals <= 0
+                                    remaining_evals = 1;
+                                end
+
+                                optionsNM.MaxIter = remaining_evals;
+                            catch
+                                if isfile(Intermediate_Fullopt_backup)
+                                    delete(Intermediate_Fullopt_backup);
+                                end
+                                disp('Unable to load backup secondary optimization checkpoint file, restarting.')
+                                x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                            end
+                        end
+                    else
+                        x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                    end
+
+                    [full_opt_point,~,~,full_opt_results] = fminsearch(fun,x0,optionsNM);
+                case 'fminsearchbnd'
+
+                    % Constraints
+                    Ranges = [params.Range];
+                    lb = Ranges(1:2:end);
+                    ub = Ranges(2:2:end);
+
+                    % First, reset the parallelization scheme for fminsearchbnd as it has no parallel option
+                    % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
+                    if Settings.Parallel_Bayesopt || Settings.Parallel_LiX_Minimizer
+                        Settings.Parallel_Bayesopt = false;
+                        Settings.Parallel_Struct_Min = false;
+                        Settings.Parallel_LiX_Minimizer = true;
+                        Settings.MinMDP.Parallel_Min = false;
+                    elseif Settings.Parallel_Struct_Min
+                        Settings.Parallel_Bayesopt = false;
+                        Settings.Parallel_Struct_Min = true;
+                        Settings.Parallel_LiX_Minimizer = false;
+                        Settings.MinMDP.Parallel_Min = true;
+                    end
+                    fun = @(x)LiX_Minimizer(Settings,x);
+
+                    % Options for the Nelder–Mead search
+                    optionsNM = optimset('Display','iter','MaxIter',Settings.Max_Local_Iterations,...
+                        'MaxFunEvals',Settings.MaxFunEvals,'TolFun',Settings.Loss_Convergence,'TolX',Settings.Param_Convergence,...
+                        'OutputFcn',@outputFcn_secondary_opt);
+
+                    if continue_fullopt
+                        try
+                            dat = load(Intermediate_Fullopt_file);
+                            intermediate_data = dat.intermediate_data;
+                            x0 = intermediate_data(end).x;
+
+                            remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
+
+                            if remaining_evals <= 0
+                                remaining_evals = 1;
+                            end
+
+                            optionsNM.MaxIter = remaining_evals;
+                        catch
+                            disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                            if isfile(Intermediate_Fullopt_file)
+                                delete(Intermediate_Fullopt_file);
+                            end
+                            try
+                                dat = load(Intermediate_Fullopt_backup,'-mat');
+                                intermediate_data = dat.intermediate_data;
+                                x0 = intermediate_data(end).x;
+
+                                remaining_evals = Settings.Max_Local_Iterations - length(intermediate_data)+2;
+
+                                if remaining_evals <= 0
+                                    remaining_evals = 1;
+                                end
+
+                                optionsNM.MaxIter = remaining_evals;
+                            catch
+                                disp('Unable to load backup secondary optimization checkpoint file, starting new.')
+                                if isfile(Intermediate_Fullopt_backup)
+                                    delete(Intermediate_Fullopt_backup);
+                                end
+                                remaining_evals = Settings.Max_Local_Iterations;
+                                x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                            end
+                        end
+                    else
+                        remaining_evals = Settings.Max_Local_Iterations;
+                        x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                    end
+
+                    [full_opt_point,~,exitflag,full_opt_results] = fminsearchbnd(fun,x0,lb,ub,optionsNM);
+
+                    % Check to see if the max local iterations is exceeded
+                    if exitflag == 0 && remaining_evals > 1 && Settings.switch_final_opt % calculation exceeded number of allowed iterations
+                        % switch to nealder-mead simplex minimization
+                        disp('Swicthing local optimization to patternsearch')
+                        Settings.final_opt_type = 'patternsearch';
+
+                        % Overwrite the input file if it exists
+                        if batch_subm
+                            save(Input_Settings,'Settings','-mat')
+                        end
+
+                        Bayesian_Optimize_LiX_Parameters(Settings)
+                        return
+                    end
+                case 'patternsearch'
+
+                    %% Options for Patternsearch
+
+                    % Constraints
+                    Ranges = [params.Range];
+                    lb = Ranges(1:2:end);
+                    ub = Ranges(2:2:end);
+
+                    % Load previous data
+                    if continue_fullopt
+                        try
+                            dat = load(Intermediate_Fullopt_file);
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;    
 
@@ -730,165 +712,186 @@ function Bayesian_Optimize_LiX_Parameters(Input_Settings)
 
                             current_iterations = length(intermediate_data);
                             max_iter = Settings.Max_Local_Iterations - current_iterations;
-
                         catch
-                            disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                            if isfile(Intermediate_Fullopt_backup)
-                                delete(Intermediate_Fullopt_backup);
+                            disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                            if isfile(Intermediate_Fullopt_file)
+                                delete(Intermediate_Fullopt_file);
                             end
-                            x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-                            init_meshsize = 0.1;
-                            max_iter = Settings.Max_Local_Iterations;
+                            try
+                                dat = load(Intermediate_Fullopt_backup,'-mat');
+                                intermediate_data = dat.intermediate_data;
+                                x0 = intermediate_data(end).x;    
+
+                                % Establish initial mesh size
+                                if isfield(intermediate_data(end).optimValues,'meshsize')
+                                    init_meshsize = intermediate_data(end).optimValues.meshsize;
+                                else
+                                    init_meshsize = 0.1;
+                                end
+
+                                current_iterations = length(intermediate_data);
+                                max_iter = Settings.Max_Local_Iterations - current_iterations;
+
+                            catch
+                                disp('Unable to load backup secondary optimization checkpoint file, starting new.')
+                                if isfile(Intermediate_Fullopt_backup)
+                                    delete(Intermediate_Fullopt_backup);
+                                end
+                                x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                                init_meshsize = 0.1;
+                                max_iter = Settings.Max_Local_Iterations;
+                            end
                         end
+                    else
+                        x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                        init_meshsize = 0.1;
+                        max_iter = Settings.Max_Local_Iterations;
                     end
-                else
-                    x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-                    init_meshsize = 0.1;
-                    max_iter = Settings.Max_Local_Iterations;
-                end
 
-        %         optionsNM = optimset('Display','iter','MaxIter',50,'MaxFunEvals',Model.MaxFunEvals,...
-        %             'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence);
+            %         optionsNM = optimset('Display','iter','MaxIter',50,'MaxFunEvals',Model.MaxFunEvals,...
+            %             'TolFun',Model.Loss_Convergence,'TolX',Model.Param_Convergence);
 
-                if max_iter <= 0
-                    max_iter = 1;
-                end
+                    if max_iter <= 0
+                        max_iter = 1;
+                    end
 
-                if Settings.ShowPlots
-                    plotopt = 'psplotbestf';
-                else
-                    plotopt = [];
-                end
+                    if Settings.ShowPlots
+                        plotopt = 'psplotbestf';
+                    else
+                        plotopt = [];
+                    end
 
-                options = optimoptions(@patternsearch,'Display','iter','MaxIterations',max_iter,...
-                    'UseParallel',Settings.Parallel_Bayesopt,'UseVectorized',false,'PlotFcn',plotopt,...
-                    'InitialMeshSize',init_meshsize,'StepTolerance',Settings.Param_Convergence,'FunctionTolerance',Settings.Loss_Convergence,...
-                    'PollOrderAlgorithm','Success','Cache','On','UseCompletePoll',false,...
-                    'PollMethod','GPSPositiveBasis2N','MaxMeshSize',Inf,'MeshTolerance',1e-8,...
-                    'OutputFcn',@outputFcn_patternsearch_opt);%,'MaxFunctionEvaluations',Model.MaxFunEvals);
-        %             'SearchFcn',{@searchneldermead,1,optionsNM});
+                    options = optimoptions(@patternsearch,'Display','iter','MaxIterations',max_iter,...
+                        'UseParallel',Settings.Parallel_Bayesopt,'UseVectorized',false,'PlotFcn',plotopt,...
+                        'InitialMeshSize',init_meshsize,'StepTolerance',Settings.Param_Convergence,'FunctionTolerance',Settings.Loss_Convergence,...
+                        'PollOrderAlgorithm','Success','Cache','On','UseCompletePoll',false,...
+                        'PollMethod','GPSPositiveBasis2N','MaxMeshSize',Inf,'MeshTolerance',1e-8,...
+                        'OutputFcn',@outputFcn_patternsearch_opt);%,'MaxFunctionEvaluations',Model.MaxFunEvals);
+            %             'SearchFcn',{@searchneldermead,1,optionsNM});
 
-                [full_opt_point,~,~,full_opt_results] = patternsearch(fun,x0,[],[],[],[],lb,ub,[],options);
-                
-            case 'fmincon' % fmincon uses gradients!
+                    [full_opt_point,~,~,full_opt_results] = patternsearch(fun,x0,[],[],[],[],lb,ub,[],options);
 
-                % Constraints
-                Ranges = [params.Range];
-                lb = Ranges(1:2:end);
-                ub = Ranges(2:2:end);
+                case 'fmincon' % fmincon uses gradients!
 
-                % Load previous data
-                if continue_fullopt
-                    try
-                        dat = load(Intermediate_Fullopt_file);
-                        intermediate_data = dat.intermediate_data;
-                        x0 = intermediate_data(end).x;    
+                    % Constraints
+                    Ranges = [params.Range];
+                    lb = Ranges(1:2:end);
+                    ub = Ranges(2:2:end);
 
-                        current_iterations = length(intermediate_data);
-                        max_iter = Settings.Max_Local_Iterations - current_iterations;
-                    catch
-                        disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                        if isfile(Intermediate_Fullopt_file)
-                            delete(Intermediate_Fullopt_file);
-                        end
+                    % Load previous data
+                    if continue_fullopt
                         try
-                            dat = load(Intermediate_Fullopt_backup,'-mat');
+                            dat = load(Intermediate_Fullopt_file);
                             intermediate_data = dat.intermediate_data;
                             x0 = intermediate_data(end).x;    
-                            
+
                             current_iterations = length(intermediate_data);
                             max_iter = Settings.Max_Local_Iterations - current_iterations;
                         catch
+                            disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                            if isfile(Intermediate_Fullopt_file)
+                                delete(Intermediate_Fullopt_file);
+                            end
+                            try
+                                dat = load(Intermediate_Fullopt_backup,'-mat');
+                                intermediate_data = dat.intermediate_data;
+                                x0 = intermediate_data(end).x;    
+
+                                current_iterations = length(intermediate_data);
+                                max_iter = Settings.Max_Local_Iterations - current_iterations;
+                            catch
+                                disp('Unable to load backup secondary optimization checkpoint file, starting new.')
+                                if isfile(Intermediate_Fullopt_backup)
+                                    delete(Intermediate_Fullopt_backup);
+                                end
+                                x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                                max_iter = Settings.Max_Local_Iterations;
+                            end
+                        end
+                    else
+                        x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                        max_iter = Settings.Max_Local_Iterations;
+                    end
+
+                    if max_iter <= 0
+                        max_iter = 1;
+                    end
+
+                    % For unconstrained problem with fmincon, OptimalityTolerance is the max of the gradient
+                    options = optimoptions(@fmincon,'Display','iter','Algorithm','active-set',...
+                        'DiffMaxChange',1e-1,'OptimalityTolerance',1e-1,'UseParallel',Settings.Parallel_Bayesopt,...
+                        'MaxIterations',max_iter,'FiniteDifferenceStepSize',sqrt(eps),...
+                        'StepTolerance',Settings.Param_Convergence,'FunctionTolerance',Settings.Loss_Convergence,...
+                        'FiniteDifferenceType','forward','MaxFunctionEvaluations',Inf,...
+                        'OutputFcn',@outputFcn_secondary_opt);
+
+                    [full_opt_point,~,~,full_opt_results,~,~,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
+                case 'none' % if no final optimization is selected, I still want to output the best bayesian optimization result
+                    full_opt_results = struct;
+                    full_opt_results.iterations = 0;
+                    full_opt_results.funccount = 0;
+                    full_opt_results.algorithm = 'none';
+                    full_opt_results.message = 'Local optimization skipped. Results are for best global optimization point.';
+                    full_opt_point = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
+                otherwise
+                    error('Unknown final optimization scheme. Choose one of "fminsearch", "patternsearch", "fminsearchbnd", or "none"')
+            end
+
+            if ~Deterministic && ~strcmpi(Settings.final_opt_type,'none')
+                try
+                    dat = load(Intermediate_Fullopt_file).intermediate_data;
+                catch
+                    disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
+                    if isfile(Intermediate_Fullopt_file)
+                        delete(Intermediate_Fullopt_file);
+                    end
+                        try
+                            dat = load(Intermediate_Fullopt_backup,'-mat');
+                        catch
                             disp('Unable to load backup secondary optimization checkpoint file, starting new.')
                             if isfile(Intermediate_Fullopt_backup)
                                 delete(Intermediate_Fullopt_backup);
                             end
-                            x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-                            max_iter = Settings.Max_Local_Iterations;
+                            Bayesian_Optimize_LiX_Parameters(Input_Settings);
+                            return
                         end
-                    end
-                else
-                    x0 = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-                    max_iter = Settings.Max_Local_Iterations;
                 end
-
-                if max_iter <= 0
-                    max_iter = 1;
+                fvals = zeros(1,length(dat));
+                for idx = 1:length(dat)
+                    fvals(idx) = dat(idx).optimValues.fval;
                 end
+                [~,minidx] = min(fvals);
+                full_opt_point = dat(minidx).x;
+            end
 
-                % For unconstrained problem with fmincon, OptimalityTolerance is the max of the gradient
-                options = optimoptions(@fmincon,'Display','iter','Algorithm','active-set',...
-                    'DiffMaxChange',1e-1,'OptimalityTolerance',1e-1,'UseParallel',Settings.Parallel_Bayesopt,...
-                    'MaxIterations',max_iter,'FiniteDifferenceStepSize',sqrt(eps),...
-                    'StepTolerance',Settings.Param_Convergence,'FunctionTolerance',Settings.Loss_Convergence,...
-                    'FiniteDifferenceType','forward','MaxFunctionEvaluations',Inf,...
-                    'OutputFcn',@outputFcn_secondary_opt);
-
-                [full_opt_point,~,~,full_opt_results,~,~,~] = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
-            case 'none' % if no final optimization is selected, I still want to output the best bayesian optimization result
-                full_opt_results = struct;
-                full_opt_results.iterations = 0;
-                full_opt_results.funccount = 0;
-                full_opt_results.algorithm = 'none';
-                full_opt_results.message = 'Local optimization skipped. Results are for best global optimization point.';
-                full_opt_point = table2array(bestPoint(results,'Criterion',Settings.BestPointCriterion));
-            otherwise
-                error('Unknown final optimization scheme. Choose one of "fminsearch", "patternsearch", "fminsearchbnd", or "none"')
-        end
-        
-        if ~Deterministic && ~strcmpi(Settings.final_opt_type,'none')
+            % Save a structure containing some calculation properties
+            Calculation_properties.Salt = Settings.Salt;
+            Calculation_properties.Theory = Settings.Theory;
+            Calculation_properties.Fix_Charge = Settings.Fix_Charge;
+            Calculation_properties.Additivity = Settings.Additivity;
+            Calculation_properties.Additional_MM_Disp = Settings.Additional_MM_Disp;
+            Calculation_properties.Additional_GAdjust = Settings.Additional_GAdjust;
+            Calculation_properties.SigmaEpsilon = Settings.SigmaEpsilon;
+            save(Final_point_filename,'full_opt_results','full_opt_point',...
+                'Calculation_properties');
+        else
             try
-                dat = load(Intermediate_Fullopt_file).intermediate_data;
+                dat = load(Final_point_filename);
             catch
-                disp('Unable to load secondary optimization checkpoint file, attempting to load backup.')
-                if isfile(Intermediate_Fullopt_file)
-                    delete(Intermediate_Fullopt_file);
+                disp('Unable to load final point data file, continuing final optimization.')
+                if isfile(Final_point_filename)
+                    delete(Final_point_filename)
                 end
-                    try
-                        dat = load(Intermediate_Fullopt_backup,'-mat');
-                    catch
-                        disp('Unable to load backup secondary optimization checkpoint file, starting new.')
-                        if isfile(Intermediate_Fullopt_backup)
-                            delete(Intermediate_Fullopt_backup);
-                        end
-                        Bayesian_Optimize_LiX_Parameters(Input_Settings);
-                        return
-                    end
+                Bayesian_Optimize_LiX_Parameters(Input_Settings)
+                return
             end
-            fvals = zeros(1,length(dat));
-            for idx = 1:length(dat)
-                fvals(idx) = dat(idx).optimValues.fval;
-            end
-            [~,minidx] = min(fvals);
-            full_opt_point = dat(minidx).x;
+            Calculation_properties = dat.Calculation_properties;
+            full_opt_results = dat.full_opt_results;
+            full_opt_point = dat.full_opt_point;
         end
-        
-        % Save a structure containing some calculation properties
-        Calculation_properties.Salt = Settings.Salt;
-        Calculation_properties.Theory = Settings.Theory;
-        Calculation_properties.Fix_Charge = Settings.Fix_Charge;
-        Calculation_properties.Additivity = Settings.Additivity;
-        Calculation_properties.Additional_MM_Disp = Settings.Additional_MM_Disp;
-        Calculation_properties.Additional_GAdjust = Settings.Additional_GAdjust;
-        Calculation_properties.SigmaEpsilon = Settings.SigmaEpsilon;
-        save(Final_point_filename,'full_opt_results','full_opt_point',...
-            'Calculation_properties');
     else
-        try
-            dat = load(Final_point_filename);
-        catch
-            disp('Unable to load final point data file, continuing final optimization.')
-            if isfile(Final_point_filename)
-                delete(Final_point_filename)
-            end
-            Bayesian_Optimize_LiX_Parameters(Input_Settings)
-            return
-        end
-        Calculation_properties = dat.Calculation_properties;
-        full_opt_results = dat.full_opt_results;
-        full_opt_point = dat.full_opt_point;
+        full_opt_point = [];
     end
-    
     %% Final test of parameters on all structures for output
     % If using Parallel_Bayesopt, change it to Parallel_LiX_Minimizer
     if Settings.Parallel_Bayesopt || Settings.Parallel_LiX_Minimizer
