@@ -23,6 +23,12 @@ PotSettings = Initialize_MD_Settings;
 PotSettings.Salt = Settings.Salt;
 [JC_MX,JC_MM,JC_XX] = JC_Potential_Parameters(PotSettings);
 
+if isfield(Settings,'Fix_Li_params') && Settings.Fix_Li_params
+    Param.sigma_MM = Settings.S.S.MM;
+    Param.epsilon_MM = Settings.S.E.MM;
+    Param.gamma_MM = Settings.S.G.MM;
+end
+
 % Potential Scaling
 switch Settings.Theory
 case 'TF'
